@@ -10,13 +10,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `provinces`
+-- Table structure for table `m_provinces`
 --
 
-DROP TABLE IF EXISTS `provinces`;
+DROP TABLE IF EXISTS `m_provinces`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `provinces` (
+CREATE TABLE IF NOT EXISTS `m_provinces` (
   `id` char(2) COLLATE utf8_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
@@ -24,63 +24,63 @@ CREATE TABLE IF NOT EXISTS `provinces` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `regencies`
+-- Table structure for table `m_regencies`
 --
 
-DROP TABLE IF EXISTS `regencies`;
+DROP TABLE IF EXISTS `m_regencies`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `regencies` (
+CREATE TABLE IF NOT EXISTS `m_regencies` (
   `id` char(4) COLLATE utf8_unicode_ci NOT NULL,
   `province_id` char(2) COLLATE utf8_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `regencies_province_id_index` (`province_id`),
-  CONSTRAINT `regencies_province_id_foreign` FOREIGN KEY (`province_id`) REFERENCES `provinces` (`id`)
+  CONSTRAINT `regencies_province_id_foreign` FOREIGN KEY (`province_id`) REFERENCES `m_provinces` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `districts`
+-- Table structure for table `m_districts`
 --
 
-DROP TABLE IF EXISTS `districts`;
+DROP TABLE IF EXISTS `m_districts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `districts` (
+CREATE TABLE IF NOT EXISTS `m_districts` (
   `id` char(7) COLLATE utf8_unicode_ci NOT NULL,
   `regency_id` char(4) COLLATE utf8_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `districts_id_index` (`regency_id`),
-  CONSTRAINT `districts_regency_id_foreign` FOREIGN KEY (`regency_id`) REFERENCES `regencies` (`id`)
+  CONSTRAINT `districts_regency_id_foreign` FOREIGN KEY (`regency_id`) REFERENCES `m_regencies` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `villages`
+-- Table structure for table `m_villages`
 --
 
-DROP TABLE IF EXISTS `villages`;
+DROP TABLE IF EXISTS `m_villages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `villages` (
+CREATE TABLE IF NOT EXISTS `m_villages` (
   `id` char(10) COLLATE utf8_unicode_ci NOT NULL,
   `district_id` char(7) COLLATE utf8_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `villages_district_id_index` (`district_id`),
-  CONSTRAINT `villages_district_id_foreign` FOREIGN KEY (`district_id`) REFERENCES `districts` (`id`)
+  CONSTRAINT `villages_district_id_foreign` FOREIGN KEY (`district_id`) REFERENCES `m_districts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 --
--- Dumping data for table `provinces`
+-- Dumping data for table `m_provinces`
 --
 
-LOCK TABLES `provinces` WRITE;
-/*!40000 ALTER TABLE `provinces` DISABLE KEYS */;
-INSERT INTO `provinces` VALUES
+LOCK TABLES `m_provinces` WRITE;
+/*!40000 ALTER TABLE `m_provinces` DISABLE KEYS */;
+INSERT INTO `m_provinces` VALUES
   ('11', 'ACEH'),
   ('12', 'SUMATERA UTARA'),
   ('13', 'SUMATERA BARAT'),
@@ -115,15 +115,15 @@ INSERT INTO `provinces` VALUES
   ('82', 'MALUKU UTARA'),
   ('91', 'PAPUA BARAT'),
   ('94', 'PAPUA');
-/*!40000 ALTER TABLE `provinces` ENABLE KEYS */;
+/*!40000 ALTER TABLE `m_provinces` ENABLE KEYS */;
 UNLOCK TABLES;
 --
--- Dumping data for table `regencies`
+-- Dumping data for table `m_regencies`
 --
 
-LOCK TABLES `regencies` WRITE;
-/*!40000 ALTER TABLE `regencies` DISABLE KEYS */;
-INSERT INTO `regencies` VALUES
+LOCK TABLES `m_regencies` WRITE;
+/*!40000 ALTER TABLE `m_regencies` DISABLE KEYS */;
+INSERT INTO `m_regencies` VALUES
   ('1101', '11', 'KABUPATEN SIMEULUE'),
   ('1102', '11', 'KABUPATEN ACEH SINGKIL'),
   ('1103', '11', 'KABUPATEN ACEH SELATAN'),
@@ -174,7 +174,7 @@ INSERT INTO `regencies` VALUES
   ('1225', '12', 'KABUPATEN NIAS BARAT'),
   ('1271', '12', 'KOTA SIBOLGA'),
   ('1272', '12', 'KOTA TANJUNG BALAI');
-INSERT INTO `regencies` VALUES
+INSERT INTO `m_regencies` VALUES
   ('1273', '12', 'KOTA PEMATANG SIANTAR'),
   ('1274', '12', 'KOTA TEBING TINGGI'),
   ('1275', '12', 'KOTA MEDAN'),
@@ -225,7 +225,7 @@ INSERT INTO `regencies` VALUES
   ('1572', '15', 'KOTA SUNGAI PENUH'),
   ('1601', '16', 'KABUPATEN OGAN KOMERING ULU'),
   ('1602', '16', 'KABUPATEN OGAN KOMERING ILIR');
-INSERT INTO `regencies` VALUES
+INSERT INTO `m_regencies` VALUES
   ('1603', '16', 'KABUPATEN MUARA ENIM'),
   ('1604', '16', 'KABUPATEN LAHAT'),
   ('1605', '16', 'KABUPATEN MUSI RAWAS'),
@@ -276,7 +276,7 @@ INSERT INTO `regencies` VALUES
   ('2101', '21', 'KABUPATEN KARIMUN'),
   ('2102', '21', 'KABUPATEN BINTAN'),
   ('2103', '21', 'KABUPATEN NATUNA');
-INSERT INTO `regencies` VALUES
+INSERT INTO `m_regencies` VALUES
   ('2104', '21', 'KABUPATEN LINGGA'),
   ('2105', '21', 'KABUPATEN KEPULAUAN ANAMBAS'),
   ('2171', '21', 'KOTA B A T A M'),
@@ -327,7 +327,7 @@ INSERT INTO `regencies` VALUES
   ('3311', '33', 'KABUPATEN SUKOHARJO'),
   ('3312', '33', 'KABUPATEN WONOGIRI'),
   ('3313', '33', 'KABUPATEN KARANGANYAR');
-INSERT INTO `regencies` VALUES
+INSERT INTO `m_regencies` VALUES
   ('3314', '33', 'KABUPATEN SRAGEN'),
   ('3315', '33', 'KABUPATEN GROBOGAN'),
   ('3316', '33', 'KABUPATEN BLORA'),
@@ -378,7 +378,7 @@ INSERT INTO `regencies` VALUES
   ('3521', '35', 'KABUPATEN NGAWI'),
   ('3522', '35', 'KABUPATEN BOJONEGORO'),
   ('3523', '35', 'KABUPATEN TUBAN');
-INSERT INTO `regencies` VALUES
+INSERT INTO `m_regencies` VALUES
   ('3524', '35', 'KABUPATEN LAMONGAN'),
   ('3525', '35', 'KABUPATEN GRESIK'),
   ('3526', '35', 'KABUPATEN BANGKALAN'),
@@ -429,7 +429,7 @@ INSERT INTO `regencies` VALUES
   ('5306', '53', 'KABUPATEN BELU'),
   ('5307', '53', 'KABUPATEN ALOR'),
   ('5308', '53', 'KABUPATEN LEMBATA');
-INSERT INTO `regencies` VALUES
+INSERT INTO `m_regencies` VALUES
   ('5309', '53', 'KABUPATEN FLORES TIMUR'),
   ('5310', '53', 'KABUPATEN SIKKA'),
   ('5311', '53', 'KABUPATEN ENDE'),
@@ -480,7 +480,7 @@ INSERT INTO `regencies` VALUES
   ('6306', '63', 'KABUPATEN HULU SUNGAI SELATAN'),
   ('6307', '63', 'KABUPATEN HULU SUNGAI TENGAH'),
   ('6308', '63', 'KABUPATEN HULU SUNGAI UTARA');
-INSERT INTO `regencies` VALUES
+INSERT INTO `m_regencies` VALUES
   ('6309', '63', 'KABUPATEN TABALONG'),
   ('6310', '63', 'KABUPATEN TANAH BUMBU'),
   ('6311', '63', 'KABUPATEN BALANGAN'),
@@ -531,7 +531,7 @@ INSERT INTO `regencies` VALUES
   ('7271', '72', 'KOTA PALU'),
   ('7301', '73', 'KABUPATEN KEPULAUAN SELAYAR'),
   ('7302', '73', 'KABUPATEN BULUKUMBA');
-INSERT INTO `regencies` VALUES
+INSERT INTO `m_regencies` VALUES
   ('7303', '73', 'KABUPATEN BANTAENG'),
   ('7304', '73', 'KABUPATEN JENEPONTO'),
   ('7305', '73', 'KABUPATEN TAKALAR'),
@@ -582,7 +582,7 @@ INSERT INTO `regencies` VALUES
   ('7603', '76', 'KABUPATEN MAMASA'),
   ('7604', '76', 'KABUPATEN MAMUJU'),
   ('7605', '76', 'KABUPATEN MAMUJU UTARA');
-INSERT INTO `regencies` VALUES
+INSERT INTO `m_regencies` VALUES
   ('7606', '76', 'KABUPATEN MAMUJU TENGAH'),
   ('8101', '81', 'KABUPATEN MALUKU TENGGARA BARAT'),
   ('8102', '81', 'KABUPATEN MALUKU TENGGARA'),
@@ -633,7 +633,7 @@ INSERT INTO `regencies` VALUES
   ('9416', '94', 'KABUPATEN YAHUKIMO'),
   ('9417', '94', 'KABUPATEN PEGUNUNGAN BINTANG'),
   ('9418', '94', 'KABUPATEN TOLIKARA');
-INSERT INTO `regencies` VALUES
+INSERT INTO `m_regencies` VALUES
   ('9419', '94', 'KABUPATEN SARMI'),
   ('9420', '94', 'KABUPATEN KEEROM'),
   ('9426', '94', 'KABUPATEN WAROPEN'),
@@ -648,15 +648,15 @@ INSERT INTO `regencies` VALUES
   ('9435', '94', 'KABUPATEN INTAN JAYA'),
   ('9436', '94', 'KABUPATEN DEIYAI'),
   ('9471', '94', 'KOTA JAYAPURA');
-/*!40000 ALTER TABLE `regencies` ENABLE KEYS */;
+/*!40000 ALTER TABLE `m_regencies` ENABLE KEYS */;
 UNLOCK TABLES;
 --
--- Dumping data for table `districts`
+-- Dumping data for table `m_districts`
 --
 
-LOCK TABLES `districts` WRITE;
-/*!40000 ALTER TABLE `districts` DISABLE KEYS */;
-INSERT INTO `districts` VALUES
+LOCK TABLES `m_districts` WRITE;
+/*!40000 ALTER TABLE `m_districts` DISABLE KEYS */;
+INSERT INTO `m_districts` VALUES
   ('1101010', '1101', 'TEUPAH SELATAN'),
   ('1101020', '1101', 'SIMEULUE TIMUR'),
   ('1101021', '1101', 'TEUPAH BARAT'),
@@ -707,7 +707,7 @@ INSERT INTO `districts` VALUES
   ('1104031', '1104', 'BUKIT TUSAM'),
   ('1104032', '1104', 'LAWE SUMUR'),
   ('1104040', '1104', 'BABUSSALAM');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1104041', '1104', 'LAWE BULAN'),
   ('1104050', '1104', 'BADAR'),
   ('1104051', '1104', 'DARUL HASANAH'),
@@ -758,7 +758,7 @@ INSERT INTO `districts` VALUES
   ('1107070', '1107', 'WOYLA'),
   ('1107071', '1107', 'WOYLA BARAT'),
   ('1107072', '1107', 'WOYLA TIMUR');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1107080', '1107', 'KAWAY XVI'),
   ('1107081', '1107', 'MEUREUBO'),
   ('1107082', '1107', 'PANTAI CEUREMEN'),
@@ -809,7 +809,7 @@ INSERT INTO `districts` VALUES
   ('1109200', '1109', 'KOTA SIGLI'),
   ('1109210', '1109', 'PIDIE'),
   ('1109220', '1109', 'BATEE');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1109230', '1109', 'MUARA TIGA'),
   ('1110010', '1110', 'SAMALANGA'),
   ('1110011', '1110', 'SIMPANG MAMPLAM'),
@@ -860,7 +860,7 @@ INSERT INTO `districts` VALUES
   ('1112020', '1112', 'TANGAN-TANGAN'),
   ('1112021', '1112', 'SETIA'),
   ('1112030', '1112', 'BLANG PIDIE');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1112031', '1112', 'JEUMPA'),
   ('1112040', '1112', 'SUSOH'),
   ('1112050', '1112', 'KUALA BATEE'),
@@ -911,7 +911,7 @@ INSERT INTO `districts` VALUES
   ('1117011', '1117', 'GAJAH PUTIH'),
   ('1117020', '1117', 'PINTU RIME GAYO'),
   ('1117030', '1117', 'BUKIT');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1117040', '1117', 'WIH PESAM'),
   ('1117050', '1117', 'BANDAR'),
   ('1117051', '1117', 'BENER KELIPAH'),
@@ -962,7 +962,7 @@ INSERT INTO `districts` VALUES
   ('1201131', '1201', 'HILI SERANGKAI'),
   ('1201132', '1201', 'BOTOMUZOI'),
   ('1202010', '1202', 'BATAHAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1202011', '1202', 'SINUNUKAN'),
   ('1202020', '1202', 'BATANG NATAL'),
   ('1202021', '1202', 'LINGGA BAYU'),
@@ -1013,7 +1013,7 @@ INSERT INTO `districts` VALUES
   ('1204060', '1204', 'SORKAM'),
   ('1204061', '1204', 'SORKAM BARAT'),
   ('1204062', '1204', 'PASARIBU TOBING');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1204070', '1204', 'BARUS'),
   ('1204071', '1204', 'SOSOR GADONG'),
   ('1204072', '1204', 'ANDAM DEWI'),
@@ -1064,7 +1064,7 @@ INSERT INTO `districts` VALUES
   ('1208020', '1208', 'BANDAR PULAU'),
   ('1208021', '1208', 'AEK SONGSONGAN'),
   ('1208022', '1208', 'RAHUNING');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1208030', '1208', 'PULAU RAKYAT'),
   ('1208031', '1208', 'AEK KUASAN'),
   ('1208032', '1208', 'AEK LEDONG'),
@@ -1115,7 +1115,7 @@ INSERT INTO `districts` VALUES
   ('1209181', '1209', 'BANDAR HULUAN'),
   ('1209190', '1209', 'BANDAR'),
   ('1209191', '1209', 'BANDAR MASILAM');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1209200', '1209', 'BOSAR MALIGAS'),
   ('1209210', '1209', 'UJUNG PADANG'),
   ('1210030', '1210', 'SIDIKALANG'),
@@ -1166,7 +1166,7 @@ INSERT INTO `districts` VALUES
   ('1212230', '1212', 'SUNGGAL'),
   ('1212240', '1212', 'HAMPARAN PERAK'),
   ('1212250', '1212', 'LABUHAN DELI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1212260', '1212', 'PERCUT SEI TUAN'),
   ('1212270', '1212', 'BATANG KUIS'),
   ('1212280', '1212', 'PANTAI LABU'),
@@ -1217,7 +1217,7 @@ INSERT INTO `districts` VALUES
   ('1214051', '1214', 'SIDUAORI'),
   ('1214052', '1214', 'SOMAMBAWA'),
   ('1214060', '1214', 'GOMO');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1214061', '1214', 'SUSUA'),
   ('1214062', '1214', 'MAZO'),
   ('1214063', '1214', 'UMBUNASI'),
@@ -1268,7 +1268,7 @@ INSERT INTO `districts` VALUES
   ('1218040', '1218', 'DOLOK MERAWAN'),
   ('1218050', '1218', 'TEBINGTINGGI'),
   ('1218051', '1218', 'TEBING SYAHBANDAR');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1218060', '1218', 'BANDAR KHALIPAH'),
   ('1218070', '1218', 'TANJUNG BERINGIN'),
   ('1218080', '1218', 'SEI RAMPAH'),
@@ -1319,7 +1319,7 @@ INSERT INTO `districts` VALUES
   ('1222040', '1222', 'SILANGKITANG'),
   ('1222050', '1222', 'KAMPUNG RAKYAT'),
   ('1223010', '1223', 'NA IX-X');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1223020', '1223', 'MARBAU'),
   ('1223030', '1223', 'AEK KUO'),
   ('1223040', '1223', 'AEK NATAS'),
@@ -1370,7 +1370,7 @@ INSERT INTO `districts` VALUES
   ('1274021', '1274', 'BAJENIS'),
   ('1274030', '1274', 'PADANG HILIR'),
   ('1275010', '1275', 'MEDAN TUNTUNGAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1275020', '1275', 'MEDAN JOHOR'),
   ('1275030', '1275', 'MEDAN AMPLAS'),
   ('1275040', '1275', 'MEDAN DENAI'),
@@ -1421,7 +1421,7 @@ INSERT INTO `districts` VALUES
   ('1302011', '1302', 'SILAUT'),
   ('1302012', '1302', 'LUNANG'),
   ('1302020', '1302', 'BASA AMPEK BALAI TAPAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1302021', '1302', 'RANAH AMPEK HULU TAPAN'),
   ('1302030', '1302', 'PANCUNG SOAL'),
   ('1302031', '1302', 'AIRPURA'),
@@ -1472,7 +1472,7 @@ INSERT INTO `districts` VALUES
   ('1305111', '1305', 'TANJUNG BARU'),
   ('1306010', '1306', 'BATANG ANAI'),
   ('1306020', '1306', 'LUBUK ALUNG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1306021', '1306', 'SINTUK TOBOH GADANG'),
   ('1306030', '1306', 'ULAKAN TAPAKIS'),
   ('1306040', '1306', 'NAN SABARIS'),
@@ -1523,7 +1523,7 @@ INSERT INTO `districts` VALUES
   ('1309080', '1309', 'LUBUK SIKAPING'),
   ('1309100', '1309', 'DUA KOTO'),
   ('1309110', '1309', 'PANTI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1309111', '1309', 'PADANG GELUGUR'),
   ('1309121', '1309', 'RAO'),
   ('1309122', '1309', 'MAPAT TUNGGUL'),
@@ -1574,7 +1574,7 @@ INSERT INTO `districts` VALUES
   ('1372020', '1372', 'TANJUNG HARAPAN'),
   ('1373010', '1373', 'SILUNGKANG'),
   ('1373020', '1373', 'LEMBAH SEGAR');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1373030', '1373', 'BARANGIN'),
   ('1373040', '1373', 'TALAWI'),
   ('1374010', '1374', 'PADANG PANJANG BARAT'),
@@ -1625,7 +1625,7 @@ INSERT INTO `districts` VALUES
   ('1403020', '1403', 'RETEH'),
   ('1403021', '1403', 'SUNGAI BATANG'),
   ('1403030', '1403', 'ENOK');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1403040', '1403', 'TANAH MERAH'),
   ('1403050', '1403', 'KUALA INDRAGIRI'),
   ('1403051', '1403', 'CONCONG'),
@@ -1676,7 +1676,7 @@ INSERT INTO `districts` VALUES
   ('1406021', '1406', 'KOTO KAMPAR HULU'),
   ('1406030', '1406', 'KUOK'),
   ('1406031', '1406', 'SALO');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1406040', '1406', 'TAPUNG'),
   ('1406041', '1406', 'TAPUNG HULU'),
   ('1406042', '1406', 'TAPUNG HILIR'),
@@ -1727,7 +1727,7 @@ INSERT INTO `districts` VALUES
   ('1409023', '1409', 'BALAI JAYA'),
   ('1409030', '1409', 'KUBU'),
   ('1409031', '1409', 'PASIR LIMAU KAPAS');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1409032', '1409', 'KUBU BABUSSALAM'),
   ('1409040', '1409', 'BANGKO'),
   ('1409041', '1409', 'SINABOI'),
@@ -1778,7 +1778,7 @@ INSERT INTO `districts` VALUES
   ('1501082', '1501', 'SIULAK MUKAI'),
   ('1501090', '1501', 'KAYU ARO'),
   ('1501091', '1501', 'GUNUNG TUJUH');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1501092', '1501', 'KAYU ARO BARAT'),
   ('1502010', '1502', 'JANGKAT'),
   ('1502011', '1502', 'SUNGAI TENANG'),
@@ -1829,7 +1829,7 @@ INSERT INTO `districts` VALUES
   ('1505020', '1505', 'KUMPEH ULU'),
   ('1505021', '1505', 'SUNGAI GELAM'),
   ('1505030', '1505', 'KUMPEH');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1505040', '1505', 'MARO SEBO'),
   ('1505041', '1505', 'TAMAN RAJO'),
   ('1505050', '1505', 'JAMBI LUAR KOTA'),
@@ -1880,7 +1880,7 @@ INSERT INTO `districts` VALUES
   ('1509030', '1509', 'RANTAU PANDAN'),
   ('1509031', '1509', 'MUKO-MUKO BATHIN VII'),
   ('1509032', '1509', 'BATHIN III ULU');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1509040', '1509', 'TANAH SEPENGGAL'),
   ('1509041', '1509', 'TANAH SEPENGGAL LINTAS'),
   ('1509050', '1509', 'TANAH TUMBUH'),
@@ -1931,7 +1931,7 @@ INSERT INTO `districts` VALUES
   ('1602040', '1602', 'PEDAMARAN'),
   ('1602041', '1602', 'PEDAMARAN TIMUR'),
   ('1602050', '1602', 'TANJUNG LUBUK');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1602051', '1602', 'TELUK GELAM'),
   ('1602060', '1602', 'KOTA KAYU AGUNG'),
   ('1602120', '1602', 'SIRAH PULAU PADANG'),
@@ -1982,7 +1982,7 @@ INSERT INTO `districts` VALUES
   ('1604123', '1604', 'LAHAT SELATAN'),
   ('1604131', '1604', 'MERAPI BARAT'),
   ('1604132', '1604', 'MERAPI TIMUR');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1604133', '1604', 'MERAPI SELATAN'),
   ('1605030', '1605', 'SUKU TENGAH LAKITAN ULU'),
   ('1605031', '1605', 'SELANGIT'),
@@ -2033,7 +2033,7 @@ INSERT INTO `districts` VALUES
   ('1607111', '1607', 'SUMBER MARGA TELANG'),
   ('1608010', '1608', 'MEKAKAU ILIR'),
   ('1608020', '1608', 'BANDING AGUNG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1608021', '1608', 'WARKUK RANAU SELATAN'),
   ('1608022', '1608', 'BUAY PEMATANG RIBU RANAU TENGAH'),
   ('1608030', '1608', 'BUAY PEMACA'),
@@ -2084,7 +2084,7 @@ INSERT INTO `districts` VALUES
   ('1610050', '1610', 'PEMULUTAN'),
   ('1610051', '1610', 'PEMULUTAN SELATAN'),
   ('1610052', '1610', 'PEMULUTAN BARAT');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1610060', '1610', 'INDRALAYA'),
   ('1610061', '1610', 'INDRALAYA UTARA'),
   ('1610062', '1610', 'INDRALAYA SELATAN'),
@@ -2135,7 +2135,7 @@ INSERT INTO `districts` VALUES
   ('1672031', '1672', 'PRABUMULIH UTARA'),
   ('1672040', '1672', 'CAMBAI'),
   ('1673010', '1673', 'DEMPO SELATAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1673011', '1673', 'DEMPO TENGAH'),
   ('1673020', '1673', 'DEMPO UTARA'),
   ('1673030', '1673', 'PAGAR ALAM SELATAN'),
@@ -2186,7 +2186,7 @@ INSERT INTO `districts` VALUES
   ('1703071', '1703', 'BATIK NAU'),
   ('1703072', '1703', 'GIRI MULYA'),
   ('1703073', '1703', 'AIR PADANG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1703080', '1703', 'PADANG JAYA'),
   ('1703090', '1703', 'KETAHUN'),
   ('1703091', '1703', 'NAPAL PUTIH'),
@@ -2237,7 +2237,7 @@ INSERT INTO `districts` VALUES
   ('1706042', '1706', 'XIV KOTO'),
   ('1706050', '1706', 'LUBUK PINANG'),
   ('1706051', '1706', 'AIR MANJUNTO');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1706052', '1706', 'V KOTO'),
   ('1707010', '1707', 'RIMBO PENGADANG'),
   ('1707011', '1707', 'TOPOS'),
@@ -2288,7 +2288,7 @@ INSERT INTO `districts` VALUES
   ('1801054', '1801', 'PAGAR DEWA'),
   ('1801055', '1801', 'BATU KETULIS'),
   ('1801056', '1801', 'BANDAR NEGERI SUOH');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1801060', '1801', 'SUMBER JAYA'),
   ('1801061', '1801', 'WAY TENONG'),
   ('1801062', '1801', 'GEDUNG SURIAN'),
@@ -2339,7 +2339,7 @@ INSERT INTO `districts` VALUES
   ('1804060', '1804', 'JABUNG'),
   ('1804061', '1804', 'PASIR SAKTI'),
   ('1804062', '1804', 'WAWAY KARYA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1804063', '1804', 'MARGA SEKAMPUNG'),
   ('1804070', '1804', 'LABUHAN MARINGGAI'),
   ('1804071', '1804', 'MATARAM BARU'),
@@ -2390,7 +2390,7 @@ INSERT INTO `districts` VALUES
   ('1806030', '1806', 'ABUNG BARAT'),
   ('1806031', '1806', 'ABUNG TENGAH'),
   ('1806032', '1806', 'ABUNG  KUNANG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1806033', '1806', 'ABUNG PEKURUN'),
   ('1806040', '1806', 'KOTABUMI'),
   ('1806041', '1806', 'KOTABUMI UTARA'),
@@ -2441,7 +2441,7 @@ INSERT INTO `districts` VALUES
   ('1809011', '1809', 'MARGA PUNDUH'),
   ('1809020', '1809', 'PADANG CERMIN'),
   ('1809021', '1809', 'TELUK PANDAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1809022', '1809', 'WAY RATAI'),
   ('1809030', '1809', 'KEDONDONG'),
   ('1809031', '1809', 'WAY KHILAU'),
@@ -2492,7 +2492,7 @@ INSERT INTO `districts` VALUES
   ('1871030', '1871', 'PANJANG'),
   ('1871040', '1871', 'TANJUNG KARANG TIMUR'),
   ('1871041', '1871', 'KEDAMAIAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1871050', '1871', 'TELUK BETUNG UTARA'),
   ('1871060', '1871', 'TANJUNG KARANG PUSAT'),
   ('1871061', '1871', 'ENGGAL'),
@@ -2543,7 +2543,7 @@ INSERT INTO `districts` VALUES
   ('1905031', '1905', 'TUKAK SADAI'),
   ('1905040', '1905', 'AIR GEGAS'),
   ('1905050', '1905', 'LEPAR PONGOK');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('1905051', '1905', 'KEPULAUAN PONGOK'),
   ('1906010', '1906', 'DENDANG'),
   ('1906011', '1906', 'SIMPANG PESAK'),
@@ -2594,7 +2594,7 @@ INSERT INTO `districts` VALUES
   ('2103052', '2103', 'BUNGURAN TENGAH'),
   ('2103053', '2103', 'BUNGURAN SELATAN'),
   ('2103060', '2103', 'SERASAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('2103061', '2103', 'SUBI'),
   ('2103062', '2103', 'SERASAN TIMUR'),
   ('2104010', '2104', 'SINGKEP BARAT'),
@@ -2645,7 +2645,7 @@ INSERT INTO `districts` VALUES
   ('3172010', '3172', 'PASAR REBO'),
   ('3172020', '3172', 'CIRACAS'),
   ('3172030', '3172', 'CIPAYUNG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3172040', '3172', 'MAKASAR'),
   ('3172050', '3172', 'KRAMAT JATI'),
   ('3172060', '3172', 'JATINEGARA'),
@@ -2696,7 +2696,7 @@ INSERT INTO `districts` VALUES
   ('3201150', '3201', 'SUKAMAKMUR'),
   ('3201160', '3201', 'CARIU'),
   ('3201161', '3201', 'TANJUNGSARI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3201170', '3201', 'JONGGOL'),
   ('3201180', '3201', 'CILEUNGSI'),
   ('3201181', '3201', 'KELAPA NUNGGAL'),
@@ -2747,7 +2747,7 @@ INSERT INTO `districts` VALUES
   ('3202180', '3202', 'SUKABUMI'),
   ('3202190', '3202', 'KADUDAMPIT'),
   ('3202200', '3202', 'CISAAT');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3202201', '3202', 'GUNUNGGURUH'),
   ('3202210', '3202', 'CIBADAK'),
   ('3202211', '3202', 'CICANTAYAN'),
@@ -2798,7 +2798,7 @@ INSERT INTO `districts` VALUES
   ('3203240', '3203', 'CIKALONGKULON'),
   ('3204010', '3204', 'CIWIDEY'),
   ('3204011', '3204', 'RANCABALI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3204020', '3204', 'PASIRJAMBU'),
   ('3204030', '3204', 'CIMAUNG'),
   ('3204040', '3204', 'PANGALENGAN'),
@@ -2849,7 +2849,7 @@ INSERT INTO `districts` VALUES
   ('3205151', '3205', 'CIGEDUG'),
   ('3205160', '3205', 'CISURUPAN'),
   ('3205161', '3205', 'SUKARESMI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3205170', '3205', 'SAMARANG'),
   ('3205171', '3205', 'PASIRWANGI'),
   ('3205181', '3205', 'TAROGONG KIDUL'),
@@ -2900,7 +2900,7 @@ INSERT INTO `districts` VALUES
   ('3206200', '3206', 'CIGALONTANG'),
   ('3206210', '3206', 'LEUWISARI'),
   ('3206211', '3206', 'SARIWANGI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3206212', '3206', 'PADAKEMBANG'),
   ('3206221', '3206', 'SUKARATU'),
   ('3206230', '3206', 'CISAYONG'),
@@ -2951,7 +2951,7 @@ INSERT INTO `districts` VALUES
   ('3208070', '3208', 'CIBINGBIN'),
   ('3208071', '3208', 'CIBEUREUM'),
   ('3208080', '3208', 'LURAGUNG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3208081', '3208', 'CIMAHI'),
   ('3208090', '3208', 'CIDAHU'),
   ('3208091', '3208', 'KALIMANGGIS'),
@@ -3002,7 +3002,7 @@ INSERT INTO `districts` VALUES
   ('3209171', '3209', 'GUNUNGJATI'),
   ('3209180', '3209', 'KAPETAKAN'),
   ('3209181', '3209', 'SURANENGGALA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3209190', '3209', 'KLANGENAN'),
   ('3209191', '3209', 'JAMBLANG'),
   ('3209200', '3209', 'ARJAWINANGUN'),
@@ -3053,7 +3053,7 @@ INSERT INTO `districts` VALUES
   ('3211090', '3211', 'CIBUGEL'),
   ('3211100', '3211', 'WADO'),
   ('3211101', '3211', 'JATINUNGGAL');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3211111', '3211', 'JATIGEDE'),
   ('3211120', '3211', 'TOMO'),
   ('3211130', '3211', 'UJUNG JAYA'),
@@ -3104,7 +3104,7 @@ INSERT INTO `districts` VALUES
   ('3213031', '3213', 'KASOMALANG'),
   ('3213040', '3213', 'TANJUNGSIANG'),
   ('3213050', '3213', 'CIJAMBE');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3213060', '3213', 'CIBOGO'),
   ('3213070', '3213', 'SUBANG'),
   ('3213080', '3213', 'KALIJATI'),
@@ -3155,7 +3155,7 @@ INSERT INTO `districts` VALUES
   ('3215060', '3215', 'TIRTAMULYA'),
   ('3215070', '3215', 'JATISARI'),
   ('3215071', '3215', 'BANYUSARI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3215072', '3215', 'KOTABARU'),
   ('3215081', '3215', 'CILAMAYA WETAN'),
   ('3215082', '3215', 'CILAMAYA KULON'),
@@ -3206,7 +3206,7 @@ INSERT INTO `districts` VALUES
   ('3217060', '3217', 'CIPONGKOR'),
   ('3217070', '3217', 'BATUJAJAR'),
   ('3217071', '3217', 'SAGULING');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3217080', '3217', 'CIPATAT'),
   ('3217090', '3217', 'PADALARANG'),
   ('3217100', '3217', 'NGAMPRAH'),
@@ -3257,7 +3257,7 @@ INSERT INTO `districts` VALUES
   ('3273141', '3273', 'ANTAPANI'),
   ('3273142', '3273', 'MANDALAJATI'),
   ('3273150', '3273', 'KIARACONDONG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3273160', '3273', 'BATUNUNGGAL'),
   ('3273170', '3273', 'SUMUR BANDUNG'),
   ('3273180', '3273', 'ANDIR'),
@@ -3308,7 +3308,7 @@ INSERT INTO `districts` VALUES
   ('3278050', '3278', 'CIHIDEUNG'),
   ('3278060', '3278', 'MANGKUBUMI'),
   ('3278070', '3278', 'INDIHIANG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3278071', '3278', 'BUNGURSARI'),
   ('3278080', '3278', 'CIPEDES'),
   ('3279010', '3279', 'BANJAR'),
@@ -3359,7 +3359,7 @@ INSERT INTO `districts` VALUES
   ('3302180', '3302', 'KARANGLEWAS'),
   ('3302190', '3302', 'KEDUNG BANTENG'),
   ('3302200', '3302', 'BATURRADEN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3302210', '3302', 'SUMBANG'),
   ('3302220', '3302', 'KEMBARAN'),
   ('3302230', '3302', 'SOKARAJA'),
@@ -3410,7 +3410,7 @@ INSERT INTO `districts` VALUES
   ('3305030', '3305', 'PURING'),
   ('3305040', '3305', 'PETANAHAN'),
   ('3305050', '3305', 'KLIRONG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3305060', '3305', 'BULUSPESANTREN'),
   ('3305070', '3305', 'AMBAL'),
   ('3305080', '3305', 'MIRIT'),
@@ -3461,7 +3461,7 @@ INSERT INTO `districts` VALUES
   ('3307090', '3307', 'WONOSOBO'),
   ('3307100', '3307', 'WATUMALANG'),
   ('3307110', '3307', 'MOJOTENGAH');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3307120', '3307', 'GARUNG'),
   ('3307130', '3307', 'KEJAJAR'),
   ('3308010', '3308', 'SALAMAN'),
@@ -3512,7 +3512,7 @@ INSERT INTO `districts` VALUES
   ('3310060', '3310', 'TRUCUK'),
   ('3310070', '3310', 'KALIKOTES'),
   ('3310080', '3310', 'KEBONARUM');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3310090', '3310', 'JOGONALAN'),
   ('3310100', '3310', 'MANISRENGGO'),
   ('3310110', '3310', 'KARANGNONGKO'),
@@ -3563,7 +3563,7 @@ INSERT INTO `districts` VALUES
   ('3312180', '3312', 'KISMANTORO'),
   ('3312190', '3312', 'PURWANTORO'),
   ('3312200', '3312', 'BULUKERTO');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3312201', '3312', 'PUHPELEM'),
   ('3312210', '3312', 'SLOGOHIMO'),
   ('3312220', '3312', 'JATISRONO'),
@@ -3614,7 +3614,7 @@ INSERT INTO `districts` VALUES
   ('3315060', '3315', 'PULOKULON'),
   ('3315070', '3315', 'KRADENAN'),
   ('3315080', '3315', 'GABUS');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3315090', '3315', 'NGARINGAN'),
   ('3315100', '3315', 'WIROSARI'),
   ('3315110', '3315', 'TAWANGHARJO'),
@@ -3665,7 +3665,7 @@ INSERT INTO `districts` VALUES
   ('3318070', '3318', 'BATANGAN'),
   ('3318080', '3318', 'JUWANA'),
   ('3318090', '3318', 'JAKENAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3318100', '3318', 'PATI'),
   ('3318110', '3318', 'GABUS'),
   ('3318120', '3318', 'MARGOREJO'),
@@ -3716,7 +3716,7 @@ INSERT INTO `districts` VALUES
   ('3321100', '3321', 'GAJAH'),
   ('3321110', '3321', 'KARANGANYAR'),
   ('3321120', '3321', 'MIJEN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3321130', '3321', 'WEDUNG'),
   ('3322010', '3322', 'GETASAN'),
   ('3322020', '3322', 'TENGARAN'),
@@ -3767,7 +3767,7 @@ INSERT INTO `districts` VALUES
   ('3324080', '3324', 'KALIWUNGU'),
   ('3324081', '3324', 'KALIWUNGU SELATAN'),
   ('3324090', '3324', 'BRANGSONG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3324100', '3324', 'PEGANDON'),
   ('3324101', '3324', 'NGAMPEL'),
   ('3324110', '3324', 'GEMUH'),
@@ -3818,7 +3818,7 @@ INSERT INTO `districts` VALUES
   ('3327030', '3327', 'BELIK'),
   ('3327040', '3327', 'WATUKUMPUL'),
   ('3327050', '3327', 'BODEH');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3327060', '3327', 'BANTARBOLANG'),
   ('3327070', '3327', 'RANDUDONGKAL'),
   ('3327080', '3327', 'PEMALANG'),
@@ -3869,7 +3869,7 @@ INSERT INTO `districts` VALUES
   ('3372020', '3372', 'SERENGAN'),
   ('3372030', '3372', 'PASAR KLIWON'),
   ('3372040', '3372', 'JEBRES');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3372050', '3372', 'BANJARSARI'),
   ('3373010', '3373', 'ARGOMULYO'),
   ('3373020', '3373', 'TINGKIR'),
@@ -3920,7 +3920,7 @@ INSERT INTO `districts` VALUES
   ('3402070', '3402', 'BANTUL'),
   ('3402080', '3402', 'JETIS'),
   ('3402090', '3402', 'IMOGIRI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3402100', '3402', 'DLINGO'),
   ('3402110', '3402', 'PLERET'),
   ('3402120', '3402', 'PIYUNGAN'),
@@ -3971,7 +3971,7 @@ INSERT INTO `districts` VALUES
   ('3471050', '3471', 'KOTAGEDE'),
   ('3471060', '3471', 'GONDOKUSUMAN'),
   ('3471070', '3471', 'DANUREJAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3471080', '3471', 'PAKUALAMAN'),
   ('3471090', '3471', 'GONDOMANAN'),
   ('3471100', '3471', 'NGAMPILAN'),
@@ -4022,7 +4022,7 @@ INSERT INTO `districts` VALUES
   ('3503071', '3503', 'SURUH'),
   ('3503080', '3503', 'GANDUSARI'),
   ('3503090', '3503', 'DURENAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3503100', '3503', 'POGALAN'),
   ('3503110', '3503', 'TRENGGALEK'),
   ('3503120', '3503', 'TUGU'),
@@ -4073,7 +4073,7 @@ INSERT INTO `districts` VALUES
   ('3506030', '3506', 'NGADILUWIH'),
   ('3506040', '3506', 'KRAS'),
   ('3506050', '3506', 'RINGINREJO');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3506060', '3506', 'KANDAT'),
   ('3506070', '3506', 'WATES'),
   ('3506080', '3506', 'NGANCAR'),
@@ -4124,7 +4124,7 @@ INSERT INTO `districts` VALUES
   ('3507270', '3507', 'LAWANG'),
   ('3507280', '3507', 'SINGOSARI'),
   ('3507290', '3507', 'KARANGPLOSO');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3507300', '3507', 'DAU'),
   ('3507310', '3507', 'PUJON'),
   ('3507320', '3507', 'NGANTANG'),
@@ -4175,7 +4175,7 @@ INSERT INTO `districts` VALUES
   ('3509230', '3509', 'PAKUSARI'),
   ('3509240', '3509', 'KALISAT'),
   ('3509250', '3509', 'LEDOKOMBO');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3509260', '3509', 'SUMBERJAMBE'),
   ('3509270', '3509', 'SUKOWONO'),
   ('3509280', '3509', 'JELBUK'),
@@ -4226,7 +4226,7 @@ INSERT INTO `districts` VALUES
   ('3511140', '3511', 'TEGALAMPEL'),
   ('3511141', '3511', 'TAMAN KROCOK'),
   ('3511150', '3511', 'KLABANG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3511151', '3511', 'IJEN'),
   ('3511152', '3511', 'BOTOLINGGO'),
   ('3511160', '3511', 'PRAJEKAN'),
@@ -4277,7 +4277,7 @@ INSERT INTO `districts` VALUES
   ('3514030', '3514', 'PUSPO'),
   ('3514040', '3514', 'TOSARI'),
   ('3514050', '3514', 'LUMBANG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3514060', '3514', 'PASREPAN'),
   ('3514070', '3514', 'KEJAYAN'),
   ('3514080', '3514', 'WONOREJO'),
@@ -4328,7 +4328,7 @@ INSERT INTO `districts` VALUES
   ('3516100', '3516', 'DLANGGU'),
   ('3516110', '3516', 'PURI'),
   ('3516120', '3516', 'TROWULAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3516130', '3516', 'SOOKO'),
   ('3516140', '3516', 'GEDEK'),
   ('3516150', '3516', 'KEMLAGI'),
@@ -4379,7 +4379,7 @@ INSERT INTO `districts` VALUES
   ('3519020', '3519', 'GEGER'),
   ('3519030', '3519', 'DOLOPO'),
   ('3519040', '3519', 'DAGANGAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3519050', '3519', 'WUNGU'),
   ('3519060', '3519', 'KARE'),
   ('3519070', '3519', 'GEMARANG'),
@@ -4430,7 +4430,7 @@ INSERT INTO `districts` VALUES
   ('3521170', '3521', 'KARANGANYAR'),
   ('3522010', '3522', 'MARGOMULYO'),
   ('3522020', '3522', 'NGRAHO');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3522030', '3522', 'TAMBAKREJO'),
   ('3522040', '3522', 'NGAMBON'),
   ('3522041', '3522', 'SEKAR'),
@@ -4481,7 +4481,7 @@ INSERT INTO `districts` VALUES
   ('3524020', '3524', 'BLULUK'),
   ('3524030', '3524', 'NGIMBANG'),
   ('3524040', '3524', 'SAMBENG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3524050', '3524', 'MANTUP'),
   ('3524060', '3524', 'KEMBANGBAHU'),
   ('3524070', '3524', 'SUGIO'),
@@ -4532,7 +4532,7 @@ INSERT INTO `districts` VALUES
   ('3526070', '3526', 'GALIS'),
   ('3526080', '3526', 'TANAH MERAH'),
   ('3526090', '3526', 'TRAGAH');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3526100', '3526', 'SOCAH'),
   ('3526110', '3526', 'BANGKALAN'),
   ('3526120', '3526', 'BURNEH'),
@@ -4583,7 +4583,7 @@ INSERT INTO `districts` VALUES
   ('3529110', '3529', 'PASONGSONGAN'),
   ('3529120', '3529', 'AMBUNTEN'),
   ('3529130', '3529', 'RUBARU');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3529140', '3529', 'DASUK'),
   ('3529150', '3529', 'MANDING'),
   ('3529160', '3529', 'BATUPUTIH'),
@@ -4634,7 +4634,7 @@ INSERT INTO `districts` VALUES
   ('3578090', '3578', 'MULYOREJO'),
   ('3578100', '3578', 'GUBENG'),
   ('3578110', '3578', 'WONOKROMO');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3578120', '3578', 'DUKUH PAKIS'),
   ('3578130', '3578', 'WIYUNG'),
   ('3578140', '3578', 'LAKARSANTRI'),
@@ -4685,7 +4685,7 @@ INSERT INTO `districts` VALUES
   ('3601150', '3601', 'MANDALAWANGI'),
   ('3601160', '3601', 'CIMANUK'),
   ('3601161', '3601', 'CIPEUCANG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3601170', '3601', 'BANJAR'),
   ('3601171', '3601', 'KADUHEJO'),
   ('3601172', '3601', 'MEKARJAYA'),
@@ -4736,7 +4736,7 @@ INSERT INTO `districts` VALUES
   ('3603120', '3603', 'PASARKEMIS'),
   ('3603121', '3603', 'SINDANG JAYA'),
   ('3603130', '3603', 'BALARAJA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3603131', '3603', 'JAYANTI'),
   ('3603132', '3603', 'SUKAMULYA'),
   ('3603140', '3603', 'KRESEK'),
@@ -4787,7 +4787,7 @@ INSERT INTO `districts` VALUES
   ('3671020', '3671', 'CIPONDOH'),
   ('3671021', '3671', 'PINANG'),
   ('3671030', '3671', 'TANGERANG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('3671031', '3671', 'KARAWACI'),
   ('3671040', '3671', 'JATI UWUNG'),
   ('3671041', '3671', 'CIBODAS'),
@@ -4838,7 +4838,7 @@ INSERT INTO `districts` VALUES
   ('5103050', '5103', 'ABIANSEMAL'),
   ('5103060', '5103', 'PETANG'),
   ('5104010', '5104', 'SUKAWATI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('5104020', '5104', 'BLAHBATUH'),
   ('5104030', '5104', 'GIANYAR'),
   ('5104040', '5104', 'TAMPAKSIRING'),
@@ -4889,7 +4889,7 @@ INSERT INTO `districts` VALUES
   ('5202020', '5202', 'PUJUT'),
   ('5202030', '5202', 'PRAYA TIMUR'),
   ('5202040', '5202', 'JANAPRIA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('5202050', '5202', 'KOPANG'),
   ('5202060', '5202', 'PRAYA'),
   ('5202061', '5202', 'PRAYA TENGAH'),
@@ -4940,7 +4940,7 @@ INSERT INTO `districts` VALUES
   ('5204131', '5204', 'LABANGKA'),
   ('5204132', '5204', 'MARONGE'),
   ('5204140', '5204', 'EMPANG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('5204141', '5204', 'TARANO'),
   ('5205010', '5205', 'HU\'U'),
   ('5205011', '5205', 'PAJO'),
@@ -4991,7 +4991,7 @@ INSERT INTO `districts` VALUES
   ('5272011', '5272', 'MPUNDA'),
   ('5272020', '5272', 'RASANAE TIMUR'),
   ('5272021', '5272', 'RABA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('5272030', '5272', 'ASAKOTA'),
   ('5301021', '5301', 'LAMBOYA'),
   ('5301022', '5301', 'WANOKAKA'),
@@ -5042,7 +5042,7 @@ INSERT INTO `districts` VALUES
   ('5303180', '5303', 'AMFOANG SELATAN'),
   ('5303181', '5303', 'AMFOANG BARAT DAYA'),
   ('5303182', '5303', 'AMFOANG TENGAH');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('5303190', '5303', 'AMFOANG UTARA'),
   ('5303191', '5303', 'AMFOANG BARAT LAUT'),
   ('5303192', '5303', 'AMFOANG TIMUR'),
@@ -5093,7 +5093,7 @@ INSERT INTO `districts` VALUES
   ('5305030', '5305', 'KOTA KEFAMENANU'),
   ('5305040', '5305', 'INSANA'),
   ('5305041', '5305', 'INSANA UTARA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('5305042', '5305', 'INSANA BARAT'),
   ('5305043', '5305', 'INSANA TENGAH'),
   ('5305044', '5305', 'INSANA FAFINESU'),
@@ -5144,7 +5144,7 @@ INSERT INTO `districts` VALUES
   ('5309010', '5309', 'WULANGGITANG'),
   ('5309011', '5309', 'TITEHENA'),
   ('5309012', '5309', 'ILEBURA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('5309020', '5309', 'TANJUNG BUNGA'),
   ('5309021', '5309', 'LEWO LEMA'),
   ('5309030', '5309', 'LARANTUKA'),
@@ -5195,7 +5195,7 @@ INSERT INTO `districts` VALUES
   ('5311050', '5311', 'WOLOWARU'),
   ('5311051', '5311', 'WOLOJITA'),
   ('5311052', '5311', 'LIO TIMUR');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('5311053', '5311', 'KELIMUTU'),
   ('5311054', '5311', 'NDORI'),
   ('5311060', '5311', 'MAUROLE'),
@@ -5246,7 +5246,7 @@ INSERT INTO `districts` VALUES
   ('5315031', '5315', 'WELAK'),
   ('5315032', '5315', 'LEMBOR SELATAN'),
   ('5315040', '5315', 'KUWUS');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('5315041', '5315', 'NDOSO'),
   ('5315050', '5315', 'MACANG PACAR'),
   ('5316010', '5316', 'KATIKUTANA'),
@@ -5297,7 +5297,7 @@ INSERT INTO `districts` VALUES
   ('5321080', '5321', 'BOTIN LEOBELE'),
   ('5321090', '5321', 'LAEN MANEN'),
   ('5321100', '5321', 'MALAKA TIMUR');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('5321110', '5321', 'KOBALIMA'),
   ('5321120', '5321', 'KOBALIMA TIMUR'),
   ('5371010', '5371', 'ALAK'),
@@ -5348,7 +5348,7 @@ INSERT INTO `districts` VALUES
   ('6103040', '6103', 'SENGAH TEMILA'),
   ('6103050', '6103', 'MANDOR'),
   ('6103060', '6103', 'MENJALIN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6103070', '6103', 'MEMPAWAH HULU'),
   ('6103071', '6103', 'SOMPAK'),
   ('6103080', '6103', 'MENYUKE'),
@@ -5399,7 +5399,7 @@ INSERT INTO `districts` VALUES
   ('6106101', '6106', 'HULU SUNGAI'),
   ('6106110', '6106', 'SUNGAI LAUR'),
   ('6106120', '6106', 'SIMPANG HULU');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6106121', '6106', 'SIMPANG DUA'),
   ('6107060', '6107', 'SERAWAI'),
   ('6107070', '6107', 'AMBALAU'),
@@ -5450,7 +5450,7 @@ INSERT INTO `districts` VALUES
   ('6110021', '6110', 'TANAH PINOH BARAT'),
   ('6110030', '6110', 'SAYAN'),
   ('6110040', '6110', 'BELIMBING');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6110041', '6110', 'BELIMBING HULU'),
   ('6110050', '6110', 'NANGA PINOH'),
   ('6110051', '6110', 'PINOH SELATAN'),
@@ -5501,7 +5501,7 @@ INSERT INTO `districts` VALUES
   ('6202190', '6202', 'CEMPAGA'),
   ('6202191', '6202', 'CEMPAGA HULU'),
   ('6202200', '6202', 'PARENGGEAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6202201', '6202', 'TUALAN HULU'),
   ('6202210', '6202', 'MENTAYA HULU'),
   ('6202211', '6202', 'BUKIT SANTUAI'),
@@ -5552,7 +5552,7 @@ INSERT INTO `districts` VALUES
   ('6207021', '6207', 'BELANTIKAN RAYA'),
   ('6207030', '6207', 'DELANG'),
   ('6207031', '6207', 'BATANGKAWA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6208010', '6208', 'SERUYAN HILIR'),
   ('6208011', '6208', 'SERUYAN HILIR TIMUR'),
   ('6208020', '6208', 'DANAU SEMBULUH'),
@@ -5603,7 +5603,7 @@ INSERT INTO `districts` VALUES
   ('6212040', '6212', 'PATANGKEP TUTUI'),
   ('6212050', '6212', 'DUSUN TENGAH'),
   ('6212051', '6212', 'RAREN BATUAH');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6212052', '6212', 'PAKU'),
   ('6212053', '6212', 'KARUSEN JANANG'),
   ('6212060', '6212', 'PEMATANG KARAU'),
@@ -5654,7 +5654,7 @@ INSERT INTO `districts` VALUES
   ('6302190', '6302', 'SAMPANAHAN'),
   ('6302200', '6302', 'PAMUKAN UTARA'),
   ('6302201', '6302', 'PAMUKAN BARAT');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6303010', '6303', 'ALUH - ALUH'),
   ('6303011', '6303', 'BERUNTUNG BARU'),
   ('6303020', '6303', 'GAMBUT'),
@@ -5705,7 +5705,7 @@ INSERT INTO `districts` VALUES
   ('6305100', '6305', 'CANDI LARAS UTARA'),
   ('6306010', '6306', 'PADANG BATUNG'),
   ('6306020', '6306', 'LOKSADO');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6306030', '6306', 'TELAGA LANGSAT'),
   ('6306040', '6306', 'ANGKINANG'),
   ('6306050', '6306', 'KANDANGAN'),
@@ -5756,7 +5756,7 @@ INSERT INTO `districts` VALUES
   ('6310041', '6310', 'KURANJI'),
   ('6310050', '6310', 'BATU LICIN'),
   ('6310051', '6310', 'KARANG BINTANG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6310052', '6310', 'SIMPANG EMPAT'),
   ('6310053', '6310', 'MANTEWE'),
   ('6311010', '6311', 'LAMPIHONG'),
@@ -5807,7 +5807,7 @@ INSERT INTO `districts` VALUES
   ('6403020', '6403', 'MUARA JAWA'),
   ('6403030', '6403', 'SANGA-SANGA'),
   ('6403040', '6403', 'LOA JANAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6403050', '6403', 'LOA KULU'),
   ('6403060', '6403', 'MUARA MUNTAI'),
   ('6403070', '6403', 'MUARA WIS'),
@@ -5858,7 +5858,7 @@ INSERT INTO `districts` VALUES
   ('6409030', '6409', 'PENAJAM'),
   ('6409040', '6409', 'SEPAKU'),
   ('6411010', '6411', 'LAHAM');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6411020', '6411', 'LONG HUBUNG'),
   ('6411030', '6411', 'LONG BAGUN'),
   ('6411040', '6411', 'LONG PAHANGAI'),
@@ -5909,7 +5909,7 @@ INSERT INTO `districts` VALUES
   ('6502100', '6502', 'BUNYU'),
   ('6503010', '6503', 'MURUK RIAN'),
   ('6503020', '6503', 'SESAYAP');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('6503030', '6503', 'BETAYAU'),
   ('6503040', '6503', 'SESAYAP HILIR'),
   ('6503050', '6503', 'TANA LIA'),
@@ -5960,7 +5960,7 @@ INSERT INTO `districts` VALUES
   ('7102120', '7102', 'KAWANGKOAN'),
   ('7102121', '7102', 'KAWANGKOAN BARAT'),
   ('7102122', '7102', 'KAWANGKOAN UTARA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7102130', '7102', 'SONDER'),
   ('7102160', '7102', 'TOMBARIRI'),
   ('7102161', '7102', 'TOMBARIRI TIMUR'),
@@ -6011,7 +6011,7 @@ INSERT INTO `districts` VALUES
   ('7104070', '7104', 'GEMEH'),
   ('7104080', '7104', 'NANUSA'),
   ('7104081', '7104', 'MIANGAS');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7105010', '7105', 'MODOINDING'),
   ('7105020', '7105', 'TOMPASO BARU'),
   ('7105021', '7105', 'MAESAAN'),
@@ -6062,7 +6062,7 @@ INSERT INTO `districts` VALUES
   ('7109041', '7109', 'PASAN'),
   ('7109042', '7109', 'RATAHAN TIMUR'),
   ('7109050', '7109', 'TOMBATU');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7109051', '7109', 'TOMBATU TIMUR'),
   ('7109052', '7109', 'TOMBATU UTARA'),
   ('7109060', '7109', 'TOULUAAN'),
@@ -6113,7 +6113,7 @@ INSERT INTO `districts` VALUES
   ('7201030', '7201', 'TOTIKUM'),
   ('7201031', '7201', 'TOTIKUM SELATAN'),
   ('7201040', '7201', 'TINANGKUNG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7201041', '7201', 'TINANGKUNG SELATAN'),
   ('7201042', '7201', 'TINANGKUNG UTARA'),
   ('7201050', '7201', 'LIANG'),
@@ -6164,7 +6164,7 @@ INSERT INTO `districts` VALUES
   ('7204031', '7204', 'PAMONA TIMUR'),
   ('7204032', '7204', 'PAMONA UTARA'),
   ('7204040', '7204', 'LORE UTARA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7204041', '7204', 'LORE TENGAH'),
   ('7204042', '7204', 'LORE TIMUR'),
   ('7204043', '7204', 'LORE PEORE'),
@@ -6215,7 +6215,7 @@ INSERT INTO `districts` VALUES
   ('7208010', '7208', 'SAUSU'),
   ('7208011', '7208', 'TORUE'),
   ('7208012', '7208', 'BALINGGI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7208020', '7208', 'PARIGI'),
   ('7208021', '7208', 'PARIGI SELATAN'),
   ('7208022', '7208', 'PARIGI BARAT'),
@@ -6266,7 +6266,7 @@ INSERT INTO `districts` VALUES
   ('7211010', '7211', 'BANGKURUNG'),
   ('7211020', '7211', 'LABOBO'),
   ('7211030', '7211', 'BANGGAI UTARA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7211040', '7211', 'BANGGAI'),
   ('7211050', '7211', 'BANGGAI TENGAH'),
   ('7211060', '7211', 'BANGGAI SELATAN'),
@@ -6317,7 +6317,7 @@ INSERT INTO `districts` VALUES
   ('7303021', '7303', 'EREMERASA'),
   ('7303030', '7303', 'TOMPOBULU'),
   ('7303031', '7303', 'PA\'JUKUKANG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7303032', '7303', 'GANTARANGKEKE'),
   ('7304010', '7304', 'BANGKALA'),
   ('7304011', '7304', 'BANGKALA BARAT'),
@@ -6368,7 +6368,7 @@ INSERT INTO `districts` VALUES
   ('7307090', '7307', 'PULAU SEMBILAN'),
   ('7308010', '7308', 'MANDAI'),
   ('7308011', '7308', 'MONCONGLOE');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7308020', '7308', 'MAROS BARU'),
   ('7308021', '7308', 'MARUSU'),
   ('7308022', '7308', 'TURIKALE'),
@@ -6419,7 +6419,7 @@ INSERT INTO `districts` VALUES
   ('7311150', '7311', 'BENGO'),
   ('7311160', '7311', 'ULAWENG'),
   ('7311170', '7311', 'PALAKKA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7311180', '7311', 'AWANGPONE'),
   ('7311190', '7311', 'TELLU SIATTINGE'),
   ('7311200', '7311', 'AMALI'),
@@ -6470,7 +6470,7 @@ INSERT INTO `districts` VALUES
   ('7315041', '7315', 'PALETEANG'),
   ('7315042', '7315', 'TIROANG'),
   ('7315050', '7315', 'PATAMPANUA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7315060', '7315', 'CEMPA'),
   ('7315070', '7315', 'DUAMPANUA'),
   ('7315071', '7315', 'BATULAPPA'),
@@ -6521,7 +6521,7 @@ INSERT INTO `districts` VALUES
   ('7318040', '7318', 'MAKALE'),
   ('7318041', '7318', 'MAKALE SELATAN'),
   ('7318042', '7318', 'MAKALE UTARA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7318050', '7318', 'SALUPUTTI'),
   ('7318051', '7318', 'BITTUANG'),
   ('7318052', '7318', 'REMBON'),
@@ -6572,7 +6572,7 @@ INSERT INTO `districts` VALUES
   ('7326180', '7326', 'AWAN RANTE KARUA'),
   ('7326190', '7326', 'RINDINGALO'),
   ('7326200', '7326', 'BUNTU PEPASAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7326210', '7326', 'BARUPPU'),
   ('7371010', '7371', 'MARISO'),
   ('7371020', '7371', 'MAMAJANG'),
@@ -6623,7 +6623,7 @@ INSERT INTO `districts` VALUES
   ('7402071', '7402', 'LOHIA'),
   ('7402072', '7402', 'DURUKA'),
   ('7402073', '7402', 'BATALAIWORU');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7402080', '7402', 'NAPABALANO'),
   ('7402081', '7402', 'LASALEPA'),
   ('7402083', '7402', 'TOWEA'),
@@ -6674,7 +6674,7 @@ INSERT INTO `districts` VALUES
   ('7404071', '7404', 'SAMATURU'),
   ('7404072', '7404', 'IWOIMENDAA'),
   ('7405010', '7405', 'TINANGGEA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7405011', '7405', 'LALEMBUU'),
   ('7405020', '7405', 'ANDOOLO'),
   ('7405021', '7405', 'BUKE'),
@@ -6725,7 +6725,7 @@ INSERT INTO `districts` VALUES
   ('7407011', '7407', 'TOGO BINONGKO'),
   ('7407020', '7407', 'TOMIA'),
   ('7407021', '7407', 'TOMIA TIMUR');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7407030', '7407', 'KALEDUPA'),
   ('7407031', '7407', 'KALEDUPA SELATAN'),
   ('7407040', '7407', 'WANGI-WANGI'),
@@ -6776,7 +6776,7 @@ INSERT INTO `districts` VALUES
   ('7411100', '7411', 'TINONDO'),
   ('7411110', '7411', 'ULUIWOI'),
   ('7411120', '7411', 'UEESI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7412010', '7412', 'WAWONII TENGGARA'),
   ('7412020', '7412', 'WAWONII TIMUR'),
   ('7412030', '7412', 'WAWONII TIMUR LAUT'),
@@ -6827,7 +6827,7 @@ INSERT INTO `districts` VALUES
   ('7472021', '7472', 'KOKALUKUNA'),
   ('7472030', '7472', 'SORAWOLIO'),
   ('7472040', '7472', 'BUNGI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7472041', '7472', 'LEA-LEA'),
   ('7501031', '7501', 'MANANGGU'),
   ('7501040', '7501', 'TILAMUTA'),
@@ -6878,7 +6878,7 @@ INSERT INTO `districts` VALUES
   ('7504022', '7504', 'TILONGKABILA'),
   ('7504030', '7504', 'SUWAWA'),
   ('7504031', '7504', 'SUWAWA SELATAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7504032', '7504', 'SUWAWA TIMUR'),
   ('7504033', '7504', 'SUWAWA TENGAH'),
   ('7504034', '7504', 'PINOGU'),
@@ -6929,7 +6929,7 @@ INSERT INTO `districts` VALUES
   ('7602044', '7602', 'B U L O'),
   ('7602050', '7602', 'POLEWALI'),
   ('7602051', '7602', 'BINUANG');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('7602052', '7602', 'ANREAPI'),
   ('7602061', '7602', 'MATANGNGA'),
   ('7603010', '7603', 'SUMARORONG'),
@@ -6980,7 +6980,7 @@ INSERT INTO `districts` VALUES
   ('8101040', '8101', 'TANIMBAR SELATAN'),
   ('8101041', '8101', 'WER TAMRIAN'),
   ('8101042', '8101', 'WER MAKTIAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('8101043', '8101', 'SELARU'),
   ('8101050', '8101', 'TANIMBAR UTARA'),
   ('8101051', '8101', 'YARU'),
@@ -7031,7 +7031,7 @@ INSERT INTO `districts` VALUES
   ('8105011', '8105', 'ARU SELATAN TIMUR'),
   ('8105012', '8105', 'ARU SELATAN UTARA'),
   ('8105020', '8105', 'ARU TENGAH');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('8105021', '8105', 'ARU TENGAH TIMUR'),
   ('8105022', '8105', 'ARU TENGAH SELATAN'),
   ('8105030', '8105', 'PULAU-PULAU ARU'),
@@ -7082,7 +7082,7 @@ INSERT INTO `districts` VALUES
   ('8108081', '8108', 'PULAU MASELA'),
   ('8108082', '8108', 'DAWELOR DAWERA'),
   ('8109010', '8109', 'KEPALA MADAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('8109020', '8109', 'LEKSULA'),
   ('8109021', '8109', 'FENA FAFAN'),
   ('8109030', '8109', 'NAMROLE'),
@@ -7133,7 +7133,7 @@ INSERT INTO `districts` VALUES
   ('8204021', '8204', 'OBI BARAT'),
   ('8204022', '8204', 'OBI TIMUR'),
   ('8204023', '8204', 'OBI UTARA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('8204030', '8204', 'BACAN'),
   ('8204031', '8204', 'MANDIOLI SELATAN'),
   ('8204032', '8204', 'MANDIOLI UTARA'),
@@ -7184,7 +7184,7 @@ INSERT INTO `districts` VALUES
   ('8206032', '8206', 'WASILE TENGAH'),
   ('8206033', '8206', 'WASILE UTARA'),
   ('8206040', '8206', 'MABA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('8206041', '8206', 'MABA TENGAH'),
   ('8206042', '8206', 'MABA UTARA'),
   ('8207010', '8207', 'MOROTAI SELATAN'),
@@ -7235,7 +7235,7 @@ INSERT INTO `districts` VALUES
   ('9101088', '9101', 'TOMAGE'),
   ('9102010', '9102', 'BURUWAY'),
   ('9102020', '9102', 'TELUK ARGUNI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9102021', '9102', 'TELUK ARGUNI BAWAH'),
   ('9102030', '9102', 'KAIMANA'),
   ('9102031', '9102', 'KAMBRAU'),
@@ -7286,7 +7286,7 @@ INSERT INTO `districts` VALUES
   ('9105144', '9105', 'MANOKWARI SELATAN'),
   ('9105146', '9105', 'TANAH RUBU'),
   ('9105170', '9105', 'MASNI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9105171', '9105', 'SIDEY'),
   ('9106010', '9106', 'INANWATAN'),
   ('9106011', '9106', 'METEMANI'),
@@ -7337,7 +7337,7 @@ INSERT INTO `districts` VALUES
   ('9108012', '9108', 'MISOOL BARAT'),
   ('9108020', '9108', 'MISOOL'),
   ('9108021', '9108', 'KOFIAU');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9108022', '9108', 'MISOOL TIMUR'),
   ('9108023', '9108', 'KEPULAUAN SEMBILAN'),
   ('9108031', '9108', 'SALAWATI UTARA'),
@@ -7388,7 +7388,7 @@ INSERT INTO `districts` VALUES
   ('9109111', '9109', 'SELEMKAI'),
   ('9110010', '9110', 'AITINYO BARAT/ATHABU'),
   ('9110011', '9110', 'AYAMARU SELATAN JAYA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9110020', '9110', 'AITINYO'),
   ('9110021', '9110', 'AITINYO TENGAH'),
   ('9110030', '9110', 'AIFAT SELATAN'),
@@ -7439,7 +7439,7 @@ INSERT INTO `districts` VALUES
   ('9171026', '9171', 'SORONG KOTA'),
   ('9401010', '9401', 'KIMAAM'),
   ('9401011', '9401', 'WAAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9401012', '9401', 'TABONJI'),
   ('9401013', '9401', 'ILWAYAB'),
   ('9401020', '9401', 'OKABA'),
@@ -7490,7 +7490,7 @@ INSERT INTO `districts` VALUES
   ('9402222', '9402', 'YALENGGA'),
   ('9402223', '9402', 'TAGIME'),
   ('9402224', '9402', 'MOLAGALOME');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9402225', '9402', 'TAGINERI'),
   ('9402226', '9402', 'BUGI'),
   ('9402227', '9402', 'BPIRI'),
@@ -7541,7 +7541,7 @@ INSERT INTO `districts` VALUES
   ('9408051', '9408', 'KEP. AMBAI'),
   ('9408052', '9408', 'YAWAKUKAT'),
   ('9408060', '9408', 'YAPEN SELATAN');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9408061', '9408', 'KOSIWO'),
   ('9408062', '9408', 'ANATAUREI'),
   ('9408070', '9408', 'YAPEN BARAT'),
@@ -7592,7 +7592,7 @@ INSERT INTO `districts` VALUES
   ('9411041', '9411', 'DAGAI'),
   ('9411042', '9411', 'KIYAGE'),
   ('9411050', '9411', 'MULIA');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9411053', '9411', 'YAMBI'),
   ('9411054', '9411', 'ILAMBURAWI'),
   ('9411055', '9411', 'MUARA'),
@@ -7643,7 +7643,7 @@ INSERT INTO `districts` VALUES
   ('9413030', '9413', 'MANDOBO'),
   ('9413031', '9413', 'FOFI'),
   ('9413032', '9413', 'ARIMOP');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9413040', '9413', 'KOUH'),
   ('9413041', '9413', 'BOMAKIA'),
   ('9413042', '9413', 'FIRIWAGE'),
@@ -7694,7 +7694,7 @@ INSERT INTO `districts` VALUES
   ('9415074', '9415', 'PULAU TIGA'),
   ('9416010', '9416', 'KURIMA'),
   ('9416011', '9416', 'MUSAIK');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9416013', '9416', 'DEKAI'),
   ('9416014', '9416', 'OBIO'),
   ('9416015', '9416', 'PASEMA'),
@@ -7745,7 +7745,7 @@ INSERT INTO `districts` VALUES
   ('9416066', '9416', 'DURAM'),
   ('9416067', '9416', 'DIRWEMNA'),
   ('9417010', '9417', 'IWUR');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9417011', '9417', 'KAWOR'),
   ('9417012', '9417', 'TARUP'),
   ('9417013', '9417', 'AWINBON'),
@@ -7796,7 +7796,7 @@ INSERT INTO `districts` VALUES
   ('9418027', '9418', 'BIUK'),
   ('9418030', '9418', 'BOKONDINI'),
   ('9418031', '9418', 'BOKONERI');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9418032', '9418', 'BEWANI'),
   ('9418040', '9418', 'KEMBU'),
   ('9418041', '9418', 'WINA'),
@@ -7847,7 +7847,7 @@ INSERT INTO `districts` VALUES
   ('9419063', '9419', 'APAWER TENGAH'),
   ('9420010', '9420', 'WEB'),
   ('9420011', '9420', 'TOWE');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9420012', '9420', 'YAFFI'),
   ('9420020', '9420', 'SENGGI'),
   ('9420021', '9420', 'KAISENAR'),
@@ -7898,7 +7898,7 @@ INSERT INTO `districts` VALUES
   ('9429034', '9429', 'MEBOROK'),
   ('9429040', '9429', 'MAPENDUMA'),
   ('9429041', '9429', 'KROPTAK');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9429042', '9429', 'PARO'),
   ('9429043', '9429', 'KEGAYEM'),
   ('9429050', '9429', 'MUGI'),
@@ -7949,7 +7949,7 @@ INSERT INTO `districts` VALUES
   ('9430082', '9430', 'NIKOGWE'),
   ('9430090', '9430', 'GAMELIA'),
   ('9430091', '9430', 'KARU');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9430092', '9430', 'YILUK'),
   ('9430093', '9430', 'GUNA'),
   ('9430100', '9430', 'POGA'),
@@ -8000,7 +8000,7 @@ INSERT INTO `districts` VALUES
   ('9434090', '9434', 'KAMU TIMUR'),
   ('9434100', '9434', 'KAMU UTARA'),
   ('9435010', '9435', 'HOMEYO');
-INSERT INTO `districts` VALUES
+INSERT INTO `m_districts` VALUES
   ('9435020', '9435', 'SUGAPA'),
   ('9435030', '9435', 'HITADIPA'),
   ('9435040', '9435', 'AGISIGA'),
@@ -8016,15 +8016,15 @@ INSERT INTO `districts` VALUES
   ('9471021', '9471', 'HERAM'),
   ('9471030', '9471', 'JAYAPURA SELATAN'),
   ('9471040', '9471', 'JAYAPURA UTARA');
-/*!40000 ALTER TABLE `districts` ENABLE KEYS */;
+/*!40000 ALTER TABLE `m_districts` ENABLE KEYS */;
 UNLOCK TABLES;
 --
--- Dumping data for table `villages`
+-- Dumping data for table `m_villages`
 --
 
-LOCK TABLES `villages` WRITE;
-/*!40000 ALTER TABLE `villages` DISABLE KEYS */;
-INSERT INTO `villages` VALUES
+LOCK TABLES `m_villages` WRITE;
+/*!40000 ALTER TABLE `m_villages` DISABLE KEYS */;
+INSERT INTO `m_villages` VALUES
   ('1101010001', '1101010', 'LATIUNG'),
   ('1101010002', '1101010', 'LABUHAN BAJAU'),
   ('1101010003', '1101010', 'SUAK LAMATAN'),
@@ -8075,7 +8075,7 @@ INSERT INTO `villages` VALUES
   ('1101021012', '1101021', 'INOR'),
   ('1101021013', '1101021', 'NAIBOS'),
   ('1101021014', '1101021', 'LAAYON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1101021015', '1101021', 'ANGKEO'),
   ('1101021016', '1101021', 'BUNON'),
   ('1101021017', '1101021', 'SILENGAS'),
@@ -8126,7 +8126,7 @@ INSERT INTO `villages` VALUES
   ('1101032006', '1101032', 'SIBULUH'),
   ('1101032007', '1101032', 'BORENGAN'),
   ('1101032008', '1101032', 'UJUNG PADANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1101040001', '1101040', 'UJUNG SALANG'),
   ('1101040002', '1101040', 'PADANG UNOI'),
   ('1101040003', '1101040', 'MEUNAFA'),
@@ -8177,7 +8177,7 @@ INSERT INTO `villages` VALUES
   ('1102020005', '1102020', 'UJUNG'),
   ('1102020006', '1102020', 'KOTA SIMBOLING'),
   ('1102020007', '1102020', 'KILANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1102020009', '1102020', 'TELUK AMBUN'),
   ('1102020010', '1102020', 'RANTAU GEDANG'),
   ('1102020011', '1102020', 'TELUK RUMBIA'),
@@ -8228,7 +8228,7 @@ INSERT INTO `villages` VALUES
   ('1102031001', '1102031', 'PERTAMPAKAN'),
   ('1102031002', '1102031', 'TANAH MERAH'),
   ('1102031003', '1102031', 'SEBATANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1102031004', '1102031', 'SEPING BARU'),
   ('1102031005', '1102031', 'PERANGUSAN'),
   ('1102031006', '1102031', 'GUNUNG LAGAN'),
@@ -8279,7 +8279,7 @@ INSERT INTO `villages` VALUES
   ('1102043003', '1102043', 'LADANG BISIK'),
   ('1102043004', '1102043', 'SAMAR DUA'),
   ('1102043005', '1102043', 'BUTAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1102043006', '1102043', 'MUKTI LINCIR'),
   ('1102043007', '1102043', 'LAPAHAN BUAYA'),
   ('1102043008', '1102043', 'LENTONG'),
@@ -8330,7 +8330,7 @@ INSERT INTO `villages` VALUES
   ('1103021008', '1103021', 'SEULEUKAT'),
   ('1103022001', '1103022', 'SENEUBOK ALUR BULAH'),
   ('1103022002', '1103022', 'ALURDUAMAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1103022003', '1103022', 'JAMBO KEUPOK'),
   ('1103022004', '1103022', 'UJUNG TANOH'),
   ('1103022005', '1103022', 'BEUTONG'),
@@ -8381,7 +8381,7 @@ INSERT INTO `villages` VALUES
   ('1103040014', '1103040', 'PASI KUALA ASAHAN'),
   ('1103040015', '1103040', 'FAJAR HARAPAN'),
   ('1103040036', '1103040', 'KRUENG KLUET');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1103040039', '1103040', 'ALUR MAS'),
   ('1103040050', '1103040', 'KAMPUNG TINGGI'),
   ('1103040051', '1103040', 'KAMPUNG RUAK'),
@@ -8432,7 +8432,7 @@ INSERT INTO `villages` VALUES
   ('1103050009', '1103050', 'JAMBO APHA'),
   ('1103050010', '1103050', 'LHOK BENGKUANG'),
   ('1103050011', '1103050', 'BATU ITAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1103050012', '1103050', 'PANJUPIAN'),
   ('1103050013', '1103050', 'LHOK RUKAM'),
   ('1103050014', '1103050', 'AIR PINANG'),
@@ -8483,7 +8483,7 @@ INSERT INTO `villages` VALUES
   ('1103070015', '1103070', 'MUTIARA'),
   ('1103080001', '1103080', 'ALUE MEUTUAH'),
   ('1103080002', '1103080', 'LHOK AMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1103080003', '1103080', 'LADANG BARO'),
   ('1103080004', '1103080', 'LABUHAN TAROK'),
   ('1103080005', '1103080', 'TANJUNG HARAPAN'),
@@ -8534,7 +8534,7 @@ INSERT INTO `villages` VALUES
   ('1103091011', '1103091', 'KEUMUMU SEBERANG'),
   ('1103091012', '1103091', 'SAWANG INDAH'),
   ('1103092001', '1103092', 'PULO IE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1103092002', '1103092', 'SUAK LOKAN'),
   ('1103092003', '1103092', 'IKU LHUNG'),
   ('1103092004', '1103092', 'PANTE GEULIMA'),
@@ -8585,7 +8585,7 @@ INSERT INTO `villages` VALUES
   ('1104011006', '1104011', 'LUMBAN SITIO TIO'),
   ('1104011007', '1104011', 'MERANTI'),
   ('1104011008', '1104011', 'PERDAMEAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1104011009', '1104011', 'MUTIARA DAMAI'),
   ('1104011010', '1104011', 'LUMBAN TUA'),
   ('1104011011', '1104011', 'DOLOK NAULI'),
@@ -8636,7 +8636,7 @@ INSERT INTO `villages` VALUES
   ('1104020035', '1104020', 'LAWE LONING SEPAKAT'),
   ('1104020036', '1104020', 'GAYA JAYA'),
   ('1104020037', '1104020', 'LAWE LONING I');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1104020038', '1104020', 'LAWE RAKAT'),
   ('1104020039', '1104020', 'SUKA MAJU'),
   ('1104020040', '1104020', 'SUKA JAYA'),
@@ -8687,7 +8687,7 @@ INSERT INTO `villages` VALUES
   ('1104022009', '1104022', 'SEMADAM ASAL'),
   ('1104022010', '1104022', 'LAWE KINGA GAB'),
   ('1104022011', '1104022', 'TITI PASIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1104022012', '1104022', 'PASAR PUNTUNG'),
   ('1104022013', '1104022', 'LAWE PETANDUK'),
   ('1104022014', '1104022', 'SEPAKAT SEGENEP'),
@@ -8738,7 +8738,7 @@ INSERT INTO `villages` VALUES
   ('1104030041', '1104030', 'PULO PERENGGE'),
   ('1104030042', '1104030', 'KUTE ANTARA'),
   ('1104030046', '1104030', 'TERUTUNG SEPERAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1104030047', '1104030', 'LAWE KIHING'),
   ('1104030048', '1104030', 'BAMBEL'),
   ('1104030049', '1104030', 'KUTE SERI'),
@@ -8789,7 +8789,7 @@ INSERT INTO `villages` VALUES
   ('1104032011', '1104032', 'SETIA BARU'),
   ('1104032012', '1104032', 'LAWE PERLAK'),
   ('1104032013', '1104032', 'LAWE SUMUR SEPAKAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1104032014', '1104032', 'TERUTUNG MEGARA BARU'),
   ('1104032015', '1104032', 'LAWE PASARAN TENGKU MBELIN'),
   ('1104032016', '1104032', 'KISAM LESTARI'),
@@ -8840,7 +8840,7 @@ INSERT INTO `villages` VALUES
   ('1104041022', '1104041', 'KANDANG BELANG MANDIRI'),
   ('1104041023', '1104041', 'MBACANG RACUN'),
   ('1104041024', '1104041', 'LAWE KINGE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1104041025', '1104041', 'PERAPAT TIMUR'),
   ('1104041026', '1104041', 'BAHAGIA'),
   ('1104041027', '1104041', 'KUTA GALUH'),
@@ -8891,7 +8891,7 @@ INSERT INTO `villages` VALUES
   ('1104051024', '1104051', 'SIMPANG IV TANJUNG'),
   ('1104051025', '1104051', 'TANJUNG LEUSER'),
   ('1104051026', '1104051', 'LAWE PINIS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1104051027', '1104051', 'KUNING ABADI'),
   ('1104051028', '1104051', 'BUNTUL KENDAWI'),
   ('1104052001', '1104052', 'DELENG DAMAR'),
@@ -8942,7 +8942,7 @@ INSERT INTO `villages` VALUES
   ('1104053021', '1104053', 'KANE LOT'),
   ('1104053022', '1104053', 'LAWE HAKHUM'),
   ('1105080001', '1105080', 'LOKOP');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1105080002', '1105080', 'TUALANG'),
   ('1105080003', '1105080', 'GAMPONG TERUJAK'),
   ('1105080004', '1105080', 'LELES'),
@@ -8993,7 +8993,7 @@ INSERT INTO `villages` VALUES
   ('1105090018', '1105090', 'PAYA BILI I'),
   ('1105090019', '1105090', 'MERBAU II'),
   ('1105090020', '1105090', 'PAYA PEULAWI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1105090021', '1105090', 'BAYEUN'),
   ('1105090022', '1105090', 'ALUE GADENG'),
   ('1105090023', '1105090', 'PERK. ALUE GADENG DUA'),
@@ -9044,7 +9044,7 @@ INSERT INTO `villages` VALUES
   ('1105110032', '1105110', 'SEUNEUBOK ACEH'),
   ('1105110033', '1105110', 'UTEUN DAMA'),
   ('1105110034', '1105110', 'PAYA MEULIGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1105110035', '1105110', 'PUNTI'),
   ('1105110036', '1105110', 'KEUMUNENG'),
   ('1105110037', '1105110', 'BANGKA RIMUENG'),
@@ -9095,7 +9095,7 @@ INSERT INTO `villages` VALUES
   ('1105112006', '1105112', 'TANJUNG TUALANG'),
   ('1105112007', '1105112', 'BEUSA SEBERANG'),
   ('1105112008', '1105112', 'PAYA GAJAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1105112009', '1105112', 'MON GEUDONG'),
   ('1105112010', '1105112', 'ALUE BU TUHA'),
   ('1105112011', '1105112', 'ALUE BU JALAN'),
@@ -9146,7 +9146,7 @@ INSERT INTO `villages` VALUES
   ('1105130104', '1105130', 'SEUNEUBOK RAMBONG'),
   ('1105130105', '1105130', 'TANOH ANOU'),
   ('1105130106', '1105130', 'KAMPUNG TANJONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1105130107', '1105130', 'KUALA PD PUNTONG'),
   ('1105130108', '1105130', 'KAMPUNG JAWA'),
   ('1105130109', '1105130', 'BLANG GEULUMPANG'),
@@ -9197,7 +9197,7 @@ INSERT INTO `villages` VALUES
   ('1105132016', '1105132', 'SEUNEUBOK SIMPANG'),
   ('1105133001', '1105133', 'ALUE LHOK'),
   ('1105133002', '1105133', 'PADANG KASAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1105133003', '1105133', 'SEUNEUBOK BUYA'),
   ('1105133004', '1105133', 'PAYA AWE'),
   ('1105133005', '1105133', 'PAYA GABOH'),
@@ -9248,7 +9248,7 @@ INSERT INTO `villages` VALUES
   ('1105135009', '1105135', 'SEUNEUBOK TEUNGOH (SMK)'),
   ('1105135010', '1105135', 'SEUNEUBOK TIMUR'),
   ('1105135011', '1105135', 'MATANG BUNGONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1105135012', '1105135', 'MATANG RAYEUK (PR)'),
   ('1105135013', '1105135', 'SEUNEUBOK DALAM (SMK)'),
   ('1105140001', '1105140', 'SEUNEUBOK SIMPANG'),
@@ -9299,7 +9299,7 @@ INSERT INTO `villages` VALUES
   ('1105150001', '1105150', 'ALUE SIWAH SERDANG'),
   ('1105150002', '1105150', 'GAMPONG LHEE'),
   ('1105150003', '1105150', 'BEURANDANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1105150005', '1105150', 'SEUNEUBOK RAMBONG'),
   ('1105150006', '1105150', 'GAMPUNG JALAN'),
   ('1105150008', '1105150', 'BUKET MEURAK'),
@@ -9350,7 +9350,7 @@ INSERT INTO `villages` VALUES
   ('1105160014', '1105160', 'BUKET DINDENG'),
   ('1105160015', '1105160', 'LHOK RAMBONG'),
   ('1105160016', '1105160', 'BLANG MIDEUN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1105160017', '1105160', 'BLANG JAMBEE'),
   ('1105160018', '1105160', 'PAYA BAKONG'),
   ('1105160019', '1105160', 'BUKET SERAJA'),
@@ -9401,7 +9401,7 @@ INSERT INTO `villages` VALUES
   ('1105170009', '1105170', 'GRONG GRONG'),
   ('1105170010', '1105170', 'MEUNASAH TUNONG'),
   ('1105170011', '1105170', 'MATANG PEUREULAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1105170012', '1105170', 'MEUNASAH LEUBOK'),
   ('1105170013', '1105170', 'MEUNASAH TEUNGOH'),
   ('1105170014', '1105170', 'KEUDE BARO'),
@@ -9452,7 +9452,7 @@ INSERT INTO `villages` VALUES
   ('1105181011', '1105181', 'MATANG KEUPULA SATU'),
   ('1105181012', '1105181', 'ULEE ATEUNG'),
   ('1105181013', '1105181', 'BLANG ANDAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1105181014', '1105181', 'BINTAH'),
   ('1105181015', '1105181', 'BLANG AWE'),
   ('1105181016', '1105181', 'PANTE MEUREUBO'),
@@ -9503,7 +9503,7 @@ INSERT INTO `villages` VALUES
   ('1106011009', '1106011', 'GAYO MURNI'),
   ('1106011010', '1106011', 'PANTAN DAMAR'),
   ('1106011011', '1106011', 'DAMAR MULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1106012001', '1106012', 'GEGARANG'),
   ('1106012002', '1106012', 'BERAWANG DEWAL'),
   ('1106012003', '1106012', 'JAGONG'),
@@ -9554,7 +9554,7 @@ INSERT INTO `villages` VALUES
   ('1106031014', '1106031', 'TAKENGON BARAT'),
   ('1106031015', '1106031', 'KUTENI REJE'),
   ('1106031016', '1106031', 'MERAH MERSA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1106031017', '1106031', 'ONE-ONE'),
   ('1106031018', '1106031', 'TOWEREN MUSARA'),
   ('1106032001', '1106032', 'GUNUNG BUKIT'),
@@ -9605,7 +9605,7 @@ INSERT INTO `villages` VALUES
   ('1106040035', '1106040', 'LINUNG AYU'),
   ('1106040036', '1106040', 'KALA PEGASING'),
   ('1106040038', '1106040', 'BELANG BEBANGKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1106040039', '1106040', 'JURUSEN'),
   ('1106040041', '1106040', 'JEJEM'),
   ('1106040042', '1106040', 'SUKA DAMAI'),
@@ -9656,7 +9656,7 @@ INSERT INTO `villages` VALUES
   ('1106051005', '1106051', 'TIMANG RASA'),
   ('1106051006', '1106051', 'TAWAR MIKO'),
   ('1106051007', '1106051', 'TAWARDI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1106051008', '1106051', 'WIH NONGKAL'),
   ('1106051009', '1106051', 'DEDINGIN'),
   ('1106051010', '1106051', 'SEGENE BALIK'),
@@ -9707,7 +9707,7 @@ INSERT INTO `villages` VALUES
   ('1106060070', '1106060', 'ARUL KUMER TIMUR'),
   ('1106060071', '1106060', 'ARUL KUMER BARAT'),
   ('1106060072', '1106060', 'ARUL KUMER SELATAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1106061001', '1106061', 'PANTAN PENYO'),
   ('1106061002', '1106061', 'BAH'),
   ('1106061003', '1106061', 'CANG DURI'),
@@ -9758,7 +9758,7 @@ INSERT INTO `villages` VALUES
   ('1106063006', '1106063', 'PANTAN TENGAH'),
   ('1106063007', '1106063', 'PILAR'),
   ('1106063008', '1106063', 'ARUL PERTIK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1106063009', '1106063', 'ATU SINGKIH'),
   ('1106063010', '1106063', 'PANTAN BENER'),
   ('1106063011', '1106063', 'KERAWANG'),
@@ -9809,7 +9809,7 @@ INSERT INTO `villages` VALUES
   ('1107060025', '1107060', 'UJONG NGA'),
   ('1107060026', '1107060', 'GAMPONG LADANG'),
   ('1107060027', '1107060', 'COT LAMPISE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1107060028', '1107060', 'PINEM'),
   ('1107060029', '1107060', 'RANGKILEH'),
   ('1107060030', '1107060', 'COT AMUN'),
@@ -9860,7 +9860,7 @@ INSERT INTO `villages` VALUES
   ('1107062020', '1107062', 'PEULANTEU LB'),
   ('1107062021', '1107062', 'UJONG SIMPANG'),
   ('1107062022', '1107062', 'PANTON MAKMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1107062023', '1107062', 'PANTON BAHAGIA'),
   ('1107062024', '1107062', 'COT JURUMUDI'),
   ('1107062025', '1107062', 'ALUE SUNDAK'),
@@ -9911,7 +9911,7 @@ INSERT INTO `villages` VALUES
   ('1107070080', '1107070', 'JAWI'),
   ('1107071001', '1107071', 'ALUE LEUHOB'),
   ('1107071002', '1107071', 'BLANG LUAH LM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1107071003', '1107071', 'PASI MALE'),
   ('1107071004', '1107071', 'NAPAI'),
   ('1107071005', '1107071', 'BLANG COT MAMEH'),
@@ -9962,7 +9962,7 @@ INSERT INTO `villages` VALUES
   ('1107072026', '1107072', 'ALUE KUYUEN'),
   ('1107080023', '1107080', 'MAREK'),
   ('1107080025', '1107080', 'PASI TEUNGOH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1107080026', '1107080', 'PASI JAMBU'),
   ('1107080027', '1107080', 'ALUE TAMPAK'),
   ('1107080028', '1107080', 'TUMPOK LADANG'),
@@ -10013,7 +10013,7 @@ INSERT INTO `villages` VALUES
   ('1107081006', '1107081', 'LANGUNG'),
   ('1107081007', '1107081', 'MEUREUBO'),
   ('1107081008', '1107081', 'UJONG DRIEN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1107081009', '1107081', 'PASI PINANG'),
   ('1107081010', '1107081', 'UJONG TANJONG'),
   ('1107081011', '1107081', 'BUKIT JAYA'),
@@ -10064,7 +10064,7 @@ INSERT INTO `villages` VALUES
   ('1107083005', '1107083', 'LEK LEK'),
   ('1107083006', '1107083', 'GAMPONG BARO'),
   ('1107083007', '1107083', 'MEUTULANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1107083008', '1107083', 'MANGGIE'),
   ('1107083009', '1107083', 'TAMPING'),
   ('1107083010', '1107083', 'COT MANGGIE'),
@@ -10115,7 +10115,7 @@ INSERT INTO `villages` VALUES
   ('1108010018', '1108010', 'TEUNGOH GEUNTEUT'),
   ('1108010019', '1108010', 'BAROH GEUNTEUT'),
   ('1108010020', '1108010', 'BAROH BLANG MEE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108010021', '1108010', 'JANTANG'),
   ('1108010022', '1108010', 'MEUNASAH KRUENG KALA'),
   ('1108010023', '1108010', 'KAREUNG'),
@@ -10166,7 +10166,7 @@ INSERT INTO `villages` VALUES
   ('1108030006', '1108030', 'RITING'),
   ('1108030028', '1108030', 'LAMPANAH TUNONG'),
   ('1108030029', '1108030', 'LAMPANAH BARO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108030030', '1108030', 'LAMPANAH TEUNGOH'),
   ('1108030031', '1108030', 'LAMPANAH DAYAH'),
   ('1108030032', '1108030', 'LAMPANAH RANJO'),
@@ -10217,7 +10217,7 @@ INSERT INTO `villages` VALUES
   ('1108031004', '1108031', 'BUENG SIMEK'),
   ('1108031005', '1108031', 'BITHAK'),
   ('1108031006', '1108031', 'TUTUI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108031007', '1108031', 'PAKUK'),
   ('1108031008', '1108031', 'PASAR LAMPAKU'),
   ('1108031009', '1108031', 'SIGAPANG'),
@@ -10268,7 +10268,7 @@ INSERT INTO `villages` VALUES
   ('1108040038', '1108040', 'IBOH TANJONG'),
   ('1108040039', '1108040', 'IBOH TUNONG'),
   ('1108040040', '1108040', 'ALUE RINDANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108040041', '1108040', 'MEUNASAH BARO'),
   ('1108040047', '1108040', 'AYON'),
   ('1108040048', '1108040', 'BAYU'),
@@ -10319,7 +10319,7 @@ INSERT INTO `villages` VALUES
   ('1108042012', '1108042', 'SAREE ACEH'),
   ('1108050001', '1108050', 'LAMNGA'),
   ('1108050002', '1108050', 'BARO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108050003', '1108050', 'NEUHEUN'),
   ('1108050004', '1108050', 'DURUNG'),
   ('1108050005', '1108050', 'LADONG'),
@@ -10370,7 +10370,7 @@ INSERT INTO `villages` VALUES
   ('1108061008', '1108061', 'MIRUEK LAMREUDEUP'),
   ('1108061009', '1108061', 'KLIENG MEURIA'),
   ('1108061010', '1108061', 'LAMPINEUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108061011', '1108061', 'LAM ASAN'),
   ('1108061012', '1108061', 'LABUY'),
   ('1108061013', '1108061', 'LAM UJONG'),
@@ -10421,7 +10421,7 @@ INSERT INTO `villages` VALUES
   ('1108070052', '1108070', 'LEUPUNG ULEE ALUE'),
   ('1108070053', '1108070', 'LEUPUNG MESJID'),
   ('1108070054', '1108070', 'COT LAMME');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108080001', '1108080', 'WEU BADA'),
   ('1108080002', '1108080', 'PIYEUNG LHANG'),
   ('1108080003', '1108080', 'PIYEUNG DATU'),
@@ -10472,7 +10472,7 @@ INSERT INTO `villages` VALUES
   ('1108081009', '1108081', 'KAYEE KUNYET'),
   ('1108081010', '1108081', 'COT MEULANGEN'),
   ('1108081011', '1108081', 'COT NAMBAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108081012', '1108081', 'COT MANCANG'),
   ('1108081013', '1108081', 'EMPEE BATA'),
   ('1108081014', '1108081', 'COT BAGI'),
@@ -10523,7 +10523,7 @@ INSERT INTO `villages` VALUES
   ('1108090033', '1108090', 'DHAM CEUKOK'),
   ('1108090034', '1108090', 'GANI'),
   ('1108090035', '1108090', 'BUENG CEUKOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108090036', '1108090', 'TEUBANG PHUI'),
   ('1108090037', '1108090', 'ATEUK LUENG IE'),
   ('1108090038', '1108090', 'ATEUK ANGGOK'),
@@ -10574,7 +10574,7 @@ INSERT INTO `villages` VALUES
   ('1108100054', '1108100', 'LAMPANAH INEU'),
   ('1108100055', '1108100', 'KLING MANYANG'),
   ('1108100056', '1108100', 'LAMPISANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108100057', '1108100', 'LAMBARO SIBREH'),
   ('1108100058', '1108100', 'WEUSITEH'),
   ('1108100059', '1108100', 'ANEUK GALONG TITI'),
@@ -10625,7 +10625,7 @@ INSERT INTO `villages` VALUES
   ('1108110017', '1108110', 'LAMSITEH'),
   ('1108110018', '1108110', 'LAMPEUNEUEN'),
   ('1108110019', '1108110', 'ULEE TUY');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108110020', '1108110', 'PUNIE'),
   ('1108110021', '1108110', 'LEU UE'),
   ('1108110022', '1108110', 'GEUNDRING'),
@@ -10676,7 +10676,7 @@ INSERT INTO `villages` VALUES
   ('1108120007', '1108120', 'LAM HASAN'),
   ('1108120008', '1108120', 'PAYATIENG'),
   ('1108120009', '1108120', 'LAMGEU-EU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1108120010', '1108120', 'LAM RUKAM'),
   ('1108120011', '1108120', 'GURAH'),
   ('1108120012', '1108120', 'LAM ISEK'),
@@ -10727,7 +10727,7 @@ INSERT INTO `villages` VALUES
   ('1109070004', '1109070', 'AMUD MESJID'),
   ('1109070005', '1109070', 'COT TUNONG'),
   ('1109070006', '1109070', 'COT BAROH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109070007', '1109070', 'KRUENG NYONG'),
   ('1109070008', '1109070', 'KRUENG JANGKO'),
   ('1109070009', '1109070', 'REUDEUP MEULAYU'),
@@ -10778,7 +10778,7 @@ INSERT INTO `villages` VALUES
   ('1109071020', '1109071', 'MEUNASAH UKEE'),
   ('1109071021', '1109071', 'PALONG'),
   ('1109080032', '1109080', 'PAYA TIBA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109080033', '1109080', 'RAPANA'),
   ('1109080034', '1109080', 'BARO YAMAN'),
   ('1109080044', '1109080', 'SENTOSA'),
@@ -10829,7 +10829,7 @@ INSERT INTO `villages` VALUES
   ('1109081020', '1109081', 'NIBONG'),
   ('1109081021', '1109081', 'PALOH LHOK USI'),
   ('1109081022', '1109081', 'CAMPLI USI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109081023', '1109081', 'DAYAH USI'),
   ('1109081024', '1109081', 'PALOH TINGGI'),
   ('1109081025', '1109081', 'RAMBONG'),
@@ -10880,7 +10880,7 @@ INSERT INTO `villages` VALUES
   ('1109100003', '1109100', 'PEUNALOM II'),
   ('1109100004', '1109100', 'PEUNALOM I'),
   ('1109100005', '1109100', 'PULO BARO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109100006', '1109100', 'KEUDE TANGSE'),
   ('1109100007', '1109100', 'PULO MESJID I'),
   ('1109100008', '1109100', 'PULO MESJID II'),
@@ -10931,7 +10931,7 @@ INSERT INTO `villages` VALUES
   ('1109112007', '1109112', 'PALOH NALEUNG'),
   ('1109112008', '1109112', 'DAYAH MENARA'),
   ('1109112009', '1109112', 'PANTE SIREN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109112010', '1109112', 'UKE'),
   ('1109112011', '1109112', 'PANTE KULU'),
   ('1109112012', '1109112', 'CUT'),
@@ -10982,7 +10982,7 @@ INSERT INTO `villages` VALUES
   ('1109120044', '1109120', 'MALI GUYUI'),
   ('1109120045', '1109120', 'TANG KUENG'),
   ('1109120046', '1109120', 'LAMEU MNS LEUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109120047', '1109120', 'LHOK EMPEH'),
   ('1109120048', '1109120', 'MALI MESJID'),
   ('1109120049', '1109120', 'MALI COT'),
@@ -11033,7 +11033,7 @@ INSERT INTO `villages` VALUES
   ('1109140025', '1109140', 'JURONG ANOE'),
   ('1109140026', '1109140', 'TEUGOH PEUDAYA'),
   ('1109140027', '1109140', 'DAYAH PEUDAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109140028', '1109140', 'CUT PALOH'),
   ('1109140029', '1109140', 'PANTE CERMEN'),
   ('1109140030', '1109140', 'MEUKE GOGO'),
@@ -11084,7 +11084,7 @@ INSERT INTO `villages` VALUES
   ('1109150011', '1109150', 'KEURUMBOK'),
   ('1109150012', '1109150', 'PULO TUNONG'),
   ('1109150013', '1109150', 'TUNONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109150014', '1109150', 'RAYA'),
   ('1109150015', '1109150', 'DABOH'),
   ('1109150016', '1109150', 'CUT'),
@@ -11135,7 +11135,7 @@ INSERT INTO `villages` VALUES
   ('1109160002', '1109160', 'MESJID SUWIEK'),
   ('1109160003', '1109160', 'TEUNGOH SUWIEK'),
   ('1109160004', '1109160', 'BEUREUDEUP');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109160005', '1109160', 'SUKON ULGA'),
   ('1109160006', '1109160', 'PEUTOE'),
   ('1109160007', '1109160', 'GLEE GAPUI'),
@@ -11186,7 +11186,7 @@ INSERT INTO `villages` VALUES
   ('1109170003', '1109170', 'MEE TANOH'),
   ('1109170004', '1109170', 'PUUK'),
   ('1109170005', '1109170', 'BALEE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109170006', '1109170', 'MEUNJEE MESJID'),
   ('1109170007', '1109170', 'SUMBOE BUGA'),
   ('1109170008', '1109170', 'RAMBAYAN KUPULA'),
@@ -11237,7 +11237,7 @@ INSERT INTO `villages` VALUES
   ('1109180005', '1109180', 'ARON ASAN KUMBANG'),
   ('1109180006', '1109180', 'MEUNASAH MESJID'),
   ('1109180007', '1109180', 'MEUNASAH MEE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109180008', '1109180', 'MEUNASAH TEUNGOH'),
   ('1109180009', '1109180', 'ASAN'),
   ('1109180010', '1109180', 'PANJOU'),
@@ -11288,7 +11288,7 @@ INSERT INTO `villages` VALUES
   ('1109190010', '1109190', 'KULAM BARO'),
   ('1109190011', '1109190', 'LINGGONG SAGOE'),
   ('1109190012', '1109190', 'BLANG LEUEN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109190013', '1109190', 'MESJID TUNGUE'),
   ('1109190014', '1109190', 'ULEE BARAT'),
   ('1109190015', '1109190', 'EMPEH'),
@@ -11339,7 +11339,7 @@ INSERT INTO `villages` VALUES
   ('1109200008', '1109200', 'KRAMAT LUAR'),
   ('1109200009', '1109200', 'LAMPOH KRUENG'),
   ('1109200010', '1109200', 'PASI PEUKAN BARO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109200011', '1109200', 'PASI RAWA'),
   ('1109200012', '1109200', 'KUALA PIDIE'),
   ('1109200013', '1109200', 'BLOK BENGKEL'),
@@ -11390,7 +11390,7 @@ INSERT INTO `villages` VALUES
   ('1109210043', '1109210', 'TIBANG'),
   ('1109210044', '1109210', 'JEUMPA'),
   ('1109210045', '1109210', 'UJONG LANGGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109210046', '1109210', 'BATEE'),
   ('1109210047', '1109210', 'BIE'),
   ('1109210048', '1109210', 'BLANGKULA'),
@@ -11441,7 +11441,7 @@ INSERT INTO `villages` VALUES
   ('1109230001', '1109230', 'PAPEUN'),
   ('1109230002', '1109230', 'TUHA BIHEUE'),
   ('1109230003', '1109230', 'BATEE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1109230004', '1109230', 'INGIN JAYA'),
   ('1109230005', '1109230', 'BLANG RAYA'),
   ('1109230006', '1109230', 'UJONG PIE'),
@@ -11492,7 +11492,7 @@ INSERT INTO `villages` VALUES
   ('1110010073', '1110010', 'PINEUNG SIRI BEE'),
   ('1110010074', '1110010', 'MATANG TEUNGOH'),
   ('1110010075', '1110010', 'ULEE UE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110010076', '1110010', 'TANJONGAN IDEM'),
   ('1110010077', '1110010', 'TANJONG BARO'),
   ('1110010078', '1110010', 'MEUNASAH LINCAH'),
@@ -11543,7 +11543,7 @@ INSERT INTO `villages` VALUES
   ('1110011037', '1110011', 'BLANG PANYANG'),
   ('1110011038', '1110011', 'CALOK'),
   ('1110011039', '1110011', 'MEUNASAH BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110011040', '1110011', 'TAMBUE BARAT'),
   ('1110011041', '1110011', 'LHOK MANE'),
   ('1110020001', '1110020', 'SEUNEUBOK BARO'),
@@ -11594,7 +11594,7 @@ INSERT INTO `villages` VALUES
   ('1110030037', '1110030', 'COT GEULUMPANG BAROH'),
   ('1110030038', '1110030', 'KEUDE JEUNIEB'),
   ('1110030039', '1110030', 'JANGGOT SEUNGKO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110030040', '1110030', 'BLANG MEE TIMU'),
   ('1110030041', '1110030', 'MATANG NIBONG'),
   ('1110030042', '1110030', 'BLANG MEE BARAT'),
@@ -11645,7 +11645,7 @@ INSERT INTO `villages` VALUES
   ('1110040012', '1110040', 'MEUNASAH KRUENG'),
   ('1110040013', '1110040', 'MEUNASAH RABO'),
   ('1110040014', '1110040', 'MEUNASAH TAMBO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110040015', '1110040', 'MEUNASAH BAROH'),
   ('1110040016', '1110040', 'BLANG MATANG'),
   ('1110040017', '1110040', 'MEUNASAH TUNONG'),
@@ -11696,7 +11696,7 @@ INSERT INTO `villages` VALUES
   ('1110050010', '1110050', 'ALUE UNOU'),
   ('1110050011', '1110050', 'BATEE RAYA'),
   ('1110050012', '1110050', 'JULI MEE TEUNGOH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110050013', '1110050', 'SEUNEUBOK GUNCI'),
   ('1110050014', '1110050', 'GEULUMPANG MEU JIMJIM'),
   ('1110050016', '1110050', 'JULI TAMBOI TANJONG'),
@@ -11747,7 +11747,7 @@ INSERT INTO `villages` VALUES
   ('1110060040', '1110060', 'BLANG BLADEH'),
   ('1110060041', '1110060', 'GEULUMPANG PAYONG'),
   ('1110060042', '1110060', 'BLANG COT BAROH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110060043', '1110060', 'COT TAROM BAROH'),
   ('1110060044', '1110060', 'GEUDONG TAMPU'),
   ('1110060061', '1110060', 'LIPAH CUT'),
@@ -11798,7 +11798,7 @@ INSERT INTO `villages` VALUES
   ('1110062009', '1110062', 'BALEE KUYUN'),
   ('1110062010', '1110062', 'KAREUNG'),
   ('1110062011', '1110062', 'LANCOK LANCOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110062012', '1110062', 'COT USIBAK'),
   ('1110062013', '1110062', 'KUALA RAJA'),
   ('1110062014', '1110062', 'UJONG BLANG MESJID'),
@@ -11849,7 +11849,7 @@ INSERT INTO `villages` VALUES
   ('1110070039', '1110070', 'PUNJOT'),
   ('1110070040', '1110070', 'PULO PINEUNG MNS II'),
   ('1110070041', '1110070', 'BUGAK BLANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110070042', '1110070', 'PANTE SUKON'),
   ('1110070043', '1110070', 'PANTE PAKU'),
   ('1110070044', '1110070', 'PANTE RANUB'),
@@ -11900,7 +11900,7 @@ INSERT INTO `villages` VALUES
   ('1110080078', '1110080', 'COT BADA BAROH'),
   ('1110080079', '1110080', 'COT KEUMUDEE'),
   ('1110080081', '1110080', 'PULO NALEUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110080082', '1110080', 'COT NGA'),
   ('1110080083', '1110080', 'KARIENG'),
   ('1110080084', '1110080', 'MATA MAMPLAM'),
@@ -11951,7 +11951,7 @@ INSERT INTO `villages` VALUES
   ('1110082003', '1110082', 'BUKET SUDAN'),
   ('1110082004', '1110082', 'COT SALEUT'),
   ('1110082005', '1110082', 'PALOH MAMPREE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110082006', '1110082', 'ALUE IET'),
   ('1110082007', '1110082', 'AWE GEUTAH'),
   ('1110082008', '1110082', 'BLANG CIRIH'),
@@ -12002,7 +12002,7 @@ INSERT INTO `villages` VALUES
   ('1110100009', '1110100', 'BLANG KUBU'),
   ('1110100014', '1110100', 'PAYA BARO'),
   ('1110100015', '1110100', 'TANJONG MESJID');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110100016', '1110100', 'MON JEUREUJAK'),
   ('1110100017', '1110100', 'DAMA KAWAN'),
   ('1110100018', '1110100', 'COT RAMBAT'),
@@ -12053,7 +12053,7 @@ INSERT INTO `villages` VALUES
   ('1110101015', '1110101', 'BABAH JURONG'),
   ('1110101016', '1110101', 'DAYAH PANJOE'),
   ('1110101017', '1110101', 'IEMBUDEE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1110101018', '1110101', 'TINGKEUM BARO'),
   ('1110101019', '1110101', 'PULO REUDEUP'),
   ('1110101020', '1110101', 'TINGKEUM MANYANG'),
@@ -12104,7 +12104,7 @@ INSERT INTO `villages` VALUES
   ('1111010024', '1111010', 'LHOK KUYUEN'),
   ('1111010025', '1111010', 'LHOK GAJAH'),
   ('1111010026', '1111010', 'PANTE JALOH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111010027', '1111010', 'BABAH BULOH'),
   ('1111010028', '1111010', 'COT LAMBIDENG'),
   ('1111010029', '1111010', 'GAMPONG TEUNGOH'),
@@ -12155,7 +12155,7 @@ INSERT INTO `villages` VALUES
   ('1111021006', '1111021', 'SEUMIRAH'),
   ('1111022001', '1111022', 'JAMUAN'),
   ('1111022002', '1111022', 'ALUE KEUREUNYAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111022003', '1111022', 'BLANG PALA'),
   ('1111022004', '1111022', 'SANGKELAN'),
   ('1111022005', '1111022', 'ULEE NYEUE'),
@@ -12206,7 +12206,7 @@ INSERT INTO `villages` VALUES
   ('1111031002', '1111031', 'KILO METER VIII'),
   ('1111031003', '1111031', 'KILO METER VI'),
   ('1111031004', '1111031', 'MEUNASAH DAYAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111031005', '1111031', 'KEBON BARU'),
   ('1111031006', '1111031', 'IE TAREK I'),
   ('1111031007', '1111031', 'IE TAREK II'),
@@ -12257,7 +12257,7 @@ INSERT INTO `villages` VALUES
   ('1111040047', '1111040', 'PUNTI'),
   ('1111040048', '1111040', 'BAROH BLANG RIMUENG'),
   ('1111040049', '1111040', 'LANCOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111041001', '1111041', 'SUKA DAMAI'),
   ('1111041002', '1111041', 'PULO MEURIA'),
   ('1111041003', '1111041', 'KRUENG MBANG'),
@@ -12308,7 +12308,7 @@ INSERT INTO `villages` VALUES
   ('1111050037', '1111050', 'TUMPOK TUNGKU'),
   ('1111050038', '1111050', 'MANYANG'),
   ('1111050039', '1111050', 'ULEE MEURIA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111050040', '1111050', 'GEULUMPANG'),
   ('1111050041', '1111050', 'MNS TANJONG'),
   ('1111050042', '1111050', 'RAYEUK MATANG'),
@@ -12359,7 +12359,7 @@ INSERT INTO `villages` VALUES
   ('1111060099', '1111060', 'PUNTI MATANG KULI'),
   ('1111060100', '1111060', 'MATANG MEE'),
   ('1111060101', '1111060', 'RAYEUK GLANGGLONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111060102', '1111060', 'TUMPOK PEUREULAK'),
   ('1111060103', '1111060', 'RAYEUK MATANG KULI'),
   ('1111060104', '1111060', 'UDE'),
@@ -12410,7 +12410,7 @@ INSERT INTO `villages` VALUES
   ('1111061038', '1111061', 'TUNONG KRUENG'),
   ('1111061039', '1111061', 'TUMPOK MESJID'),
   ('1111062001', '1111062', 'TANJONG SEURUEKUY');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111062002', '1111062', 'ALUE RIMEE'),
   ('1111062003', '1111062', 'PAYA LUENG JALO'),
   ('1111062004', '1111062', 'SERDANG'),
@@ -12461,7 +12461,7 @@ INSERT INTO `villages` VALUES
   ('1111080025', '1111080', 'MATANG RAYA'),
   ('1111080026', '1111080', 'MATANG SEUKE PULOT'),
   ('1111080027', '1111080', 'LUENG TUHA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111080028', '1111080', 'PUCOK ALUE'),
   ('1111080029', '1111080', 'MATANG SERDANG'),
   ('1111080030', '1111080', 'MATANG TEUNGOH T'),
@@ -12512,7 +12512,7 @@ INSERT INTO `villages` VALUES
   ('1111081005', '1111081', 'LANGKAHAN'),
   ('1111081006', '1111081', 'GEUDUMBAK'),
   ('1111081007', '1111081', 'TANJONG DALAM SELATAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111081008', '1111081', 'MEUNASAH BLANG'),
   ('1111081009', '1111081', 'ALUE KRAK KAYEE'),
   ('1111081010', '1111081', 'TANJONG JAWA'),
@@ -12563,7 +12563,7 @@ INSERT INTO `villages` VALUES
   ('1111090032', '1111090', 'BANTAYAN'),
   ('1111090033', '1111090', 'TEUPIN KUYUEN'),
   ('1111100001', '1111100', 'CINTA MAKMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111100002', '1111100', 'BABUSSALAM'),
   ('1111100003', '1111100', 'BUKET DARA BARO'),
   ('1111100004', '1111100', 'MATANG BARO'),
@@ -12614,7 +12614,7 @@ INSERT INTO `villages` VALUES
   ('1111100069', '1111100', 'ALUE SERDANG'),
   ('1111100070', '1111100', 'MATANG RAYA BARAT'),
   ('1111100074', '1111100', 'PULO SEUKE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111100075', '1111100', 'ALUE GEUDONG'),
   ('1111100076', '1111100', 'MATANG KEULAYU'),
   ('1111100077', '1111100', 'MATANG RAYA TIMU'),
@@ -12665,7 +12665,7 @@ INSERT INTO `villages` VALUES
   ('1111110016', '1111110', 'MEUNASAH RAYEUK LB'),
   ('1111110017', '1111110', 'MEUCAT'),
   ('1111110018', '1111110', 'ASAN LB');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111110019', '1111110', 'RAWA'),
   ('1111110020', '1111110', 'BABAH GEUDUBANG'),
   ('1111110021', '1111110', 'MEUNASAH MEUREBO'),
@@ -12716,7 +12716,7 @@ INSERT INTO `villages` VALUES
   ('1111110067', '1111110', 'RANTO'),
   ('1111110068', '1111110', 'KEUTAPANG'),
   ('1111110069', '1111110', 'ALUE MUDEM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111110070', '1111110', 'R A M B O T'),
   ('1111110071', '1111110', 'ARA AB'),
   ('1111110072', '1111110', 'MEUNASAH ALUE DRIEN LB'),
@@ -12767,7 +12767,7 @@ INSERT INTO `villages` VALUES
   ('1111120061', '1111120', 'RAYEUK NALEUNG'),
   ('1111120062', '1111120', 'BLANG BIDOK'),
   ('1111120063', '1111120', 'PUNTI PULO AGAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111120064', '1111120', 'TEUNGOH PULO AGAM'),
   ('1111120065', '1111120', 'RAWA'),
   ('1111120066', '1111120', 'MATANG BEN'),
@@ -12818,7 +12818,7 @@ INSERT INTO `villages` VALUES
   ('1111130014', '1111130', 'PUSONG'),
   ('1111130015', '1111130', 'MANCANG'),
   ('1111130016', '1111130', 'BLANG KABU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111130017', '1111130', 'KEUDE GEUDONG'),
   ('1111130018', '1111130', 'BLANG PEURIA'),
   ('1111130019', '1111130', 'MEUNASAH ASAN'),
@@ -12869,7 +12869,7 @@ INSERT INTO `villages` VALUES
   ('1111140024', '1111140', 'MESJID'),
   ('1111140025', '1111140', 'PANTE'),
   ('1111140026', '1111140', 'KEUTAPANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111140027', '1111140', 'KEUDE TEUPIN PUNTI'),
   ('1111140028', '1111140', 'AWE'),
   ('1111140029', '1111140', 'HAGU'),
@@ -12920,7 +12920,7 @@ INSERT INTO `villages` VALUES
   ('1111160011', '1111160', 'KEUDE MANE'),
   ('1111160012', '1111160', 'MANE TUNONG'),
   ('1111160013', '1111160', 'PANTE GURAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1111160014', '1111160', 'KAMBAM'),
   ('1111160015', '1111160', 'KEUDE BUNGKAIH'),
   ('1111160016', '1111160', 'ULEE MADON'),
@@ -12971,7 +12971,7 @@ INSERT INTO `villages` VALUES
   ('1112011004', '1112011', 'MEUNASAH TENGAH'),
   ('1112011005', '1112011', 'MEUNASAH SUKON'),
   ('1112011006', '1112011', 'COT BAK-U');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1112011007', '1112011', 'MEURANDEH'),
   ('1112011008', '1112011', 'PADANG KELELE'),
   ('1112011009', '1112011', 'LADANG TUHA I'),
@@ -13022,7 +13022,7 @@ INSERT INTO `villages` VALUES
   ('1112030018', '1112030', 'LHUNG ASAN'),
   ('1112030019', '1112030', 'GUHANG'),
   ('1112030027', '1112030', 'KUTA TUHA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1112030029', '1112030', 'GUDANG'),
   ('1112030030', '1112030', 'BABAH LHUNG'),
   ('1112031001', '1112031', 'PADANG GEULUMPANG'),
@@ -13073,7 +13073,7 @@ INSERT INTO `villages` VALUES
   ('1112050005', '1112050', 'KRUENG BATEE'),
   ('1112050006', '1112050', 'LHOK GAJAH'),
   ('1112050007', '1112050', 'MUKA BLANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1112050008', '1112050', 'PADANG SIKABU'),
   ('1112050009', '1112050', 'LHUNG GELUMPANG'),
   ('1112050010', '1112050', 'ALUE PADEE'),
@@ -13124,7 +13124,7 @@ INSERT INTO `villages` VALUES
   ('1113011008', '1113011', 'KETUKAH'),
   ('1113011009', '1113011', 'BLANG JERANGO'),
   ('1113011010', '1113011', 'PEPARIK DEKAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1113020002', '1113020', 'PALOK'),
   ('1113020003', '1113020', 'PENGGALANGAN'),
   ('1113020004', '1113020', 'LEMPUH'),
@@ -13175,7 +13175,7 @@ INSERT INTO `villages` VALUES
   ('1113023003', '1113023', 'BLANG BENGKIK'),
   ('1113023004', '1113023', 'GANTUNG GELUNI'),
   ('1113023005', '1113023', 'KONG BUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1113023006', '1113023', 'UME LAH'),
   ('1113023007', '1113023', 'AKANG SIWAH'),
   ('1113023008', '1113023', 'TETINGI'),
@@ -13226,7 +13226,7 @@ INSERT INTO `villages` VALUES
   ('1113050013', '1113050', 'BERHUT'),
   ('1113050015', '1113050', 'KUTE REJE'),
   ('1113050016', '1113050', 'GEWAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1113050017', '1113050', 'PANTAN LUES'),
   ('1113050018', '1113050', 'MAKMUR JAYA'),
   ('1113050019', '1113050', 'PERSADA TONGRA'),
@@ -13277,7 +13277,7 @@ INSERT INTO `villages` VALUES
   ('1114020005', '1114020', 'KEBUN SUNGAI LIPUT'),
   ('1114020007', '1114020', 'ALUR SELEBU'),
   ('1114020008', '1114020', 'SUKA MAKMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1114020009', '1114020', 'SEUMADAM'),
   ('1114020010', '1114020', 'KARANGJADI'),
   ('1114020011', '1114020', 'KAMPUNG JAWA'),
@@ -13328,7 +13328,7 @@ INSERT INTO `villages` VALUES
   ('1114050010', '1114050', 'SEI KURUK III'),
   ('1114050011', '1114050', 'SEI KURUK II'),
   ('1114050012', '1114050', 'GEDUNG BIARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1114050013', '1114050', 'PERK SEURUWAY'),
   ('1114050014', '1114050', 'PADANG LANGGIS'),
   ('1114050015', '1114050', 'PANTAI BALAI'),
@@ -13379,7 +13379,7 @@ INSERT INTO `villages` VALUES
   ('1114061003', '1114061', 'PAYA RAHAT'),
   ('1114061004', '1114061', 'SUKA MULIA/UPAH HULU'),
   ('1114061005', '1114061', 'MATANG SEUPING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1114061006', '1114061', 'GAMPONG BESAR'),
   ('1114061007', '1114061', 'TELAGA MEUKU II'),
   ('1114061008', '1114061', 'TELAGA MEUKU I'),
@@ -13430,7 +13430,7 @@ INSERT INTO `villages` VALUES
   ('1114071012', '1114071', 'PANTAI PERLAK'),
   ('1114071013', '1114071', 'PANTAI TINJAU'),
   ('1114071014', '1114071', 'KEBUN BATANG ARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1114080001', '1114080', 'KRUENG SIKAJANG'),
   ('1114080002', '1114080', 'SEUNEUBOK PUNTI'),
   ('1114080003', '1114080', 'PAYA KETENGGAR'),
@@ -13481,7 +13481,7 @@ INSERT INTO `villages` VALUES
   ('1115010018', '1115010', 'SERBA GUNA'),
   ('1115010022', '1115010', 'KAYEE UNOU'),
   ('1115010023', '1115010', 'GEULANGGANG GAJAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1115010024', '1115010', 'SIDOJADI'),
   ('1115010025', '1115010', 'SUKAMULIA'),
   ('1115010026', '1115010', 'SIMPANG DUA'),
@@ -13532,7 +13532,7 @@ INSERT INTO `villages` VALUES
   ('1115020040', '1115020', 'BLANG BARO'),
   ('1115020041', '1115020', 'BLANG MUKO'),
   ('1115020042', '1115020', 'SIMPANG PEUT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1115020043', '1115020', 'KUTA MAKMUR'),
   ('1115020044', '1115020', 'GUNONG REUBO'),
   ('1115020045', '1115020', 'UJONG PASI'),
@@ -13583,7 +13583,7 @@ INSERT INTO `villages` VALUES
   ('1115030006', '1115030', 'MEUNASAH KRUENG'),
   ('1115030007', '1115030', 'KEUDE SEUMOT'),
   ('1115030008', '1115030', 'BLANG SEUMOT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1115030009', '1115030', 'BABAH KRUENG'),
   ('1115030010', '1115030', 'MEUNASAH PANTE'),
   ('1115030011', '1115030', 'BLANG BARO PR'),
@@ -13634,7 +13634,7 @@ INSERT INTO `villages` VALUES
   ('1115040047', '1115040', 'KUTA KUMBANG'),
   ('1115040048', '1115040', 'SAPEK'),
   ('1115040049', '1115040', 'KUTA SAYEH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1115040050', '1115040', 'PAROM'),
   ('1115040051', '1115040', 'BLANG BARO'),
   ('1115040052', '1115040', 'PEUREULAK'),
@@ -13685,7 +13685,7 @@ INSERT INTO `villages` VALUES
   ('1115050024', '1115050', 'BLANG BAYU'),
   ('1115050025', '1115050', 'MEURANDEH SUAK'),
   ('1115050026', '1115050', 'COT DIRUI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1115050027', '1115050', 'COT MANYANG'),
   ('1115050028', '1115050', 'KABU BAROH'),
   ('1115050029', '1115050', 'KABU TUNONG'),
@@ -13736,7 +13736,7 @@ INSERT INTO `villages` VALUES
   ('1116020004', '1116020', 'LADANG BARO'),
   ('1116020005', '1116020', 'BABAH CEUPAN'),
   ('1116020006', '1116020', 'GAMPONG HARAPAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1116020007', '1116020', 'TUWI KAYEE'),
   ('1116020008', '1116020', 'PANTON KABU'),
   ('1116020009', '1116020', 'ALUE TEUNGOH'),
@@ -13787,7 +13787,7 @@ INSERT INTO `villages` VALUES
   ('1116050011', '1116050', 'JEUMPHEUK'),
   ('1116050012', '1116050', 'BABAH NIPAH'),
   ('1116050013', '1116050', 'KUALA LIGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1116050014', '1116050', 'SEUMANTOK'),
   ('1116050027', '1116050', 'KRUENG AYON'),
   ('1116050028', '1116050', 'COT PUNTI'),
@@ -13838,7 +13838,7 @@ INSERT INTO `villages` VALUES
   ('1116060030', '1116060', 'BAK PAOH'),
   ('1116060031', '1116060', 'PASAR LAMNO'),
   ('1116060032', '1116060', 'PANTE KEUTAPANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1116060033', '1116060', 'PANTON MAKMUR'),
   ('1116060034', '1116060', 'KRUENG TUNONG'),
   ('1116060035', '1116060', 'LAMTUI'),
@@ -13889,7 +13889,7 @@ INSERT INTO `villages` VALUES
   ('1117010026', '1117010', 'PANTAN PEDIANGAN'),
   ('1117010027', '1117010', 'LAMPAHAN BARAT'),
   ('1117010028', '1117010', 'MEKAR AYU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1117010029', '1117010', 'LAMPAHAN TIMUR'),
   ('1117010030', '1117010', 'KOLAM PARA KANIS'),
   ('1117010031', '1117010', 'TIMANG RASA'),
@@ -13940,7 +13940,7 @@ INSERT INTO `villages` VALUES
   ('1117030006', '1117030', 'TINGKEM BERSATU'),
   ('1117030007', '1117030', 'TINGKEM ASLI'),
   ('1117030008', '1117030', 'REJE GURU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1117030009', '1117030', 'BLANG SENTANG'),
   ('1117030010', '1117030', 'PASAR SIMPANG TIGA'),
   ('1117030011', '1117030', 'BALE REDELONG'),
@@ -13991,7 +13991,7 @@ INSERT INTO `villages` VALUES
   ('1117040016', '1117040', 'JAMUR UJUNG'),
   ('1117040017', '1117040', 'WONOSOBO'),
   ('1117040018', '1117040', 'LUT KUCAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1117040019', '1117040', 'WIH PESAM'),
   ('1117040020', '1117040', 'CINTA DAMAI'),
   ('1117040021', '1117040', 'BENER MULIE'),
@@ -14042,7 +14042,7 @@ INSERT INTO `villages` VALUES
   ('1117051003', '1117051', 'BENER KELIPAH SELATAN'),
   ('1117051004', '1117051', 'BINTANG MUSARA'),
   ('1117051005', '1117051', 'BANDAR JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1117051006', '1117051', 'NOSAR TAWAR JAYA'),
   ('1117051007', '1117051', 'JONGOK MELUEM'),
   ('1117051008', '1117051', 'SUKU BENER'),
@@ -14093,7 +14093,7 @@ INSERT INTO `villages` VALUES
   ('1117070012', '1117070', 'TEMAS MUMANANG'),
   ('1117070013', '1117070', 'WEH TENANG TUA'),
   ('1117070014', '1117070', 'AYU ARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1117070015', '1117070', 'BALE MUSARA'),
   ('1117070016', '1117070', 'BALE PURNAMA'),
   ('1117070017', '1117070', 'BURNI PASE'),
@@ -14144,7 +14144,7 @@ INSERT INTO `villages` VALUES
   ('1118020005', '1118020', 'MEUNASAH KULAM'),
   ('1118020006', '1118020', 'MEUNASAH TEUNGOH'),
   ('1118020007', '1118020', 'GEUNTENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1118020008', '1118020', 'MEUNASAH BIE'),
   ('1118020009', '1118020', 'MEUNASAH RAYA'),
   ('1118020010', '1118020', 'GAMPONG BLANG'),
@@ -14195,7 +14195,7 @@ INSERT INTO `villages` VALUES
   ('1118030036', '1118030', 'GAMPONG ULEE GLE'),
   ('1118030037', '1118030', 'MUKO KUTHANG'),
   ('1118030038', '1118030', 'PEULAKAN TUNONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1118030039', '1118030', 'PEULAKAN TAMBO'),
   ('1118030040', '1118030', 'KUTA KRUENG'),
   ('1118030041', '1118030', 'PAYA TUNONG'),
@@ -14246,7 +14246,7 @@ INSERT INTO `villages` VALUES
   ('1118050023', '1118050', 'KEUDE ULIM'),
   ('1118050024', '1118050', 'DAYAH LUBUE'),
   ('1118050025', '1118050', 'MESJID ULIM BAROH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1118050026', '1118050', 'MEUNASAH BUENG'),
   ('1118050027', '1118050', 'GEULANGGANG'),
   ('1118050028', '1118050', 'TIJIEN HUSEN'),
@@ -14297,7 +14297,7 @@ INSERT INTO `villages` VALUES
   ('1118080006', '1118080', 'MNS KAYEE JATOE'),
   ('1118080007', '1118080', 'MNS BLANG BARO'),
   ('1118080008', '1118080', 'MNS BLANG IBOIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1118080009', '1118080', 'MNS DAYAH LANGIEN'),
   ('1118080010', '1118080', 'MNS BLANG KRUENG'),
   ('1118080011', '1118080', 'MEUNASAH ALUE'),
@@ -14348,7 +14348,7 @@ INSERT INTO `villages` VALUES
   ('1171010033', '1171010', 'LAMBUNG'),
   ('1171010034', '1171010', 'BLANG OI'),
   ('1171010035', '1171010', 'ALUE DEAH TEUNGOH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1171010036', '1171010', 'DEAH BARO'),
   ('1171011001', '1171011', 'ULEE PATA'),
   ('1171011002', '1171011', 'LAMJAMEE'),
@@ -14399,7 +14399,7 @@ INSERT INTO `villages` VALUES
   ('1171030013', '1171030', 'LAMPULO'),
   ('1171030014', '1171030', 'LAMDINGIN'),
   ('1171030015', '1171030', 'LAMBARO SKEP');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1171031001', '1171031', 'LAMPASEH KOTA'),
   ('1171031002', '1171031', 'MERDUATI'),
   ('1171031003', '1171031', 'KEUDAH'),
@@ -14450,7 +14450,7 @@ INSERT INTO `villages` VALUES
   ('1173010012', '1173010', 'SIMPANG WIE'),
   ('1173010013', '1173010', 'BUKET RATA'),
   ('1173010014', '1173010', 'BUKET MEUTUAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1173010015', '1173010', 'ALUE MERBAU'),
   ('1173010016', '1173010', 'MATANG CEUNGAI'),
   ('1173010017', '1173010', 'SEUNEUBOK ANTARA'),
@@ -14501,7 +14501,7 @@ INSERT INTO `villages` VALUES
   ('1173021011', '1173021', 'LENGKONG'),
   ('1173021012', '1173021', 'SUKAJADI MAKMUR'),
   ('1173030001', '1173030', 'GAMPONG TEUNGOH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1173030002', '1173030', 'PEUKAN LANGSA'),
   ('1173030004', '1173030', 'GAMPONG JAWA'),
   ('1173030005', '1173030', 'PAYA BUJOK BLANG PASE'),
@@ -14552,7 +14552,7 @@ INSERT INTO `villages` VALUES
   ('1174020018', '1174020', 'MNS ALUE'),
   ('1174021001', '1174021', 'COT TRIENG'),
   ('1174021002', '1174021', 'PALOH PUNTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1174021003', '1174021', 'MNS DAYAH'),
   ('1174021004', '1174021', 'BLANG PANYANG'),
   ('1174021005', '1174021', 'MEURIA'),
@@ -14603,7 +14603,7 @@ INSERT INTO `villages` VALUES
   ('1175020004', '1175020', 'LAE BERSIH'),
   ('1175020005', '1175020', 'CEPU'),
   ('1175020006', '1175020', 'KUTA TENGAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1175020007', '1175020', 'SIKELANG'),
   ('1175020008', '1175020', 'JONTOR'),
   ('1175020009', '1175020', 'LAE IKAN'),
@@ -14654,7 +14654,7 @@ INSERT INTO `villages` VALUES
   ('1175040018', '1175040', 'JABI-JABI BARAT'),
   ('1175040019', '1175040', 'BATU NAPAL'),
   ('1175050001', '1175050', 'SEPANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1175050002', '1175050', 'LONGKIB'),
   ('1175050003', '1175050', 'PANJI'),
   ('1175050004', '1175050', 'DARUL AMAN'),
@@ -14705,7 +14705,7 @@ INSERT INTO `villages` VALUES
   ('1201061011', '1201061', 'SITOLUBANUA'),
   ('1201061012', '1201061', 'ORAHILI'),
   ('1201061013', '1201061', 'SIOFAEWALI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1201061014', '1201061', 'SOHOYA'),
   ('1201061015', '1201061', 'TAGAULE'),
   ('1201061016', '1201061', 'BOTOHAENGA'),
@@ -14756,7 +14756,7 @@ INSERT INTO `villages` VALUES
   ('1201071001', '1201071', 'TUHEMBUASI'),
   ('1201071002', '1201071', 'HILIBADALU'),
   ('1201071003', '1201071', 'LAURI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1201071004', '1201071', 'HILIMBANA'),
   ('1201071005', '1201071', 'SAETAGARAMBA'),
   ('1201071006', '1201071', 'SOGAEADU'),
@@ -14807,7 +14807,7 @@ INSERT INTO `villages` VALUES
   ('1201131002', '1201131', 'LOLOFAOSO LALAI'),
   ('1201131003', '1201131', 'FULOLO LALAI'),
   ('1201131004', '1201131', 'LALAI I / II');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1201131005', '1201131', 'LAWA LAWA'),
   ('1201131006', '1201131', 'LOLOWUA'),
   ('1201131007', '1201131', 'DAHADANO BOTOMBAWO'),
@@ -14858,7 +14858,7 @@ INSERT INTO `villages` VALUES
   ('1202011001', '1202011', 'SINUNUKAN IV'),
   ('1202011002', '1202011', 'SINUNUKAN II'),
   ('1202011003', '1202011', 'SINUNUKAN I CENTRAL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1202011004', '1202011', 'SINUNUKAN III'),
   ('1202011005', '1202011', 'BANJAR AUR UTARA'),
   ('1202011006', '1202011', 'BINTUNGAN BEJANGKAR BARU'),
@@ -14909,7 +14909,7 @@ INSERT INTO `villages` VALUES
   ('1202021017', '1202021', 'SIMPANG DUKU'),
   ('1202021018', '1202021', 'SIMPANG KOJE'),
   ('1202021019', '1202021', 'PANGKALAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1202021020', '1202021', 'LANCAT'),
   ('1202021021', '1202021', 'SIKUMBU'),
   ('1202021022', '1202021', 'AEK GARINGGING'),
@@ -14960,7 +14960,7 @@ INSERT INTO `villages` VALUES
   ('1202030030', '1202030', 'PADANG BULAN'),
   ('1202030031', '1202030', 'MUARA SIAMBAK'),
   ('1202030032', '1202030', 'SIMANDOLAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1202030033', '1202030', 'MUARAPOTAN'),
   ('1202030035', '1202030', 'TOMBANG BUSTAK'),
   ('1202030036', '1202030', 'HUTA BARINGIN TB'),
@@ -15011,7 +15011,7 @@ INSERT INTO `villages` VALUES
   ('1202032028', '1202032', 'SIMANGAMBAT TB'),
   ('1202033001', '1202033', 'PURBA BARU'),
   ('1202033002', '1202033', 'SIANTONA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1202033003', '1202033', 'PURBA LAMO'),
   ('1202033004', '1202033', 'BANGUN PURBA'),
   ('1202033005', '1202033', 'AEK MARIAN MG'),
@@ -15062,7 +15062,7 @@ INSERT INTO `villages` VALUES
   ('1202050030', '1202050', 'DARUSSALAM'),
   ('1202050031', '1202050', 'SIOBON JULU'),
   ('1202050032', '1202050', 'KOTA SIANTAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1202050033', '1202050', 'PANYABUNGAN II'),
   ('1202050034', '1202050', 'PANYABUNGAN III'),
   ('1202050035', '1202050', 'PANYABUNGAN I'),
@@ -15113,7 +15113,7 @@ INSERT INTO `villages` VALUES
   ('1202052006', '1202052', 'BARBARAN'),
   ('1202052007', '1202052', 'HUTA TONGA BARBARAN'),
   ('1202052008', '1202052', 'RUNDING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1202052009', '1202052', 'BARBARAN JAE'),
   ('1202052010', '1202052', 'BATANG GADIS JAE'),
   ('1202053005', '1202053', 'BARINGIN JAYA'),
@@ -15164,7 +15164,7 @@ INSERT INTO `villages` VALUES
   ('1202060005', '1202060', 'PASAR II NATAL'),
   ('1202060006', '1202060', 'PASAR I NATAL'),
   ('1202060007', '1202060', 'SETIA KARYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1202060008', '1202060', 'PATILUBAN HILIR'),
   ('1202060009', '1202060', 'TEGAL SARI'),
   ('1202060010', '1202060', 'PERKEBUNAN PATILUBAN'),
@@ -15215,7 +15215,7 @@ INSERT INTO `villages` VALUES
   ('1202080017', '1202080', 'HUTA GODANG MUDA'),
   ('1202080020', '1202080', 'MUARA BATANG ANGKOLA'),
   ('1202080021', '1202080', 'HURABA I');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1202080022', '1202080', 'SIMANINGGIR'),
   ('1202080023', '1202080', 'SIABU'),
   ('1202080024', '1202080', 'BONAN DOLOK'),
@@ -15266,7 +15266,7 @@ INSERT INTO `villages` VALUES
   ('1203010084', '1203010', 'SIDADI I'),
   ('1203010087', '1203010', 'JANJI MAULI MT'),
   ('1203010088', '1203010', 'MUARA TAIS III');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1203010090', '1203010', 'PARGUMBANGAN'),
   ('1203010094', '1203010', 'PANGARIBUAN'),
   ('1203010099', '1203010', 'AEK NAULI'),
@@ -15317,7 +15317,7 @@ INSERT INTO `villages` VALUES
   ('1203012007', '1203012', 'LUMBAN JABI-JABI'),
   ('1203012008', '1203012', 'PURBATUA'),
   ('1203012009', '1203012', 'HUTARAJA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1203012010', '1203012', 'PANABARI HUTA TONGA'),
   ('1203012011', '1203012', 'SITUMBA'),
   ('1203012012', '1203012', 'BATU HORPAK'),
@@ -15368,7 +15368,7 @@ INSERT INTO `villages` VALUES
   ('1203090021', '1203090', 'AEK NABARA'),
   ('1203090022', '1203090', 'SIBANGKUA'),
   ('1203090023', '1203090', 'SIGUMURU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1203090024', '1203090', 'SITINJAK'),
   ('1203090025', '1203090', 'SIMATORKIS SISOMA'),
   ('1203090026', '1203090', 'PANOBASAN'),
@@ -15419,7 +15419,7 @@ INSERT INTO `villages` VALUES
   ('1203101070', '1203101', 'SUGI'),
   ('1203101071', '1203101', 'TANJUNG DOLOK'),
   ('1203102001', '1203102', 'MUARA UPU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1203102002', '1203102', 'BANDAR HAPINIS'),
   ('1203102003', '1203102', 'HUTA RAJA'),
   ('1203102004', '1203102', 'MUARA MANOMPAS'),
@@ -15470,7 +15470,7 @@ INSERT INTO `villages` VALUES
   ('1203110117', '1203110', 'PAHAE AEK SAGALA'),
   ('1203120031', '1203120', 'SIPOGU'),
   ('1203120032', '1203120', 'DALIHAN NATOLU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1203120033', '1203120', 'PARDOMUAN'),
   ('1203120034', '1203120', 'ARSE NAULI'),
   ('1203120035', '1203120', 'PINAGAR'),
@@ -15521,7 +15521,7 @@ INSERT INTO `villages` VALUES
   ('1204011004', '1204011', 'LOPIAN'),
   ('1204011005', '1204011', 'AEK HORSIK'),
   ('1204011006', '1204011', 'KEBUN PISANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1204011007', '1204011', 'GUNUNG KELAMBU'),
   ('1204011008', '1204011', 'LUBUK AMPOLU'),
   ('1204011009', '1204011', 'PAGARAN HONAS'),
@@ -15572,7 +15572,7 @@ INSERT INTO `villages` VALUES
   ('1204031004', '1204031', 'SAIT KALANGAN II'),
   ('1204031005', '1204031', 'AEK BONTAR'),
   ('1204031006', '1204031', 'TAPIAN NAULI/SAURMANGGITA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1204031007', '1204031', 'BONALUMBAN'),
   ('1204031008', '1204031', 'TUKKA'),
   ('1204031009', '1204031', 'AEK TOLANG INDUK'),
@@ -15623,7 +15623,7 @@ INSERT INTO `villages` VALUES
   ('1204060021', '1204060', 'RIANIATE'),
   ('1204060023', '1204060', 'DOLOK PANTIS'),
   ('1204060024', '1204060', 'TELUK ROBAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1204060025', '1204060', 'SORKAM KIRI'),
   ('1204060026', '1204060', 'SORKAM TENGAH'),
   ('1204060027', '1204060', 'HITE URAT'),
@@ -15674,7 +15674,7 @@ INSERT INTO `villages` VALUES
   ('1204071006', '1204071', 'BARINGIN'),
   ('1204071007', '1204071', 'HUTA TOMBAK'),
   ('1204071008', '1204071', 'SIBINTANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1204071009', '1204071', 'UNTE BOANG'),
   ('1204072001', '1204072', 'LADANG TENGAH'),
   ('1204072002', '1204072', 'URATAN'),
@@ -15725,7 +15725,7 @@ INSERT INTO `villages` VALUES
   ('1204081007', '1204081', 'SIGODUNG'),
   ('1204081008', '1204081', 'MUARA ORE'),
   ('1205030001', '1205030', 'MANALU PURBA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1205030002', '1205030', 'MANALU DOLOK'),
   ('1205030003', '1205030', 'MANALU'),
   ('1205030004', '1205030', 'HUTA JULU'),
@@ -15776,7 +15776,7 @@ INSERT INTO `villages` VALUES
   ('1205060010', '1205060', 'PARBUBU DOLOK'),
   ('1205060011', '1205060', 'HUTA TORUAN VIII'),
   ('1205060012', '1205060', 'PARBUBU I');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1205060013', '1205060', 'HUTATORUAN I'),
   ('1205060019', '1205060', 'SOSUNGGULON'),
   ('1205060020', '1205060', 'PARBAJU TORUAN'),
@@ -15827,7 +15827,7 @@ INSERT INTO `villages` VALUES
   ('1205070012', '1205070', 'JANJI MATOGU'),
   ('1205070013', '1205070', 'LUMBAN JAEAN'),
   ('1205070014', '1205070', 'ONAN HASANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1205070015', '1205070', 'PANTIS'),
   ('1205070016', '1205070', 'LONTUNG DOLOK'),
   ('1205070017', '1205070', 'SIMATANIARI'),
@@ -15878,7 +15878,7 @@ INSERT INTO `villages` VALUES
   ('1205090011', '1205090', 'PARSI BARUNGAN'),
   ('1205090012', '1205090', 'PAKPAHAN'),
   ('1205090013', '1205090', 'NAJUMAMBE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1205090014', '1205090', 'PURBATUA'),
   ('1205090015', '1205090', 'LUMBAN SORMIN'),
   ('1205090016', '1205090', 'SIBINGKE'),
@@ -15929,7 +15929,7 @@ INSERT INTO `villages` VALUES
   ('1205110022', '1205110', 'SIABAL ABAL IV'),
   ('1205110023', '1205110', 'AEK NAULI IV'),
   ('1205110024', '1205110', 'SIABAL-ABAL VI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1205110025', '1205110', 'SIABAL-ABAL V'),
   ('1205120001', '1205120', 'LUMBAN TONGA TONGA'),
   ('1205120002', '1205120', 'PANIARAN'),
@@ -15980,7 +15980,7 @@ INSERT INTO `villages` VALUES
   ('1205180018', '1205180', 'SILANDO'),
   ('1205180019', '1205180', 'PAPANDE'),
   ('1205180020', '1205180', 'SIBANDANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1205180021', '1205180', 'SAMPURAN'),
   ('1206030004', '1206030', 'AEK BOLON JULU'),
   ('1206030005', '1206030', 'AEK BOLON JAE'),
@@ -16031,7 +16031,7 @@ INSERT INTO `villages` VALUES
   ('1206040006', '1206040', 'SITANGKOLA'),
   ('1206040007', '1206040', 'SIBUEA'),
   ('1206040008', '1206040', 'SIMATIBUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1206040009', '1206040', 'PARDOMUAN NAULI'),
   ('1206040010', '1206040', 'UJUNG TANDUK'),
   ('1206040011', '1206040', 'PINTU BOSI'),
@@ -16082,7 +16082,7 @@ INSERT INTO `villages` VALUES
   ('1206051011', '1206051', 'RIGANJANG'),
   ('1206051012', '1206051', 'PASAR BORBOR'),
   ('1206051013', '1206051', 'LUMBAN SEWA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1206051014', '1206051', 'HUTA GURGUR'),
   ('1206051015', '1206051', 'SIMARE'),
   ('1206052001', '1206052', 'LUMBAN RAU TENGAH'),
@@ -16133,7 +16133,7 @@ INSERT INTO `villages` VALUES
   ('1206070012', '1206070', 'PARPAREAN III'),
   ('1206070013', '1206070', 'PARPAREAN IV'),
   ('1206070014', '1206070', 'GALA GALA PANGKAILAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1206070026', '1206070', 'PASAR PORSEA'),
   ('1206070027', '1206070', 'PATANE III'),
   ('1206070028', '1206070', 'PATANE IV'),
@@ -16184,7 +16184,7 @@ INSERT INTO `villages` VALUES
   ('1206080027', '1206080', 'HATINGGIAN'),
   ('1206080028', '1206080', 'LINTONG JULU'),
   ('1206080029', '1206080', 'PASAR LUMBAN JULU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1206080030', '1206080', 'SIONGGANG UTARA'),
   ('1206080031', '1206080', 'SIONGGANG TENGAH'),
   ('1206080032', '1206080', 'SIONGGANG SELATAN'),
@@ -16235,7 +16235,7 @@ INSERT INTO `villages` VALUES
   ('1207050003', '1207050', 'KAMPUNG DALAM'),
   ('1207050004', '1207050', 'LINGGA TIGA'),
   ('1207050005', '1207050', 'BANDAR TINGGI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1207050006', '1207050', 'S TIGA AEK NABARA'),
   ('1207050007', '1207050', 'S EMPAT AEK NABARA'),
   ('1207050008', '1207050', 'S LIMA AEK NABARA'),
@@ -16286,7 +16286,7 @@ INSERT INTO `villages` VALUES
   ('1207130012', '1207130', 'TANJUNG HALOBAN'),
   ('1207130013', '1207130', 'SELAT BESAR'),
   ('1207140001', '1207140', 'SEI SENTOSA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1207140002', '1207140', 'AJAMU'),
   ('1207140003', '1207140', 'MERANTI PAHAM'),
   ('1207140004', '1207140', 'TELUK SENTOSA'),
@@ -16337,7 +16337,7 @@ INSERT INTO `villages` VALUES
   ('1208010005', '1208010', 'SEI KOPAS'),
   ('1208010006', '1208010', 'SILAU JAWA'),
   ('1208010007', '1208010', 'SEI NADORAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1208010008', '1208010', 'TOMUAN HOLBUNG'),
   ('1208010009', '1208010', 'GOTTING SIDODADI'),
   ('1208020013', '1208020', 'BANDAR PULAU PEKAN'),
@@ -16388,7 +16388,7 @@ INSERT INTO `villages` VALUES
   ('1208032001', '1208032', 'AEK BANGE'),
   ('1208032002', '1208032', 'LEDONG BARAT'),
   ('1208032003', '1208032', 'LEDONG TIMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1208032004', '1208032', 'AEK KORSIK'),
   ('1208032005', '1208032', 'AEK LEDONG'),
   ('1208032006', '1208032', 'AEK NABUNTU'),
@@ -16439,7 +16439,7 @@ INSERT INTO `villages` VALUES
   ('1208070005', '1208070', 'PERKEBUNAN AIR BATU I/II'),
   ('1208070006', '1208070', 'PINANGGIRIPAN'),
   ('1208070007', '1208070', 'DANAU SIJABUT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1208070008', '1208070', 'HESSA PERLOMPONGAN'),
   ('1208070009', '1208070', 'AIR GENTING'),
   ('1208070010', '1208070', 'HESSA AIR GENTING'),
@@ -16490,7 +16490,7 @@ INSERT INTO `villages` VALUES
   ('1208091005', '1208091', 'GEDANGAN'),
   ('1208091006', '1208091', 'SIDOMULYO'),
   ('1208091007', '1208091', 'PULO BANDRING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1208091008', '1208091', 'SUKA MAKMUR'),
   ('1208091009', '1208091', 'SUKADAMAI BARAT'),
   ('1208091010', '1208091', 'BUNUT SEBERANG'),
@@ -16541,7 +16541,7 @@ INSERT INTO `villages` VALUES
   ('1209010002', '1209010', 'SIBANGUN MERIAH'),
   ('1209010004', '1209010', 'SARIBU DOLOK'),
   ('1209010005', '1209010', 'PURBA SINOMBAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1209010006', '1209010', 'PURBA TUA'),
   ('1209010011', '1209010', 'PURBA TUA BARU'),
   ('1209010014', '1209010', 'SINAR BARU'),
@@ -16592,7 +16592,7 @@ INSERT INTO `villages` VALUES
   ('1209040021', '1209040', 'BUKIT REJO'),
   ('1209041001', '1209041', 'SIPOLHA HORISAN'),
   ('1209041002', '1209041', 'PEMATANG TAMBUN RAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1209041003', '1209041', 'SIHAPORAS'),
   ('1209041004', '1209041', 'JORLANG HULUAN'),
   ('1209041005', '1209041', 'BANDAR MANIK'),
@@ -16643,7 +16643,7 @@ INSERT INTO `villages` VALUES
   ('1209070005', '1209070', 'MARIHAT RAJA'),
   ('1209070006', '1209070', 'TIGA DOLOK'),
   ('1209070007', '1209070', 'BANDAR DOLOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1209070008', '1209070', 'DOLOK TOMUAN'),
   ('1209070009', '1209070', 'UJUNG BONDAR'),
   ('1209070010', '1209070', 'SIATASAN'),
@@ -16694,7 +16694,7 @@ INSERT INTO `villages` VALUES
   ('1209091010', '1209091', 'BANUH RAYA'),
   ('1209091011', '1209091', 'RUKUN MULYO'),
   ('1209100003', '1209100', 'RAYA BAYU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1209100004', '1209100', 'DALIG RAYA'),
   ('1209100005', '1209100', 'PEMATANG RAYA'),
   ('1209100006', '1209100', 'MEREK RAYA'),
@@ -16745,7 +16745,7 @@ INSERT INTO `villages` VALUES
   ('1209120008', '1209120', 'BANDAR MARUHUR'),
   ('1209120009', '1209120', 'SILAU PARIBUAN'),
   ('1209120010', '1209120', 'SILAU DUNIA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1209120011', '1209120', 'BUTTU BAYU'),
   ('1209120012', '1209120', 'NAGORI TANI'),
   ('1209120013', '1209120', 'BAH SARIMAH'),
@@ -16796,7 +16796,7 @@ INSERT INTO `villages` VALUES
   ('1209160001', '1209160', 'SILAMPUYANG'),
   ('1209160002', '1209160', 'SILAU MANIK'),
   ('1209160003', '1209160', 'SILAU MALAHA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1209160004', '1209160', 'MARIHAT BARIS'),
   ('1209160005', '1209160', 'SIANTAR ESTATE'),
   ('1209160006', '1209160', 'RAMBUNG MERAH'),
@@ -16847,7 +16847,7 @@ INSERT INTO `villages` VALUES
   ('1209170015', '1209170', 'MALIGAS BAYU'),
   ('1209170016', '1209170', 'RAJA MALIGAS'),
   ('1209170017', '1209170', 'DOLOK SINUMBAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1209170018', '1209170', 'RAJA MALIGAS I'),
   ('1209170019', '1209170', 'BAHAL BATU'),
   ('1209170020', '1209170', 'POKAN BARU'),
@@ -16898,7 +16898,7 @@ INSERT INTO `villages` VALUES
   ('1209190012', '1209190', 'PERLANAAN'),
   ('1209190013', '1209190', 'SIDO TANI'),
   ('1209190014', '1209190', 'SUGARANG BAYU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1209190015', '1209190', 'PERDAGANGAN III'),
   ('1209190016', '1209190', 'LANDBOUW'),
   ('1209191001', '1209191', 'PANOMBEAN BARU'),
@@ -16949,7 +16949,7 @@ INSERT INTO `villages` VALUES
   ('1209210019', '1209210', 'BANJAR HULU'),
   ('1209210020', '1209210', 'RAWA MASIN'),
   ('1210030002', '1210030', 'SIDIANGKAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1210030003', '1210030', 'BATANG BERUH'),
   ('1210030004', '1210030', 'BINTANG HULU'),
   ('1210030005', '1210030', 'KALANG SIMBARA'),
@@ -17000,7 +17000,7 @@ INSERT INTO `villages` VALUES
   ('1210050018', '1210050', 'TANJUNG BERINGIN I'),
   ('1210050019', '1210050', 'BARISAN NAULI'),
   ('1210051001', '1210051', 'SILALAHI II');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1210051002', '1210051', 'SILALAHI I'),
   ('1210051003', '1210051', 'PAROPO'),
   ('1210051004', '1210051', 'SILALAHI III'),
@@ -17051,7 +17051,7 @@ INSERT INTO `villages` VALUES
   ('1210080006', '1210080', 'SIGAMBIR GAMBIR'),
   ('1210080007', '1210080', 'SILUMBOYAH'),
   ('1210080008', '1210080', 'PANGARIBUAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1210080009', '1210080', 'TUALANG'),
   ('1210080010', '1210080', 'BAKAL JULU'),
   ('1210080011', '1210080', 'SIPOLTONG'),
@@ -17102,7 +17102,7 @@ INSERT INTO `villages` VALUES
   ('1210110012', '1210110', 'MBINANGA'),
   ('1210110013', '1210110', 'KUTA USANG'),
   ('1210120001', '1210120', 'RENUN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1210120002', '1210120', 'PASIR TENGAH'),
   ('1210120003', '1210120', 'PAMAH'),
   ('1210120004', '1210120', 'KUTA BULUH'),
@@ -17153,7 +17153,7 @@ INSERT INTO `villages` VALUES
   ('1211030003', '1211030', 'GUNUNG'),
   ('1211030004', '1211030', 'SIMPANG PERGENDANGEN'),
   ('1211030005', '1211030', 'PERGENDANGEN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1211030006', '1211030', 'TIGABINANGA'),
   ('1211030007', '1211030', 'KUTA GALOH'),
   ('1211030008', '1211030', 'KUTA RAYA'),
@@ -17204,7 +17204,7 @@ INSERT INTO `villages` VALUES
   ('1211050008', '1211050', 'TANJUNG BERINGIN'),
   ('1211050009', '1211050', 'PERTUMBUNGEN'),
   ('1211050010', '1211050', 'PARIMBALANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1211050011', '1211050', 'MUNTE'),
   ('1211050012', '1211050', 'GUNUNG MANUMPAK'),
   ('1211050013', '1211050', 'SELAKKAR'),
@@ -17255,7 +17255,7 @@ INSERT INTO `villages` VALUES
   ('1211071012', '1211071', 'SUSUK'),
   ('1211071013', '1211071', 'GUNUNG MERLAWAN'),
   ('1211071014', '1211071', 'NARI GUNUNG SATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1211071015', '1211071', 'KUTA GALUH'),
   ('1211071016', '1211071', 'PENAMPEN'),
   ('1211071017', '1211071', 'KUTA KEPAR'),
@@ -17306,7 +17306,7 @@ INSERT INTO `villages` VALUES
   ('1211090005', '1211090', 'PADANG MAS'),
   ('1211090006', '1211090', 'GUNG LETO'),
   ('1211090007', '1211090', 'GUNG NEGERI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1211090008', '1211090', 'SAMURA'),
   ('1211090009', '1211090', 'KETAREN'),
   ('1211090010', '1211090', 'KAMPUNG DALAM'),
@@ -17357,7 +17357,7 @@ INSERT INTO `villages` VALUES
   ('1211111006', '1211111', 'UJUNG SAMPUN'),
   ('1211111007', '1211111', 'DOLAT RAYAT'),
   ('1211120001', '1211120', 'KODON-KODON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1211120002', '1211120', 'SIBOLANGIT'),
   ('1211120003', '1211120', 'TONGGING'),
   ('1211120004', '1211120', 'PENGAMBATEN'),
@@ -17408,7 +17408,7 @@ INSERT INTO `villages` VALUES
   ('1212010011', '1212010', 'MARJANJI PEMATANG'),
   ('1212010012', '1212010', 'MARJANJI TONGAH'),
   ('1212020001', '1212020', 'LIANG PEMATANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1212020002', '1212020', 'LIANG MUDA'),
   ('1212020003', '1212020', 'TANJUNG RAJA'),
   ('1212020004', '1212020', 'GUNUNG MANUMPAK B'),
@@ -17459,7 +17459,7 @@ INSERT INTO `villages` VALUES
   ('1212030029', '1212030', 'SAYUM SABAH'),
   ('1212030030', '1212030', 'RAMBUNG BARU'),
   ('1212040001', '1212040', 'SUKA MAKMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1212040002', '1212040', 'PERPANDEN'),
   ('1212040003', '1212040', 'NAMO MIRIK'),
   ('1212040004', '1212040', 'SUKA DAME'),
@@ -17510,7 +17510,7 @@ INSERT INTO `villages` VALUES
   ('1212060010', '1212060', 'SILUE LUE'),
   ('1212060011', '1212060', 'LUBANG IDO'),
   ('1212060012', '1212060', 'RUMAH MBACANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1212060013', '1212060', 'RUMAH KEBEN'),
   ('1212060014', '1212060', 'TANGKAHAN'),
   ('1212060015', '1212060', 'CINTA RAKYAT'),
@@ -17561,7 +17561,7 @@ INSERT INTO `villages` VALUES
   ('1212080007', '1212080', 'GUNUNG RINTIS'),
   ('1212080008', '1212080', 'LAU REMPAH'),
   ('1212080009', '1212080', 'JUMA TOMBAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1212080010', '1212080', 'NEGARA/BERINGIN'),
   ('1212080011', '1212080', 'TALUN KENAS'),
   ('1212080012', '1212080', 'SUMBUL'),
@@ -17612,7 +17612,7 @@ INSERT INTO `villages` VALUES
   ('1212190026', '1212190', 'TANAH MERAH'),
   ('1212190027', '1212190', 'PERTANGGUHAN'),
   ('1212190028', '1212190', 'TANJUNG SIPORKIS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1212190029', '1212190', 'BATU LOKONG'),
   ('1212190030', '1212190', 'NAGA REJO'),
   ('1212190031', '1212190', 'PAYA ITIK'),
@@ -17663,7 +17663,7 @@ INSERT INTO `villages` VALUES
   ('1212220005', '1212220', 'KEDAI DURIAN'),
   ('1212220006', '1212220', 'SUKA MAKMUR'),
   ('1212230001', '1212230', 'TELAGA SARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1212230002', '1212230', 'SEI MENCIRIM'),
   ('1212230003', '1212230', 'SUKA MAJU'),
   ('1212230004', '1212230', 'SEI BERAS SEKATA'),
@@ -17714,7 +17714,7 @@ INSERT INTO `villages` VALUES
   ('1212260007', '1212260', 'BANDAR KHALIPAH'),
   ('1212260008', '1212260', 'MEDAN ESTATE'),
   ('1212260009', '1212260', 'LAUT DENDANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1212260010', '1212260', 'SAMPALI'),
   ('1212260011', '1212260', 'BANDAR SETIA'),
   ('1212260012', '1212260', 'KOLAM'),
@@ -17765,7 +17765,7 @@ INSERT INTO `villages` VALUES
   ('1212290007', '1212290', 'SIDOURIP'),
   ('1212290008', '1212290', 'PASAR ENAM KUALA NAMU'),
   ('1212290009', '1212290', 'KARANG ANYAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1212290010', '1212290', 'BERINGIN'),
   ('1212290011', '1212290', 'SIDOARJO DUA RAMUNIA'),
   ('1212300001', '1212300', 'PALUH KEMIRI'),
@@ -17816,7 +17816,7 @@ INSERT INTO `villages` VALUES
   ('1213010020', '1213010', 'TIMBANG JAYA'),
   ('1213010021', '1213010', 'MUSAM PEMBANGUNAN'),
   ('1213010023', '1213010', 'UJUNG BANDAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1213011001', '1213011', 'SUMBER JAYA'),
   ('1213011002', '1213011', 'PULAU SEMIKAT'),
   ('1213011003', '1213011', 'SEBERTUNG'),
@@ -17867,7 +17867,7 @@ INSERT INTO `villages` VALUES
   ('1213030013', '1213030', 'PASAR VI KWALA MENCIRIM'),
   ('1213030014', '1213030', 'PURWOBINANGUN'),
   ('1213030015', '1213030', 'EMPLASMEN KWALA MENCIRIM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1213030016', '1213030', 'MEKAR JAYA'),
   ('1213040001', '1213040', 'GARUNGGANG'),
   ('1213040002', '1213040', 'PARIT BINDU'),
@@ -17918,7 +17918,7 @@ INSERT INTO `villages` VALUES
   ('1213070010', '1213070', 'KARANGREJO'),
   ('1213070011', '1213070', 'DENDANG'),
   ('1213070012', '1213070', 'PAYA MABAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1213080001', '1213080', 'BESILAM BUKIT LEMBASA'),
   ('1213080002', '1213080', 'GERGAS'),
   ('1213080003', '1213080', 'BINGAI'),
@@ -17969,7 +17969,7 @@ INSERT INTO `villages` VALUES
   ('1213120007', '1213120', 'KEBUN LADA'),
   ('1213120008', '1213120', 'TANJUNG MULIA'),
   ('1213120009', '1213120', 'MUKA PAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1213120010', '1213120', 'CEMPA'),
   ('1213120011', '1213120', 'BATU MALENGGANG'),
   ('1213120012', '1213120', 'TAMARAN'),
@@ -18020,7 +18020,7 @@ INSERT INTO `villages` VALUES
   ('1213150008', '1213150', 'PASAR RAWA'),
   ('1213150009', '1213150', 'KWALA GEBANG'),
   ('1213150010', '1213150', 'BUKIT MENGKIRAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1213150011', '1213150', 'PASIRAN'),
   ('1213160001', '1213160', 'PELAWI UTARA'),
   ('1213160002', '1213160', 'SECURAI UTARA'),
@@ -18071,7 +18071,7 @@ INSERT INTO `villages` VALUES
   ('1213200009', '1213200', 'BUKIT JENGKOL'),
   ('1213200010', '1213200', 'PULAU SEMBILAN'),
   ('1213200011', '1213200', 'PULAU KAMPAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1213201001', '1213201', 'SALAHAJI'),
   ('1213201002', '1213201', 'SERANG JAYA'),
   ('1213201003', '1213201', 'PEMATANG TENGAH'),
@@ -18122,7 +18122,7 @@ INSERT INTO `villages` VALUES
   ('1214020038', '1214020', 'HILIAMODULA'),
   ('1214020039', '1214020', 'BAWODOBARA'),
   ('1214020040', '1214020', 'BAWOAMAHELATO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1214020041', '1214020', 'LOBOI'),
   ('1214020042', '1214020', 'BAWOOMASIO'),
   ('1214020043', '1214020', 'BALOGIA'),
@@ -18173,7 +18173,7 @@ INSERT INTO `villages` VALUES
   ('1214030007', '1214030', 'HILITOBARA'),
   ('1214030008', '1214030', 'PASAR TELUK DALAM'),
   ('1214030009', '1214030', 'BAWONIFAOSO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1214030010', '1214030', 'BAWOZAUA'),
   ('1214030011', '1214030', 'HILIGANOWO'),
   ('1214030022', '1214030', 'BAWODOBARA'),
@@ -18224,7 +18224,7 @@ INSERT INTO `villages` VALUES
   ('1214033008', '1214033', 'SAMADAYA HILISIMAETANO'),
   ('1214033009', '1214033', 'IDALA JAYA HILISIMAETANO'),
   ('1214033010', '1214033', 'FAOMASI HILISIMAETANO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1214033011', '1214033', 'HILIAURIFA HILISIMAETANO'),
   ('1214033012', '1214033', 'NDRASO HILISIMAETANO'),
   ('1214033013', '1214033', 'PEKAN HILISIMAETANO'),
@@ -18275,7 +18275,7 @@ INSERT INTO `villages` VALUES
   ('1214040015', '1214040', 'ORAHILI EHO'),
   ('1214040019', '1214040', 'SIROFI'),
   ('1214040020', '1214040', 'HILISALOO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1214040021', '1214040', 'LOLOABOLO'),
   ('1214040022', '1214040', 'MOHILI'),
   ('1214040023', '1214040', 'HILINDRASO'),
@@ -18326,7 +18326,7 @@ INSERT INTO `villages` VALUES
   ('1214050017', '1214050', 'HILIORUDUA'),
   ('1214050018', '1214050', 'SINAR BARU DARO-DARO'),
   ('1214050019', '1214050', 'HILIABOLATA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1214050020', '1214050', 'SISARAHILILAZA'),
   ('1214050021', '1214050', 'HARENORO'),
   ('1214050022', '1214050', 'HILIZOMBOI'),
@@ -18377,7 +18377,7 @@ INSERT INTO `villages` VALUES
   ('1214060039', '1214060', 'GUNUNG GABUNGAN'),
   ('1214061001', '1214061', 'HILIMBOE'),
   ('1214061002', '1214061', 'HILIORAHUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1214061003', '1214061', 'SIFALAGO SUSUA'),
   ('1214061004', '1214061', 'HILIMBOHO'),
   ('1214061005', '1214061', 'ORAHILI SUSUA'),
@@ -18428,7 +18428,7 @@ INSERT INTO `villages` VALUES
   ('1214064011', '1214064', 'HILIGABUNGAN'),
   ('1214064012', '1214064', 'BUHAWA'),
   ('1214065001', '1214065', 'LAWA LAWA LUO IDANOTAE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1214065002', '1214065', 'DAO-DAO ZANUWO IDANOTAE'),
   ('1214065003', '1214065', 'FANEDANU'),
   ('1214065004', '1214065', 'FANEDANU SIBOHOU'),
@@ -18479,7 +18479,7 @@ INSERT INTO `villages` VALUES
   ('1214072002', '1214072', 'TAREWE'),
   ('1214072003', '1214072', 'SISARAHILI HURUNA'),
   ('1214072004', '1214072', 'SIFALAGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1214072005', '1214072', 'TUNDUMBAHO'),
   ('1214072006', '1214072', 'LALIMANAWA'),
   ('1214072007', '1214072', 'SIFOROASI'),
@@ -18530,7 +18530,7 @@ INSERT INTO `villages` VALUES
   ('1214082013', '1214082', 'BALOHILI OOU'),
   ('1214083001', '1214083', 'SISARAHILI OYO'),
   ('1214083002', '1214083', 'TETEHOSI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1214083003', '1214083', 'LAUSO'),
   ('1214083004', '1214083', 'ORAHILI HURUNA'),
   ('1214083005', '1214083', 'SISOBAHILI HURUNA'),
@@ -18581,7 +18581,7 @@ INSERT INTO `villages` VALUES
   ('1215020014', '1215020', 'PARBOTIHAN'),
   ('1215020015', '1215020', 'BATU NAGODANG SIATAS'),
   ('1215020016', '1215020', 'SAMPETUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1215020017', '1215020', 'PARNAPA'),
   ('1215020020', '1215020', 'SIBULUAN'),
   ('1215020021', '1215020', 'SIGALOGO'),
@@ -18632,7 +18632,7 @@ INSERT INTO `villages` VALUES
   ('1215050013', '1215050', 'SIBUNTUON PARPEA'),
   ('1215050015', '1215050', 'SIBUNTUON PARTUR'),
   ('1215050016', '1215050', 'SITOLU BAHAL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1215050017', '1215050', 'TAPIAN NAULI'),
   ('1215050018', '1215050', 'SIPONJOT'),
   ('1215050019', '1215050', 'DOLOK MARGU'),
@@ -18683,7 +18683,7 @@ INSERT INTO `villages` VALUES
   ('1215090009', '1215090', 'SIHOTANG HASUGIAN TONGA'),
   ('1215090010', '1215090', 'SIONOM HUDON SELATAN'),
   ('1215090011', '1215090', 'SIHOTANG HASUGIAN DOLOK I');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1215090012', '1215090', 'SIONOM HUDON TIMUR I'),
   ('1215090013', '1215090', 'SIONOM HUDON UTARA'),
   ('1215090014', '1215090', 'SIONOM HUDON JULU'),
@@ -18734,7 +18734,7 @@ INSERT INTO `villages` VALUES
   ('1216013005', '1216013', 'CIKAOK'),
   ('1216014001', '1216014', 'AORNAKAN I'),
   ('1216014002', '1216014', 'AORNAKAN II');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1216014003', '1216014', 'SIMERPARA'),
   ('1216014004', '1216014', 'KECUPAK I'),
   ('1216014005', '1216014', 'KECUPAK II'),
@@ -18785,7 +18785,7 @@ INSERT INTO `villages` VALUES
   ('1217020013', '1217020', 'TURPUK LIMBONG'),
   ('1217020014', '1217020', 'HUTAGALUNG'),
   ('1217020015', '1217020', 'HARIARAPINTU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1217030001', '1217030', 'TAMBA DOLOK'),
   ('1217030002', '1217030', 'CINTA MAJU'),
   ('1217030003', '1217030', 'BUNTU MAULI'),
@@ -18836,7 +18836,7 @@ INSERT INTO `villages` VALUES
   ('1217060017', '1217060', 'SIGAOL SIMBOLON'),
   ('1217060018', '1217060', 'PAMUTARAN'),
   ('1217060019', '1217060', 'SIDEAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1217060020', '1217060', 'PALLOMBUAN'),
   ('1217060021', '1217060', 'HUTADAME'),
   ('1217070001', '1217070', 'PARADUAN'),
@@ -18887,7 +18887,7 @@ INSERT INTO `villages` VALUES
   ('1217090010', '1217090', 'MARTOBA'),
   ('1217090011', '1217090', 'SIHUSAPI'),
   ('1217090012', '1217090', 'MADUMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1217090013', '1217090', 'SIMANINDO SANGKAL'),
   ('1217090014', '1217090', 'CINTA DAME'),
   ('1217090015', '1217090', 'SIMARMATA'),
@@ -18938,7 +18938,7 @@ INSERT INTO `villages` VALUES
   ('1218012019', '1218012', 'PANOMBEAN'),
   ('1218020001', '1218020', 'PERTAMBATAN'),
   ('1218020002', '1218020', 'BAH KERAPUH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1218020003', '1218020', 'DOLOK SAGALA'),
   ('1218020004', '1218020', 'BUKIT CERMIN HILIR'),
   ('1218020005', '1218020', 'TANJUNG MARIA'),
@@ -18989,7 +18989,7 @@ INSERT INTO `villages` VALUES
   ('1218030012', '1218030', 'SIPISPIS'),
   ('1218030013', '1218030', 'SILAU PADANG'),
   ('1218030014', '1218030', 'MARJANJI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1218030015', '1218030', 'BULUH DURI'),
   ('1218030016', '1218030', 'GUNUNG MANAKO'),
   ('1218030017', '1218030', 'DAMAK URAT'),
@@ -19040,7 +19040,7 @@ INSERT INTO `villages` VALUES
   ('1218060001', '1218060', 'BANDAR TENGAH'),
   ('1218060002', '1218060', 'JUHAR'),
   ('1218060003', '1218060', 'KAYU BESAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1218060004', '1218060', 'PEKAN BANDAR KHALIPAH'),
   ('1218060005', '1218060', 'GELAM SEI SERIMAH'),
   ('1218070001', '1218070', 'PEMATANG TERANG'),
@@ -19091,7 +19091,7 @@ INSERT INTO `villages` VALUES
   ('1218090011', '1218090', 'BOGAK BESAR'),
   ('1218090012', '1218090', 'PEMATANG KUALA'),
   ('1218100010', '1218100', 'ADOLINA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1218100011', '1218100', 'MELATI DUA'),
   ('1218100013', '1218100', 'TANJUNG BULUH'),
   ('1218100014', '1218100', 'SEI BULUH'),
@@ -19142,7 +19142,7 @@ INSERT INTO `villages` VALUES
   ('1218110008', '1218110', 'LUBUK SABAN'),
   ('1218110009', '1218110', 'KUALA LAMA'),
   ('1218110010', '1218110', 'PANTAI CERMIN KIRI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1218110011', '1218110', 'PANTAI CERMIN KANAN'),
   ('1218110012', '1218110', 'KOTA PARI'),
   ('1219010002', '1219010', 'PERKEBUNAN SEI BALAI'),
@@ -19193,7 +19193,7 @@ INSERT INTO `villages` VALUES
   ('1219030020', '1219030', 'DAHARI INDAH'),
   ('1219031001', '1219031', 'PETATAL'),
   ('1219031002', '1219031', 'PERKEBUNAN TANAH DATAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1219031003', '1219031', 'KARANG BARU'),
   ('1219031004', '1219031', 'BANGUN SARI'),
   ('1219031005', '1219031', 'BINJEI BARU'),
@@ -19244,7 +19244,7 @@ INSERT INTO `villages` VALUES
   ('1219050012', '1219050', 'TANJUNG MUDA'),
   ('1219050013', '1219050', 'TANAH TINGGI'),
   ('1219050014', '1219050', 'SUKARAJA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1219050015', '1219050', 'PEMATANG PANJANG'),
   ('1219050016', '1219050', 'ARAS'),
   ('1219050017', '1219050', 'LIMAU SUNDAI'),
@@ -19295,7 +19295,7 @@ INSERT INTO `villages` VALUES
   ('1219070016', '1219070', 'CENGKERING PEKAN'),
   ('1219070017', '1219070', 'PAKAM RAYA SELATAN'),
   ('1219070018', '1219070', 'MANDARSAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1219070019', '1219070', 'MEDANG BARU'),
   ('1219070020', '1219070', 'PEMATANG NIBUNG'),
   ('1219070021', '1219070', 'PAGURAWAN'),
@@ -19346,7 +19346,7 @@ INSERT INTO `villages` VALUES
   ('1220020013', '1220020', 'LANTOSAN II'),
   ('1220020014', '1220020', 'BATU GANA'),
   ('1220020015', '1220020', 'PARUPUK JAE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1220020016', '1220020', 'PARUPUK JULU'),
   ('1220020017', '1220020', 'PANCUR PANGKO'),
   ('1220020018', '1220020', 'PARAN NANGKA'),
@@ -19397,7 +19397,7 @@ INSERT INTO `villages` VALUES
   ('1220040036', '1220040', 'AEK SUHAT'),
   ('1220040040', '1220040', 'PADANG GARUGUR'),
   ('1220040041', '1220040', 'SIGAMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1220040042', '1220040', 'SIMANOSOR'),
   ('1220040043', '1220040', 'PARLIMBATAN'),
   ('1220040044', '1220040', 'GUNUNG MANAON II'),
@@ -19448,7 +19448,7 @@ INSERT INTO `villages` VALUES
   ('1220040104', '1220040', 'BOTUNG'),
   ('1220040105', '1220040', 'DOLOK SAE'),
   ('1220040106', '1220040', 'SIHAPAS HAPAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1220040107', '1220040', 'BATU MAMAK'),
   ('1220040108', '1220040', 'LOSUNG BATU'),
   ('1220040109', '1220040', 'SUNGE TOLANG'),
@@ -19499,7 +19499,7 @@ INSERT INTO `villages` VALUES
   ('1220051007', '1220051', 'TOBING TINGGI UB'),
   ('1220051008', '1220051', 'MARLAUNG'),
   ('1220051009', '1220051', 'MANANTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1220051010', '1220051', 'JAMBU TONANG'),
   ('1220051011', '1220051', 'MANARE TUA'),
   ('1220051012', '1220051', 'PASIR LANCAT UB'),
@@ -19550,7 +19550,7 @@ INSERT INTO `villages` VALUES
   ('1220061011', '1220061', 'BOLATAN'),
   ('1220061012', '1220061', 'UPT BATANG PANE I'),
   ('1220061013', '1220061', 'BATANG PANE II');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1220061014', '1220061', 'UPT BATANG PANE III'),
   ('1220070001', '1220070', 'HUTA IMBARU GUL'),
   ('1220070002', '1220070', 'GUMARUNTAR'),
@@ -19601,7 +19601,7 @@ INSERT INTO `villages` VALUES
   ('1220070047', '1220070', 'SIMANGAMBAT TUA'),
   ('1220070048', '1220070', 'SIMATANIARI'),
   ('1220070049', '1220070', 'SIMANOSOR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1220070050', '1220070', 'SIMATANIARI JAE'),
   ('1220070051', '1220070', 'LUBUK KUNDUR'),
   ('1220070052', '1220070', 'LUBUK LANJANG'),
@@ -19652,7 +19652,7 @@ INSERT INTO `villages` VALUES
   ('1220080011', '1220080', 'GONTING BANGE'),
   ('1220080012', '1220080', 'SIMANGAMBAT'),
   ('1220080013', '1220080', 'TANJUNG BARU SILAIYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1220080014', '1220080', 'PADANG MALAKKA'),
   ('1220080015', '1220080', 'SABA BANGUNAN'),
   ('1220080016', '1220080', 'MALINO'),
@@ -19703,7 +19703,7 @@ INSERT INTO `villages` VALUES
   ('1221010007', '1221010', 'HUTA BARU SIUNDOL'),
   ('1221010008', '1221010', 'BINANGA TOLU'),
   ('1221010009', '1221010', 'AEK BARGOT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1221010010', '1221010', 'ULU AER'),
   ('1221010011', '1221010', 'HULIM'),
   ('1221010012', '1221010', 'SIANGGUNAN'),
@@ -19754,7 +19754,7 @@ INSERT INTO `villages` VALUES
   ('1221030047', '1221030', 'BANGUN RAYA'),
   ('1221030048', '1221030', 'PURBATUA'),
   ('1221030049', '1221030', 'SIALAM BUE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1221030050', '1221030', 'SIBUHUAN JAE'),
   ('1221030052', '1221030', 'HANDIS JULU'),
   ('1221030054', '1221030', 'SIOLIP'),
@@ -19805,7 +19805,7 @@ INSERT INTO `villages` VALUES
   ('1221050038', '1221050', 'MANDIAN'),
   ('1221050039', '1221050', 'PARAPAT'),
   ('1221050040', '1221050', 'HANDIO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1221050041', '1221050', 'HORUAN'),
   ('1221050042', '1221050', 'HARANG JAE'),
   ('1221050043', '1221050', 'HARANG JULU'),
@@ -19856,7 +19856,7 @@ INSERT INTO `villages` VALUES
   ('1221060020', '1221060', 'TANJUNG BOTUNG'),
   ('1221060021', '1221060', 'PINARIK'),
   ('1221060022', '1221060', 'GUNUNG MANAON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1221060023', '1221060', 'MUARA TIGE'),
   ('1221060024', '1221060', 'SIBODAK PAPASO'),
   ('1221060025', '1221060', 'GUNUNG INTAN'),
@@ -19907,7 +19907,7 @@ INSERT INTO `villages` VALUES
   ('1221080084', '1221080', 'GONTING JAE'),
   ('1221080085', '1221080', 'BINANGA TOLU'),
   ('1221080086', '1221080', 'PASIR LANCAT LAMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1221080087', '1221080', 'PASIR LANCAT BARU'),
   ('1221080088', '1221080', 'RAMBA'),
   ('1221080089', '1221080', 'TARUTUNG SIHODA-HODA'),
@@ -19958,7 +19958,7 @@ INSERT INTO `villages` VALUES
   ('1221090068', '1221090', 'PASAR BINANGA'),
   ('1221090069', '1221090', 'SIOLIP'),
   ('1221090070', '1221090', 'AEK TUNJANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1221090071', '1221090', 'MANOMBO'),
   ('1221090072', '1221090', 'BANGKUDU'),
   ('1221090073', '1221090', 'AEK TANDUK'),
@@ -20009,7 +20009,7 @@ INSERT INTO `villages` VALUES
   ('1222010003', '1222010', 'SABUNGAN'),
   ('1222010004', '1222010', 'HAJORAN'),
   ('1222010005', '1222010', 'UJUNG GADING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1222010006', '1222010', 'HUTA GODANG'),
   ('1222010007', '1222010', 'PARIMBURAN'),
   ('1222010008', '1222010', 'SAMPEAN'),
@@ -20060,7 +20060,7 @@ INSERT INTO `villages` VALUES
   ('1222050014', '1222050', 'TANJUNG SELAMAT'),
   ('1222050015', '1222050', 'TANJUNG MULIA'),
   ('1223010001', '1223010', 'PEMATANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1223010002', '1223010', 'BATU TUNGGAL'),
   ('1223010003', '1223010', 'SUNGAI RAJA'),
   ('1223010004', '1223010', 'PERKEBUNAN BERANGIR'),
@@ -20111,7 +20111,7 @@ INSERT INTO `villages` VALUES
   ('1223040010', '1223040', 'ADIAN TOROP'),
   ('1223040011', '1223040', 'PANGKALAN'),
   ('1223040012', '1223040', 'UJUNG PADANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1223050001', '1223050', 'LOBU HUALA'),
   ('1223050002', '1223050', 'SIAMPORIK'),
   ('1223050003', '1223050', 'SIMANGALAM'),
@@ -20162,7 +20162,7 @@ INSERT INTO `villages` VALUES
   ('1224020001', '1224020', 'BITAYA'),
   ('1224020002', '1224020', 'LAHEMBOHO'),
   ('1224020003', '1224020', 'HILISEBUA SIWALUBANUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1224020004', '1224020', 'ANAOMA'),
   ('1224020005', '1224020', 'DAHANA TUGALAOYO'),
   ('1224020006', '1224020', 'LOLOANA A'),
@@ -20213,7 +20213,7 @@ INSERT INTO `villages` VALUES
   ('1224070006', '1224070', 'SERIWAU'),
   ('1224070007', '1224070', 'SAWO'),
   ('1224070008', '1224070', 'LASARA SAWO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1224070009', '1224070', 'SISARAHILI TELUK SIABANG'),
   ('1224070010', '1224070', 'SIFAHANDRO'),
   ('1224080001', '1224080', 'BAHO'),
@@ -20264,7 +20264,7 @@ INSERT INTO `villages` VALUES
   ('1224110017', '1224110', 'LAHEWA'),
   ('1224110018', '1224110', 'OMBOLATA'),
   ('1224110019', '1224110', 'MARAFALA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1224110020', '1224110', 'BALEFADORO TUHO'),
   ('1224110021', '1224110', 'HILI GAWOLO'),
   ('1225010001', '1225010', 'BAWOSALOO'),
@@ -20315,7 +20315,7 @@ INSERT INTO `villages` VALUES
   ('1225040005', '1225040', 'HILIMBUASI'),
   ('1225040006', '1225040', 'LOLOFITU'),
   ('1225040007', '1225040', 'HILIUSO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1225040008', '1225040', 'W A N G O'),
   ('1225050001', '1225050', 'HILIMAYO'),
   ('1225050002', '1225050', 'HIAMBANUA'),
@@ -20366,7 +20366,7 @@ INSERT INTO `villages` VALUES
   ('1225080001', '1225080', 'ONOZALUKHU YOU'),
   ('1225080002', '1225080', 'SIDUAHILI'),
   ('1225080003', '1225080', 'HILISOROMI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1225080004', '1225080', 'GUNUNG BARU'),
   ('1225080005', '1225080', 'HILIWALOO II'),
   ('1225080006', '1225080', 'HILIFADOLO'),
@@ -20417,7 +20417,7 @@ INSERT INTO `villages` VALUES
   ('1272040003', '1272040', 'SUMBER SARI'),
   ('1272040004', '1272040', 'MUARA SENTOSA'),
   ('1272040005', '1272040', 'SEI RAJA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1272050001', '1272050', 'BETING KWALA KAPIAS'),
   ('1272050002', '1272050', 'KAPIAS PULAU BUAYA'),
   ('1272050003', '1272050', 'SEI MERBAU'),
@@ -20468,7 +20468,7 @@ INSERT INTO `villages` VALUES
   ('1273060006', '1273060', 'NAGA PITA.'),
   ('1273060007', '1273060', 'PONDOK SAYUR'),
   ('1273060008', '1273060', 'TAMBUN NABOLON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1273060009', '1273060', 'NAGAPITU'),
   ('1273060010', '1273060', 'TANJUNG PINGGIR'),
   ('1273060011', '1273060', 'TANJUNG TONGAH'),
@@ -20519,7 +20519,7 @@ INSERT INTO `villages` VALUES
   ('1275010005', '1275010', 'KEMENANGAN TANI'),
   ('1275010006', '1275010', 'SIMALINGKAR B'),
   ('1275010007', '1275010', 'SIMPANG SELAYANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1275010008', '1275010', 'TANJUNG SELAMAT'),
   ('1275010009', '1275010', 'M A N G G A'),
   ('1275020001', '1275020', 'KWALA BEKALA'),
@@ -20570,7 +20570,7 @@ INSERT INTO `villages` VALUES
   ('1275070003', '1275070', 'SUKA RAJA'),
   ('1275070004', '1275070', 'J A T I'),
   ('1275070005', '1275070', 'H A M D A N');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1275070006', '1275070', 'A U R'),
   ('1275080001', '1275080', 'SARI REJO'),
   ('1275080002', '1275080', 'SUKA DAMAI'),
@@ -20621,7 +20621,7 @@ INSERT INTO `villages` VALUES
   ('1275150004', '1275150', 'GAHARU'),
   ('1275150005', '1275150', 'DURIAN'),
   ('1275150006', '1275150', 'GLUGUR DARAT II');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1275150007', '1275150', 'GLUGUR DARAT I'),
   ('1275150008', '1275150', 'PULO BRAYAN DARAT I'),
   ('1275150009', '1275150', 'PULO BRAYAN DARAT II'),
@@ -20672,7 +20672,7 @@ INSERT INTO `villages` VALUES
   ('1276010004', '1276010', 'PUJI DADI'),
   ('1276010005', '1276010', 'BINJAI ESTATE'),
   ('1276010006', '1276010', 'RAMBUNG BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1276010007', '1276010', 'RAMBUNG DALAM'),
   ('1276010008', '1276010', 'RAMBUNG TIMUR'),
   ('1276020001', '1276020', 'BERNGAM'),
@@ -20723,7 +20723,7 @@ INSERT INTO `villages` VALUES
   ('1277010017', '1277010', 'PERKEBUNAN P KOLING'),
   ('1277010018', '1277010', 'LABUHAN LABO'),
   ('1277020001', '1277020', 'HANOPAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1277020002', '1277020', 'SIDANGKAL'),
   ('1277020003', '1277020', 'WEK VI'),
   ('1277020004', '1277020', 'UJUNG PADANG'),
@@ -20774,7 +20774,7 @@ INSERT INTO `villages` VALUES
   ('1277050006', '1277050', 'SABUNGAN SIPABANGUN'),
   ('1277050007', '1277050', 'SINGALI'),
   ('1277050008', '1277050', 'HUTA PADANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1277050009', '1277050', 'LUBUK RAYA'),
   ('1277050010', '1277050', 'TINJOMAN'),
   ('1277051001', '1277051', 'SIMATOHIR'),
@@ -20825,7 +20825,7 @@ INSERT INTO `villages` VALUES
   ('1278020012', '1278020', 'HILIGARA'),
   ('1278020013', '1278020', 'HILIGODU OMBOLATA'),
   ('1278020014', '1278020', 'TETEHOSI OMBALATA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1278020016', '1278020', 'SISOBAHILI II TANOSEO'),
   ('1278030001', '1278030', 'ONOZIKHO'),
   ('1278030002', '1278030', 'GADA'),
@@ -20876,7 +20876,7 @@ INSERT INTO `villages` VALUES
   ('1278050006', '1278050', 'ORAHILI TANOSEO'),
   ('1278050007', '1278050', 'TARAKHAINI'),
   ('1278050008', '1278050', 'FADORO HILIMBOWO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1278050009', '1278050', 'IRAONO LASE'),
   ('1278060001', '1278060', 'HILIGODU ULU'),
   ('1278060002', '1278060', 'HILIMBOWO OLORA'),
@@ -20927,7 +20927,7 @@ INSERT INTO `villages` VALUES
   ('1301040005', '1301040', 'MONGAN POULA'),
   ('1301040006', '1301040', 'SOTBOYAK'),
   ('1301040007', '1301040', 'BOJAKAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1301040009', '1301040', 'MALANCAN'),
   ('1301041001', '1301041', 'SIMATALU'),
   ('1301041002', '1301041', 'SIMALEGI'),
@@ -20978,7 +20978,7 @@ INSERT INTO `villages` VALUES
   ('1302030004', '1302030', 'TIGO SEPAKAT INDERAPURA'),
   ('1302030005', '1302030', 'INDERAPURA SELATAN'),
   ('1302030006', '1302030', 'KUDO-KUDO INDERAPURA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1302030009', '1302030', 'SIMPANG LAMA INDERAPURA'),
   ('1302030010', '1302030', 'TLUK AMPLU INDRAPURA'),
   ('1302030012', '1302030', 'INDERAPURA TENGAH'),
@@ -21029,7 +21029,7 @@ INSERT INTO `villages` VALUES
   ('1302060008', '1302060', 'KAMBANG UTARA'),
   ('1302060009', '1302060', 'KAMBANG TIMUR'),
   ('1302070001', '1302070', 'AMPING PARAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1302070002', '1302070', 'SURANTIH'),
   ('1302070003', '1302070', 'TARATAK'),
   ('1302070004', '1302070', 'AMPING PARAK TIMUR'),
@@ -21080,7 +21080,7 @@ INSERT INTO `villages` VALUES
   ('1302100008', '1302100', 'SAWAH LAWEH PASAR BARU'),
   ('1302100009', '1302100', 'KAPEH PANJI JAYA TALAOK'),
   ('1302100010', '1302100', 'AUR BEGALUNG TALAOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1302100011', '1302100', 'KAPELGAM KOTO BARAPAK'),
   ('1302100012', '1302100', 'KAPUJAN KOTO BARAPAK'),
   ('1302100013', '1302100', 'KOTO BARU KOTO BARAPAK'),
@@ -21131,7 +21131,7 @@ INSERT INTO `villages` VALUES
   ('1303060003', '1303060', 'AIA LUO'),
   ('1303061001', '1303061', 'RANGKIANG LULUIH'),
   ('1303061002', '1303061', 'BATU BAJANJANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1303061003', '1303061', 'SIMANAU'),
   ('1303061004', '1303061', 'TANJUANG BALIK SUMISO'),
   ('1303061005', '1303061', 'GARABAK DATA'),
@@ -21182,7 +21182,7 @@ INSERT INTO `villages` VALUES
   ('1303120007', '1303120', 'BUKIK KANDUANG'),
   ('1303120008', '1303120', 'KUNCIA'),
   ('1303120009', '1303120', 'SIBERAMBANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1303130001', '1303130', 'KACANG'),
   ('1303130002', '1303130', 'TIKALAK'),
   ('1303130003', '1303130', 'SINGKARAK'),
@@ -21233,7 +21233,7 @@ INSERT INTO `villages` VALUES
   ('1304080003', '1304080', 'MUARO BODI'),
   ('1304080004', '1304080', 'PALANGKI'),
   ('1304080005', '1304080', 'KOTO TUO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1304090001', '1304090', 'BATU MANJULUA'),
   ('1304090002', '1304090', 'PADANG SIBUSUAK'),
   ('1304090003', '1304090', 'PAMUATAN'),
@@ -21284,7 +21284,7 @@ INSERT INTO `villages` VALUES
   ('1305030005', '1305030', 'PARIANGAN'),
   ('1305030006', '1305030', 'SUNGAI JAMBU'),
   ('1305040001', '1305040', 'SIMAWANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1305040002', '1305040', 'BALIMBIANG'),
   ('1305040003', '1305040', 'III KOTO'),
   ('1305040004', '1305040', 'PADANG MAGEK'),
@@ -21335,7 +21335,7 @@ INSERT INTO `villages` VALUES
   ('1306010001', '1306010', 'KATAPIANG'),
   ('1306010002', '1306010', 'KASANG'),
   ('1306010003', '1306010', 'SUNGAI BULUH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1306010004', '1306010', 'BUAYAN LUBUK ALUNG'),
   ('1306010005', '1306010', 'SUNGAI BULUH SELATAN'),
   ('1306010006', '1306010', 'SUNGAI BULUH BARAT'),
@@ -21386,7 +21386,7 @@ INSERT INTO `villages` VALUES
   ('1306052004', '1306052', 'ANDURING'),
   ('1306060001', '1306060', 'BALAH AIA'),
   ('1306060002', '1306060', 'LAREH NAN PANJANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1306060003', '1306060', 'LURAH AMPALU'),
   ('1306060004', '1306060', 'SUNGAI SARIAK'),
   ('1306060005', '1306060', 'BALAH AIE TIMUR'),
@@ -21437,7 +21437,7 @@ INSERT INTO `villages` VALUES
   ('1306100003', '1306100', 'III KOTO AUR MALINTANG TIMUR'),
   ('1306100004', '1306100', 'III KOTO AUR MALINTANG UTARA'),
   ('1306100005', '1306100', 'BALAI BAIK MALAI III KOTO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1307010001', '1307010', 'TIKU SELATAN'),
   ('1307010002', '1307010', 'TIKU UTARA'),
   ('1307010003', '1307010', 'TIKU LIMO JORONG'),
@@ -21488,7 +21488,7 @@ INSERT INTO `villages` VALUES
   ('1307062003', '1307062', 'BATAGAK'),
   ('1307062004', '1307062', 'SARIAK'),
   ('1307062005', '1307062', 'SUNGAI PUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1307070001', '1307070', 'BATU TABA'),
   ('1307070002', '1307070', 'PASIA'),
   ('1307070003', '1307070', 'BALAI GURAH'),
@@ -21539,7 +21539,7 @@ INSERT INTO `villages` VALUES
   ('1308020002', '1308020', 'ANDALEH'),
   ('1308020003', '1308020', 'SUNGAI KAMUYANG'),
   ('1308020004', '1308020', 'TANJUANG ARO SIKABU-KABU PD. PANJANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1308021001', '1308021', 'HALABAN'),
   ('1308021002', '1308021', 'AMPALU'),
   ('1308021003', '1308021', 'TANJUANG GADANG'),
@@ -21590,7 +21590,7 @@ INSERT INTO `villages` VALUES
   ('1308060003', '1308060', 'KOTO TINGGI'),
   ('1308070001', '1308070', 'KOTO LAMO'),
   ('1308070002', '1308070', 'LUBUAK ALAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1308070003', '1308070', 'MUARO PAITI'),
   ('1308070004', '1308070', 'KOTO BANGUN'),
   ('1308070005', '1308070', 'DURIAN TINGGI'),
@@ -21641,7 +21641,7 @@ INSERT INTO `villages` VALUES
   ('1309125003', '1309125', 'LANGUANG'),
   ('1310010001', '1310010', 'LUBUK GADANG'),
   ('1310010002', '1310010', 'LUBUK GADANG TIMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1310010003', '1310010', 'LUBUK GADANG SELATAN'),
   ('1310010004', '1310010', 'LUBUK GADANG UTARA'),
   ('1310020001', '1310020', 'LUBUK MALAKO'),
@@ -21692,7 +21692,7 @@ INSERT INTO `villages` VALUES
   ('1311011007', '1311011', 'KOTO RANAH'),
   ('1311012001', '1311012', 'LUBUK BESAR'),
   ('1311012002', '1311012', 'ALAHAN NAN TIGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1311012003', '1311012', 'SUNGAI LIMAU'),
   ('1311012004', '1311012', 'SINAMAR'),
   ('1311012005', '1311012', 'TANJUNG ALAM'),
@@ -21743,7 +21743,7 @@ INSERT INTO `villages` VALUES
   ('1312070001', '1312070', 'KAJAI'),
   ('1312070002', '1312070', 'TALU'),
   ('1312070003', '1312070', 'SINURUIK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1312080001', '1312080', 'LINGKUANG AUA'),
   ('1312080002', '1312080', 'AUA KUNIANG'),
   ('1312080003', '1312080', 'AIA GADANG'),
@@ -21794,7 +21794,7 @@ INSERT INTO `villages` VALUES
   ('1371040029', '1371040', 'RANAH PARAK RUMBIO'),
   ('1371050020', '1371050', 'SAWAHAN'),
   ('1371050028', '1371050', 'GANTING PARAK GADANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1371050029', '1371050', 'PARAK GADANG TIMUR'),
   ('1371050030', '1371050', 'KUBU MARAPALAM'),
   ('1371050031', '1371050', 'KUBU PARAK KARAKAH'),
@@ -21845,7 +21845,7 @@ INSERT INTO `villages` VALUES
   ('1371100014', '1371100', 'LIMAU MANIS SELATAN'),
   ('1371100015', '1371100', 'LIMAU MANIS'),
   ('1371110001', '1371110', 'DADOK TUNGGUL HITAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1371110002', '1371110', 'AIR PACAH'),
   ('1371110004', '1371110', 'LUBUK MINTURUN'),
   ('1371110007', '1371110', 'BUNGO PASANG'),
@@ -21896,7 +21896,7 @@ INSERT INTO `villages` VALUES
   ('1373030007', '1373030', 'TALAGO GUNUNG'),
   ('1373030008', '1373030', 'SANTUR'),
   ('1373030009', '1373030', 'KOLOK MUDIK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1373030010', '1373030', 'KOLOK NAN TUO'),
   ('1373040001', '1373040', 'SIKALANG'),
   ('1373040002', '1373040', 'RANTIH'),
@@ -21947,7 +21947,7 @@ INSERT INTO `villages` VALUES
   ('1375030004', '1375030', 'AUR KUNING'),
   ('1375030005', '1375030', 'PAKAN LABUH'),
   ('1375030006', '1375030', 'KUBU TANJUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1375030007', '1375030', 'LADANG CAKIAH'),
   ('1375030008', '1375030', 'PARIT ANTANG'),
   ('1376010010', '1376010', 'PAKAN SINAYAN'),
@@ -21998,7 +21998,7 @@ INSERT INTO `villages` VALUES
   ('1376031004', '1376031', 'PADANG SIKABU'),
   ('1376031005', '1376031', 'PARIT MUKO AIE'),
   ('1376031006', '1376031', 'SUNGAI DURIAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1377010001', '1377010', 'PASIR SUNUR'),
   ('1377010002', '1377010', 'MARUNGGI'),
   ('1377010003', '1377010', 'KAMPUNG APAR'),
@@ -22049,7 +22049,7 @@ INSERT INTO `villages` VALUES
   ('1377021010', '1377021', 'KAMPUNG TANGAH'),
   ('1377021011', '1377021', 'SUNGAI PASAK'),
   ('1377021012', '1377021', 'AIR SANTOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1377021013', '1377021', 'CUBADAK MENTAWAI'),
   ('1377021014', '1377021', 'KOTO MARAPAK'),
   ('1377021015', '1377021', 'PAKASAI'),
@@ -22100,7 +22100,7 @@ INSERT INTO `villages` VALUES
   ('1401011003', '1401011', 'LUBUK AMBACANG'),
   ('1401011004', '1401011', 'KOTO KOMBU'),
   ('1401011005', '1401011', 'SUMPU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1401011006', '1401011', 'INUMAN'),
   ('1401011007', '1401011', 'TANJUNG MEDANG'),
   ('1401011008', '1401011', 'MUDIK ULO'),
@@ -22151,7 +22151,7 @@ INSERT INTO `villages` VALUES
   ('1401021003', '1401021', 'SIMPANG RAYA'),
   ('1401021004', '1401021', 'KOTO BARU'),
   ('1401021005', '1401021', 'SUMBER JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1401021006', '1401021', 'SUKA DAMAI'),
   ('1401021007', '1401021', 'MUARA BAHAN'),
   ('1401021008', '1401021', 'BUKIT RAYA'),
@@ -22202,7 +22202,7 @@ INSERT INTO `villages` VALUES
   ('1401040003', '1401040', 'BANJAR BENAI'),
   ('1401040004', '1401040', 'GUNUNG KESIANGAN'),
   ('1401040005', '1401040', 'BANJAR LOPAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1401040006', '1401040', 'PULAU KALIMANTING'),
   ('1401040007', '1401040', 'TANJUNG'),
   ('1401040008', '1401040', 'PULAU INGU'),
@@ -22253,7 +22253,7 @@ INSERT INTO `villages` VALUES
   ('1401052004', '1401052', 'LOGAS'),
   ('1401052005', '1401052', 'SUNGAI RAMBAI'),
   ('1401052006', '1401052', 'RAMBAHAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1401052007', '1401052', 'LUBUK KEBUN'),
   ('1401052008', '1401052', 'SITUGAL'),
   ('1401052009', '1401052', 'HULU TESO'),
@@ -22304,7 +22304,7 @@ INSERT INTO `villages` VALUES
   ('1401061012', '1401061', 'KETAPING JAYA'),
   ('1401061013', '1401061', 'LEBUH LURUS'),
   ('1401061014', '1401061', 'KAMPUNG BARU KOTO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1402010006', '1402010', 'SEMELINANG TEBING'),
   ('1402010007', '1402010', 'PAUH RANAP'),
   ('1402010010', '1402010', 'BATURIJAL HULU'),
@@ -22355,7 +22355,7 @@ INSERT INTO `villages` VALUES
   ('1402021016', '1402021', 'SIPANG'),
   ('1402021017', '1402021', 'PEJANGKI'),
   ('1402021018', '1402021', 'LAHAI KEMUNING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1402021019', '1402021', 'KEPAYANG SARI'),
   ('1402021020', '1402021', 'BATU PAPAN'),
   ('1402021021', '1402021', 'SANGLAP'),
@@ -22406,7 +22406,7 @@ INSERT INTO `villages` VALUES
   ('1402031018', '1402031', 'TALANG SUNGAI EKOK'),
   ('1402031019', '1402031', 'TALANG SUKA MAJU'),
   ('1402040008', '1402040', 'PASIR KERANJI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1402040009', '1402040', 'AIR MOLEK I'),
   ('1402040010', '1402040', 'CANDIREJO'),
   ('1402040011', '1402040', 'AIR MOLEK II'),
@@ -22457,7 +22457,7 @@ INSERT INTO `villages` VALUES
   ('1402043029', '1402043', 'TASIK JUANG'),
   ('1402043030', '1402043', 'PONTIAN MEKAR'),
   ('1402043031', '1402043', 'AIR PUTIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1402050001', '1402050', 'BARANGAN'),
   ('1402050002', '1402050', 'ALANG KEPAYANG'),
   ('1402050003', '1402050', 'DANAU BARU'),
@@ -22508,7 +22508,7 @@ INSERT INTO `villages` VALUES
   ('1403010004', '1403010', 'NUSANTARA JAYA'),
   ('1403010005', '1403010', 'KEMBANG MEKAR SARI'),
   ('1403010006', '1403010', 'KOTABARU SEBERIDA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1403010007', '1403010', 'PASAR KEMBANG'),
   ('1403010008', '1403010', 'KUALA KERITANG'),
   ('1403010009', '1403010', 'KUALA LEMANG'),
@@ -22559,7 +22559,7 @@ INSERT INTO `villages` VALUES
   ('1403030003', '1403030', 'SUNGAI RUKAM'),
   ('1403030004', '1403030', 'PENGALIHAN'),
   ('1403030005', '1403030', 'SUNGAI AMBAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1403030006', '1403030', 'PUSARAN'),
   ('1403030007', '1403030', 'ENOK'),
   ('1403030008', '1403030', 'TELUK MEDAN'),
@@ -22610,7 +22610,7 @@ INSERT INTO `villages` VALUES
   ('1403070009', '1403070', 'TEMPULING'),
   ('1403070010', '1403070', 'SUNGAI SALAK'),
   ('1403070011', '1403070', 'TELUK JIRA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1403070012', '1403070', 'MUMPA'),
   ('1403070013', '1403070', 'TELUK KIAMBANG'),
   ('1403070014', '1403070', 'KARYA TUNAS JAYA'),
@@ -22661,7 +22661,7 @@ INSERT INTO `villages` VALUES
   ('1403100005', '1403100', 'JERAMBANG'),
   ('1403100006', '1403100', 'SUNGAI BARU'),
   ('1403100007', '1403100', 'LAHANG BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1403100008', '1403100', 'KUALA LAHANG'),
   ('1403100009', '1403100', 'LAHANG TENGAH'),
   ('1403100010', '1403100', 'LAHANG HULU'),
@@ -22712,7 +22712,7 @@ INSERT INTO `villages` VALUES
   ('1403121011', '1403121', 'SAKA PALAS JAYA'),
   ('1403121012', '1403121', 'CATUR KARYA'),
   ('1403121013', '1403121', 'BAGAN JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1403121014', '1403121', 'TELUK BUNIAN'),
   ('1403121015', '1403121', 'HIDAYAH'),
   ('1403121016', '1403121', 'TERUSAN BERINGIN JAYA'),
@@ -22763,7 +22763,7 @@ INSERT INTO `villages` VALUES
   ('1404012003', '1404012', 'LUBUK OGUNG'),
   ('1404012004', '1404012', 'MUDA SETIA'),
   ('1404012005', '1404012', 'KIYAP JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1404020019', '1404020', 'TANJUNG BERINGIN'),
   ('1404020020', '1404020', 'TALAU'),
   ('1404020021', '1404020', 'KESUMA'),
@@ -22814,7 +22814,7 @@ INSERT INTO `villages` VALUES
   ('1404030018', '1404030', 'KERIUNG'),
   ('1404030019', '1404030', 'SIALANG KAYU BATU'),
   ('1404031001', '1404031', 'SUNGAI ARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1404031002', '1404031', 'RANSANG'),
   ('1404031003', '1404031', 'KUALA TOLAM'),
   ('1404031004', '1404031', 'PELALAWAN'),
@@ -22865,7 +22865,7 @@ INSERT INTO `villages` VALUES
   ('1404042009', '1404042', 'SEGAMAI'),
   ('1405010005', '1405010', 'MANDI ANGIN'),
   ('1405010006', '1405010', 'MINAS BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1405010007', '1405010', 'RANTAU BERTUAH'),
   ('1405010008', '1405010', 'MINAS TIMUR'),
   ('1405010009', '1405010', 'MINAS JAYA'),
@@ -22916,7 +22916,7 @@ INSERT INTO `villages` VALUES
   ('1405022014', '1405022', 'PINANG SEBATANG BARAT'),
   ('1405022015', '1405022', 'PINANG SEBATANG TIMUR'),
   ('1405022016', '1405022', 'PERAWANG BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1405022017', '1405022', 'PERAWANG'),
   ('1405022018', '1405022', 'TUALANG TIMUR'),
   ('1405023001', '1405023', 'SUKA MULIA'),
@@ -22967,7 +22967,7 @@ INSERT INTO `villages` VALUES
   ('1405030021', '1405030', 'PENYENGAT'),
   ('1405030022', '1405030', 'TELUK LANUS'),
   ('1405030023', '1405030', 'HARAPAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1405030027', '1405030', 'TELUK BATIL'),
   ('1405030028', '1405030', 'BUNSUR'),
   ('1405030029', '1405030', 'KAYU ARA PERMAI'),
@@ -23018,7 +23018,7 @@ INSERT INTO `villages` VALUES
   ('1406010045', '1406010', 'TELUK PAMAN TIMUR'),
   ('1406010046', '1406010', 'SUNGAI HARAPAN'),
   ('1406011001', '1406011', 'AUR KUNING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1406011002', '1406011', 'TANJUNG BERINGIN'),
   ('1406011003', '1406011', 'BATU SANGGAN'),
   ('1406011004', '1406011', 'TANJUNG BELIT'),
@@ -23069,7 +23069,7 @@ INSERT INTO `villages` VALUES
   ('1406014008', '1406014', 'KOTO DAMAI'),
   ('1406014009', '1406014', 'UTAMA KARYA'),
   ('1406014010', '1406014', 'BUKIT SAKAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1406014011', '1406014', 'MEKAR JAYA'),
   ('1406020001', '1406020', 'BALUNG'),
   ('1406020002', '1406020', 'PULAU GADANG'),
@@ -23120,7 +23120,7 @@ INSERT INTO `villages` VALUES
   ('1406040014', '1406040', 'MUKTI SARI'),
   ('1406040015', '1406040', 'INDRAPURI'),
   ('1406040016', '1406040', 'GADING SARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1406040017', '1406040', 'TANJUNG SAWIT'),
   ('1406040018', '1406040', 'SUMBER MAKMUR'),
   ('1406040019', '1406040', 'PETAPAHAN JAYA'),
@@ -23171,7 +23171,7 @@ INSERT INTO `villages` VALUES
   ('1406051004', '1406051', 'PASIR SIALANG'),
   ('1406051005', '1406051', 'BUKIT SEMBILAN'),
   ('1406051006', '1406051', 'LABOI JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1406051007', '1406051', 'SUKA MULYA'),
   ('1406051008', '1406051', 'BUKIT PAYUNG'),
   ('1406051009', '1406051', 'BINUANG'),
@@ -23222,7 +23222,7 @@ INSERT INTO `villages` VALUES
   ('1406070003', '1406070', 'TAMBANG'),
   ('1406070004', '1406070', 'PADANG LUAS'),
   ('1406070005', '1406070', 'GOBAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1406070006', '1406070', 'TERANTANG'),
   ('1406070007', '1406070', 'RIMBA PANJANG'),
   ('1406070008', '1406070', 'KUALU'),
@@ -23273,7 +23273,7 @@ INSERT INTO `villages` VALUES
   ('1407011005', '1407011', 'SUNGAI KANDIS'),
   ('1407020003', '1407020', 'KUMAIN'),
   ('1407020004', '1407020', 'BONO TAPUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1407020005', '1407020', 'DAYO'),
   ('1407020006', '1407020', 'TAPUNG JAYA'),
   ('1407020012', '1407020', 'TANDUN'),
@@ -23324,7 +23324,7 @@ INSERT INTO `villages` VALUES
   ('1407041005', '1407041', 'PASIR UTAMA'),
   ('1407041006', '1407041', 'RAMBAH HILIR'),
   ('1407041007', '1407041', 'RAMBAH MUDA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1407041008', '1407041', 'SUNGAI SITOLANG'),
   ('1407041009', '1407041', 'LUBUK KRAPAT'),
   ('1407041010', '1407041', 'RAMBAH HILIR TENGAH'),
@@ -23375,7 +23375,7 @@ INSERT INTO `villages` VALUES
   ('1407060012', '1407060', 'KEPENUHAN SEI MANDIAN'),
   ('1407060013', '1407060', 'ULAK PATIAN'),
   ('1407060016', '1407060', 'RANTAU BINUANG SAKTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1407060017', '1407060', 'KEPENUHAN BARAT MULYA'),
   ('1407060018', '1407060', 'KEPENUHAN BARAT SUNGAI ROKAN JAYA'),
   ('1407061001', '1407061', 'KEPENUHAN JAYA'),
@@ -23426,7 +23426,7 @@ INSERT INTO `villages` VALUES
   ('1408011016', '1408011', 'BULUH APO'),
   ('1408012001', '1408012', 'BULUH MANIS'),
   ('1408012002', '1408012', 'PETANI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1408012003', '1408012', 'TAMBUSAI BATANG DUI'),
   ('1408012004', '1408012', 'SIMPANG PADANG'),
   ('1408012005', '1408012', 'PEMATANG OBO'),
@@ -23477,7 +23477,7 @@ INSERT INTO `villages` VALUES
   ('1408022001', '1408022', 'PARIT I API API'),
   ('1408022002', '1408022', 'TEMIANG'),
   ('1408022003', '1408022', 'API API');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1408022004', '1408022', 'TENGGAYUN'),
   ('1408022005', '1408022', 'SEPAHAT'),
   ('1408022006', '1408022', 'BUKIT KERIKIL'),
@@ -23528,7 +23528,7 @@ INSERT INTO `villages` VALUES
   ('1408040020', '1408040', 'MESKOM'),
   ('1408040021', '1408040', 'PALKUN'),
   ('1408040022', '1408040', 'KELEMANTAN BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1408040023', '1408040', 'SUNGAI BATANG'),
   ('1408040024', '1408040', 'PEMATANG DUKU TIMUR'),
   ('1408040025', '1408040', 'DAMAI'),
@@ -23579,7 +23579,7 @@ INSERT INTO `villages` VALUES
   ('1409010023', '1409010', 'SINTONG PUSAKA'),
   ('1409010024', '1409010', 'MENGGALA TELADAN'),
   ('1409010025', '1409010', 'CEMPEDAK RAHUK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1409011002', '1409011', 'PUJUD'),
   ('1409011003', '1409011', 'TELUK NAYANG'),
   ('1409011004', '1409011', 'AIR HITAM'),
@@ -23630,7 +23630,7 @@ INSERT INTO `villages` VALUES
   ('1409020021', '1409020', 'JAYA AGUNG'),
   ('1409020022', '1409020', 'MERANTI MAKMUR'),
   ('1409020025', '1409020', 'BAYANGKARA JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1409020031', '1409020', 'BAHTERA MAKMUR KOTA'),
   ('1409020032', '1409020', 'BAGAN BATU KOTA'),
   ('1409020035', '1409020', 'BAGAN BATU BARAT'),
@@ -23681,7 +23681,7 @@ INSERT INTO `villages` VALUES
   ('1409031002', '1409031', 'PASIR LIMAU KAPAS'),
   ('1409031003', '1409031', 'PANIPAHAN'),
   ('1409031004', '1409031', 'TELUK PULAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1409031005', '1409031', 'PANIPAHAN LAUT'),
   ('1409031006', '1409031', 'PANIPAHAN DARAT'),
   ('1409031007', '1409031', 'PULAU JEMUR'),
@@ -23732,7 +23732,7 @@ INSERT INTO `villages` VALUES
   ('1409043011', '1409043', 'SUNGAI BESAR'),
   ('1409043012', '1409043', 'PEKAITAN'),
   ('1409043025', '1409043', 'KUBU I');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1409043026', '1409043', 'KARYA MULYO SARI'),
   ('1409043027', '1409043', 'ROKAN BARU PESISIR'),
   ('1409050005', '1409050', 'KARYA MUKTI'),
@@ -23783,7 +23783,7 @@ INSERT INTO `villages` VALUES
   ('1410020011', '1410020', 'SELAT PANJANG TIMUR'),
   ('1410020012', '1410020', 'SELAT PANJANG SELATAN'),
   ('1410020013', '1410020', 'ALAH AIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1410020014', '1410020', 'ALAH AIR TIMUR'),
   ('1410020015', '1410020', 'SELAT PANJANG BARAT'),
   ('1410020016', '1410020', 'SELAT PANJANG KOTA'),
@@ -23834,7 +23834,7 @@ INSERT INTO `villages` VALUES
   ('1410040015', '1410040', 'MELAI'),
   ('1410040016', '1410040', 'PERMAI'),
   ('1410040017', '1410040', 'MEKAR BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1410050001', '1410050', 'LUKIT'),
   ('1410050002', '1410050', 'MERANTI BUNTING'),
   ('1410050003', '1410050', 'TANJUNG KULIM'),
@@ -23885,7 +23885,7 @@ INSERT INTO `villages` VALUES
   ('1471020001', '1471020', 'SIMPANG TIGA'),
   ('1471020004', '1471020', 'TENGKERANG SELATAN'),
   ('1471020007', '1471020', 'TENGKERANG UTARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1471020011', '1471020', 'TENGKERANG LABUAI'),
   ('1471020012', '1471020', 'AIR DINGIN'),
   ('1471021001', '1471021', 'TENGKERANG TENGAH'),
@@ -23936,7 +23936,7 @@ INSERT INTO `villages` VALUES
   ('1471080001', '1471080', 'UMBAN SARI'),
   ('1471080006', '1471080', 'RUMBAI BUKIT'),
   ('1471080007', '1471080', 'MUARA FAJAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1471080008', '1471080', 'PALAS'),
   ('1471080009', '1471080', 'SRI MERANTI'),
   ('1471080010', '1471080', 'AGROWISATA'),
@@ -23987,7 +23987,7 @@ INSERT INTO `villages` VALUES
   ('1501010001', '1501010', 'LEMPUR MUDIK'),
   ('1501010002', '1501010', 'DUSUN BARU LEMPUR'),
   ('1501010003', '1501010', 'LEMPUR TENGAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1501010004', '1501010', 'LEMPUR HILIR'),
   ('1501010005', '1501010', 'PERIKAN TENGAH'),
   ('1501010006', '1501010', 'SELAMPAUNG'),
@@ -24038,7 +24038,7 @@ INSERT INTO `villages` VALUES
   ('1501030015', '1501030', 'KOTO BARU SEMERAP'),
   ('1501030016', '1501030', 'PONDOK SIGUANG'),
   ('1501030017', '1501030', 'TANJUNG PAUH HILIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1501030018', '1501030', 'PUNAI MERINDU'),
   ('1501030019', '1501030', 'TANJUNG PAUH MUDIK'),
   ('1501030020', '1501030', 'PANCURAN TIGA'),
@@ -24089,7 +24089,7 @@ INSERT INTO `villages` VALUES
   ('1501050029', '1501050', 'HIANG KARYA'),
   ('1501050030', '1501050', 'BARU SEMERAH'),
   ('1501050031', '1501050', 'HIANG LESTARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1501050032', '1501050', 'ANGKASA PURA'),
   ('1501050033', '1501050', 'HIANG SAKTI'),
   ('1501050034', '1501050', 'PENAWAR TINGGI'),
@@ -24140,7 +24140,7 @@ INSERT INTO `villages` VALUES
   ('1501072003', '1501072', 'LUBUK SULI'),
   ('1501072004', '1501072', 'DUSUN BARU KUBANG'),
   ('1501072005', '1501072', 'KUBANG GEDANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1501072006', '1501072', 'KOTO PANJANG'),
   ('1501072007', '1501072', 'KOTO PAYANG'),
   ('1501072008', '1501072', 'KOTO TUO'),
@@ -24191,7 +24191,7 @@ INSERT INTO `villages` VALUES
   ('1501081014', '1501081', 'PASAR SIULAK GEDANG'),
   ('1501081015', '1501081', 'DUSUN DALAM'),
   ('1501081016', '1501081', 'KOTO BERINGIN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1501081017', '1501081', 'SIULAK PANJANG'),
   ('1501081018', '1501081', 'KOTO TENGAH'),
   ('1501081019', '1501081', 'KOTO ARO'),
@@ -24242,7 +24242,7 @@ INSERT INTO `villages` VALUES
   ('1501090039', '1501090', 'PASAR SUNGAI TANDUK'),
   ('1501090040', '1501090', 'MEKAR SARI'),
   ('1501090041', '1501090', 'RENAH KASAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1501090043', '1501090', 'MEKAR JAYA'),
   ('1501090044', '1501090', 'SANGIR TENGAH'),
   ('1501090045', '1501090', 'BENDUNG AIR TIMUR'),
@@ -24293,7 +24293,7 @@ INSERT INTO `villages` VALUES
   ('1502011003', '1502011', 'TANJUNG BENUANG'),
   ('1502011004', '1502011', 'GEDANG'),
   ('1502011005', '1502011', 'RANTAU SULI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1502011006', '1502011', 'TALANG TEMBAGO'),
   ('1502011007', '1502011', 'BARU'),
   ('1502011008', '1502011', 'TANJUNG MUDO'),
@@ -24344,7 +24344,7 @@ INSERT INTO `villages` VALUES
   ('1502030004', '1502030', 'REJOSARI'),
   ('1502030005', '1502030', 'PEMATANG KANCIL'),
   ('1502030006', '1502030', 'TANAH ABANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1502030007', '1502030', 'EMPANG BENAO'),
   ('1502030008', '1502030', 'TANJUNG GEDANG'),
   ('1502030009', '1502030', 'K E R O Y A'),
@@ -24395,7 +24395,7 @@ INSERT INTO `villages` VALUES
   ('1502042007', '1502042', 'BARU NALO'),
   ('1502043001', '1502043', 'PULAU BARU'),
   ('1502043002', '1502043', 'RANTAU ALAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1502043003', '1502043', 'LUBUK GAUNG'),
   ('1502043004', '1502043', 'TITIAN TERAS'),
   ('1502043005', '1502043', 'SALAM BUKU'),
@@ -24446,7 +24446,7 @@ INSERT INTO `villages` VALUES
   ('1502060046', '1502060', 'LUBUK NAPAL'),
   ('1502060047', '1502060', 'KELURAHAN PASAR BARU RANTAU PANJANG'),
   ('1502061009', '1502061', 'MUARA JERNIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1502061010', '1502061', 'PULAU ARO'),
   ('1502061011', '1502061', 'KAPUK'),
   ('1502061012', '1502061', 'RANTAU NGARAU'),
@@ -24497,7 +24497,7 @@ INSERT INTO `villages` VALUES
   ('1502067013', '1502067', 'TANJUNG BERINGIN'),
   ('1502067014', '1502067', 'MUARO LANGEH'),
   ('1503010001', '1503010', 'SIMPANG NARSO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1503010002', '1503010', 'BATU EMPANG'),
   ('1503010003', '1503010', 'BATIN PENGAMBANG'),
   ('1503010004', '1503010', 'MUARA AIR DUA'),
@@ -24548,7 +24548,7 @@ INSERT INTO `villages` VALUES
   ('1503021010', '1503021', 'SUNGAI KERAMAT'),
   ('1503030008', '1503030', 'PEMATANG KULIM'),
   ('1503030009', '1503030', 'BATU PUTIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1503030010', '1503030', 'PELAWAN'),
   ('1503030011', '1503030', 'SUNGAI MERAH'),
   ('1503030012', '1503030', 'PENEGAH'),
@@ -24599,7 +24599,7 @@ INSERT INTO `villages` VALUES
   ('1503041007', '1503041', 'PULAU LINTANG'),
   ('1503041008', '1503041', 'PENARUN'),
   ('1503041009', '1503041', 'PULAU MALAKO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1503041010', '1503041', 'TANJUNG'),
   ('1503041011', '1503041', 'LIMBUR TEMBESI'),
   ('1503041012', '1503041', 'BANGUN JAYO'),
@@ -24650,7 +24650,7 @@ INSERT INTO `villages` VALUES
   ('1503060019', '1503060', 'JATI BARU'),
   ('1503060020', '1503060', 'TALANG SERDANG'),
   ('1503060021', '1503060', 'GURUN BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1503060022', '1503060', 'MANDIANGIN PASAR'),
   ('1503060023', '1503060', 'KUTE JAYE'),
   ('1503060024', '1503060', 'SUNGAI ROTAN'),
@@ -24701,7 +24701,7 @@ INSERT INTO `villages` VALUES
   ('1504020006', '1504020', 'PAKU AJI'),
   ('1504020007', '1504020', 'MUARA JANGGA'),
   ('1504020008', '1504020', 'MATA GUAL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1504020009', '1504020', 'KOTO BUAYO'),
   ('1504020010', '1504020', 'KARMEO'),
   ('1504020011', '1504020', 'SIMPANG KARMEO'),
@@ -24752,7 +24752,7 @@ INSERT INTO `villages` VALUES
   ('1504041004', '1504041', 'POMPA AIR'),
   ('1504041005', '1504041', 'LADANG PERIS'),
   ('1504041006', '1504041', 'PENEROKAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1504041007', '1504041', 'BAJUBANG'),
   ('1504041008', '1504041', 'BATIN'),
   ('1504041009', '1504041', 'PETAJIN'),
@@ -24803,7 +24803,7 @@ INSERT INTO `villages` VALUES
   ('1505011010', '1505011', 'MARGA'),
   ('1505011011', '1505011', 'BUKIT MAS'),
   ('1505011012', '1505011', 'PANCA BAKTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1505011013', '1505011', 'BUKIT MAKMUR'),
   ('1505011020', '1505011', 'SUKA MAKMUR'),
   ('1505011021', '1505011', 'MARGA MULYA'),
@@ -24854,7 +24854,7 @@ INSERT INTO `villages` VALUES
   ('1505021002', '1505021', 'SUMBER AGUNG'),
   ('1505021003', '1505021', 'LADANG PANJANG'),
   ('1505021004', '1505021', 'TALANG BELIDO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1505021005', '1505021', 'TALANG KERINCI'),
   ('1505021006', '1505021', 'KEBON SEMBILAN'),
   ('1505021007', '1505021', 'SUNGAI GELAM'),
@@ -24905,7 +24905,7 @@ INSERT INTO `villages` VALUES
   ('1505041008', '1505041', 'SEKUMBUNG'),
   ('1505041009', '1505041', 'RUKAM'),
   ('1505041010', '1505041', 'MANIS MATO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1505050003', '1505050', 'SUNGAI BERTAM'),
   ('1505050004', '1505050', 'MUHAJIRIN'),
   ('1505050005', '1505050', 'MARO SEBO'),
@@ -24956,7 +24956,7 @@ INSERT INTO `villages` VALUES
   ('1506011003', '1506011', 'SIMPANG TUAN'),
   ('1506011004', '1506011', 'PEMATANG RAHIM'),
   ('1506011005', '1506011', 'SINAR WAJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1506011006', '1506011', 'SUNGAI BERAS'),
   ('1506011007', '1506011', 'MENCOLOK'),
   ('1506012001', '1506012', 'RANTAU KARYA'),
@@ -25007,7 +25007,7 @@ INSERT INTO `villages` VALUES
   ('1506040010', '1506040', 'BANDAR JAYA'),
   ('1506040011', '1506040', 'SUNGAI DUSUN'),
   ('1506040012', '1506040', 'HARAPAN MAKMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1506040013', '1506040', 'MARGA MULYA'),
   ('1506040014', '1506040', 'KARYA BHAKTI'),
   ('1506040015', '1506040', 'PEMATANG MAYAN'),
@@ -25058,7 +25058,7 @@ INSERT INTO `villages` VALUES
   ('1507011020', '1507011', 'TANJUNG MAKMUR'),
   ('1507011021', '1507011', 'MERLUNG'),
   ('1507012001', '1507012', 'LUBUK BERNAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1507012002', '1507012', 'KAMPUNG BARU'),
   ('1507012003', '1507012', 'TANJUNG BOJO'),
   ('1507012004', '1507012', 'DUSUN KEBON'),
@@ -25109,7 +25109,7 @@ INSERT INTO `villages` VALUES
   ('1507020013', '1507020', 'SUNGAI PAMPANG'),
   ('1507020014', '1507020', 'SUNGAI JERING'),
   ('1507020015', '1507020', 'SUNGAI RAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1507020016', '1507020', 'SUNGAI BAUNG'),
   ('1507020017', '1507020', 'KARYA MAJU'),
   ('1507020018', '1507020', 'PASAR SENIN'),
@@ -25160,7 +25160,7 @@ INSERT INTO `villages` VALUES
   ('1507040012', '1507040', 'PEMATANG BULUH'),
   ('1507040013', '1507040', 'MUNTIALO'),
   ('1507040014', '1507040', 'TELUK KULBI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1507040015', '1507040', 'MANDALA JAYA'),
   ('1507040016', '1507040', 'SUNGAI TERAP'),
   ('1507040017', '1507040', 'BUNGA TANJUNG'),
@@ -25211,7 +25211,7 @@ INSERT INTO `villages` VALUES
   ('1508021004', '1508021', 'LEMBAK BUNGUR'),
   ('1508021005', '1508021', 'TELUK SINGKAWANG'),
   ('1508021006', '1508021', 'TERITI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1508021007', '1508021', 'DUSUN TUO SUMAY'),
   ('1508021008', '1508021', 'TELUK LANGKAP'),
   ('1508021009', '1508021', 'SUO SUO'),
@@ -25262,7 +25262,7 @@ INSERT INTO `villages` VALUES
   ('1508040030', '1508040', 'TELUK KASAI RAMBAHAN'),
   ('1508040031', '1508040', 'ULAK BANJIR RAMBAHAN'),
   ('1508040032', '1508040', 'TELUK PANDAN RAMBAHAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1508040033', '1508040', 'JAMBU'),
   ('1508041001', '1508041', 'TANJUNG'),
   ('1508041002', '1508041', 'KUAMANG'),
@@ -25313,7 +25313,7 @@ INSERT INTO `villages` VALUES
   ('1509011008', '1509011', 'SUMBER HARAPAN'),
   ('1509011009', '1509011', 'BANGUN HARJO'),
   ('1509011010', '1509011', 'KUNING GADING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1509011011', '1509011', 'KARYA HARAPAN MUKTI'),
   ('1509011012', '1509011', 'KUAMANG JAYA'),
   ('1509011013', '1509011', 'MUARA KUAMANG'),
@@ -25364,7 +25364,7 @@ INSERT INTO `villages` VALUES
   ('1509031007', '1509031', 'MANGUN JAYO'),
   ('1509031008', '1509031', 'SUKA JAYA'),
   ('1509031009', '1509031', 'PEKAN JUMAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1509032001', '1509032', 'SUNGAI TELANG'),
   ('1509032002', '1509032', 'TIMBOLASI'),
   ('1509032003', '1509032', 'KARAK APUNG'),
@@ -25415,7 +25415,7 @@ INSERT INTO `villages` VALUES
   ('1509051006', '1509051', 'TANJUNG BUNGO'),
   ('1509051007', '1509051', 'TUO LIMBUR'),
   ('1509051008', '1509051', 'MUARA TEBO PANDAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1509051009', '1509051', 'TEBO JAYA'),
   ('1509051010', '1509051', 'SEKAR MENGKUANG'),
   ('1509051011', '1509051', 'PAUH AGUNG'),
@@ -25466,7 +25466,7 @@ INSERT INTO `villages` VALUES
   ('1571021005', '1571021', 'PAYO SILINCAH'),
   ('1571030001', '1571030', 'KEBUN HANDIL'),
   ('1571030002', '1571030', 'JELUTUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1571030003', '1571030', 'PAYO LEBAR'),
   ('1571030004', '1571030', 'LEBAK BANDUNG'),
   ('1571030005', '1571030', 'CEMPAKA PUTIH'),
@@ -25517,7 +25517,7 @@ INSERT INTO `villages` VALUES
   ('1572010008', '1572010', 'KOTO PANAP'),
   ('1572010009', '1572010', 'KOTO BARU TANAH KAMPUNG'),
   ('1572010010', '1572010', 'KOTO PUDUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1572010011', '1572010', 'KOTO TENGAH'),
   ('1572010012', '1572010', 'KOTO TUO'),
   ('1572010013', '1572010', 'TANJUNG BUNGA'),
@@ -25568,7 +25568,7 @@ INSERT INTO `villages` VALUES
   ('1572050008', '1572050', 'KOTO TENGAH'),
   ('1572050009', '1572050', 'KOTO LOLO'),
   ('1572050010', '1572050', 'KOTO DUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1572050011', '1572050', 'SEBERANG'),
   ('1572050012', '1572050', 'SUMUR GEDANG'),
   ('1572050013', '1572050', 'SUNGAI LIUK'),
@@ -25619,7 +25619,7 @@ INSERT INTO `villages` VALUES
   ('1601080018', '1601080', 'KESAMBI RATA'),
   ('1601080021', '1601080', 'GUNUNG LIWAT'),
   ('1601080022', '1601080', 'SEMANDING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1601080023', '1601080', 'PENGANDONAN'),
   ('1601080024', '1601080', 'TANJUNGAN'),
   ('1601080025', '1601080', 'UJAN MAS'),
@@ -25670,7 +25670,7 @@ INSERT INTO `villages` VALUES
   ('1601090029', '1601090', 'PANJI JAYA'),
   ('1601090030', '1601090', 'MAKARTI JAYA'),
   ('1601090031', '1601090', 'MAKARTI TAMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1601090032', '1601090', 'PENILIKAN/MITRA OGAN'),
   ('1601090033', '1601090', 'PENINJAUAN'),
   ('1601090034', '1601090', 'SAUNG NAGA'),
@@ -25721,7 +25721,7 @@ INSERT INTO `villages` VALUES
   ('1601131001', '1601131', 'BATUMARTA I'),
   ('1601131002', '1601131', 'BATUMARTA II'),
   ('1601131003', '1601131', 'BATTU WINANGUN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1601131004', '1601131', 'LEKIS REJO'),
   ('1601131005', '1601131', 'LUBUK BANJAR'),
   ('1601131006', '1601131', 'BATU RADEN'),
@@ -25772,7 +25772,7 @@ INSERT INTO `villages` VALUES
   ('1602011013', '1602011', 'TANJUNG SARI'),
   ('1602011014', '1602011', 'PURWO ASRI'),
   ('1602011015', '1602011', 'LUBUK MAKMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1602011016', '1602011', 'RANTAU DURIAN ASLI'),
   ('1602020015', '1602020', 'KALI DERAS'),
   ('1602020016', '1602020', 'SUMBER DERAS'),
@@ -25823,7 +25823,7 @@ INSERT INTO `villages` VALUES
   ('1602022012', '1602022', 'KARYA JAYA'),
   ('1602022013', '1602022', 'MUKTI KARYA'),
   ('1602022015', '1602022', 'SURYA KARTA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1602022016', '1602022', 'CATUR TUNGGAL'),
   ('1602022017', '1602022', 'PEMATANG SUKARAMAH'),
   ('1602022018', '1602022', 'SUMBER MULYA'),
@@ -25874,7 +25874,7 @@ INSERT INTO `villages` VALUES
   ('1602031003', '1602031', 'SUNGAI JERUJU'),
   ('1602031004', '1602031', 'SUNGAI LUMPUR'),
   ('1602031005', '1602031', 'ULAK KEDONDONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1602031006', '1602031', 'SUNGAI KETUPAK'),
   ('1602031007', '1602031', 'PELIMBANGAN'),
   ('1602031008', '1602031', 'CENGAL'),
@@ -25925,7 +25925,7 @@ INSERT INTO `villages` VALUES
   ('1602050021', '1602050', 'TANJUNG LAGA'),
   ('1602050022', '1602050', 'TANJUNG LUBUK'),
   ('1602050026', '1602050', 'JAMBU ILIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1602050027', '1602050', 'ATAR BALAM'),
   ('1602050028', '1602050', 'TANJUNG HARAPAN'),
   ('1602050029', '1602050', 'PULAU GEMANTUNG DARAT'),
@@ -25976,7 +25976,7 @@ INSERT INTO `villages` VALUES
   ('1602120004', '1602120', 'BATU AMPAR'),
   ('1602120005', '1602120', 'AWAL TERUSAN'),
   ('1602120006', '1602120', 'TERUSAN MENANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1602120007', '1602120', 'BELANTI'),
   ('1602120008', '1602120', 'RENGAS PITU'),
   ('1602120009', '1602120', 'TERATE'),
@@ -26027,7 +26027,7 @@ INSERT INTO `villages` VALUES
   ('1602130023', '1602130', 'MENGGERIS'),
   ('1602130024', '1602130', 'SECONDONG'),
   ('1602130025', '1602130', 'JERMUN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1602130035', '1602130', 'TANJUNG KEMANG'),
   ('1602130036', '1602130', 'ULAK PIANGGU'),
   ('1602130037', '1602130', 'ULAK KEMANG BARU'),
@@ -26078,7 +26078,7 @@ INSERT INTO `villages` VALUES
   ('1603010005', '1603010', 'MUARA DANAU'),
   ('1603010006', '1603010', 'PENYANDINGAN'),
   ('1603010007', '1603010', 'TANAH ABANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1603010008', '1603010', 'KARYA NYATA'),
   ('1603010009', '1603010', 'PAGAR AGUNG'),
   ('1603010010', '1603010', 'PERAPAU'),
@@ -26129,7 +26129,7 @@ INSERT INTO `villages` VALUES
   ('1603020023', '1603020', 'PULAU PANGGUNG'),
   ('1603020024', '1603020', 'MUARA EMIL'),
   ('1603020025', '1603020', 'SUGIH WARAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1603020026', '1603020', 'PAGAR JATI'),
   ('1603031001', '1603031', 'MARGA MULIA'),
   ('1603031002', '1603031', 'SUMBER RAHAYU'),
@@ -26180,7 +26180,7 @@ INSERT INTO `villages` VALUES
   ('1603050006', '1603050', 'PASAR III'),
   ('1603050007', '1603050', 'TUNGKAL'),
   ('1603050008', '1603050', 'LUBUK EMPELAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1603050009', '1603050', 'TANJUNG JATI'),
   ('1603050010', '1603050', 'MUARA LAWAI'),
   ('1603050011', '1603050', 'MUARA ENIM'),
@@ -26231,7 +26231,7 @@ INSERT INTO `villages` VALUES
   ('1603070003', '1603070', 'AUR DURI'),
   ('1603070004', '1603070', 'MANUNGGAL JAYA'),
   ('1603070005', '1603070', 'MANUNGGAL MAKMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1603070006', '1603070', 'AIR ENAU UPT XI'),
   ('1603070007', '1603070', 'AIR TALAS'),
   ('1603070008', '1603070', 'JEMENANG'),
@@ -26282,7 +26282,7 @@ INSERT INTO `villages` VALUES
   ('1603091010', '1603091', 'TAPUS'),
   ('1603091011', '1603091', 'PETANANG'),
   ('1603091012', '1603091', 'TALANG NANGKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1603091013', '1603091', 'ALAI'),
   ('1603091017', '1603091', 'TANJUNG BARU'),
   ('1603091020', '1603091', 'LUBUK ENAU'),
@@ -26333,7 +26333,7 @@ INSERT INTO `villages` VALUES
   ('1603095019', '1603095', 'TALANG BELIUNG'),
   ('1604011001', '1604011', 'TANJUNG SAKTI'),
   ('1604011002', '1604011', 'PENANDINGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1604011003', '1604011', 'TANJUNG BULAN'),
   ('1604011004', '1604011', 'PAJAR BULAN'),
   ('1604011005', '1604011', 'NEGERI KAYA'),
@@ -26384,7 +26384,7 @@ INSERT INTO `villages` VALUES
   ('1604040018', '1604040', 'GEDUNG AGUNG'),
   ('1604040019', '1604040', 'MUARA GULA'),
   ('1604040020', '1604040', 'TANJUNG BULAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1604040037', '1604040', 'TANJUNG BERINGIN'),
   ('1604040039', '1604040', 'PAGAR RUYUNG'),
   ('1604041001', '1604041', 'KARANG LEBAK'),
@@ -26435,7 +26435,7 @@ INSERT INTO `villages` VALUES
   ('1604050040', '1604050', 'KARANG DALAM'),
   ('1604050041', '1604050', 'PAGAR BATU'),
   ('1604050042', '1604050', 'KUBA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1604050043', '1604050', 'JATI'),
   ('1604050044', '1604050', 'MUARA SIBAN'),
   ('1604051001', '1604051', 'KEDATON'),
@@ -26486,7 +26486,7 @@ INSERT INTO `villages` VALUES
   ('1604060046', '1604060', 'NANTIGIRI'),
   ('1604060047', '1604060', 'KEDATON'),
   ('1604060048', '1604060', 'BANDARAJI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1604060049', '1604060', 'TERTAP'),
   ('1604060050', '1604060', 'PENANTIAN'),
   ('1604060051', '1604060', 'SADAN'),
@@ -26537,7 +26537,7 @@ INSERT INTO `villages` VALUES
   ('1604111008', '1604111', 'ULAK BANDUNG'),
   ('1604111009', '1604111', 'JAJARAN BARU'),
   ('1604111010', '1604111', 'WONOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1604111011', '1604111', 'SUKA MERINDU'),
   ('1604111012', '1604111', 'JAJARAN LAMA'),
   ('1604111013', '1604111', 'LUBUK SEKETI'),
@@ -26588,7 +26588,7 @@ INSERT INTO `villages` VALUES
   ('1604113007', '1604113', 'TANJUNG BERINGIN'),
   ('1604113008', '1604113', 'PAGAR JATI'),
   ('1604113009', '1604113', 'JAGABAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1604113010', '1604113', 'SIRAH PULAU'),
   ('1604113011', '1604113', 'TANJUNG ALAM'),
   ('1604113012', '1604113', 'KARANG CAHAYA'),
@@ -26639,7 +26639,7 @@ INSERT INTO `villages` VALUES
   ('1604121001', '1604121', 'SUGI WARAS'),
   ('1604121002', '1604121', 'TANJUNG PERIUK'),
   ('1604121003', '1604121', 'TANJUNG KARANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1604121004', '1604121', 'MUARA TANDI'),
   ('1604121005', '1604121', 'DARMO'),
   ('1604121006', '1604121', 'ENDIKAT ILIR'),
@@ -26690,7 +26690,7 @@ INSERT INTO `villages` VALUES
   ('1604131024', '1604131', 'MUARA MAUNG'),
   ('1604131025', '1604131', 'TELATANG'),
   ('1604131026', '1604131', 'MERAPI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1604131027', '1604131', 'PURWOSARI'),
   ('1604131028', '1604131', 'KARANG REJO'),
   ('1604132001', '1604132', 'SIRAH PULAU'),
@@ -26741,7 +26741,7 @@ INSERT INTO `villages` VALUES
   ('1605031010', '1605031', 'NAPAL MELINTANG'),
   ('1605031011', '1605031', 'LUBUK NGIN'),
   ('1605031012', '1605031', 'LUBUK NGIN BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1605032001', '1605032', 'SUMBER JAYA'),
   ('1605032002', '1605032', 'SUMBER HARTA'),
   ('1605032003', '1605032', 'JAMBU REJO'),
@@ -26792,7 +26792,7 @@ INSERT INTO `villages` VALUES
   ('1605050027', '1605050', 'AIR SATAN'),
   ('1605050028', '1605050', 'DURIAN REMUK'),
   ('1605050029', '1605050', 'SATAN INDAH JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1605050030', '1605050', 'AIR LESING'),
   ('1605051001', '1605051', 'RANTAU SERIK'),
   ('1605051002', '1605051', 'KEBUR'),
@@ -26843,7 +26843,7 @@ INSERT INTO `villages` VALUES
   ('1605070045', '1605070', 'TEMUAN SARI'),
   ('1605070046', '1605070', 'TEMUAN JAYA'),
   ('1605070047', '1605070', 'MEKARSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1605070048', '1605070', 'MANGAN JAYA'),
   ('1605070049', '1605070', 'LUBUK MUDA'),
   ('1605070050', '1605070', 'SUKAMENANG'),
@@ -26894,7 +26894,7 @@ INSERT INTO `villages` VALUES
   ('1605080015', '1605080', 'PRABUMULIH I'),
   ('1605080016', '1605080', 'PRABUMULIH II'),
   ('1605080017', '1605080', 'PELITA JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1605080018', '1605080', 'SIDO MULYO'),
   ('1605080019', '1605080', 'MARGA BARU'),
   ('1605080020', '1605080', 'SEMANGUS BARU'),
@@ -26945,7 +26945,7 @@ INSERT INTO `villages` VALUES
   ('1606020030', '1606020', 'MUARA PUNJUNG'),
   ('1606020031', '1606020', 'BERUGA'),
   ('1606020032', '1606020', 'SUGIWARAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1606020033', '1606020', 'SUGI RAYA'),
   ('1606020034', '1606020', 'SEREKA'),
   ('1606020035', '1606020', 'SRI MULYO'),
@@ -26996,7 +26996,7 @@ INSERT INTO `villages` VALUES
   ('1606023011', '1606023', 'ULAK TEBERAU'),
   ('1606023012', '1606023', 'SIMPANG SARI'),
   ('1606023013', '1606023', 'ULAK PACEH JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1606023014', '1606023', 'TALANG PIASE'),
   ('1606023015', '1606023', 'PANDAN DULANG'),
   ('1606030001', '1606030', 'JIRAK'),
@@ -27047,7 +27047,7 @@ INSERT INTO `villages` VALUES
   ('1606041010', '1606041', 'PETALING'),
   ('1606041011', '1606041', 'LAIS'),
   ('1606041012', '1606041', 'TELUK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1606041013', '1606041', 'EPIL'),
   ('1606041014', '1606041', 'TANJUNG AGUNG SELATAN'),
   ('1606041015', '1606041', 'LAIS UTARA'),
@@ -27098,7 +27098,7 @@ INSERT INTO `villages` VALUES
   ('1606092016', '1606092', 'GAJAH MUDA'),
   ('1606100027', '1606100', 'MUARA MERANG'),
   ('1606100028', '1606100', 'MANGSANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1606100040', '1606100', 'TAMPANG BARU'),
   ('1606100041', '1606100', 'PULAI GADING'),
   ('1606100042', '1606100', 'MUARA MEDAK'),
@@ -27149,7 +27149,7 @@ INSERT INTO `villages` VALUES
   ('1606101027', '1606101', 'MEKAR JAYA'),
   ('1606102001', '1606102', 'BEROJAYA TIMUR'),
   ('1606102002', '1606102', 'BEJI MULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1606102003', '1606102', 'MARGO MULYO'),
   ('1606102004', '1606102', 'PANDAN SARI'),
   ('1606102005', '1606102', 'SIMPANG TUNGKAL'),
@@ -27200,7 +27200,7 @@ INSERT INTO `villages` VALUES
   ('1607021002', '1607021', 'AIR SENGGERIS'),
   ('1607021003', '1607021', 'LUBUK LANCANG'),
   ('1607021004', '1607021', 'BIYUKU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1607021005', '1607021', 'RIMBA TERAB'),
   ('1607021006', '1607021', 'SEDANG'),
   ('1607021007', '1607021', 'TANJUNG LAUT'),
@@ -27251,7 +27251,7 @@ INSERT INTO `villages` VALUES
   ('1607031012', '1607031', 'PANCAMULYA PERTAK II SP 2'),
   ('1607031013', '1607031', 'SUKA JAYA PERTAK III'),
   ('1607031014', '1607031', 'SUKA KARYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1607040001', '1607040', 'GALANG TINGGI'),
   ('1607040002', '1607040', 'PETALING'),
   ('1607040003', '1607040', 'SIDANG MAS'),
@@ -27302,7 +27302,7 @@ INSERT INTO `villages` VALUES
   ('1607050022', '1607050', 'TALANG KERAMAT'),
   ('1607050023', '1607050', 'SUNGAI RENGIT MURNI'),
   ('1607051001', '1607051', 'SEBALIK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1607051002', '1607051', 'TANJUNG LAGO'),
   ('1607051003', '1607051', 'MANGGAR RAYA'),
   ('1607051004', '1607051', 'BANYU URIP'),
@@ -27353,7 +27353,7 @@ INSERT INTO `villages` VALUES
   ('1607070005', '1607070', 'TANAH LEMBAK'),
   ('1607070006', '1607070', 'PARIT'),
   ('1607070007', '1607070', 'PELAJU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1607070008', '1607070', 'SUKA PINDAH'),
   ('1607070009', '1607070', 'DURIAN GADIS'),
   ('1607070010', '1607070', 'TANJUNG KERANG'),
@@ -27404,7 +27404,7 @@ INSERT INTO `villages` VALUES
   ('1607081020', '1607081', 'KUALA SUGIHAN'),
   ('1607081021', '1607081', 'SIDO MAKMUR'),
   ('1607081022', '1607081', 'MEKAR JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1607090007', '1607090', 'UPANG MAKMUR'),
   ('1607090008', '1607090', 'PANGESTU'),
   ('1607090009', '1607090', 'MAKARTI JAYA'),
@@ -27455,7 +27455,7 @@ INSERT INTO `villages` VALUES
   ('1607110005', '1607110', 'SUMBER HIDUP'),
   ('1607110006', '1607110', 'TELANG REJO'),
   ('1607110007', '1607110', 'TELANG KARYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1607110012', '1607110', 'SUMBER MULYA'),
   ('1607110013', '1607110', 'MARGA RAHAYU'),
   ('1607110018', '1607110', 'PANCA MUKTI'),
@@ -27506,7 +27506,7 @@ INSERT INTO `villages` VALUES
   ('1608020037', '1608020', 'SIDODADI'),
   ('1608020038', '1608020', 'SIPATUHU DUA'),
   ('1608020039', '1608020', 'PENANTIAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1608020040', '1608020', 'SUKAMAJU'),
   ('1608020041', '1608020', 'TANGSI AGUNG'),
   ('1608020042', '1608020', 'SUMBER MAKMUR'),
@@ -27557,7 +27557,7 @@ INSERT INTO `villages` VALUES
   ('1608030004', '1608030', 'KARET JAYA'),
   ('1608030005', '1608030', 'SRI MENANTI'),
   ('1608030006', '1608030', 'TALANG PADANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1608030007', '1608030', 'SERAKAT JAYA'),
   ('1608030008', '1608030', 'DURIAN SEMBILAN'),
   ('1608030010', '1608030', 'SUMBER RINGIN'),
@@ -27608,7 +27608,7 @@ INSERT INTO `villages` VALUES
   ('1608051004', '1608051', 'GUNUNG CAHYA'),
   ('1608051005', '1608051', 'RUOS'),
   ('1608051006', '1608051', 'BUMI JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1608051007', '1608051', 'BANJAR AGUNG'),
   ('1608051008', '1608051', 'SUKAJAYA'),
   ('1608051009', '1608051', 'RANTAU PANJANG'),
@@ -27659,7 +27659,7 @@ INSERT INTO `villages` VALUES
   ('1608071004', '1608071', 'GEDUNG NYAWA'),
   ('1608071005', '1608071', 'GEDUNG WANI'),
   ('1608071006', '1608071', 'SURA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1608071007', '1608071', 'MERPANG'),
   ('1608071008', '1608071', 'KARANG ENDAH'),
   ('1608071009', '1608071', 'AIR BARU'),
@@ -27710,7 +27710,7 @@ INSERT INTO `villages` VALUES
   ('1608091008', '1608091', 'TANJUNG JATI'),
   ('1608091009', '1608091', 'CAMPANG JAYA'),
   ('1608100001', '1608100', 'GUNUNG BATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1608100002', '1608100', 'KEMU'),
   ('1608100003', '1608100', 'SIMPANG PANCUR'),
   ('1608100004', '1608100', 'PAGAR AGUNG'),
@@ -27761,7 +27761,7 @@ INSERT INTO `villages` VALUES
   ('1609011004', '1609011', 'NEGERI RATU'),
   ('1609011005', '1609011', 'NEGERI RATU BARU'),
   ('1609011006', '1609011', 'PERACAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1609011007', '1609011', 'TUNAS PERACAK'),
   ('1609011008', '1609011', 'SUKA BARU'),
   ('1609012001', '1609012', 'MENDAH'),
@@ -27812,7 +27812,7 @@ INSERT INTO `villages` VALUES
   ('1609031008', '1609031', 'TANJUNG SARI'),
   ('1609031009', '1609031', 'SUMBER ASRI'),
   ('1609031010', '1609031', 'SUKA MAJU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1609031011', '1609031', 'SUKOHARJO'),
   ('1609031012', '1609031', 'TEKOREJO'),
   ('1609031013', '1609031', 'PENGANDONAN'),
@@ -27863,7 +27863,7 @@ INSERT INTO `villages` VALUES
   ('1609040027', '1609040', 'TALANG GIRING'),
   ('1609040028', '1609040', 'KALIREJO'),
   ('1609041001', '1609041', 'BATU MARTA X');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1609041002', '1609041', 'BINA AMARTA'),
   ('1609041003', '1609041', 'BATU MARTA VI'),
   ('1609041004', '1609041', 'BANDING AGUNG'),
@@ -27914,7 +27914,7 @@ INSERT INTO `villages` VALUES
   ('1609060012', '1609060', 'TRIYOSO'),
   ('1609060013', '1609060', 'SERBAGUNA'),
   ('1609060014', '1609060', 'SUMBER SUKO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1609060015', '1609060', 'SUKAJADI'),
   ('1609060016', '1609060', 'SUKOSARI'),
   ('1609060017', '1609060', 'PUJORAHAYU'),
@@ -27965,7 +27965,7 @@ INSERT INTO `villages` VALUES
   ('1609070016', '1609070', 'NUSA TENGGARA'),
   ('1609070017', '1609070', 'SUMBER REJO'),
   ('1609070018', '1609070', 'SINAR BALI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1609070019', '1609070', 'KARANG JADI'),
   ('1609070020', '1609070', 'RINGIN SARI'),
   ('1609070021', '1609070', 'GANTI WARNO'),
@@ -28016,7 +28016,7 @@ INSERT INTO `villages` VALUES
   ('1609090009', '1609090', 'TRIMO HARJO'),
   ('1609090011', '1609090', 'SUKA MULYA'),
   ('1609090018', '1609090', 'TARAMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1609090019', '1609090', 'KARANG ENDAH'),
   ('1609090020', '1609090', 'SRI WANGI'),
   ('1609090021', '1609090', 'KRUJON'),
@@ -28067,7 +28067,7 @@ INSERT INTO `villages` VALUES
   ('1609101001', '1609101', 'TANJUNG KUKUH'),
   ('1609101002', '1609101', 'BETUNG'),
   ('1609101003', '1609101', 'TANJUNG MAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1609101004', '1609101', 'MENANGA BESAR'),
   ('1609101005', '1609101', 'MENANGA TENGAH'),
   ('1609101006', '1609101', 'KANGKUNG'),
@@ -28118,7 +28118,7 @@ INSERT INTO `villages` VALUES
   ('1610020008', '1610020', 'SERI BANDUNG'),
   ('1610020012', '1610020', 'SERI TANJUNG'),
   ('1610020013', '1610020', 'BANGUN JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1610020014', '1610020', 'TANJUNG TAMBAK'),
   ('1610020015', '1610020', 'TANJUNG BARU PETAI'),
   ('1610020016', '1610020', 'TANJUNG BATU SEBERANG'),
@@ -28169,7 +28169,7 @@ INSERT INTO `villages` VALUES
   ('1610031004', '1610031', 'MUARA KUMBANG'),
   ('1610031005', '1610031', 'LUBUK RUKAM'),
   ('1610031006', '1610031', 'PANDAN ARANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1610031007', '1610031', 'KANDIS I'),
   ('1610031008', '1610031', 'SANTAPAN BARAT'),
   ('1610031009', '1610031', 'MIJI'),
@@ -28220,7 +28220,7 @@ INSERT INTO `villages` VALUES
   ('1610042011', '1610042', 'SUNGAI PINANG LAGATI'),
   ('1610042012', '1610042', 'SUNGAI PINANG NIBUNG'),
   ('1610042013', '1610042', 'SERIJABO BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1610050016', '1610050', 'AUR STANDING'),
   ('1610050019', '1610050', 'SUKA RAMI'),
   ('1610050020', '1610050', 'PALU'),
@@ -28271,7 +28271,7 @@ INSERT INTO `villages` VALUES
   ('1610052008', '1610052', 'ULAK PETANGISAN'),
   ('1610052009', '1610052', 'TALANG PANGERAN ILIR'),
   ('1610052010', '1610052', 'ULAK KEMBAHANG II');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1610052011', '1610052', 'ARISAN JAYA'),
   ('1610060005', '1610060', 'LUBUK SAKTI'),
   ('1610060006', '1610060', 'TANJUNG GELAM'),
@@ -28322,7 +28322,7 @@ INSERT INTO `villages` VALUES
   ('1610062011', '1610062', 'ARISAN GADING'),
   ('1610062012', '1610062', 'MERANJAT III'),
   ('1610062013', '1610062', 'TEBING GERINTING UTARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1610062014', '1610062', 'TANJUNG DAYANG UTARA'),
   ('1611010006', '1611010', 'SAWAH'),
   ('1611010007', '1611010', 'SELEMAN ULU'),
@@ -28373,7 +28373,7 @@ INSERT INTO `villages` VALUES
   ('1611030010', '1611030', 'GUNUNG MERAKSABARU'),
   ('1611030011', '1611030', 'SARANG BULAN'),
   ('1611030012', '1611030', 'BAYAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1611030013', '1611030', 'TANJUNG BARU'),
   ('1611030014', '1611030', 'MUARA KARANG'),
   ('1611030015', '1611030', 'LANDUR'),
@@ -28424,7 +28424,7 @@ INSERT INTO `villages` VALUES
   ('1611051001', '1611051', 'PUNTANG'),
   ('1611051002', '1611051', 'BANDAR AJI'),
   ('1611051003', '1611051', 'PADURAKSA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1611051004', '1611051', 'KARANG GEDE'),
   ('1611051005', '1611051', 'KARANG DAPO BARU'),
   ('1611051006', '1611051', 'KARANG DAPO LAMA'),
@@ -28475,7 +28475,7 @@ INSERT INTO `villages` VALUES
   ('1611071001', '1611071', 'LUBUK KELUMPANG'),
   ('1611071002', '1611071', 'SAWAH'),
   ('1611071003', '1611071', 'TANJUNG NING SIMPANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1611071004', '1611071', 'TANJUNG NING JAYA'),
   ('1611071005', '1611071', 'TANJUNG NING LAMA'),
   ('1611071006', '1611071', 'TANJUNG NING TENGAH'),
@@ -28526,7 +28526,7 @@ INSERT INTO `villages` VALUES
   ('1612030004', '1612030', 'BETUNG'),
   ('1612030005', '1612030', 'BETUNG SELATAN'),
   ('1612030006', '1612030', 'BETUNG BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1612030007', '1612030', 'KARANG AGUNG'),
   ('1612030008', '1612030', 'TANJUNG KURUNG'),
   ('1612040001', '1612040', 'PURUN TIMUR'),
@@ -28577,7 +28577,7 @@ INSERT INTO `villages` VALUES
   ('1613020009', '1613020', 'SUKAMENANG'),
   ('1613020010', '1613020', 'TERUSAN'),
   ('1613020011', '1613020', 'KARANG JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1613020012', '1613020', 'EMBACANG BARU'),
   ('1613020013', '1613020', 'EMBACANG BARU ILIR'),
   ('1613020014', '1613020', 'EMBACANG LAMA'),
@@ -28628,7 +28628,7 @@ INSERT INTO `villages` VALUES
   ('1613060001', '1613060', 'MANDI ANGIN'),
   ('1613060002', '1613060', 'BERINGIN MAKMUR I'),
   ('1613060003', '1613060', 'BATU KUCING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1613060004', '1613060', 'PAUH'),
   ('1613060005', '1613060', 'MEKARSARI'),
   ('1613060006', '1613060', 'KETAPAT BENING'),
@@ -28679,7 +28679,7 @@ INSERT INTO `villages` VALUES
   ('1671022004', '1671022', 'SILABERANTI'),
   ('1671022005', '1671022', '9/10 ULU'),
   ('1671030007', '1671030', 'SENTOSA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1671030008', '1671030', '16 ULU'),
   ('1671030010', '1671030', 'TANGGA TAKAT'),
   ('1671030011', '1671030', '14 ULU'),
@@ -28730,7 +28730,7 @@ INSERT INTO `villages` VALUES
   ('1671060009', '1671060', '5 ILIR'),
   ('1671061001', '1671061', 'SEI LAIS'),
   ('1671061002', '1671061', 'SEI SELINCAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1671061003', '1671061', 'SEI SELAYUR'),
   ('1671061004', '1671061', 'KALIDONI'),
   ('1671061005', '1671061', 'BUKIT SANGKAL'),
@@ -28781,7 +28781,7 @@ INSERT INTO `villages` VALUES
   ('1672021003', '1672021', 'SUKA RAJA'),
   ('1672021004', '1672021', 'MAJASARI'),
   ('1672030001', '1672030', 'GUNUNG KEMALA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1672030002', '1672030', 'PATIH GALUNG'),
   ('1672030003', '1672030', 'PRABUMULIH'),
   ('1672030008', '1672030', 'MUNTANG TAPUS'),
@@ -28832,7 +28832,7 @@ INSERT INTO `villages` VALUES
   ('1673040008', '1673040', 'ALUN DUA'),
   ('1673040009', '1673040', 'KURIPAN BABAS'),
   ('1673040010', '1673040', 'SELIBAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1674011001', '1674011', 'KAYU ARA'),
   ('1674011002', '1674011', 'WATAS LUBUK DURIAN'),
   ('1674011003', '1674011', 'LUBUK TANJUNG'),
@@ -28883,7 +28883,7 @@ INSERT INTO `villages` VALUES
   ('1674032005', '1674032', 'JAWA KIRI'),
   ('1674032006', '1674032', 'WIRA KARYA'),
   ('1674032007', '1674032', 'DEMPO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1674032008', '1674032', 'KARYA BHAKTI'),
   ('1674032009', '1674032', 'CEREME TABA'),
   ('1674041001', '1674041', 'SUMBER AGUNG'),
@@ -28934,7 +28934,7 @@ INSERT INTO `villages` VALUES
   ('1701041017', '1701041', 'GELUMBANG'),
   ('1701041018', '1701041', 'PADANG KAPUK'),
   ('1701041019', '1701041', 'IBUL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1701041020', '1701041', 'PADANG BERANGIN'),
   ('1701042012', '1701042', 'LAWANG AGUNG'),
   ('1701042013', '1701042', 'DURIAN SEBATANG'),
@@ -28985,7 +28985,7 @@ INSERT INTO `villages` VALUES
   ('1701045009', '1701045', 'PAGAR BANYU'),
   ('1701045010', '1701045', 'SUKARAMI'),
   ('1701045011', '1701045', 'BETUNGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1701045012', '1701045', 'KARANG CAYA'),
   ('1701050001', '1701050', 'MUARA PULUTAN'),
   ('1701050002', '1701050', 'MUARA PAYANG'),
@@ -29036,7 +29036,7 @@ INSERT INTO `villages` VALUES
   ('1701060030', '1701060', 'PADANG MUMPO'),
   ('1701060031', '1701060', 'PADANG TAMBAK'),
   ('1701061001', '1701061', 'TANGGO RASO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1701061002', '1701061', 'AIR KEMANG'),
   ('1701061003', '1701061', 'BANDUNG AYU'),
   ('1701061004', '1701061', 'TUNGKAL I'),
@@ -29087,7 +29087,7 @@ INSERT INTO `villages` VALUES
   ('1702021007', '1702021', 'LUBUK BELIMBING II'),
   ('1702021008', '1702021', 'LUBUK BINGIN BARU'),
   ('1702021009', '1702021', 'LUBUK TUNJUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1702021010', '1702021', 'SUKA KARYA'),
   ('1702030028', '1702030', 'KARANG BARU'),
   ('1702030029', '1702030', 'GURU AGUNG'),
@@ -29138,7 +29138,7 @@ INSERT INTO `villages` VALUES
   ('1702040013', '1702040', 'AIR RAMBAI'),
   ('1702040014', '1702040', 'DWI TUNGGAL'),
   ('1702040015', '1702040', 'ADIREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1702040016', '1702040', 'TALANG BENIH'),
   ('1702040017', '1702040', 'JALAN BARU'),
   ('1702040018', '1702040', 'PASAR BARU'),
@@ -29189,7 +29189,7 @@ INSERT INTO `villages` VALUES
   ('1702044004', '1702044', 'BANYUMAS'),
   ('1702044005', '1702044', 'PELABUHAN BARU'),
   ('1702044006', '1702044', 'KAMPUNG JAWA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1702044007', '1702044', 'SIDOREJO'),
   ('1702044008', '1702044', 'AIR BANG'),
   ('1702044009', '1702044', 'AIR MERAH'),
@@ -29240,7 +29240,7 @@ INSERT INTO `villages` VALUES
   ('1703050040', '1703050', 'MAGELANG'),
   ('1703050041', '1703050', 'TALANG CURUP'),
   ('1703050042', '1703050', 'BANYUMAS BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1703050043', '1703050', 'SERUMBUNG'),
   ('1703050044', '1703050', 'LUBUK DURIAN'),
   ('1703050045', '1703050', 'SALAM HARJO'),
@@ -29291,7 +29291,7 @@ INSERT INTO `villages` VALUES
   ('1703053010', '1703053', 'BATU RAJA REJANG'),
   ('1703053011', '1703053', 'BATU ROTO'),
   ('1703053012', '1703053', 'PEMATANG BALAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1703053013', '1703053', 'TALANG RENDAH'),
   ('1703053014', '1703053', 'SUMBEREJO'),
   ('1703053015', '1703053', 'KOTA LEKAT MUDIK'),
@@ -29342,7 +29342,7 @@ INSERT INTO `villages` VALUES
   ('1703070007', '1703070', 'AIR PADANG'),
   ('1703070008', '1703070', 'DATAR LEBAR'),
   ('1703070010', '1703070', 'TALANG RASAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1703070011', '1703070', 'LUBUK GEDANG'),
   ('1703070012', '1703070', 'SUKA LANGU'),
   ('1703070026', '1703070', 'TABA BARU'),
@@ -29393,7 +29393,7 @@ INSERT INTO `villages` VALUES
   ('1703090001', '1703090', 'URAI'),
   ('1703090007', '1703090', 'PASAR KETAHUN'),
   ('1703090008', '1703090', 'GIRI KENCANA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1703090011', '1703090', 'KUALA LELANGI'),
   ('1703090012', '1703090', 'TALANG BARU'),
   ('1703090013', '1703090', 'DUSUN RAJA'),
@@ -29444,7 +29444,7 @@ INSERT INTO `villages` VALUES
   ('1703101001', '1703101', 'SUKA NEGARA'),
   ('1703101002', '1703101', 'KARYA JAYA'),
   ('1703101003', '1703101', 'KARYA BAKTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1703101004', '1703101', 'SUKA MEDAN'),
   ('1703101005', '1703101', 'SUKA MERINDU'),
   ('1703101006', '1703101', 'SUKA MAJU'),
@@ -29495,7 +29495,7 @@ INSERT INTO `villages` VALUES
   ('1704030016', '1704030', 'JEMBATAN DUA'),
   ('1704030017', '1704030', 'GEDUNG SAKO'),
   ('1704030018', '1704030', 'BANDAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1704030019', '1704030', 'PASAR LAMA'),
   ('1704030020', '1704030', 'TANJUNG BESAR'),
   ('1704030035', '1704030', 'PENGUBAIAN'),
@@ -29546,7 +29546,7 @@ INSERT INTO `villages` VALUES
   ('1704042003', '1704042', 'SUMBER MAKMUR'),
   ('1704042004', '1704042', 'TRI TUNGGAL BHAKTI'),
   ('1704042005', '1704042', 'MUARA SAHUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1704042006', '1704042', 'ULAK LEBAR'),
   ('1704042007', '1704042', 'CINTA MAKMUR'),
   ('1704050010', '1704050', 'GEDUNG WANI'),
@@ -29597,7 +29597,7 @@ INSERT INTO `villages` VALUES
   ('1704060022', '1704060', 'TANJUNG IMAN II'),
   ('1704060023', '1704060', 'SELIKA III'),
   ('1704061001', '1704061', 'PAGAR DEWA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1704061002', '1704061', 'TALANG TAIS'),
   ('1704061003', '1704061', 'PENANTIAN'),
   ('1704061004', '1704061', 'SIRING AGUNG'),
@@ -29648,7 +29648,7 @@ INSERT INTO `villages` VALUES
   ('1704073007', '1704073', 'BUNGIN TAMBUN II'),
   ('1704073008', '1704073', 'BUNGIN TAMBUN III'),
   ('1704073009', '1704073', 'NAGA RANTAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1704073010', '1704073', 'MARGO MULYO'),
   ('1704073011', '1704073', 'JATI MULYO'),
   ('1705010001', '1705010', 'TEDUNAN'),
@@ -29699,7 +29699,7 @@ INSERT INTO `villages` VALUES
   ('1705020020', '1705020', 'MEKAR SARI MUKTI'),
   ('1705020021', '1705020', 'SUBAN'),
   ('1705020022', '1705020', 'TELATAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1705020023', '1705020', 'KEMANG MANIS'),
   ('1705020024', '1705020', 'GUNUNG MEGANG'),
   ('1705030043', '1705030', 'KEMBANG SERI'),
@@ -29750,7 +29750,7 @@ INSERT INTO `villages` VALUES
   ('1705033004', '1705033', 'AIR KERUH'),
   ('1705033005', '1705033', 'MUARA SIMPUR'),
   ('1705033006', '1705033', 'HARGO BINANGUN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1705033007', '1705033', 'SIMPUR IJANG'),
   ('1705033008', '1705033', 'MEKAR JAYA'),
   ('1705033009', '1705033', 'GIRI NANTO'),
@@ -29801,7 +29801,7 @@ INSERT INTO `villages` VALUES
   ('1705044005', '1705044', 'TALANG BERINGIN'),
   ('1705044006', '1705044', 'TALANG RAMI'),
   ('1705044007', '1705044', 'LUBUK RESAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1705044008', '1705044', 'SEKALAK'),
   ('1705044009', '1705044', 'SINAR PAGI'),
   ('1705044010', '1705044', 'TALANG EMPAT'),
@@ -29852,7 +29852,7 @@ INSERT INTO `villages` VALUES
   ('1705052008', '1705052', 'TALANG KEBUN'),
   ('1705052009', '1705052', 'ARANG SAPAT'),
   ('1705052010', '1705052', 'NAPAL JUNGUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1705052011', '1705052', 'CAWANG'),
   ('1705052012', '1705052', 'PADANG CAPO ILIR'),
   ('1705052013', '1705052', 'SAKAIAN'),
@@ -29903,7 +29903,7 @@ INSERT INTO `villages` VALUES
   ('1706020014', '1706020', 'PONDOK KANDANG'),
   ('1706020022', '1706020', 'BUMI MEKAR JAYA'),
   ('1706020023', '1706020', 'KARYA MULYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1706020024', '1706020', 'TELUK BAKUNG'),
   ('1706021001', '1706021', 'PADANG GADING'),
   ('1706021002', '1706021', 'RETAK MUDIK'),
@@ -29954,7 +29954,7 @@ INSERT INTO `villages` VALUES
   ('1706032003', '1706032', 'SUNGAI IPUH'),
   ('1706032004', '1706032', 'SUNGAI GADING'),
   ('1706032005', '1706032', 'SURIAN BUNGKAL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1706032006', '1706032', 'LUBUK SAHUNG'),
   ('1706032007', '1706032', 'LUBUK BANGKO'),
   ('1706032008', '1706032', 'TALANG BUAI'),
@@ -30005,7 +30005,7 @@ INSERT INTO `villages` VALUES
   ('1706052002', '1706052', 'SUNGAI LINTANG'),
   ('1706052003', '1706052', 'TALANG PETAI'),
   ('1706052004', '1706052', 'LALANG LUAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1706052005', '1706052', 'RASNO'),
   ('1706052006', '1706052', 'PONDOK PANJANG'),
   ('1706052007', '1706052', 'TALANG SAKTI'),
@@ -30056,7 +30056,7 @@ INSERT INTO `villages` VALUES
   ('1707030015', '1707030', 'SEMELAKO III'),
   ('1707030016', '1707030', 'DANAU LIANG'),
   ('1707030017', '1707030', 'SUKA DAMAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1707031001', '1707031', 'UJUNG TANJUNG I'),
   ('1707031002', '1707031', 'MUNING AGUNG'),
   ('1707031003', '1707031', 'UJUNG TANJUNG II'),
@@ -30107,7 +30107,7 @@ INSERT INTO `villages` VALUES
   ('1707052003', '1707052', 'KOTA BARU'),
   ('1707052004', '1707052', 'KOTA AGUNG'),
   ('1707052005', '1707052', 'LEMEU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1707052006', '1707052', 'PANGKALAN'),
   ('1707052007', '1707052', 'TANGUA'),
   ('1707053001', '1707053', 'KETENONG SATU'),
@@ -30158,7 +30158,7 @@ INSERT INTO `villages` VALUES
   ('1708030011', '1708030', 'TALANG BABATAN'),
   ('1708030012', '1708030', 'BAYUNG'),
   ('1708030013', '1708030', 'SUNGAI JERNIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1708040001', '1708040', 'TERTIK'),
   ('1708040002', '1708040', 'TABA AIR PAUH'),
   ('1708040003', '1708040', 'PENANJUNG PANJANG'),
@@ -30209,7 +30209,7 @@ INSERT INTO `villages` VALUES
   ('1708060011', '1708060', 'SIDO MAKMUR'),
   ('1708060012', '1708060', 'SUMBER SARI'),
   ('1708060013', '1708060', 'MEKAR SARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1708060015', '1708060', 'SIDO REJO'),
   ('1708060016', '1708060', 'BANDUNG JAYA'),
   ('1708070001', '1708070', 'DASPETAH'),
@@ -30260,7 +30260,7 @@ INSERT INTO `villages` VALUES
   ('1709020006', '1709020', 'TABA MUTUNG'),
   ('1709020007', '1709020', 'KANCING'),
   ('1709020008', '1709020', 'UJUNG KARANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1709020009', '1709020', 'TALANG EMPAT'),
   ('1709020010', '1709020', 'TABA TERUNJAM'),
   ('1709020011', '1709020', 'PADANG TAMBAK'),
@@ -30311,7 +30311,7 @@ INSERT INTO `villages` VALUES
   ('1709040020', '1709040', 'KARANG ARE'),
   ('1709040021', '1709040', 'KERTAPATI MUDIK'),
   ('1709040022', '1709040', 'KEROYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1709040023', '1709040', 'RENA JAYA'),
   ('1709041001', '1709041', 'LUBUK PUAR'),
   ('1709041002', '1709041', 'PUNJUNG'),
@@ -30362,7 +30362,7 @@ INSERT INTO `villages` VALUES
   ('1709060013', '1709060', 'SENABAH'),
   ('1709060014', '1709060', 'TALANG TENGAH II'),
   ('1709060015', '1709060', 'TANJUNG KEPAYANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1709060016', '1709060', 'KEBUN LEBAR'),
   ('1709060017', '1709060', 'TIAMBANG'),
   ('1709060018', '1709060', 'PEMATANG TIGA'),
@@ -30413,7 +30413,7 @@ INSERT INTO `villages` VALUES
   ('1771022003', '1771022', 'PADANG JATI'),
   ('1771022004', '1771022', 'BELAKANG PONDOK'),
   ('1771022005', '1771022', 'PENGANTUNGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1771022006', '1771022', 'KEBUN DAHRI'),
   ('1771022007', '1771022', 'KEBUN GERAND'),
   ('1771022008', '1771022', 'ANGGUT ATAS'),
@@ -30464,7 +30464,7 @@ INSERT INTO `villages` VALUES
   ('1801040013', '1801040', 'BAHWAY'),
   ('1801040014', '1801040', 'SEDAMPAH INDAH'),
   ('1801041001', '1801041', 'TANJUNG RAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1801041002', '1801041', 'HANAKAU'),
   ('1801041003', '1801041', 'BUAY NYERUPA'),
   ('1801041004', '1801041', 'TAPAK SIRING'),
@@ -30515,7 +30515,7 @@ INSERT INTO `villages` VALUES
   ('1801053006', '1801053', 'KEGERINGAN'),
   ('1801053007', '1801053', 'NEGERI RATU'),
   ('1801053008', '1801053', 'KEMBAHANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1801053009', '1801053', 'SUKARAJA'),
   ('1801053010', '1801053', 'KERANG'),
   ('1801053011', '1801053', 'TEBA LIYOKH'),
@@ -30566,7 +30566,7 @@ INSERT INTO `villages` VALUES
   ('1801061014', '1801061', 'FAJAR BULAN'),
   ('1801062001', '1801062', 'MEKAR JAYA'),
   ('1801062002', '1801062', 'PURA MEKAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1801062003', '1801062', 'CIPTA WARAS'),
   ('1801062004', '1801062', 'TRI MULYO'),
   ('1801062005', '1801062', 'GEDUNG SURIAN'),
@@ -30617,7 +30617,7 @@ INSERT INTO `villages` VALUES
   ('1802010039', '1802010', 'WAY LIWOK'),
   ('1802010040', '1802010', 'SUMUR TUJUH'),
   ('1802010041', '1802010', 'DADI MULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1802010042', '1802010', 'SRI MELATI'),
   ('1802011001', '1802011', 'TUGU PAPAK'),
   ('1802011002', '1802011', 'KARANG REJO'),
@@ -30668,7 +30668,7 @@ INSERT INTO `villages` VALUES
   ('1802020036', '1802020', 'KOTA BATU'),
   ('1802020037', '1802020', 'CAMPANG TIGA'),
   ('1802020038', '1802020', 'BENTENGAN JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1802021001', '1802021', 'TAMPANG'),
   ('1802021002', '1802021', 'KAUR GADING'),
   ('1802021003', '1802021', 'TIROM'),
@@ -30719,7 +30719,7 @@ INSERT INTO `villages` VALUES
   ('1802030006', '1802030', 'KEMUNING'),
   ('1802030007', '1802030', 'GEDUNG AGUNG'),
   ('1802030008', '1802030', 'PENANTIAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1802030009', '1802030', 'MUARA DUA'),
   ('1802030010', '1802030', 'TEKAD'),
   ('1802030014', '1802030', 'PULAU PANGGUNG'),
@@ -30770,7 +30770,7 @@ INSERT INTO `villages` VALUES
   ('1802040033', '1802040', 'BANDING AGUNG'),
   ('1802040034', '1802040', 'TALANG PADANG'),
   ('1802040035', '1802040', 'SUKA NEGERI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1802040036', '1802040', 'SUKA BANDUNG'),
   ('1802040037', '1802040', 'SUKA MERINDU'),
   ('1802040038', '1802040', 'SINAR SEMENDO'),
@@ -30821,7 +30821,7 @@ INSERT INTO `villages` VALUES
   ('1802050005', '1802050', 'TANJUNG AGUNG'),
   ('1802050006', '1802050', 'BABAKAN'),
   ('1802050007', '1802050', 'GUNUNG KASIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1802050008', '1802050', 'TANJUNG KEMALA'),
   ('1802050009', '1802050', 'BINJAI WANGI'),
   ('1802050010', '1802050', 'SUKAJADI'),
@@ -30872,7 +30872,7 @@ INSERT INTO `villages` VALUES
   ('1802110038', '1802110', 'KUBU LANGKA'),
   ('1802110039', '1802110', 'KUTA KAKHANG'),
   ('1802110040', '1802110', 'SUKA BANJAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1802111001', '1802111', 'UMBAR'),
   ('1802111002', '1802111', 'PAKU'),
   ('1802111003', '1802111', 'NAPAL'),
@@ -30923,7 +30923,7 @@ INSERT INTO `villages` VALUES
   ('1803060023', '1803060', 'KALI SARI'),
   ('1803060024', '1803060', 'WAI SARI'),
   ('1803060025', '1803060', 'RULUNG MULYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1803060026', '1803060', 'RULUNG SARI'),
   ('1803070001', '1803070', 'WAY HUWI'),
   ('1803070002', '1803070', 'JATIMULYO'),
@@ -30974,7 +30974,7 @@ INSERT INTO `villages` VALUES
   ('1803090002', '1803090', 'KARYA TUNGGAL'),
   ('1803090003', '1803090', 'BABATAN'),
   ('1803090004', '1803090', 'PARDASUKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1803090005', '1803090', 'SUKAJAYA'),
   ('1803090006', '1803090', 'TANJUNGRATU'),
   ('1803090007', '1803090', 'TANJUNGAGUNG'),
@@ -31025,7 +31025,7 @@ INSERT INTO `villages` VALUES
   ('1803101001', '1803101', 'RANTAU MINYAK'),
   ('1803101002', '1803101', 'SIDOASRI'),
   ('1803101003', '1803101', 'WAY GELAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1803101004', '1803101', 'CANDIPURO/TITIWANGI'),
   ('1803101005', '1803101', 'TRIMOMUKTI'),
   ('1803101006', '1803101', 'BUMI JAYA'),
@@ -31076,7 +31076,7 @@ INSERT INTO `villages` VALUES
   ('1803111004', '1803111', 'CUGUNG'),
   ('1803111005', '1803111', 'BATU BALAK'),
   ('1803111006', '1803111', 'KUNJIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1803111007', '1803111', 'WAYMULI'),
   ('1803111008', '1803111', 'SUKARAJA'),
   ('1803111009', '1803111', 'RAJABASA'),
@@ -31127,7 +31127,7 @@ INSERT INTO `villages` VALUES
   ('1803130019', '1803130', 'GAYAM'),
   ('1803130020', '1803130', 'GEDUNGHARTA'),
   ('1803130021', '1803130', 'WAY KALAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1803130022', '1803130', 'PADAN'),
   ('1803130023', '1803130', 'KAMPUNGBARU'),
   ('1803130024', '1803130', 'BANJARMASIN'),
@@ -31178,7 +31178,7 @@ INSERT INTO `villages` VALUES
   ('1804020006', '1804020', 'BANAR JOYO'),
   ('1804020007', '1804020', 'TELOGO REJO'),
   ('1804020008', '1804020', 'SUMBER REJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1804020009', '1804020', 'BANJAR REJO'),
   ('1804020010', '1804020', 'BUMI HARJO'),
   ('1804020011', '1804020', 'BALE REJO'),
@@ -31229,7 +31229,7 @@ INSERT INTO `villages` VALUES
   ('1804050009', '1804050', 'BANJAR AGUNG'),
   ('1804050010', '1804050', 'TUBA'),
   ('1804050011', '1804050', 'MENGANDUNG SARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1804050012', '1804050', 'SINDANG ANOM'),
   ('1804050013', '1804050', 'BUMI MULYO'),
   ('1804050014', '1804050', 'GUNUNG MULYO'),
@@ -31280,7 +31280,7 @@ INSERT INTO `villages` VALUES
   ('1804070006', '1804070', 'KARYA MAKMUR'),
   ('1804070007', '1804070', 'BANDAR NEGERI'),
   ('1804070015', '1804070', 'MARINGGAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1804070016', '1804070', 'MUARA GADING MAS'),
   ('1804070017', '1804070', 'LABUHAN MARINGAI'),
   ('1804070031', '1804070', 'SRI GADING'),
@@ -31331,7 +31331,7 @@ INSERT INTO `villages` VALUES
   ('1804080025', '1804080', 'LABUHAN RATU BARU'),
   ('1804081001', '1804081', 'BRAJA GEMILANG'),
   ('1804081002', '1804081', 'BRAJA LUHUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1804081003', '1804081', 'BRAJA KENCANA'),
   ('1804081004', '1804081', 'BRAJA HARJOSARI'),
   ('1804081005', '1804081', 'BRAJA INDAH'),
@@ -31382,7 +31382,7 @@ INSERT INTO `villages` VALUES
   ('1804092005', '1804092', 'GEDUNG DALAM'),
   ('1804092006', '1804092', 'SUKARAJA NUBAN'),
   ('1804092007', '1804092', 'TRISNO MULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1804092008', '1804092', 'CEMPAKA NUBAN'),
   ('1804092009', '1804092', 'KEDATON II (DUA)'),
   ('1804092010', '1804092', 'KEDATON INDUK'),
@@ -31433,7 +31433,7 @@ INSERT INTO `villages` VALUES
   ('1804121007', '1804121', 'TANJUNG TIRTO'),
   ('1804121008', '1804121', 'KALI PASIR'),
   ('1805010006', '1805010', 'PURWOSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1805010008', '1805010', 'MOJOKERTO'),
   ('1805010009', '1805010', 'SENDANG AYU'),
   ('1805010010', '1805010', 'SURABAYA'),
@@ -31484,7 +31484,7 @@ INSERT INTO `villages` VALUES
   ('1805012020', '1805012', 'PADANG REJO'),
   ('1805013001', '1805013', 'SRI KATON'),
   ('1805013002', '1805013', 'JAYA SAKTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1805013003', '1805013', 'BUMI JAYA'),
   ('1805013004', '1805013', 'MULYO HAJI'),
   ('1805013005', '1805013', 'HAJI PEMANGGILAN'),
@@ -31535,7 +31535,7 @@ INSERT INTO `villages` VALUES
   ('1805030006', '1805030', 'SIDOLUHUR'),
   ('1805030007', '1805030', 'SIDOMULYO'),
   ('1805030008', '1805030', 'TIMBUL REJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1805030009', '1805030', 'SUKA WARINGIN'),
   ('1805030010', '1805030', 'SUKA NEGARA'),
   ('1805030011', '1805030', 'SRI PENDOWO'),
@@ -31586,7 +31586,7 @@ INSERT INTO `villages` VALUES
   ('1805050006', '1805050', 'TRIMURJO'),
   ('1805050007', '1805050', 'NOTOHARJO'),
   ('1805050008', '1805050', 'UNTORO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1805050009', '1805050', 'PURWOADI'),
   ('1805050010', '1805050', 'PURWODADI'),
   ('1805050011', '1805050', 'PUJODADI'),
@@ -31637,7 +31637,7 @@ INSERT INTO `villages` VALUES
   ('1805081002', '1805081', 'ENDANG REJO'),
   ('1805081003', '1805081', 'DONO ARUM'),
   ('1805081004', '1805081', 'SIMPANG AGUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1805081005', '1805081', 'BUMI KENCANA'),
   ('1805081006', '1805081', 'GAYAU SAKTI'),
   ('1805081007', '1805081', 'FAJAR ASRI'),
@@ -31688,7 +31688,7 @@ INSERT INTO `villages` VALUES
   ('1805110003', '1805110', 'SISWA BANGUN'),
   ('1805110004', '1805110', 'SANGGAR BUANA'),
   ('1805110005', '1805110', 'SAKTI BUANA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1805110006', '1805110', 'SETIA BAKTI'),
   ('1805110007', '1805110', 'SUMBER BARU'),
   ('1805110008', '1805110', 'TANJUNG HARAPAN'),
@@ -31739,7 +31739,7 @@ INSERT INTO `villages` VALUES
   ('1805130016', '1805130', 'GAYA BARU TIGA'),
   ('1805130018', '1805130', 'KENANGA SARI'),
   ('1805130019', '1805130', 'SRI MULYA JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1805130020', '1805130', 'GAYA BARU SATU'),
   ('1805130021', '1805130', 'GAYA BARU DELAPAN'),
   ('1805130022', '1805130', 'MATARAM ILIR'),
@@ -31790,7 +31790,7 @@ INSERT INTO `villages` VALUES
   ('1806020019', '1806020', 'PRIANGAN BARU'),
   ('1806030017', '1806030', 'HUJAN MAS'),
   ('1806030024', '1806030', 'BUMI NABUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1806030025', '1806030', 'PENGARINGAN'),
   ('1806030026', '1806030', 'SIMPANG ABUNG'),
   ('1806030027', '1806030', 'WAY WAKAK'),
@@ -31841,7 +31841,7 @@ INSERT INTO `villages` VALUES
   ('1806040019', '1806040', 'KOTABUMI UDIK'),
   ('1806040020', '1806040', 'SINDANG SARI'),
   ('1806040027', '1806040', 'KOTABUMI TENGAH BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1806040028', '1806040', 'BOJONG BARAT'),
   ('1806040029', '1806040', 'SUMBER ARUM'),
   ('1806041001', '1806041', 'KALI CINTA'),
@@ -31892,7 +31892,7 @@ INSERT INTO `villages` VALUES
   ('1806052001', '1806052', 'JAGANG'),
   ('1806052002', '1806052', 'TANJUNG IMAN'),
   ('1806052003', '1806052', 'BLAMBANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1806052004', '1806052', 'PAGAR GADING'),
   ('1806052005', '1806052', 'TULUNG SINGKIP'),
   ('1806052006', '1806052', 'PAGAR'),
@@ -31943,7 +31943,7 @@ INSERT INTO `villages` VALUES
   ('1806072001', '1806072', 'KOTA NAPAL'),
   ('1806072002', '1806072', 'TANAH ABANG'),
   ('1806072003', '1806072', 'NEGARA TULANG BAWANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1806072004', '1806072', 'TULANG BAWANG BARU'),
   ('1806072005', '1806072', 'SUKADANA ILIR'),
   ('1806072006', '1806072', 'SUKADANA UDIK'),
@@ -31994,7 +31994,7 @@ INSERT INTO `villages` VALUES
   ('1806081006', '1806081', 'BERINGIN JAYA'),
   ('1806081007', '1806081', 'IBUL JAYA'),
   ('1806081008', '1806081', 'TULUNG BUYUT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1806081009', '1806081', 'GEDUNG RAJA'),
   ('1806081010', '1806081', 'GEDUNG NEGARA'),
   ('1806082001', '1806082', 'NEGERI CAMPANG JAYA'),
@@ -32045,7 +32045,7 @@ INSERT INTO `villages` VALUES
   ('1807020031', '1807020', 'BUMI MERAPI'),
   ('1807020032', '1807020', 'BUMI REJO'),
   ('1807020033', '1807020', 'BANJAR SARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1807020034', '1807020', 'SUKOSARI'),
   ('1807020038', '1807020', 'GUNUNG KATUN'),
   ('1807021001', '1807021', 'BANJAR RATU'),
@@ -32096,7 +32096,7 @@ INSERT INTO `villages` VALUES
   ('1807031006', '1807031', 'SIMPANG TIGA'),
   ('1807031007', '1807031', 'TANJUNG RAYA'),
   ('1807031008', '1807031', 'BERINGIN JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1807031009', '1807031', 'KARYA MAJU'),
   ('1807031010', '1807031', 'MULYA JAYA'),
   ('1807040001', '1807040', 'RAMBANG JAYA'),
@@ -32147,7 +32147,7 @@ INSERT INTO `villages` VALUES
   ('1807042007', '1807042', 'KARYA AGUNG'),
   ('1807042008', '1807042', 'PENENGAHAN'),
   ('1807042009', '1807042', 'MULYA SARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1807042010', '1807042', 'TANJUNG REJO'),
   ('1807042011', '1807042', 'SUNGSANG'),
   ('1807042012', '1807042', 'KOTA BARU'),
@@ -32198,7 +32198,7 @@ INSERT INTO `villages` VALUES
   ('1807060009', '1807060', 'WAY TAWAR'),
   ('1807060010', '1807060', 'PAKUAN SAKTI'),
   ('1807060011', '1807060', 'NEGARA HARJA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1807060012', '1807060', 'NEGARA TAMA'),
   ('1807060032', '1807060', 'BUMI MULYA'),
   ('1807060035', '1807060', 'NEGARA SAKTI'),
@@ -32249,7 +32249,7 @@ INSERT INTO `villages` VALUES
   ('1808030017', '1808030', 'BANJAR DEWA'),
   ('1808031001', '1808031', 'RINGIN SARI'),
   ('1808031002', '1808031', 'CATUR KARYA BUANA JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1808031003', '1808031', 'BUJUK AGUNG'),
   ('1808031004', '1808031', 'SUKAMAJU'),
   ('1808031005', '1808031', 'PENAWAR JAYA'),
@@ -32300,7 +32300,7 @@ INSERT INTO `villages` VALUES
   ('1808050001', '1808050', 'BUJUNG TENUK'),
   ('1808050002', '1808050', 'ASTRA KSETRA'),
   ('1808050005', '1808050', 'UJUNG GUNUNG ILIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1808050012', '1808050', 'MENGGALA SELATAN'),
   ('1808050013', '1808050', 'UJUNG GUNUNG'),
   ('1808050014', '1808050', 'MENGGALA TENGAH'),
@@ -32351,7 +32351,7 @@ INSERT INTO `villages` VALUES
   ('1808054008', '1808054', 'BUMI DIPASENA ABADI'),
   ('1808055001', '1808055', 'RAWA RAGIL'),
   ('1808055002', '1808055', 'GEDUNG JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1808055003', '1808055', 'DUTO YOSO MULYO'),
   ('1808055004', '1808055', 'ANDALAS CERMIN'),
   ('1808055005', '1808055', 'PANGGUNG MULYO'),
@@ -32402,7 +32402,7 @@ INSERT INTO `villages` VALUES
   ('1809010010', '1809010', 'BANDING AGUNG'),
   ('1809010021', '1809010', 'BANGUN REJO'),
   ('1809011001', '1809011', 'KAMPUNGBARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1809011002', '1809011', 'KEKATANG'),
   ('1809011003', '1809011', 'PEKON AMPAI'),
   ('1809011004', '1809011', 'KUNYAIAN'),
@@ -32453,7 +32453,7 @@ INSERT INTO `villages` VALUES
   ('1809030017', '1809030', 'GUNUNG SUGIH'),
   ('1809030032', '1809030', 'BABAKAN LOA'),
   ('1809030033', '1809030', 'PESAWARAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1809030034', '1809030', 'TEBAJAWA'),
   ('1809030035', '1809030', 'HARAPAN JAYA'),
   ('1809031001', '1809031', 'BAYAS JAYA'),
@@ -32504,7 +32504,7 @@ INSERT INTO `villages` VALUES
   ('1809060001', '1809060', 'PURWOREJO'),
   ('1809060002', '1809060', 'KAGUNGANRATU'),
   ('1809060003', '1809060', 'PUJORAHAYU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1809060004', '1809060', 'KALIREJO'),
   ('1809060005', '1809060', 'TANJUNG REJO'),
   ('1809060006', '1809060', 'NEGERIKATUN'),
@@ -32555,7 +32555,7 @@ INSERT INTO `villages` VALUES
   ('1810020003', '1810020', 'AMBARAWA'),
   ('1810020004', '1810020', 'AMBARAWA BARAT'),
   ('1810020005', '1810020', 'TANJUNG ANOM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1810020006', '1810020', 'JATI AGUNG'),
   ('1810020007', '1810020', 'MARGODADI'),
   ('1810020008', '1810020', 'AMBARAWA TIMUR'),
@@ -32606,7 +32606,7 @@ INSERT INTO `villages` VALUES
   ('1810040021', '1810040', 'BUMI AYU'),
   ('1810040022', '1810040', 'PODOSARI'),
   ('1810040023', '1810040', 'FAJAR AGUNG BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1810050001', '1810050', 'PAREREJO'),
   ('1810050002', '1810050', 'BLITAREJO'),
   ('1810050003', '1810050', 'PANJEREJO'),
@@ -32657,7 +32657,7 @@ INSERT INTO `villages` VALUES
   ('1810070009', '1810070', 'SINAR MULIA'),
   ('1810070010', '1810070', 'MULYOREJO'),
   ('1810070011', '1810070', 'BANYU URIP');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1810080004', '1810080', 'SINAR WAYA'),
   ('1810080005', '1810080', 'BANDUNG BARU'),
   ('1810080006', '1810080', 'WARINGINSARI TIMUR'),
@@ -32708,7 +32708,7 @@ INSERT INTO `villages` VALUES
   ('1811030002', '1811030', 'ADI LUHUR'),
   ('1811030003', '1811030', 'FAJAR BARU'),
   ('1811030004', '1811030', 'ADI MULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1811030005', '1811030', 'FAJAR ASRI'),
   ('1811030006', '1811030', 'FAJAR INDAH'),
   ('1811030007', '1811030', 'ADI KARYA MULYA'),
@@ -32759,7 +32759,7 @@ INSERT INTO `villages` VALUES
   ('1811060013', '1811060', 'SUNGAI CAMBAI'),
   ('1811060014', '1811060', 'MARGO JAYA'),
   ('1811060015', '1811060', 'PANGKAL MAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1811060016', '1811060', 'TANJUNG MENANG RAYA'),
   ('1811060017', '1811060', 'TEBING KARYA MANDIRI'),
   ('1811060018', '1811060', 'TANJUNG MAS REJO'),
@@ -32810,7 +32810,7 @@ INSERT INTO `villages` VALUES
   ('1812030011', '1812030', 'MENGGALA MAS'),
   ('1812030013', '1812030', 'TUNAS ASRI'),
   ('1812030014', '1812030', 'WONOKERTO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1812030015', '1812030', 'PANARAGAN JAYA UTAMA'),
   ('1812030016', '1812030', 'PANARAGAN JAYA INDAH'),
   ('1812030017', '1812030', 'MULYA JAYA'),
@@ -32861,7 +32861,7 @@ INSERT INTO `villages` VALUES
   ('1812070006', '1812070', 'SUMBER JAYA'),
   ('1812070007', '1812070', 'BANGUN JAYA'),
   ('1812070008', '1812070', 'TUNAS JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1812070009', '1812070', 'JAYA MURNI'),
   ('1812070010', '1812070', 'TRI TUNGGAL JAYA'),
   ('1812070011', '1812070', 'MULYA SARI'),
@@ -32912,7 +32912,7 @@ INSERT INTO `villages` VALUES
   ('1813040003', '1813040', 'ASAHAN WAY SINDI'),
   ('1813040004', '1813040', 'WAY SINDI HANUAN'),
   ('1813040005', '1813040', 'WAY SINDI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1813040006', '1813040', 'KEBUAYAN'),
   ('1813040007', '1813040', 'WAY NUKAK'),
   ('1813040008', '1813040', 'LAAY'),
@@ -32963,7 +32963,7 @@ INSERT INTO `villages` VALUES
   ('1813080013', '1813080', 'SUKARAME'),
   ('1813080014', '1813080', 'NEGERI RATU TENUMBANG'),
   ('1813080015', '1813080', 'TULUNG BAMBAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1813090001', '1813090', 'GEDUNG CAHYA KUNINGAN'),
   ('1813090002', '1813090', 'SUKA BANJAR'),
   ('1813090003', '1813090', 'SUKA NEGARA'),
@@ -33014,7 +33014,7 @@ INSERT INTO `villages` VALUES
   ('1871020013', '1871020', 'SUMUR PUTRI'),
   ('1871020014', '1871020', 'GUNUNG MAS'),
   ('1871021001', '1871021', 'KANGKUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1871021002', '1871021', 'BUMI WARAS'),
   ('1871021003', '1871021', 'BUMI RAYA'),
   ('1871021004', '1871021', 'SUKARAJA'),
@@ -33065,7 +33065,7 @@ INSERT INTO `villages` VALUES
   ('1871070010', '1871070', 'SUKAJAWA BARU'),
   ('1871070013', '1871070', 'KELAPA TIGA PERMAI'),
   ('1871071001', '1871071', 'SUMBER AGUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1871071002', '1871071', 'KEDAUNG'),
   ('1871071003', '1871071', 'PINANG JAYA'),
   ('1871071004', '1871071', 'BERINGIN RAYA'),
@@ -33116,7 +33116,7 @@ INSERT INTO `villages` VALUES
   ('1871091008', '1871091', 'CAMPANG RAYA'),
   ('1871091009', '1871091', 'CAMPANG JAYA'),
   ('1871091010', '1871091', 'WAY GUBAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1871091011', '1871091', 'WAY LAGA'),
   ('1871092001', '1871092', 'JAGABAYA I'),
   ('1871092002', '1871092', 'JAGABAYA II'),
@@ -33167,7 +33167,7 @@ INSERT INTO `villages` VALUES
   ('1901080014', '1901080', 'BATURUSA'),
   ('1901080015', '1901080', 'AIR ANYIR'),
   ('1901080016', '1901080', 'RIDING PANJANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1901080017', '1901080', 'DWI MAKMUR'),
   ('1901080018', '1901080', 'JURUNG'),
   ('1901080019', '1901080', 'MERAWANG'),
@@ -33218,7 +33218,7 @@ INSERT INTO `villages` VALUES
   ('1901130019', '1901130', 'AIR ASAM'),
   ('1901130020', '1901130', 'REMODONG INDAH'),
   ('1901131001', '1901131', 'BANYU ASIN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1901131002', '1901131', 'PANGKAL NIUR'),
   ('1901131004', '1901131', 'CIT'),
   ('1901131005', '1901131', 'DENIANG'),
@@ -33269,7 +33269,7 @@ INSERT INTO `villages` VALUES
   ('1902062007', '1902062', 'SIJUK'),
   ('1902062008', '1902062', 'SUNGAI PADANG'),
   ('1902062009', '1902062', 'TANJONG TINGGI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1902062010', '1902062', 'PELEPAK  PUTE'),
   ('1902063001', '1902063', 'SUAK GUAL'),
   ('1902063002', '1902063', 'PETALING'),
@@ -33320,7 +33320,7 @@ INSERT INTO `villages` VALUES
   ('1903050002', '1903050', 'TUMBAK PETAR'),
   ('1903050003', '1903050', 'LIMBUNG'),
   ('1903050004', '1903050', 'RUKAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1903050009', '1903050', 'RANGGI/ASAM'),
   ('1903050010', '1903050', 'SUNGAI BULUH'),
   ('1903050011', '1903050', 'KETAP'),
@@ -33371,7 +33371,7 @@ INSERT INTO `villages` VALUES
   ('1904030001', '1904030', 'SUNGAI SELAN'),
   ('1904030002', '1904030', 'LAMPUR'),
   ('1904030003', '1904030', 'KERANTAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1904030008', '1904030', 'KERETAK'),
   ('1904030009', '1904030', 'SARANGMANDI'),
   ('1904030011', '1904030', 'KEMINGKING'),
@@ -33422,7 +33422,7 @@ INSERT INTO `villages` VALUES
   ('1905030014', '1905030', 'KEPOH'),
   ('1905031001', '1905031', 'SADAI'),
   ('1905031002', '1905031', 'PASIR PUTIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1905031003', '1905031', 'TUKAK'),
   ('1905031004', '1905031', 'TIRAM'),
   ('1905031005', '1905031', 'BUKIT TERAP'),
@@ -33473,7 +33473,7 @@ INSERT INTO `villages` VALUES
   ('1906031005', '1906031', 'AIR KELIK'),
   ('1906040001', '1906040', 'CENDIL'),
   ('1906040002', '1906040', 'BUDING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('1906040003', '1906040', 'MENTAWAK'),
   ('1906040005', '1906040', 'MAYANG'),
   ('1906040007', '1906040', 'PEMBAHARUAN'),
@@ -33524,7 +33524,7 @@ INSERT INTO `villages` VALUES
   ('2101010005', '2101010', 'SUGIE'),
   ('2101010006', '2101010', 'KEBAN'),
   ('2101010007', '2101010', 'SELAT MIE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('2101010008', '2101010', 'TANJUNG PELANDUK'),
   ('2101010009', '2101010', 'JANG'),
   ('2101010010', '2101010', 'MORO TIMUR'),
@@ -33575,7 +33575,7 @@ INSERT INTO `villages` VALUES
   ('2101032007', '2101032', 'BARAN TIMUR'),
   ('2101032008', '2101032', 'PARIT BENUT'),
   ('2101033001', '2101033', 'TEBING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('2101033002', '2101033', 'TELUK UMA'),
   ('2101033004', '2101033', 'KAPLING'),
   ('2101033005', '2101033', 'PAMAK'),
@@ -33626,7 +33626,7 @@ INSERT INTO `villages` VALUES
   ('2102064002', '2102064', 'TOAPAYA'),
   ('2102064003', '2102064', 'TOAPAYA ASRI'),
   ('2102064004', '2102064', 'TOAPAYA SELATAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('2102070001', '2102070', 'PULAU PINANG'),
   ('2102070002', '2102070', 'PULAU MENTEBUNG'),
   ('2102070003', '2102070', 'KAMPUNG MELAYU'),
@@ -33677,7 +33677,7 @@ INSERT INTO `villages` VALUES
   ('2103050015', '2103050', 'RANAI DARAT'),
   ('2103050016', '2103050', 'BANDARSYAH'),
   ('2103051002', '2103051', 'TANJUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('2103051003', '2103051', 'KELANGA'),
   ('2103051004', '2103051', 'PENGADAH'),
   ('2103051005', '2103051', 'SEBADAI HULU'),
@@ -33728,7 +33728,7 @@ INSERT INTO `villages` VALUES
   ('2104020008', '2104020', 'BATU BERDAUN'),
   ('2104020009', '2104020', 'DABO LAMA'),
   ('2104020010', '2104020', 'BATU KACANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('2104020011', '2104020', 'TANJUNG HARAPAN'),
   ('2104020012', '2104020', 'SUNGAI LUMPUR'),
   ('2104021001', '2104021', 'BERHALA'),
@@ -33779,7 +33779,7 @@ INSERT INTO `villages` VALUES
   ('2104050010', '2104050', 'MENSANAK'),
   ('2104050011', '2104050', 'BENAN'),
   ('2104050012', '2104050', 'TANJUNG LIPAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('2104050013', '2104050', 'PENAAH'),
   ('2104050014', '2104050', 'LABOH'),
   ('2104050015', '2104050', 'BARAN'),
@@ -33830,7 +33830,7 @@ INSERT INTO `villages` VALUES
   ('2105070008', '2105070', 'PUTIK'),
   ('2105070009', '2105070', 'BAYAT'),
   ('2105070010', '2105070', 'PIABUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('2105070011', '2105070', 'LANGIR'),
   ('2105070012', '2105070', 'CANDI'),
   ('2105070013', '2105070', 'PIASAN'),
@@ -33881,7 +33881,7 @@ INSERT INTO `villages` VALUES
   ('2171051006', '2171051', 'SUKAJADI'),
   ('2171060002', '2171060', 'TANJUNG RIAU'),
   ('2171060003', '2171060', 'TIBAN BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('2171060004', '2171060', 'TIBAN LAMA'),
   ('2171060005', '2171060', 'TIBAN INDAH'),
   ('2171060006', '2171060', 'PATAM LESTARI'),
@@ -33932,7 +33932,7 @@ INSERT INTO `villages` VALUES
   ('3171010002', '3171010', 'SRENGSENG SAWAH'),
   ('3171010003', '3171010', 'CIGANJUR'),
   ('3171010004', '3171010', 'JAGAKARSA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3171010005', '3171010', 'LENTENG AGUNG'),
   ('3171010006', '3171010', 'TANJUNG BARAT'),
   ('3171020001', '3171020', 'CILANDAK TIMUR'),
@@ -33983,7 +33983,7 @@ INSERT INTO `villages` VALUES
   ('3171090003', '3171090', 'TEBET TIMUR'),
   ('3171090004', '3171090', 'KEBON BARU'),
   ('3171090005', '3171090', 'BUKIT DURI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3171090006', '3171090', 'MANGGARAI SELATAN'),
   ('3171090007', '3171090', 'MANGGARAI'),
   ('3171100001', '3171100', 'KARET SEMANGGI'),
@@ -34034,7 +34034,7 @@ INSERT INTO `villages` VALUES
   ('3172070005', '3172070', 'MALAKA JAYA'),
   ('3172070006', '3172070', 'MALAKA SARI'),
   ('3172080001', '3172080', 'JATINEGARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3172080002', '3172080', 'PENGGILINGAN'),
   ('3172080003', '3172080', 'PULO GEBANG'),
   ('3172080005', '3172080', 'CAKUNG TIMUR'),
@@ -34085,7 +34085,7 @@ INSERT INTO `villages` VALUES
   ('3173060008', '3173060', 'GUNUNG SAHARI SELATAN'),
   ('3173070001', '3173070', 'PASAR BARU'),
   ('3173070002', '3173070', 'GUNUNG SAHARI UTARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3173070003', '3173070', 'KARTINI'),
   ('3173070004', '3173070', 'KARANG ANYAR'),
   ('3173070005', '3173070', 'MANGGA DUA SELATAN'),
@@ -34136,7 +34136,7 @@ INSERT INTO `villages` VALUES
   ('3174060004', '3174060', 'TANGKI'),
   ('3174060005', '3174060', 'MANGGA BESAR'),
   ('3174060006', '3174060', 'KEAGUNGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3174060007', '3174060', 'GLODOK'),
   ('3174060008', '3174060', 'PINANGSIA'),
   ('3174070001', '3174070', 'DURI KOSAMBI'),
@@ -34187,7 +34187,7 @@ INSERT INTO `villages` VALUES
   ('3201010004', '3201010', 'CURUG BITUNG'),
   ('3201010005', '3201010', 'NANGGUNG'),
   ('3201010006', '3201010', 'PANGKAL JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3201010007', '3201010', 'SUKALUYU'),
   ('3201010008', '3201010', 'HAMBARO'),
   ('3201010009', '3201010', 'KALONG LIUD'),
@@ -34238,7 +34238,7 @@ INSERT INTO `villages` VALUES
   ('3201040012', '3201040', 'GIRIMULYA'),
   ('3201040013', '3201040', 'LEUWEUNG KOLOT'),
   ('3201040014', '3201040', 'CIARUTEN ILIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3201040015', '3201040', 'CIJUJUNG'),
   ('3201050004', '3201050', 'CIAMPEA UDIK'),
   ('3201050008', '3201050', 'CINANGKA'),
@@ -34289,7 +34289,7 @@ INSERT INTO `villages` VALUES
   ('3201071007', '3201071', 'SUKAMANTRI'),
   ('3201071008', '3201071', 'SIRNAGALIH'),
   ('3201080010', '3201080', 'WARUNG MENTENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3201080011', '3201080', 'CIJERUK'),
   ('3201080012', '3201080', 'CIPELANG'),
   ('3201080013', '3201080', 'CIBALUNG'),
@@ -34340,7 +34340,7 @@ INSERT INTO `villages` VALUES
   ('3201110006', '3201110', 'CISARUA'),
   ('3201110007', '3201110', 'KOPO'),
   ('3201110008', '3201110', 'LEUWIMALANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3201110009', '3201110', 'JOGJOGAN'),
   ('3201110010', '3201110', 'CILEMBER'),
   ('3201120001', '3201120', 'SUKARESMI'),
@@ -34391,7 +34391,7 @@ INSERT INTO `villages` VALUES
   ('3201160013', '3201160', 'CIKUTAMAHI'),
   ('3201160014', '3201160', 'CIBATU TIGA'),
   ('3201160015', '3201160', 'MEKARWANGI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3201160016', '3201160', 'TEGAL PANJANG'),
   ('3201160017', '3201160', 'CARIU'),
   ('3201160018', '3201160', 'KUTA MEKAR'),
@@ -34442,7 +34442,7 @@ INSERT INTO `villages` VALUES
   ('3201181008', '3201181', 'BOJONG'),
   ('3201181009', '3201181', 'CIKAHURIPAN'),
   ('3201190001', '3201190', 'KARANGGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3201190002', '3201190', 'GUNUNG PUTRI'),
   ('3201190003', '3201190', 'TLAJUNG UDIK'),
   ('3201190004', '3201190', 'BOJONG NANGKA'),
@@ -34493,7 +34493,7 @@ INSERT INTO `villages` VALUES
   ('3201221003', '3201221', 'SUKMAJAYA'),
   ('3201221004', '3201221', 'NANGGERANG'),
   ('3201221005', '3201221', 'SASAK PANJANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3201221006', '3201221', 'KALISUREN'),
   ('3201221007', '3201221', 'CITAYAM'),
   ('3201230006', '3201230', 'SEMPLAK BARAT'),
@@ -34544,7 +34544,7 @@ INSERT INTO `villages` VALUES
   ('3201260002', '3201260', 'CIDOKOM'),
   ('3201260003', '3201260', 'GOBANG'),
   ('3201260004', '3201260', 'RABAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3201260005', '3201260', 'CIBODAS'),
   ('3201260006', '3201260', 'KAMPUNG SAWAH'),
   ('3201260007', '3201260', 'RUMPIN'),
@@ -34595,7 +34595,7 @@ INSERT INTO `villages` VALUES
   ('3201280017', '3201280', 'PANGAUR'),
   ('3201280018', '3201280', 'WIRAJAYA'),
   ('3201290001', '3201290', 'CIOMAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3201290002', '3201290', 'TAPOS'),
   ('3201290003', '3201290', 'BATOK'),
   ('3201290004', '3201290', 'BABAKAN'),
@@ -34646,7 +34646,7 @@ INSERT INTO `villages` VALUES
   ('3202030013', '3202030', 'SURADE'),
   ('3202030014', '3202030', 'KADALEMAN'),
   ('3202030015', '3202030', 'WANASARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3202030016', '3202030', 'SIRNASARI'),
   ('3202030017', '3202030', 'SUKATANI'),
   ('3202030018', '3202030', 'KADEMANGAN'),
@@ -34697,7 +34697,7 @@ INSERT INTO `villages` VALUES
   ('3202080006', '3202080', 'GUNUNG BENTANG'),
   ('3202080007', '3202080', 'PASANGGRAHAN'),
   ('3202080009', '3202080', 'DATARNANGKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3202080010', '3202080', 'SAGARANTEN'),
   ('3202080011', '3202080', 'MARGALUYU'),
   ('3202080012', '3202080', 'CIBITUNG'),
@@ -34748,7 +34748,7 @@ INSERT INTO `villages` VALUES
   ('3202111006', '3202111', 'MEKARASIH'),
   ('3202111007', '3202111', 'SANGRAWAYANG'),
   ('3202120002', '3202120', 'HEGARMANAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3202120003', '3202120', 'BANTARKALONG'),
   ('3202120004', '3202120', 'SIRNAJAYA'),
   ('3202120005', '3202120', 'BOJONGKERTA'),
@@ -34799,7 +34799,7 @@ INSERT INTO `villages` VALUES
   ('3202150003', '3202150', 'KERTAANGSANA'),
   ('3202150004', '3202150', 'MEKARSARI'),
   ('3202150005', '3202150', 'BOJONGKALONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3202150006', '3202150', 'BOJONGSARI'),
   ('3202150007', '3202150', 'SUKAMAJU'),
   ('3202150008', '3202150', 'WANGUNREJA'),
@@ -34850,7 +34850,7 @@ INSERT INTO `villages` VALUES
   ('3202190005', '3202190', 'KADUDAMPIT'),
   ('3202190006', '3202190', 'GEDE PANGRANGO'),
   ('3202190007', '3202190', 'SUKAMAJU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3202190008', '3202190', 'CIPETIR'),
   ('3202190009', '3202190', 'UNDRUS BINANGUN'),
   ('3202200007', '3202200', 'PADAASIH'),
@@ -34901,7 +34901,7 @@ INSERT INTO `villages` VALUES
   ('3202212009', '3202212', 'PASIRDATAR INDAH'),
   ('3202220001', '3202220', 'CISARUA'),
   ('3202220002', '3202220', 'BALEKAMBANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3202220003', '3202220', 'NAGRAK SELATAN'),
   ('3202220004', '3202220', 'NAGRAK UTARA'),
   ('3202220005', '3202220', 'KALAPAREA'),
@@ -34952,7 +34952,7 @@ INSERT INTO `villages` VALUES
   ('3202260012', '3202260', 'BABAKANJAYA'),
   ('3202261001', '3202261', 'BEREKAH'),
   ('3202261002', '3202261', 'BOJONG GENTENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3202261003', '3202261', 'BOJONG GALING'),
   ('3202261004', '3202261', 'CIBODAS'),
   ('3202261005', '3202261', 'CIPANENGAH'),
@@ -35003,7 +35003,7 @@ INSERT INTO `villages` VALUES
   ('3202300005', '3202300', 'CIHAMERANG'),
   ('3202300006', '3202300', 'CIANAGA'),
   ('3203010001', '3203010', 'SINARLAUT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3203010002', '3203010', 'BOJONGKASO'),
   ('3203010003', '3203010', 'SUKAMANAH'),
   ('3203010004', '3203010', 'WANASARI'),
@@ -35054,7 +35054,7 @@ INSERT INTO `villages` VALUES
   ('3203040001', '3203040', 'CINERANG'),
   ('3203040002', '3203040', 'WANGUNJAYA'),
   ('3203040003', '3203040', 'MEKARSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3203040004', '3203040', 'WANGUNSARI'),
   ('3203040005', '3203040', 'MALATI'),
   ('3203040006', '3203040', 'SUKAMULYA'),
@@ -35105,7 +35105,7 @@ INSERT INTO `villages` VALUES
   ('3203061004', '3203061', 'GIRIMUKTI'),
   ('3203061005', '3203061', 'SIMPANG'),
   ('3203061006', '3203061', 'KALIBARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3203061007', '3203061', 'PUSAKAJAYA'),
   ('3203061008', '3203061', 'KARANGJAYA'),
   ('3203061009', '3203061', 'PADAMULYA'),
@@ -35156,7 +35156,7 @@ INSERT INTO `villages` VALUES
   ('3203100002', '3203100', 'PAGELARAN'),
   ('3203100003', '3203100', 'PADAMAJU'),
   ('3203100008', '3203100', 'BUNIWANGI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3203100009', '3203100', 'BUNIJAYA'),
   ('3203100010', '3203100', 'PANGADEGAN'),
   ('3203100011', '3203100', 'SITUHIANG'),
@@ -35207,7 +35207,7 @@ INSERT INTO `villages` VALUES
   ('3203130012', '3203130', 'JAMBUDIPA'),
   ('3203130013', '3203130', 'MEKARWANGI'),
   ('3203130014', '3203130', 'TEGALLEGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3203130015', '3203130', 'BUNIKASIH'),
   ('3203130016', '3203130', 'BUNISARI'),
   ('3203130017', '3203130', 'CIEUNDEUR'),
@@ -35258,7 +35258,7 @@ INSERT INTO `villages` VALUES
   ('3203161005', '3203161', 'KERTASARI'),
   ('3203161006', '3203161', 'KERTAMUKTI'),
   ('3203161007', '3203161', 'CIPEUYEUM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3203161008', '3203161', 'MEKARWANGI'),
   ('3203170004', '3203170', 'KARANGWANGI'),
   ('3203170005', '3203170', 'GUNUNGSARI'),
@@ -35309,7 +35309,7 @@ INSERT INTO `villages` VALUES
   ('3203200010', '3203200', 'MEKARSARI'),
   ('3203200011', '3203200', 'BABAKANKARET'),
   ('3203210001', '3203210', 'PADALUYU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3203210002', '3203210', 'SUKAJAYA'),
   ('3203210003', '3203210', 'CIBULAKAN'),
   ('3203210004', '3203210', 'CIRUMPUT'),
@@ -35360,7 +35360,7 @@ INSERT INTO `villages` VALUES
   ('3203240008', '3203240', 'MEKARJAYA'),
   ('3203240009', '3203240', 'MEKAR SARI'),
   ('3203240010', '3203240', 'SUKAMULYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3203240011', '3203240', 'MEKARGALIH'),
   ('3203240012', '3203240', 'NEGLASARI'),
   ('3203240013', '3203240', 'LEMBAHSARI'),
@@ -35411,7 +35411,7 @@ INSERT INTO `villages` VALUES
   ('3204040008', '3204040', 'SUKAMANAH'),
   ('3204040009', '3204040', 'MARGAMUKTI'),
   ('3204040010', '3204040', 'PANGALENGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3204040011', '3204040', 'MARGAMULYA'),
   ('3204040012', '3204040', 'TRIBAKTIMULYA'),
   ('3204040013', '3204040', 'LAMAJANG'),
@@ -35462,7 +35462,7 @@ INSERT INTO `villages` VALUES
   ('3204090001', '3204090', 'SRIRAHAYU'),
   ('3204090002', '3204090', 'CILULUK'),
   ('3204090003', '3204090', 'MEKARLAKSANA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3204090004', '3204090', 'CIHANYIR'),
   ('3204090005', '3204090', 'CIKANCUNG'),
   ('3204090006', '3204090', 'MANDALASARI'),
@@ -35513,7 +35513,7 @@ INSERT INTO `villages` VALUES
   ('3204120008', '3204120', 'MAJASETRA'),
   ('3204120009', '3204120', 'MAJALAYA'),
   ('3204120010', '3204120', 'MAJAKERTA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3204120011', '3204120', 'BOJONG'),
   ('3204121001', '3204121', 'PANYADAP'),
   ('3204121002', '3204121', 'PADAMUKTI'),
@@ -35564,7 +35564,7 @@ INSERT INTO `villages` VALUES
   ('3204160007', '3204160', 'KIANGROKE'),
   ('3204160008', '3204160', 'KAMASAN'),
   ('3204160009', '3204160', 'BANJARAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3204160010', '3204160', 'TARAJUSARI'),
   ('3204160011', '3204160', 'PASIRMULYA'),
   ('3204161001', '3204161', 'JATISARI'),
@@ -35615,7 +35615,7 @@ INSERT INTO `villages` VALUES
   ('3204250005', '3204250', 'MARGAASIH'),
   ('3204250006', '3204250', 'LAGADAR'),
   ('3204260001', '3204260', 'SULAEMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3204260002', '3204260', 'SUKAMENAK'),
   ('3204260003', '3204260', 'SAYATI'),
   ('3204260004', '3204260', 'MARGAHAYU SELATAN'),
@@ -35666,7 +35666,7 @@ INSERT INTO `villages` VALUES
   ('3205011002', '3205011', 'INDRALAYANG'),
   ('3205011003', '3205011', 'PURBAYANI'),
   ('3205011004', '3205011', 'CARINGIN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3205011005', '3205011', 'SUKARAME'),
   ('3205011006', '3205011', 'SAMUDRAJAYA'),
   ('3205020001', '3205020', 'SELAAWI'),
@@ -35717,7 +35717,7 @@ INSERT INTO `villages` VALUES
   ('3205060003', '3205060', 'CIKELET'),
   ('3205060004', '3205060', 'PAMALAYAN'),
   ('3205060005', '3205060', 'LINGGAMANIK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3205060006', '3205060', 'KARANGSARI'),
   ('3205060007', '3205060', 'KERTAMUKTI'),
   ('3205060008', '3205060', 'CIROYOM'),
@@ -35768,7 +35768,7 @@ INSERT INTO `villages` VALUES
   ('3205110011', '3205110', 'SUKAMULYA'),
   ('3205110012', '3205110', 'GIRIMUKTI'),
   ('3205110013', '3205110', 'CIUDIAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3205111001', '3205111', 'CISANGKAL'),
   ('3205111002', '3205111', 'JAYAMUKTI'),
   ('3205111003', '3205111', 'CIHURIP'),
@@ -35819,7 +35819,7 @@ INSERT INTO `villages` VALUES
   ('3205150008', '3205150', 'MULYASARI'),
   ('3205150009', '3205150', 'BAYONGBONG'),
   ('3205150010', '3205150', 'CINISTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3205150011', '3205150', 'CIELA'),
   ('3205150012', '3205150', 'KARYAJAYA'),
   ('3205150013', '3205150', 'PANEMBONG'),
@@ -35870,7 +35870,7 @@ INSERT INTO `villages` VALUES
   ('3205170018', '3205170', 'CINTARASA'),
   ('3205170019', '3205170', 'CINTARAYAT'),
   ('3205170020', '3205170', 'CINTAASIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3205170021', '3205170', 'SAMARANG'),
   ('3205170022', '3205170', 'SUKARASA'),
   ('3205170023', '3205170', 'SUKAKARYA'),
@@ -35921,7 +35921,7 @@ INSERT INTO `villages` VALUES
   ('3205190006', '3205190', 'MUARA SANDING'),
   ('3205190007', '3205190', 'PAMINGGIR'),
   ('3205190008', '3205190', 'REGOL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3205190009', '3205190', 'CIWALEN'),
   ('3205190010', '3205190', 'PAKUWON'),
   ('3205190011', '3205190', 'SUKAMANTRI'),
@@ -35972,7 +35972,7 @@ INSERT INTO `villages` VALUES
   ('3205220001', '3205220', 'PASANGGRAHAN'),
   ('3205220006', '3205220', 'SUKAMUKTI'),
   ('3205220007', '3205220', 'MEKARLUYU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3205220008', '3205220', 'SUKAWENING'),
   ('3205220009', '3205220', 'SUDALARANG'),
   ('3205220010', '3205220', 'MARIPARI'),
@@ -36023,7 +36023,7 @@ INSERT INTO `villages` VALUES
   ('3205260002', '3205260', 'KERTAJAYA'),
   ('3205260003', '3205260', 'WANAKERTA'),
   ('3205260004', '3205260', 'KARYAMUKTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3205260005', '3205260', 'PADASUKA'),
   ('3205260007', '3205260', 'CIBUNAR'),
   ('3205260008', '3205260', 'SUKALILAH'),
@@ -36074,7 +36074,7 @@ INSERT INTO `villages` VALUES
   ('3205300003', '3205300', 'MEKARSARI'),
   ('3205300004', '3205300', 'SELAAWI'),
   ('3205300005', '3205300', 'CIRAPUHAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3205300006', '3205300', 'SAMIDA'),
   ('3205300007', '3205300', 'PELITAASIH'),
   ('3205310001', '3205310', 'KUTANAGARA'),
@@ -36125,7 +36125,7 @@ INSERT INTO `villages` VALUES
   ('3206020007', '3206020', 'KARANGNUNGGAL'),
   ('3206020008', '3206020', 'KARANGMEKAR'),
   ('3206020009', '3206020', 'CIBATUIRENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3206020010', '3206020', 'CIBATU'),
   ('3206020011', '3206020', 'SUKAWANGUN'),
   ('3206020012', '3206020', 'CINTAWANGI'),
@@ -36176,7 +36176,7 @@ INSERT INTO `villages` VALUES
   ('3206061004', '3206061', 'PARUNGPONTENG'),
   ('3206061005', '3206061', 'GIRIKENCANA'),
   ('3206061006', '3206061', 'BARUMEKAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3206061007', '3206061', 'CIBANTENG'),
   ('3206061008', '3206061', 'BURUJULJAYA'),
   ('3206070002', '3206070', 'SIRNAGALIH'),
@@ -36227,7 +36227,7 @@ INSERT INTO `villages` VALUES
   ('3206100005', '3206100', 'CIKUBANG'),
   ('3206100007', '3206100', 'KERTARAHARJA'),
   ('3206100008', '3206100', 'PURWARAHAYU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3206100009', '3206100', 'PAGERALAM'),
   ('3206110009', '3206110', 'SUKARASA'),
   ('3206110010', '3206110', 'JAHIANG'),
@@ -36278,7 +36278,7 @@ INSERT INTO `villages` VALUES
   ('3206141003', '3206141', 'CIWARAK'),
   ('3206141004', '3206141', 'JATIWARAS'),
   ('3206141005', '3206141', 'PAPAYAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3206141006', '3206141', 'NEGLASARI'),
   ('3206141007', '3206141', 'KAPUTIHAN'),
   ('3206141008', '3206141', 'SETIAWANGI'),
@@ -36329,7 +36329,7 @@ INSERT INTO `villages` VALUES
   ('3206190021', '3206190', 'CIKUNIR'),
   ('3206190022', '3206190', 'CIKADONGDONG'),
   ('3206191001', '3206191', 'SUKARAPIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3206191002', '3206191', 'WARGAKERTA'),
   ('3206191003', '3206191', 'SUKA MENAK'),
   ('3206191004', '3206191', 'PADASUKA'),
@@ -36380,7 +36380,7 @@ INSERT INTO `villages` VALUES
   ('3206221001', '3206221', 'TAWANGBANTENG'),
   ('3206221002', '3206221', 'GUNUNGSARI'),
   ('3206221003', '3206221', 'SUKAMAHI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3206221004', '3206221', 'SUKAGALIH'),
   ('3206221005', '3206221', 'INDRAJAYA'),
   ('3206221006', '3206221', 'SUKARATU'),
@@ -36431,7 +36431,7 @@ INSERT INTO `villages` VALUES
   ('3206260008', '3206260', 'KURNIABAKTI'),
   ('3206260009', '3206260', 'PAKEMITAN'),
   ('3206260010', '3206260', 'SUKAMANTRI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3206260011', '3206260', 'PASIRHUNI'),
   ('3206261001', '3206261', 'PAMOYANAN'),
   ('3206261002', '3206261', 'BUNIASIH'),
@@ -36482,7 +36482,7 @@ INSERT INTO `villages` VALUES
   ('3207110001', '3207110', 'SINDANGANGIN'),
   ('3207110002', '3207110', 'PULOERANG'),
   ('3207110003', '3207110', 'KALAPASAWIT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3207110004', '3207110', 'SUKANAGARA'),
   ('3207110005', '3207110', 'KERTAJAYA'),
   ('3207110006', '3207110', 'SIDAHARJA'),
@@ -36533,7 +36533,7 @@ INSERT INTO `villages` VALUES
   ('3207150008', '3207150', 'DEWASARI'),
   ('3207150009', '3207150', 'UTAMA'),
   ('3207150010', '3207150', 'KERTAHARJA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3207150011', '3207150', 'KARANGANYAR'),
   ('3207160001', '3207160', 'DANASARI'),
   ('3207160002', '3207160', 'SIDAMULYA'),
@@ -36584,7 +36584,7 @@ INSERT INTO `villages` VALUES
   ('3207210002', '3207210', 'CISADAP'),
   ('3207210003', '3207210', 'IMBANAGARA'),
   ('3207210004', '3207210', 'SINDANGRASA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3207210005', '3207210', 'PANYINGKIRAN'),
   ('3207210006', '3207210', 'PAWINDAN'),
   ('3207210007', '3207210', 'LINGGASARI'),
@@ -36635,7 +36635,7 @@ INSERT INTO `villages` VALUES
   ('3207240004', '3207240', 'MANGKUBUMI'),
   ('3207240005', '3207240', 'BENDASARI'),
   ('3207240006', '3207240', 'SADANANYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3207240007', '3207240', 'TANJUNGSARI'),
   ('3207240008', '3207240', 'GUNUNGSARI'),
   ('3207250001', '3207250', 'MUKTISARI'),
@@ -36686,7 +36686,7 @@ INSERT INTO `villages` VALUES
   ('3207280009', '3207280', 'PURWASARI'),
   ('3207280010', '3207280', 'CITEUREUP'),
   ('3207280011', '3207280', 'LINGGAPURA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3207281001', '3207281', 'CIKUPA'),
   ('3207281002', '3207281', 'SUKARAHARJA'),
   ('3207281003', '3207281', 'AWILUAR'),
@@ -36737,7 +36737,7 @@ INSERT INTO `villages` VALUES
   ('3208010014', '3208010', 'BAKOM'),
   ('3208010015', '3208010', 'KARANGANYAR'),
   ('3208010016', '3208010', 'GUNUNGSIRAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3208010017', '3208010', 'SITUSARI'),
   ('3208010018', '3208010', 'KARANGSARI'),
   ('3208010019', '3208010', 'SAGARAHIANG'),
@@ -36788,7 +36788,7 @@ INSERT INTO `villages` VALUES
   ('3208050001', '3208050', 'TANGKOLO'),
   ('3208050002', '3208050', 'PAMULIHAN'),
   ('3208050004', '3208050', 'JATISARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3208050009', '3208050', 'SUBANG'),
   ('3208050010', '3208050', 'BANGUNJAYA'),
   ('3208050011', '3208050', 'GUNUNGACI'),
@@ -36839,7 +36839,7 @@ INSERT INTO `villages` VALUES
   ('3208071007', '3208071', 'SUKADANA'),
   ('3208071008', '3208071', 'TARIKOLOT'),
   ('3208080001', '3208080', 'WALAHARCAGEUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3208080002', '3208080', 'DUKUHPICUNG'),
   ('3208080003', '3208080', 'WILANAGARA'),
   ('3208080004', '3208080', 'SINDANGSARI'),
@@ -36890,7 +36890,7 @@ INSERT INTO `villages` VALUES
   ('3208100007', '3208100', 'KERAMATMULYA'),
   ('3208100008', '3208100', 'GERESIK'),
   ('3208100009', '3208100', 'CIPUTAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3208100010', '3208100', 'KAPANDAYAN'),
   ('3208100011', '3208100', 'DUKUHDALEM'),
   ('3208100014', '3208100', 'PANGKALAN'),
@@ -36941,7 +36941,7 @@ INSERT INTO `villages` VALUES
   ('3208111009', '3208111', 'KUTAMANDARAKAN'),
   ('3208111010', '3208111', 'MALEBER'),
   ('3208111011', '3208111', 'KARANGTENGAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3208111012', '3208111', 'DUKUHTENGAH'),
   ('3208111013', '3208111', 'BUNIASIH'),
   ('3208111014', '3208111', 'CIPORANG'),
@@ -36992,7 +36992,7 @@ INSERT INTO `villages` VALUES
   ('3208130014', '3208130', 'AWIRARANGAN'),
   ('3208130015', '3208130', 'KASTURI'),
   ('3208130016', '3208130', 'PADAREK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3208140001', '3208140', 'CIGADUNG'),
   ('3208140002', '3208140', 'SUKAMULYA'),
   ('3208140003', '3208140', 'CILEULEUY'),
@@ -37043,7 +37043,7 @@ INSERT INTO `villages` VALUES
   ('3208161009', '3208161', 'CIKELENG'),
   ('3208161010', '3208161', 'KALIMATI'),
   ('3208170001', '3208170', 'BANDORASA KULON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3208170002', '3208170', 'BANDORASA WETAN'),
   ('3208170012', '3208170', 'BOJONG'),
   ('3208170013', '3208170', 'LINGGAMEKAR'),
@@ -37094,7 +37094,7 @@ INSERT INTO `villages` VALUES
   ('3208181013', '3208181', 'SAREWU'),
   ('3208190001', '3208190', 'CIBUNTU'),
   ('3208190002', '3208190', 'PANIIS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3208190003', '3208190', 'SINGKUP'),
   ('3208190004', '3208190', 'CIDAHU'),
   ('3208190005', '3208190', 'PASAWAHAN'),
@@ -37145,7 +37145,7 @@ INSERT INTO `villages` VALUES
   ('3209030012', '3209030', 'PANGGANGSARI'),
   ('3209030013', '3209030', 'LOSARI LOR'),
   ('3209030014', '3209030', 'MULYASARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3209030015', '3209030', 'KALIRAHAYU'),
   ('3209030016', '3209030', 'KALISARI'),
   ('3209030017', '3209030', 'AMBULU'),
@@ -37196,7 +37196,7 @@ INSERT INTO `villages` VALUES
   ('3209050017', '3209050', 'KALIMEANG'),
   ('3209050018', '3209050', 'KARANGMALANG'),
   ('3209050019', '3209050', 'KARANGMEKAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3209050020', '3209050', 'KUBANGKARANG'),
   ('3209050021', '3209050', 'KARANGSEMBUNG'),
   ('3209051001', '3209051', 'SEUSEUPAN'),
@@ -37247,7 +37247,7 @@ INSERT INTO `villages` VALUES
   ('3209080007', '3209080', 'MERTAPADA WETAN'),
   ('3209080009', '3209080', 'KANCI KULON'),
   ('3209080010', '3209080', 'KANCI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3209080011', '3209080', 'ASTANAJAPURA'),
   ('3209080015', '3209080', 'KENDAL'),
   ('3209080016', '3209080', 'JAPURA KIDUL'),
@@ -37298,7 +37298,7 @@ INSERT INTO `villages` VALUES
   ('3209111012', '3209111', 'CEMPAKA'),
   ('3209111013', '3209111', 'KEPONGPONGAN'),
   ('3209111014', '3209111', 'KUBANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3209111015', '3209111', 'SARWADADI'),
   ('3209120010', '3209120', 'MATANGAJI'),
   ('3209120011', '3209120', 'SIDAWANGI'),
@@ -37349,7 +37349,7 @@ INSERT INTO `villages` VALUES
   ('3209140025', '3209140', 'PURBAWINANGUN'),
   ('3209140026', '3209140', 'KEBAREPAN'),
   ('3209140027', '3209140', 'PASANGGRAHAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3209140028', '3209140', 'KEDUNGSANA'),
   ('3209140029', '3209140', 'DANAMULYA'),
   ('3209141001', '3209141', 'CIKEDUK'),
@@ -37400,7 +37400,7 @@ INSERT INTO `villages` VALUES
   ('3209171002', '3209171', 'PASINDANGAN'),
   ('3209171003', '3209171', 'JADIMULYA'),
   ('3209171004', '3209171', 'KLAYAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3209171005', '3209171', 'JATIMERTA'),
   ('3209171006', '3209171', 'ASTANA'),
   ('3209171007', '3209171', 'KALISAPU'),
@@ -37451,7 +37451,7 @@ INSERT INTO `villages` VALUES
   ('3209200012', '3209200', 'TEGALGUBUG'),
   ('3209200013', '3209200', 'RAWAGATEL'),
   ('3209200014', '3209200', 'TEGALGUBUG LOR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3209200015', '3209200', 'KARANGSAMBUNG'),
   ('3209200016', '3209200', 'BULAK'),
   ('3209200017', '3209200', 'GEYONGAN'),
@@ -37502,7 +37502,7 @@ INSERT INTO `villages` VALUES
   ('3209230021', '3209230', 'JAGAPURA KULON'),
   ('3209230022', '3209230', 'JAGAPURA LOR'),
   ('3209230023', '3209230', 'SIBUBUT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3209231001', '3209231', 'KALIDERES'),
   ('3209231002', '3209231', 'PRAJAWINANGUN WETAN'),
   ('3209231003', '3209231', 'PRAJAWINANGUN KULON'),
@@ -37553,7 +37553,7 @@ INSERT INTO `villages` VALUES
   ('3210021008', '3210021', 'LEBAKWANGI'),
   ('3210021009', '3210021', 'SUKADANA'),
   ('3210021010', '3210021', 'GIRIMUKTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3210021011', '3210021', 'KRAMATJAYA'),
   ('3210030014', '3210030', 'CISOKA'),
   ('3210030015', '3210030', 'SINDANGPANJI'),
@@ -37604,7 +37604,7 @@ INSERT INTO `villages` VALUES
   ('3210041003', '3210041', 'SINDANGPALA'),
   ('3210041004', '3210041', 'DARMALARANG'),
   ('3210041005', '3210041', 'SUNIABARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3210041006', '3210041', 'SANGIANG'),
   ('3210041007', '3210041', 'SUNIA'),
   ('3210041008', '3210041', 'KAREO'),
@@ -37655,7 +37655,7 @@ INSERT INTO `villages` VALUES
   ('3210070009', '3210070', 'TARIKOLOT'),
   ('3210070010', '3210070', 'CIKASARUNG'),
   ('3210070011', '3210070', 'CIJATI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3210070012', '3210070', 'MAJALENGKA KULON'),
   ('3210070014', '3210070', 'SIDAMUKTI'),
   ('3210080001', '3210080', 'KAWUNGHILIR'),
@@ -37706,7 +37706,7 @@ INSERT INTO `villages` VALUES
   ('3210110004', '3210110', 'LENGKONGKULON'),
   ('3210110006', '3210110', 'SINDANGWANGI'),
   ('3210110007', '3210110', 'BUAHKAPAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3210110009', '3210110', 'LEUWILAJA'),
   ('3210110010', '3210110', 'BALAGEDOG'),
   ('3210120001', '3210120', 'PARAKAN'),
@@ -37757,7 +37757,7 @@ INSERT INTO `villages` VALUES
   ('3210150016', '3210150', 'BATURUYUK'),
   ('3210150017', '3210150', 'MANDAPA'),
   ('3210150018', '3210150', 'BALIDA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3210150019', '3210150', 'PASIRMALATI'),
   ('3210150020', '3210150', 'KARANGANYAR'),
   ('3210150021', '3210150', 'SALAWANA'),
@@ -37808,7 +37808,7 @@ INSERT INTO `villages` VALUES
   ('3210190006', '3210190', 'RANDEGAN WETAN'),
   ('3210190007', '3210190', 'PUTRIDALEM'),
   ('3210190008', '3210190', 'JATITENGAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3210190009', '3210190', 'JATITUJUH'),
   ('3210190010', '3210190', 'BABAJURANG'),
   ('3210190011', '3210190', 'PILANGSARI'),
@@ -37859,7 +37859,7 @@ INSERT INTO `villages` VALUES
   ('3211010009', '3211010', 'CIKERUH'),
   ('3211010010', '3211010', 'CIBEUSI'),
   ('3211010011', '3211010', 'CILELES');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3211010012', '3211010', 'CILAYUNG'),
   ('3211020001', '3211020', 'MANGUNARGA'),
   ('3211020002', '3211020', 'SAWAHDADAP'),
@@ -37910,7 +37910,7 @@ INSERT INTO `villages` VALUES
   ('3211040011', '3211040', 'NAGARAWANGI'),
   ('3211040012', '3211040', 'CIBUNAR'),
   ('3211040013', '3211040', 'PANGADEGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3211040014', '3211040', 'CIBUNGUR'),
   ('3211050001', '3211050', 'SUKAJAYA'),
   ('3211050002', '3211050', 'MARGAMEKAR'),
@@ -37961,7 +37961,7 @@ INSERT INTO `villages` VALUES
   ('3211070020', '3211070', 'SITURAJA UTARA'),
   ('3211070021', '3211070', 'MALAKA'),
   ('3211070022', '3211070', 'PAMULIHAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3211070023', '3211070', 'CICARIMANAH'),
   ('3211071001', '3211071', 'SUNDAMEKAR'),
   ('3211071002', '3211071', 'CIMARGA'),
@@ -38012,7 +38012,7 @@ INSERT INTO `villages` VALUES
   ('3211101003', '3211101', 'CIMANINTIN'),
   ('3211101004', '3211101', 'SUKAMANAH'),
   ('3211101005', '3211101', 'BANJARSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3211101006', '3211101', 'SARIMEKAR'),
   ('3211101007', '3211101', 'TARIKOLOT'),
   ('3211101008', '3211101', 'SIRNASARI'),
@@ -38063,7 +38063,7 @@ INSERT INTO `villages` VALUES
   ('3211150003', '3211150', 'PASEH KIDUL'),
   ('3211150004', '3211150', 'CIJAMBE'),
   ('3211150005', '3211150', 'PASIREUNGIT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3211150006', '3211150', 'PADANAAN'),
   ('3211150007', '3211150', 'BONGKOK'),
   ('3211150008', '3211150', 'PASEH KALER'),
@@ -38114,7 +38114,7 @@ INSERT INTO `villages` VALUES
   ('3211180001', '3211180', 'SEKARWANGI'),
   ('3211180002', '3211180', 'CILANGKAP'),
   ('3211180003', '3211180', 'CIBITUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3211180004', '3211180', 'CIKURUBUK'),
   ('3211180005', '3211180', 'BOJONGLOA'),
   ('3211180006', '3211180', 'NAGRAK'),
@@ -38165,7 +38165,7 @@ INSERT INTO `villages` VALUES
   ('3212030003', '3212030', 'GABUSKULON'),
   ('3212030004', '3212030', 'SEKARMULYA'),
   ('3212030005', '3212030', 'KEDOKANGABUS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3212030006', '3212030', 'RANCAMULYA'),
   ('3212030007', '3212030', 'RANCAHAN'),
   ('3212030008', '3212030', 'GABUSWETAN'),
@@ -38216,7 +38216,7 @@ INSERT INTO `villages` VALUES
   ('3212061013', '3212061', 'MEKARSARI'),
   ('3212070006', '3212070', 'BANGKALOA ILIR'),
   ('3212070007', '3212070', 'WIDASARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3212070008', '3212070', 'KALENSARI'),
   ('3212070011', '3212070', 'UJUNGARIS'),
   ('3212070012', '3212070', 'KONGSIJAYA'),
@@ -38267,7 +38267,7 @@ INSERT INTO `villages` VALUES
   ('3212101003', '3212101', 'KEDOKAN AGUNG'),
   ('3212101004', '3212101', 'KEDOKANBUNDER'),
   ('3212101005', '3212101', 'JAYAWINANGUN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3212101006', '3212101', 'CANGKINGAN'),
   ('3212101007', '3212101', 'JAYALAKSANA'),
   ('3212110001', '3212110', 'SEGERAN KIDUL'),
@@ -38318,7 +38318,7 @@ INSERT INTO `villages` VALUES
   ('3212140007', '3212140', 'BALONGAN'),
   ('3212140008', '3212140', 'SUDIMAMPIR'),
   ('3212140009', '3212140', 'SUDIMAMPIRLOR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3212140010', '3212140', 'MAJAKERTA'),
   ('3212150001', '3212150', 'TELUKAGUNG'),
   ('3212150002', '3212150', 'PLUMBON'),
@@ -38369,7 +38369,7 @@ INSERT INTO `villages` VALUES
   ('3212170007', '3212170', 'LEGOK'),
   ('3212170008', '3212170', 'BOJONGSLAWI'),
   ('3212170009', '3212170', 'LOHBENER');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3212170010', '3212170', 'PAMAYAHAN'),
   ('3212170011', '3212170', 'SINDANGKERTA'),
   ('3212170015', '3212170', 'RAMBATAN KULON'),
@@ -38420,7 +38420,7 @@ INSERT INTO `villages` VALUES
   ('3212210008', '3212210', 'KOPYAH'),
   ('3212210009', '3212210', 'ANJATAN BARU'),
   ('3212210010', '3212210', 'ANJATAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3212210011', '3212210', 'CILANDAK'),
   ('3212210012', '3212210', 'CILANDAK LOR'),
   ('3212210013', '3212210', 'ANJATAN UTARA'),
@@ -38471,7 +38471,7 @@ INSERT INTO `villages` VALUES
   ('3213030005', '3213030', 'SUKAKERTI'),
   ('3213030008', '3213030', 'DARMAGA'),
   ('3213030009', '3213030', 'CISALAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3213030010', '3213030', 'CIGADOG'),
   ('3213030014', '3213030', 'PAKUHAJI'),
   ('3213031001', '3213031', 'PASANGGRAHAN'),
@@ -38522,7 +38522,7 @@ INSERT INTO `villages` VALUES
   ('3213080007', '3213080', 'KALIJATI BARAT'),
   ('3213080008', '3213080', 'KALIJATI TIMUR'),
   ('3213080016', '3213080', 'KALIANGSANA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3213080017', '3213080', 'BANGGALAMULYA'),
   ('3213080018', '3213080', 'JALUPANG'),
   ('3213080019', '3213080', 'CARACAS'),
@@ -38573,7 +38573,7 @@ INSERT INTO `villages` VALUES
   ('3213120011', '3213120', 'PANYINGKIRAN'),
   ('3213130001', '3213130', 'KAUNGANTEN'),
   ('3213130002', '3213130', 'SINDANGSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3213130003', '3213130', 'CIKAUM TIMUR'),
   ('3213130004', '3213130', 'CIKAUM BARAT'),
   ('3213130005', '3213130', 'PASIRMUNCANG'),
@@ -38624,7 +38624,7 @@ INSERT INTO `villages` VALUES
   ('3213170006', '3213170', 'BINONG'),
   ('3213170007', '3213170', 'KEDIRI'),
   ('3213170008', '3213170', 'MULYASARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3213170018', '3213170', 'KARANGWANGI'),
   ('3213171001', '3213171', 'TANJUNGRASA'),
   ('3213171002', '3213171', 'WANAJAYA'),
@@ -38675,7 +38675,7 @@ INSERT INTO `villages` VALUES
   ('3213201008', '3213201', 'PUSAKAJAYA'),
   ('3213210002', '3213210', 'TEGALURUNG'),
   ('3213210003', '3213210', 'MAYANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3213210004', '3213210', 'LEGONWETAN'),
   ('3213210005', '3213210', 'LEGONKULON'),
   ('3213210006', '3213210', 'PANGARENGAN'),
@@ -38726,7 +38726,7 @@ INSERT INTO `villages` VALUES
   ('3214030012', '3214030', 'SUKAMULYA'),
   ('3214030013', '3214030', 'PASANGGRAHAN'),
   ('3214040001', '3214040', 'RAWASARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3214040002', '3214040', 'GANDASOLI'),
   ('3214040003', '3214040', 'GANDAMEKAR'),
   ('3214040004', '3214040', 'CIBOGOHILIR'),
@@ -38777,7 +38777,7 @@ INSERT INTO `villages` VALUES
   ('3214070006', '3214070', 'BOJONG BARAT'),
   ('3214070007', '3214070', 'PANGKALAN'),
   ('3214070008', '3214070', 'SUKAMANAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3214070009', '3214070', 'PAWENANG'),
   ('3214070010', '3214070', 'SINDANGSARI'),
   ('3214070011', '3214070', 'SINDANGPANON'),
@@ -38828,7 +38828,7 @@ INSERT INTO `villages` VALUES
   ('3214091006', '3214091', 'TANJUNGSARI'),
   ('3214091007', '3214091', 'SALAM JAYA'),
   ('3214091008', '3214091', 'SITU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3214091009', '3214091', 'PARAKANSALAM'),
   ('3214091010', '3214091', 'SALAM MULYA'),
   ('3214100005', '3214100', 'SINDANGKASIH'),
@@ -38879,7 +38879,7 @@ INSERT INTO `villages` VALUES
   ('3214112008', '3214112', 'CIKOPO'),
   ('3214112009', '3214112', 'KARANGMUKTI'),
   ('3214112010', '3214112', 'CIBODAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3215010001', '3215010', 'MEDALSARI'),
   ('3215010011', '3215010', 'KERTASARI'),
   ('3215010012', '3215010', 'CINTAASIH'),
@@ -38930,7 +38930,7 @@ INSERT INTO `villages` VALUES
   ('3215040006', '3215040', 'KIARAPAYUNG'),
   ('3215040007', '3215040', 'GINTUNGKERTA'),
   ('3215040008', '3215040', 'ANGGADITA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3215040011', '3215040', 'KLARI'),
   ('3215040012', '3215040', 'CIBALONGSARI'),
   ('3215040014', '3215040', 'PANCAWATI'),
@@ -38981,7 +38981,7 @@ INSERT INTO `villages` VALUES
   ('3215071003', '3215071', 'CICINDE UTARA'),
   ('3215071004', '3215071', 'JAYAMUKTI'),
   ('3215071005', '3215071', 'GEMPOLKOLOT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3215071006', '3215071', 'GEMPOL'),
   ('3215071007', '3215071', 'GEMBONGAN'),
   ('3215071008', '3215071', 'MEKARASIH'),
@@ -39032,7 +39032,7 @@ INSERT INTO `villages` VALUES
   ('3215090010', '3215090', 'LEMAHMUKTI'),
   ('3215090011', '3215090', 'PULOMULYA'),
   ('3215100001', '3215100', 'PASIRTALAGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3215100002', '3215100', 'TALAGAMULYA'),
   ('3215100003', '3215100', 'CARIUMULYA'),
   ('3215100004', '3215100', 'CILEWO'),
@@ -39083,7 +39083,7 @@ INSERT INTO `villages` VALUES
   ('3215120013', '3215120', 'SUKARAJA'),
   ('3215130001', '3215130', 'DAYEUHLUHUR'),
   ('3215130002', '3215130', 'LEMAHKARYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3215130003', '3215130', 'LEMAHDUHUR'),
   ('3215130004', '3215130', 'LEMAHSUBUR'),
   ('3215130005', '3215130', 'LEMAHMAKMUR'),
@@ -39134,7 +39134,7 @@ INSERT INTO `villages` VALUES
   ('3215160011', '3215160', 'RANDUMULYA'),
   ('3215160012', '3215160', 'LABANJAYA'),
   ('3215160015', '3215160', 'SUNGAIBUNTU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3215160016', '3215160', 'KEDALJAYA'),
   ('3215160017', '3215160', 'DONGKAL'),
   ('3215160018', '3215160', 'PUSPASARI'),
@@ -39185,7 +39185,7 @@ INSERT INTO `villages` VALUES
   ('3215200005', '3215200', 'TANJUNGBUNGIN'),
   ('3215200006', '3215200', 'TANJUNGMEKAR'),
   ('3215200007', '3215200', 'TANJUNGPAKIS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3215200008', '3215200', 'TELUKJAYA'),
   ('3216010001', '3216010', 'RAGEMANUNGGAL'),
   ('3216010002', '3216010', 'MUKTIJAYA'),
@@ -39236,7 +39236,7 @@ INSERT INTO `villages` VALUES
   ('3216041002', '3216041', 'HEGARMANAH'),
   ('3216041003', '3216041', 'CIPAYUNG'),
   ('3216041004', '3216041', 'JATIREJA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3216041005', '3216041', 'JATIBARU'),
   ('3216041006', '3216041', 'TANJUNGBARU'),
   ('3216041007', '3216041', 'LABANSARI'),
@@ -39287,7 +39287,7 @@ INSERT INTO `villages` VALUES
   ('3216071011', '3216071', 'KALIJAYA'),
   ('3216081001', '3216081', 'JATIMULYA'),
   ('3216081002', '3216081', 'LAMBANGSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3216081003', '3216081', 'LAMBANGJAYA'),
   ('3216081004', '3216081', 'TAMBUN'),
   ('3216081005', '3216081', 'SETIADARMA'),
@@ -39338,7 +39338,7 @@ INSERT INTO `villages` VALUES
   ('3216120001', '3216120', 'SUKAASIH'),
   ('3216120002', '3216120', 'SUKARUKUN'),
   ('3216120003', '3216120', 'BANJARSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3216120004', '3216120', 'SUKAHURIP'),
   ('3216120005', '3216120', 'SUKAMANAH'),
   ('3216120006', '3216120', 'SUKAMULYA'),
@@ -39389,7 +39389,7 @@ INSERT INTO `villages` VALUES
   ('3217020002', '3217020', 'SINDANGJAYA'),
   ('3217020003', '3217020', 'BUNIJAYA'),
   ('3217020004', '3217020', 'SIRNAJAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3217020005', '3217020', 'GUNUNGHALU'),
   ('3217020006', '3217020', 'CELAK'),
   ('3217020007', '3217020', 'WARGASALUYU'),
@@ -39440,7 +39440,7 @@ INSERT INTO `villages` VALUES
   ('3217060011', '3217060', 'CIBENDA'),
   ('3217060012', '3217060', 'CIJAMBU'),
   ('3217060013', '3217060', 'SIRNAGALIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3217060014', '3217060', 'BARANANGSIANG'),
   ('3217070001', '3217070', 'SELACAU'),
   ('3217070002', '3217070', 'BATUJAJAR BARAT'),
@@ -39491,7 +39491,7 @@ INSERT INTO `villages` VALUES
   ('3217110001', '3217110', 'CIWARUGA'),
   ('3217110002', '3217110', 'CIHIDEUNG'),
   ('3217110003', '3217110', 'CIGUGUR GIRANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3217110004', '3217110', 'SARIWANGI'),
   ('3217110005', '3217110', 'CIHANJUANG'),
   ('3217110006', '3217110', 'CIHANJUANG RAHAYU'),
@@ -39542,7 +39542,7 @@ INSERT INTO `villages` VALUES
   ('3217150008', '3217150', 'MARGALAKSANA'),
   ('3217150009', '3217150', 'SUKAHAJI'),
   ('3217150010', '3217150', 'CIHARASHAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3217150011', '3217150', 'SIRNAGALIH'),
   ('3217150012', '3217150', 'CIROYOM'),
   ('3218010001', '3218010', 'KERTAMUKTI'),
@@ -39593,7 +39593,7 @@ INSERT INTO `villages` VALUES
   ('3218050006', '3218050', 'BOJONG'),
   ('3218050007', '3218050', 'SELASARI'),
   ('3218050008', '3218050', 'CINTARATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3218050009', '3218050', 'CINTAKARYA'),
   ('3218050010', '3218050', 'PARAKANMANGGU'),
   ('3218060001', '3218060', 'SUKARESIK'),
@@ -39644,7 +39644,7 @@ INSERT INTO `villages` VALUES
   ('3271010005', '3271010', 'KERTAMAYA'),
   ('3271010006', '3271010', 'RANCAMAYA'),
   ('3271010007', '3271010', 'BOJONGKERTA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3271010008', '3271010', 'HARJASARI'),
   ('3271010009', '3271010', 'MUARASARI'),
   ('3271010010', '3271010', 'PAKUAN'),
@@ -39695,7 +39695,7 @@ INSERT INTO `villages` VALUES
   ('3271060001', '3271060', 'KEDUNGWARINGIN'),
   ('3271060002', '3271060', 'KEDUNGJAYA'),
   ('3271060003', '3271060', 'KEBONPEDES');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3271060004', '3271060', 'TANAHSAREAL'),
   ('3271060005', '3271060', 'KEDUNGBADAK'),
   ('3271060006', '3271060', 'SUKARESMI'),
@@ -39746,7 +39746,7 @@ INSERT INTO `villages` VALUES
   ('3273020001', '3273020', 'MARGASUKA'),
   ('3273020002', '3273020', 'CIRANGRANG'),
   ('3273020003', '3273020', 'MARGAHAYU UTARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3273020004', '3273020', 'BABAKAN CIPARAY'),
   ('3273020005', '3273020', 'BABAKAN'),
   ('3273020006', '3273020', 'SUKAHAJI'),
@@ -39797,7 +39797,7 @@ INSERT INTO `villages` VALUES
   ('3273110003', '3273110', 'PASIR BIRU'),
   ('3273110004', '3273110', 'CIPADUNG'),
   ('3273110005', '3273110', 'PALASARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3273110006', '3273110', 'CISURUPAN'),
   ('3273111001', '3273111', 'MEKAR MULYA'),
   ('3273111002', '3273111', 'CIPADUNG KIDUL'),
@@ -39848,7 +39848,7 @@ INSERT INTO `villages` VALUES
   ('3273180005', '3273180', 'CIROYOM'),
   ('3273180006', '3273180', 'KEBON JERUK'),
   ('3273190001', '3273190', 'ARJUNA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3273190002', '3273190', 'PASIRKALIKI'),
   ('3273190003', '3273190', 'PAMOYANAN'),
   ('3273190004', '3273190', 'PAJAJARAN'),
@@ -39899,7 +39899,7 @@ INSERT INTO `villages` VALUES
   ('3274030004', '3274030', 'PEKALANGAN'),
   ('3274040001', '3274040', 'KARYAMULYA'),
   ('3274040002', '3274040', 'SUNYARAGI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3274040003', '3274040', 'DRAJAT'),
   ('3274040004', '3274040', 'KESAMBI'),
   ('3274040005', '3274040', 'PEKIRINGAN'),
@@ -39950,7 +39950,7 @@ INSERT INTO `villages` VALUES
   ('3275060001', '3275060', 'BINTARA JAYA'),
   ('3275060002', '3275060', 'BINTARA'),
   ('3275060003', '3275060', 'KRANJI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3275060005', '3275060', 'KOTA BARU'),
   ('3275060008', '3275060', 'JAKA SAMPURNA'),
   ('3275061001', '3275061', 'HARAPAN MULYA'),
@@ -40001,7 +40001,7 @@ INSERT INTO `villages` VALUES
   ('3276040010', '3276040', 'CISALAK PASAR'),
   ('3276040011', '3276040', 'MEKARSARI'),
   ('3276040013', '3276040', 'PASIR GUNUNG SELATAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3276041001', '3276041', 'CILANGKAP'),
   ('3276041002', '3276041', 'CIMPAEUN'),
   ('3276041003', '3276041', 'TAPOS'),
@@ -40052,7 +40052,7 @@ INSERT INTO `villages` VALUES
   ('3278020006', '3278020', 'SUKAHURIP'),
   ('3278020007', '3278020', 'MUGARSARI'),
   ('3278020008', '3278020', 'SUMELAP');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3278030001', '3278030', 'CIHERANG'),
   ('3278030002', '3278030', 'CIAKAR'),
   ('3278030003', '3278030', 'MARGABAKTI'),
@@ -40103,7 +40103,7 @@ INSERT INTO `villages` VALUES
   ('3278080001', '3278080', 'PANGLAYUNGAN'),
   ('3278080002', '3278080', 'CIPEDES'),
   ('3278080003', '3278080', 'NAGARASARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3278080004', '3278080', 'SUKAMANAH'),
   ('3279010001', '3279010', 'SITUBATU'),
   ('3279010002', '3279010', 'NEGLASARI'),
@@ -40154,7 +40154,7 @@ INSERT INTO `villages` VALUES
   ('3301020008', '3301020', 'MADURA'),
   ('3301020009', '3301020', 'MADUSARI'),
   ('3301020010', '3301020', 'TAMBAKSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3301020011', '3301020', 'MAJINGKLAK'),
   ('3301020012', '3301020', 'MALABAR'),
   ('3301020013', '3301020', 'LIMBANGAN'),
@@ -40205,7 +40205,7 @@ INSERT INTO `villages` VALUES
   ('3301050012', '3301050', 'CIRUYUNG'),
   ('3301050013', '3301050', 'PAMULIHAN'),
   ('3301050014', '3301050', 'BABAKAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3301060001', '3301060', 'SERANG'),
   ('3301060002', '3301060', 'MULYADADI'),
   ('3301060003', '3301060', 'CIPARI'),
@@ -40256,7 +40256,7 @@ INSERT INTO `villages` VALUES
   ('3301100009', '3301100', 'KARANGANYAR'),
   ('3301100010', '3301100', 'MUKTISARI'),
   ('3301100011', '3301100', 'KERTAJAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3301100012', '3301100', 'CINANGSI'),
   ('3301100013', '3301100', 'KARANGGINTUNG'),
   ('3301100014', '3301100', 'RUNGKANG'),
@@ -40307,7 +40307,7 @@ INSERT INTO `villages` VALUES
   ('3301140010', '3301140', 'PLANJAN'),
   ('3301140011', '3301140', 'DONDONG'),
   ('3301140012', '3301140', 'CIWUNI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3301140013', '3301140', 'KARANGJENGKOL'),
   ('3301140015', '3301140', 'PESANGGRAHAN'),
   ('3301140016', '3301140', 'BULUPAYUNG'),
@@ -40358,7 +40358,7 @@ INSERT INTO `villages` VALUES
   ('3301180010', '3301180', 'PESANGGRAHAN'),
   ('3301180012', '3301180', 'BAJING KULON'),
   ('3301180013', '3301180', 'KEDAWUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3301180015', '3301180', 'GENTASARI'),
   ('3301180016', '3301180', 'MUJUR LOR'),
   ('3301190001', '3301190', 'WIDARAPAYUNG KULON'),
@@ -40409,7 +40409,7 @@ INSERT INTO `villages` VALUES
   ('3301730002', '3301730', 'GUMILIR'),
   ('3301730003', '3301730', 'MERTASINGA'),
   ('3301730004', '3301730', 'TRITIH KULON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3301730005', '3301730', 'KARANGTALUN'),
   ('3302010001', '3302010', 'CINGEBUL'),
   ('3302010003', '3302010', 'CIDORA'),
@@ -40460,7 +40460,7 @@ INSERT INTO `villages` VALUES
   ('3302050008', '3302050', 'CINDAGA'),
   ('3302050009', '3302050', 'KEBASEN'),
   ('3302050010', '3302050', 'GAMBARSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3302050011', '3302050', 'TUMIYANG'),
   ('3302050012', '3302050', 'MANDIRANCAN'),
   ('3302060001', '3302060', 'GRUJUGAN'),
@@ -40511,7 +40511,7 @@ INSERT INTO `villages` VALUES
   ('3302090007', '3302090', 'KANDING'),
   ('3302090008', '3302090', 'SOMAKATON'),
   ('3302090009', '3302090', 'PLANA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3302100001', '3302100', 'SROWOT'),
   ('3302100002', '3302100', 'SURO'),
   ('3302100003', '3302100', 'KALIORI'),
@@ -40562,7 +40562,7 @@ INSERT INTO `villages` VALUES
   ('3302140005', '3302140', 'BANJARSARI'),
   ('3302140006', '3302140', 'KALIBENDA'),
   ('3302140007', '3302140', 'PANCURENDANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3302140008', '3302140', 'PANCASAN'),
   ('3302140009', '3302140', 'KARANGBAWANG'),
   ('3302140010', '3302140', 'KRACAK'),
@@ -40613,7 +40613,7 @@ INSERT INTO `villages` VALUES
   ('3302170015', '3302170', 'KARANGLO'),
   ('3302170016', '3302170', 'KALISARI'),
   ('3302170017', '3302170', 'KARANGTENGAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3302170018', '3302170', 'SAMBIRATA'),
   ('3302170019', '3302170', 'GUNUNGLURAH'),
   ('3302170020', '3302170', 'SOKAWERA'),
@@ -40664,7 +40664,7 @@ INSERT INTO `villages` VALUES
   ('3302210009', '3302210', 'KAWUNGCARANG'),
   ('3302210010', '3302210', 'DATAR'),
   ('3302210011', '3302210', 'BANJARSARI KULON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3302210012', '3302210', 'BANJARSARI WETAN'),
   ('3302210013', '3302210', 'BANTERAN'),
   ('3302210014', '3302210', 'CIBEREM'),
@@ -40715,7 +40715,7 @@ INSERT INTO `villages` VALUES
   ('3302720001', '3302720', 'KARANGLEWAS LOR'),
   ('3302720002', '3302720', 'PASIR KIDUL'),
   ('3302720003', '3302720', 'REJASARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3302720004', '3302720', 'PASIRMUNCANG'),
   ('3302720005', '3302720', 'BANTARSOKA'),
   ('3302720006', '3302720', 'KOBER'),
@@ -40766,7 +40766,7 @@ INSERT INTO `villages` VALUES
   ('3303030001', '3303030', 'BANDINGAN'),
   ('3303030002', '3303030', 'LAMUK'),
   ('3303030003', '3303030', 'SOKANEGARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3303030004', '3303030', 'GUMIWANG'),
   ('3303030006', '3303030', 'NANGKASAWIT'),
   ('3303030007', '3303030', 'PANDANSARI'),
@@ -40817,7 +40817,7 @@ INSERT INTO `villages` VALUES
   ('3303070001', '3303070', 'JOMPO'),
   ('3303070002', '3303070', 'RABAK'),
   ('3303070003', '3303070', 'BLATER');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3303070004', '3303070', 'SIDAKANGEN'),
   ('3303070005', '3303070', 'KARANGPETIR'),
   ('3303070006', '3303070', 'GRECOL'),
@@ -40868,7 +40868,7 @@ INSERT INTO `villages` VALUES
   ('3303100010', '3303100', 'PAGEDANGAN'),
   ('3303100011', '3303100', 'PEKALONGAN'),
   ('3303100013', '3303100', 'BUMISARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3303110001', '3303110', 'KARANGTURI'),
   ('3303110002', '3303110', 'ONJE'),
   ('3303110003', '3303110', 'SINDANG'),
@@ -40919,7 +40919,7 @@ INSERT INTO `villages` VALUES
   ('3303140001', '3303140', 'KALIORI'),
   ('3303140005', '3303140', 'KALIJARAN'),
   ('3303140006', '3303140', 'KARANGANYAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3303140007', '3303140', 'BANJARKERTA'),
   ('3303140008', '3303140', 'KARANGGEDANG'),
   ('3303140009', '3303140', 'KABUNDERAN'),
@@ -40970,7 +40970,7 @@ INSERT INTO `villages` VALUES
   ('3304010005', '3304010', 'PANARUSAN WETAN'),
   ('3304010006', '3304010', 'GUMELEM KULON'),
   ('3304010007', '3304010', 'GUMELEM WETAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3304010008', '3304010', 'DERIK'),
   ('3304010009', '3304010', 'BERTA'),
   ('3304010010', '3304010', 'KARANGJATI'),
@@ -41021,7 +41021,7 @@ INSERT INTO `villages` VALUES
   ('3304050007', '3304050', 'KUTAYASA'),
   ('3304050008', '3304050', 'WINONG'),
   ('3304050009', '3304050', 'DEPOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3304050010', '3304050', 'WATUURIP'),
   ('3304050012', '3304050', 'MASARAN'),
   ('3304050013', '3304050', 'SERANG'),
@@ -41072,7 +41072,7 @@ INSERT INTO `villages` VALUES
   ('3304080004', '3304080', 'DAWUHAN'),
   ('3304080005', '3304080', 'PAGELAK'),
   ('3304080006', '3304080', 'KUTAYASA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3304080007', '3304080', 'PEKAUMAN'),
   ('3304080008', '3304080', 'TALUNAMBA'),
   ('3304080009', '3304080', 'PENAWANGAN'),
@@ -41123,7 +41123,7 @@ INSERT INTO `villages` VALUES
   ('3304110009', '3304110', 'BADAMITA'),
   ('3304110010', '3304110', 'BANDINGAN'),
   ('3304110011', '3304110', 'PINGIT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3304120001', '3304120', 'SAMBONG'),
   ('3304120002', '3304120', 'TRIBUANA'),
   ('3304120003', '3304120', 'SAWANGAN'),
@@ -41174,7 +41174,7 @@ INSERT INTO `villages` VALUES
   ('3304150002', '3304150', 'BITING'),
   ('3304150003', '3304150', 'TLAHAB'),
   ('3304150004', '3304150', 'DERMAYASA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3304150005', '3304150', 'PEJAWARAN'),
   ('3304150006', '3304150', 'PEGUNDUNGAN'),
   ('3304150007', '3304150', 'BEJI'),
@@ -41225,7 +41225,7 @@ INSERT INTO `villages` VALUES
   ('3304180018', '3304180', 'SIKUMPUL'),
   ('3304180019', '3304180', 'GUNUNGLANGIT'),
   ('3304180020', '3304180', 'BEDANA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3304180021', '3304180', 'SIRUKUN'),
   ('3304180022', '3304180', 'KARANGANYAR'),
   ('3304180023', '3304180', 'PLORENGAN'),
@@ -41276,7 +41276,7 @@ INSERT INTO `villages` VALUES
   ('3305030001', '3305030', 'TAMBAKMULYO'),
   ('3305030002', '3305030', 'SUROREJAN'),
   ('3305030003', '3305030', 'WALUYOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3305030004', '3305030', 'SIDOHARJO'),
   ('3305030005', '3305030', 'PULIHARJO'),
   ('3305030006', '3305030', 'PURWOSARI'),
@@ -41327,7 +41327,7 @@ INSERT INTO `villages` VALUES
   ('3305050008', '3305050', 'KEDUNGSARI'),
   ('3305050009', '3305050', 'JERUKAGUNG'),
   ('3305050010', '3305050', 'KLEGENWONOSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3305050011', '3305050', 'KLIRONG'),
   ('3305050012', '3305050', 'KALIWUNGU'),
   ('3305050013', '3305050', 'JATIMALANG'),
@@ -41378,7 +41378,7 @@ INSERT INTO `villages` VALUES
   ('3305070013', '3305070', 'PASARSENEN'),
   ('3305070014', '3305070', 'PUCANGAN'),
   ('3305070015', '3305070', 'AMBALKEBREK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3305070016', '3305070', 'GONDANGLEGI'),
   ('3305070017', '3305070', 'BANJARSARI'),
   ('3305070018', '3305070', 'LAJER'),
@@ -41429,7 +41429,7 @@ INSERT INTO `villages` VALUES
   ('3305081010', '3305081', 'BONJOKLOR'),
   ('3305090001', '3305090', 'TERSOBO'),
   ('3305090003', '3305090', 'KABEKELAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3305090004', '3305090', 'TUNGGALROSO'),
   ('3305090005', '3305090', 'KEDUNGWARU'),
   ('3305090006', '3305090', 'BAGUNG'),
@@ -41480,7 +41480,7 @@ INSERT INTO `villages` VALUES
   ('3305110025', '3305110', 'SAWANGAN'),
   ('3305110026', '3305110', 'KALIRANCANG'),
   ('3305110027', '3305110', 'KRAKAL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3305111001', '3305111', 'JATIPURUS'),
   ('3305111003', '3305111', 'BLATER'),
   ('3305111004', '3305111', 'PONCOWARNO'),
@@ -41531,7 +41531,7 @@ INSERT INTO `villages` VALUES
   ('3305130012', '3305130', 'PENIRON'),
   ('3305130013', '3305130', 'WATULAWANG'),
   ('3305140001', '3305140', 'MENGANTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3305140002', '3305140', 'TRIKARSO'),
   ('3305140003', '3305140', 'SIDOHARJO'),
   ('3305140004', '3305140', 'GIWANGRETNO'),
@@ -41582,7 +41582,7 @@ INSERT INTO `villages` VALUES
   ('3305160007', '3305160', 'KUWARASAN'),
   ('3305160008', '3305160', 'HARJODOWO'),
   ('3305160009', '3305160', 'LEMAHDUWUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3305160010', '3305160', 'MADURESO'),
   ('3305160011', '3305160', 'MANGLI'),
   ('3305160012', '3305160', 'GANDUSARI'),
@@ -41633,7 +41633,7 @@ INSERT INTO `villages` VALUES
   ('3305190013', '3305190', 'WONOSIGRO'),
   ('3305190014', '3305190', 'KLOPOGODO'),
   ('3305200001', '3305200', 'SIDOMULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3305200002', '3305200', 'PANJATAN'),
   ('3305200003', '3305200', 'KARANGANYAR'),
   ('3305200004', '3305200', 'JATILUHUR'),
@@ -41684,7 +41684,7 @@ INSERT INTO `villages` VALUES
   ('3305221013', '3305221', 'KARANGSAMBUNG'),
   ('3305221014', '3305221', 'TOTOGAN'),
   ('3306010001', '3306010', 'KERTOJAYAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3306010002', '3306010', 'UKIRSARI'),
   ('3306010003', '3306010', 'PASARANOM'),
   ('3306010004', '3306010', 'MUNGGANGSARI'),
@@ -41735,7 +41735,7 @@ INSERT INTO `villages` VALUES
   ('3306020019', '3306020', 'LABAN'),
   ('3306020020', '3306020', 'RASUKAN'),
   ('3306020021', '3306020', 'WONOSRI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3306020023', '3306020', 'TANJUNGREJO'),
   ('3306020024', '3306020', 'KALITANJUNG'),
   ('3306020025', '3306020', 'KUWUKAN'),
@@ -41786,7 +41786,7 @@ INSERT INTO `villages` VALUES
   ('3306030016', '3306030', 'GESING'),
   ('3306030017', '3306030', 'KEPONGGOK'),
   ('3306030018', '3306030', 'BUBUTAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3306030019', '3306030', 'TEGALAREN'),
   ('3306030020', '3306030', 'SUKOMANAH'),
   ('3306030022', '3306030', 'GUYANGAN'),
@@ -41837,7 +41837,7 @@ INSERT INTO `villages` VALUES
   ('3306050012', '3306050', 'NGARAN'),
   ('3306050013', '3306050', 'KEDUNGGUBAH'),
   ('3306050014', '3306050', 'JELOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3306050015', '3306050', 'TLOGO REJO'),
   ('3306050016', '3306050', 'GUNUNGWANGI'),
   ('3306050017', '3306050', 'HARDIMULYO'),
@@ -41888,7 +41888,7 @@ INSERT INTO `villages` VALUES
   ('3306070017', '3306070', 'TANJUNGANOM'),
   ('3306070018', '3306070', 'SAWIT'),
   ('3306070019', '3306070', 'SUMBER SARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3306070020', '3306070', 'PAKISREJO'),
   ('3306070021', '3306070', 'CANDINGASINAN'),
   ('3306070022', '3306070', 'SOKOWATEN'),
@@ -41939,7 +41939,7 @@ INSERT INTO `villages` VALUES
   ('3306090016', '3306090', 'KUTOARJO'),
   ('3306090017', '3306090', 'BANDUNG'),
   ('3306090018', '3306090', 'SOKOHARJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3306090019', '3306090', 'PACOR'),
   ('3306090020', '3306090', 'TUNGGORONO'),
   ('3306090021', '3306090', 'TEPUS KULON'),
@@ -41990,7 +41990,7 @@ INSERT INTO `villages` VALUES
   ('3306110003', '3306110', 'WONOYOSO'),
   ('3306110004', '3306110', 'TASIKMADU'),
   ('3306110005', '3306110', 'TAPEN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3306110006', '3306110', 'TERSIDI KIDUL'),
   ('3306110007', '3306110', 'TERSIDI LOR'),
   ('3306110008', '3306110', 'SEKARTEJO'),
@@ -42041,7 +42041,7 @@ INSERT INTO `villages` VALUES
   ('3306120005', '3306120', 'ROWOBAYEM'),
   ('3306120006', '3306120', 'KEMIRI KIDUL'),
   ('3306120008', '3306120', 'GESIKAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3306120009', '3306120', 'REJOSARI'),
   ('3306120010', '3306120', 'KROYO LOR'),
   ('3306120011', '3306120', 'KEMIRI LOR'),
@@ -42092,7 +42092,7 @@ INSERT INTO `villages` VALUES
   ('3306140001', '3306140', 'WINONG KIDUL'),
   ('3306140003', '3306140', 'LUGOSOBO'),
   ('3306140004', '3306140', 'GINTUNGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3306140007', '3306140', 'KROYO'),
   ('3306140008', '3306140', 'WINONG LOR'),
   ('3306140009', '3306140', 'MLARAN'),
@@ -42143,7 +42143,7 @@ INSERT INTO `villages` VALUES
   ('3306160009', '3306160', 'KEDUNG LOTENG'),
   ('3306160011', '3306160', 'KALIBOTO'),
   ('3306160012', '3306160', 'SENDANGSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3306160013', '3306160', 'KARANG SARI'),
   ('3306160015', '3306160', 'LEGETAN'),
   ('3306160016', '3306160', 'KETOSARI'),
@@ -42194,7 +42194,7 @@ INSERT INTO `villages` VALUES
   ('3307020020', '3307020', 'TEGALGOT'),
   ('3307020021', '3307020', 'WARANGAN'),
   ('3307020022', '3307020', 'ROPOH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3307020023', '3307020', 'PULOSAREN'),
   ('3307030004', '3307030', 'BOGORAN'),
   ('3307030005', '3307030', 'KARANGSARI'),
@@ -42245,7 +42245,7 @@ INSERT INTO `villages` VALUES
   ('3307050004', '3307050', 'SOJOKERTO'),
   ('3307050005', '3307050', 'BESANI'),
   ('3307050006', '3307050', 'LEKSONO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3307050007', '3307050', 'JLAMPRANG'),
   ('3307050008', '3307050', 'WONOKERTO'),
   ('3307050019', '3307050', 'JONGGOLSARI'),
@@ -42296,7 +42296,7 @@ INSERT INTO `villages` VALUES
   ('3307070001', '3307070', 'MANGUNREJO'),
   ('3307070003', '3307070', 'PERBOTO'),
   ('3307070004', '3307070', 'KEDALON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3307070005', '3307070', 'REJOSARI'),
   ('3307070006', '3307070', 'KALIKAJAR'),
   ('3307070007', '3307070', 'SIMBANG'),
@@ -42347,7 +42347,7 @@ INSERT INTO `villages` VALUES
   ('3307090016', '3307090', 'WONOSARI'),
   ('3307090017', '3307090', 'BOMERTO'),
   ('3307090018', '3307090', 'SARIYOSO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3307090019', '3307090', 'TLOGOJATI'),
   ('3307090020', '3307090', 'WONOSOBO BARAT'),
   ('3307090021', '3307090', 'WONOSOBO TIMUR'),
@@ -42398,7 +42398,7 @@ INSERT INTO `villages` VALUES
   ('3307120011', '3307120', 'TLOGO'),
   ('3307120012', '3307120', 'MARON'),
   ('3307120014', '3307120', 'LARANGAN LOR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3307120015', '3307120', 'MLANDI'),
   ('3307130002', '3307130', 'SIGEDANG'),
   ('3307130003', '3307130', 'TAMBI'),
@@ -42449,7 +42449,7 @@ INSERT INTO `villages` VALUES
   ('3308020013', '3308020', 'KARANGANYAR'),
   ('3308020014', '3308020', 'KARANGREJO'),
   ('3308020015', '3308020', 'NGADIHARJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3308020016', '3308020', 'KEBONSARI'),
   ('3308020017', '3308020', 'TEGALARUM'),
   ('3308020018', '3308020', 'KEMBANGLIMUS'),
@@ -42500,7 +42500,7 @@ INSERT INTO `villages` VALUES
   ('3308060012', '3308060', 'SEWUKAN'),
   ('3308060013', '3308060', 'KRINJING'),
   ('3308060014', '3308060', 'PATEN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3308060015', '3308060', 'SENGI'),
   ('3308070001', '3308070', 'TANJUNG'),
   ('3308070002', '3308070', 'SOKORINI'),
@@ -42551,7 +42551,7 @@ INSERT INTO `villages` VALUES
   ('3308100008', '3308100', 'PODOSOKO'),
   ('3308100009', '3308100', 'TEMPAK'),
   ('3308100010', '3308100', 'SIDOMULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3308100011', '3308100', 'MEJING'),
   ('3308100012', '3308100', 'SUROJOYO'),
   ('3308100013', '3308100', 'CANDIMULYO'),
@@ -42602,7 +42602,7 @@ INSERT INTO `villages` VALUES
   ('3308130012', '3308130', 'KRINJING'),
   ('3308130013', '3308130', 'BANGSRI'),
   ('3308130014', '3308130', 'KAJORAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3308130015', '3308130', 'MANGUNREJO'),
   ('3308130016', '3308130', 'SAMBAK'),
   ('3308130017', '3308130', 'BAMBUSARI'),
@@ -42653,7 +42653,7 @@ INSERT INTO `villages` VALUES
   ('3308150013', '3308150', 'SIDOREJO'),
   ('3308150014', '3308150', 'REJOSARI'),
   ('3308160001', '3308160', 'DAMPIT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3308160002', '3308160', 'TANJUNGSARI'),
   ('3308160003', '3308160', 'PASANGSARI'),
   ('3308160004', '3308160', 'KEMBANGKUNING'),
@@ -42704,7 +42704,7 @@ INSERT INTO `villages` VALUES
   ('3308180010', '3308180', 'BANYUSARI'),
   ('3308180011', '3308180', 'DLIMAS'),
   ('3308180012', '3308180', 'GLAGAHOMBO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3308180013', '3308180', 'NGASEM'),
   ('3308180014', '3308180', 'GIRIREJO'),
   ('3308180015', '3308180', 'PURWODADI'),
@@ -42755,7 +42755,7 @@ INSERT INTO `villages` VALUES
   ('3308200023', '3308200', 'SIDOGEDE'),
   ('3308200024', '3308200', 'KALIPUCANG'),
   ('3308200025', '3308200', 'SEWORAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3308200026', '3308200', 'BANJARSARI'),
   ('3308200027', '3308200', 'LOSARI'),
   ('3308200028', '3308200', 'NGRANCAH'),
@@ -42806,7 +42806,7 @@ INSERT INTO `villages` VALUES
   ('3309030003', '3309030', 'GEDANGAN'),
   ('3309030005', '3309030', 'PARAS'),
   ('3309030006', '3309030', 'JELOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3309030007', '3309030', 'BAKULAN'),
   ('3309030008', '3309030', 'MLIWIS'),
   ('3309030009', '3309030', 'SUKABUMI'),
@@ -42857,7 +42857,7 @@ INSERT INTO `villages` VALUES
   ('3309070005', '3309070', 'SUDIMORO'),
   ('3309070006', '3309070', 'BANGSALAN'),
   ('3309070007', '3309070', 'SALAKAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3309070008', '3309070', 'TERAS'),
   ('3309070009', '3309070', 'RANDUSARI'),
   ('3309070010', '3309070', 'MOJOLEGI'),
@@ -42908,7 +42908,7 @@ INSERT INTO `villages` VALUES
   ('3309110001', '3309110', 'NGARGOREJO'),
   ('3309110002', '3309110', 'SOBOKERTO'),
   ('3309110004', '3309110', 'GAGAKSIPAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3309110005', '3309110', 'DONOHUDAN'),
   ('3309110006', '3309110', 'SAWAHAN'),
   ('3309110007', '3309110', 'PANDEYAN'),
@@ -42959,7 +42959,7 @@ INSERT INTO `villages` VALUES
   ('3309150006', '3309150', 'BLUMBANG'),
   ('3309150007', '3309150', 'BADE'),
   ('3309150008', '3309150', 'KLEGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3309150009', '3309150', 'GONDANGLEGI'),
   ('3309150010', '3309150', 'KARANGGATAK'),
   ('3309150011', '3309150', 'BANYUURIP'),
@@ -43010,7 +43010,7 @@ INSERT INTO `villages` VALUES
   ('3309190001', '3309190', 'KROBOKAN'),
   ('3309190002', '3309190', 'NGAREN'),
   ('3309190003', '3309190', 'KALIMATI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3309190004', '3309190', 'SAMBENG'),
   ('3309190006', '3309190', 'JUWANGI'),
   ('3309190007', '3309190', 'PILANGREJO'),
@@ -43061,7 +43061,7 @@ INSERT INTO `villages` VALUES
   ('3310030019', '3310030', 'KALITENGAH'),
   ('3310040001', '3310040', 'BOGEM'),
   ('3310040002', '3310040', 'NENGAHAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3310040003', '3310040', 'JARUM'),
   ('3310040004', '3310040', 'NGERANGAN'),
   ('3310040005', '3310040', 'JAMBAKAN'),
@@ -43112,7 +43112,7 @@ INSERT INTO `villages` VALUES
   ('3310060018', '3310060', 'PALAR'),
   ('3310070001', '3310070', 'JIMBUNG'),
   ('3310070002', '3310070', 'NGEMPLAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3310070003', '3310070', 'KALIKOTES'),
   ('3310070004', '3310070', 'KRAJAN'),
   ('3310070005', '3310070', 'TAMBONGWETAN'),
@@ -43163,7 +43163,7 @@ INSERT INTO `villages` VALUES
   ('3310110009', '3310110', 'BLIMBING'),
   ('3310110010', '3310110', 'KANOMAN'),
   ('3310110011', '3310110', 'GEMAMPIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3310110012', '3310110', 'LOGEDE'),
   ('3310110013', '3310110', 'JIWAN'),
   ('3310110014', '3310110', 'NGEMPLAK'),
@@ -43214,7 +43214,7 @@ INSERT INTO `villages` VALUES
   ('3310150011', '3310150', 'NGOLODONO'),
   ('3310150012', '3310150', 'PUGERAN'),
   ('3310150013', '3310150', 'DEMANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3310150014', '3310150', 'BABADAN'),
   ('3310150015', '3310150', 'TEGALAMPEL'),
   ('3310150016', '3310150', 'KARANGTALUN'),
@@ -43265,7 +43265,7 @@ INSERT INTO `villages` VALUES
   ('3310180011', '3310180', 'SABRANG'),
   ('3310180012', '3310180', 'TLOBONG'),
   ('3310180013', '3310180', 'GATAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3310180014', '3310180', 'KEPANJEN'),
   ('3310180015', '3310180', 'SEGARAN'),
   ('3310180016', '3310180', 'SIDOMULYO'),
@@ -43316,7 +43316,7 @@ INSERT INTO `villages` VALUES
   ('3310210014', '3310210', 'MALANGAN'),
   ('3310210015', '3310210', 'PUCANG MILIRAN'),
   ('3310210016', '3310210', 'COKRO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3310210017', '3310210', 'DALEMAN'),
   ('3310220002', '3310220', 'RANDULANANG'),
   ('3310220003', '3310220', 'MRANGGEN'),
@@ -43367,7 +43367,7 @@ INSERT INTO `villages` VALUES
   ('3310720007', '3310720', 'KABUPATEN'),
   ('3310720008', '3310720', 'KLATEN'),
   ('3310720009', '3310720', 'TONGGALAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3310730001', '3310730', 'SEKARSULI'),
   ('3310730002', '3310730', 'BARENG LOR'),
   ('3310730003', '3310730', 'KARANGANOM'),
@@ -43418,7 +43418,7 @@ INSERT INTO `villages` VALUES
   ('3311040008', '3311040', 'COMBONGAN'),
   ('3311040009', '3311040', 'KRIWEN'),
   ('3311040010', '3311040', 'BULAKAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3311040012', '3311040', 'SUKOHARJO'),
   ('3311040013', '3311040', 'BULAKREJO'),
   ('3311040014', '3311040', 'SONOREJO'),
@@ -43469,7 +43469,7 @@ INSERT INTO `villages` VALUES
   ('3311080005', '3311080', 'CANGKOL'),
   ('3311080006', '3311080', 'KLUMPRIT'),
   ('3311080007', '3311080', 'KRAGILAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3311080008', '3311080', 'SAPEN'),
   ('3311080009', '3311080', 'TRIYAGAN'),
   ('3311080010', '3311080', 'JOHO'),
@@ -43520,7 +43520,7 @@ INSERT INTO `villages` VALUES
   ('3311120003', '3311120', 'MAKAMHAJI'),
   ('3311120004', '3311120', 'PABELAN'),
   ('3311120005', '3311120', 'NGADIREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3311120006', '3311120', 'KARTASURA'),
   ('3311120007', '3311120', 'PUCANGAN'),
   ('3311120008', '3311120', 'KERTONATAN'),
@@ -43571,7 +43571,7 @@ INSERT INTO `villages` VALUES
   ('3312040008', '3312040', 'TUKULREJO'),
   ('3312040009', '3312040', 'BUMIHARJO'),
   ('3312040010', '3312040', 'SELOMARTO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3312040011', '3312040', 'GIRIWOYO'),
   ('3312040012', '3312040', 'SEJATI'),
   ('3312040013', '3312040', 'SENDANGAGUNG'),
@@ -43622,7 +43622,7 @@ INSERT INTO `villages` VALUES
   ('3312090004', '3312090', 'WATUAGUNG'),
   ('3312090005', '3312090', 'BATURETNO'),
   ('3312090006', '3312090', 'BELIKURIP');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3312090007', '3312090', 'TEMON'),
   ('3312090008', '3312090', 'SARADAN'),
   ('3312090009', '3312090', 'TALUNOMBO'),
@@ -43673,7 +43673,7 @@ INSERT INTO `villages` VALUES
   ('3312140002', '3312140', 'WURYOREJO'),
   ('3312140003', '3312140', 'POKOHKIDUL'),
   ('3312140004', '3312140', 'PURWOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3312140006', '3312140', 'WONOBOYO'),
   ('3312140007', '3312140', 'GIRIPURWO'),
   ('3312140008', '3312140', 'GIRITIRTO'),
@@ -43724,7 +43724,7 @@ INSERT INTO `villages` VALUES
   ('3312180004', '3312180', 'MIRI'),
   ('3312180005', '3312180', 'LEMAHBANG'),
   ('3312180006', '3312180', 'GESING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3312180007', '3312180', 'KISMANTORO'),
   ('3312180008', '3312180', 'NGROTO'),
   ('3312180009', '3312180', 'GEDAWUNG'),
@@ -43775,7 +43775,7 @@ INSERT INTO `villages` VALUES
   ('3312220005', '3312220', 'SIDOREJO'),
   ('3312220006', '3312220', 'NGROMPAK'),
   ('3312220010', '3312220', 'SAMBIREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3312220011', '3312220', 'GUNUNGSARI'),
   ('3312220012', '3312220', 'JATISARI'),
   ('3312220013', '3312220', 'PANDEYAN'),
@@ -43826,7 +43826,7 @@ INSERT INTO `villages` VALUES
   ('3313020008', '3313020', 'KARANGSARI'),
   ('3313020009', '3313020', 'WUKIRSAWIT'),
   ('3313030001', '3313030', 'PASEBAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3313030002', '3313030', 'LEMAHBANG'),
   ('3313030003', '3313030', 'KARANGBANGUN'),
   ('3313030004', '3313030', 'PLOSO'),
@@ -43877,7 +43877,7 @@ INSERT INTO `villages` VALUES
   ('3313080001', '3313080', 'BANGSRI'),
   ('3313080002', '3313080', 'NGEMPLAK'),
   ('3313080003', '3313080', 'DOPLANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3313080005', '3313080', 'KARANG'),
   ('3313080006', '3313080', 'SALAM'),
   ('3313080007', '3313080', 'KARANGPANDAN'),
@@ -43928,7 +43928,7 @@ INSERT INTO `villages` VALUES
   ('3313130004', '3313130', 'SELOKATON'),
   ('3313130005', '3313130', 'BULUREJO'),
   ('3313130006', '3313130', 'REJOSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3313130007', '3313130', 'JERUKSAWIT'),
   ('3313130008', '3313130', 'KARANGTURI'),
   ('3313130009', '3313130', 'KRAGAN'),
@@ -43979,7 +43979,7 @@ INSERT INTO `villages` VALUES
   ('3314010005', '3314010', 'KRIKILAN'),
   ('3314010006', '3314010', 'BUKURAN'),
   ('3314010008', '3314010', 'BANARAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3314010009', '3314010', 'SAMBEREMBE'),
   ('3314010010', '3314010', 'DONOYUDAN'),
   ('3314010011', '3314010', 'WONOREJO'),
@@ -44030,7 +44030,7 @@ INSERT INTO `villages` VALUES
   ('3314050007', '3314050', 'BLIMBING'),
   ('3314050008', '3314050', 'SAMBIREJO'),
   ('3314050009', '3314050', 'KADIPIRO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3314060001', '3314060', 'SRIMULYO'),
   ('3314060002', '3314060', 'TEGALREJO'),
   ('3314060004', '3314060', 'GLONGGONG'),
@@ -44081,7 +44081,7 @@ INSERT INTO `villages` VALUES
   ('3314110007', '3314110', 'SINGOPADU'),
   ('3314110008', '3314110', 'JAMBANAN'),
   ('3314110009', '3314110', 'TARAMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3314110010', '3314110', 'TENGGAK'),
   ('3314110011', '3314110', 'SRIBIT'),
   ('3314110012', '3314110', 'PANDAK'),
@@ -44132,7 +44132,7 @@ INSERT INTO `villages` VALUES
   ('3314150009', '3314150', 'PAGAK'),
   ('3314150010', '3314150', 'TLOGO TIRTO'),
   ('3314150011', '3314150', 'NGARGOSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3314160001', '3314160', 'SONO'),
   ('3314160002', '3314160', 'TEMPELREJO'),
   ('3314160003', '3314160', 'TROMBOL'),
@@ -44183,7 +44183,7 @@ INSERT INTO `villages` VALUES
   ('3315010011', '3315010', 'JUMO'),
   ('3315010012', '3315010', 'WATES'),
   ('3315020002', '3315020', 'KETRO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3315020003', '3315020', 'SENDANGHARJO'),
   ('3315020004', '3315020', 'KARANGANYAR'),
   ('3315020005', '3315020', 'PARAKAN'),
@@ -44234,7 +44234,7 @@ INSERT INTO `villages` VALUES
   ('3315050001', '3315050', 'RAMBAT'),
   ('3315050002', '3315050', 'KALANGBANCAR'),
   ('3315050003', '3315050', 'JUWORO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3315050004', '3315050', 'MONGGOT'),
   ('3315050005', '3315050', 'NGRANDU'),
   ('3315050006', '3315050', 'BANGSRI'),
@@ -44285,7 +44285,7 @@ INSERT INTO `villages` VALUES
   ('3315090002', '3315090', 'SARIREJO'),
   ('3315090003', '3315090', 'KALANGDOSARI'),
   ('3315090004', '3315090', 'KALANGLUNDO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3315090005', '3315090', 'TRUWOLU'),
   ('3315090007', '3315090', 'BANDUNGSARI'),
   ('3315090008', '3315090', 'NGARINGAN'),
@@ -44336,7 +44336,7 @@ INSERT INTO `villages` VALUES
   ('3315130007', '3315130', 'NAMBUHAN'),
   ('3315130008', '3315130', 'WARUKARANGANYAR'),
   ('3315130009', '3315130', 'NGLOBAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3315130010', '3315130', 'KEDUNGREJO'),
   ('3315130011', '3315130', 'KARANGANYAR'),
   ('3315130012', '3315130', 'PURWODADI'),
@@ -44387,7 +44387,7 @@ INSERT INTO `villages` VALUES
   ('3315160025', '3315160', 'WANUTUNGGAL'),
   ('3315160026', '3315160', 'MANGGARWETAN'),
   ('3315160027', '3315160', 'MANGGARMAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3315160028', '3315160', 'TINANDING'),
   ('3315170001', '3315170', 'PENADARAN'),
   ('3315170002', '3315170', 'GELAPAN'),
@@ -44438,7 +44438,7 @@ INSERT INTO `villages` VALUES
   ('3316010005', '3316010', 'JEGONG'),
   ('3316010006', '3316010', 'JATI'),
   ('3316010007', '3316010', 'SINGGET');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3316010008', '3316010', 'GABUSAN'),
   ('3316010009', '3316010', 'DOPLANG'),
   ('3316010010', '3316010', 'RANDULAWANG'),
@@ -44489,7 +44489,7 @@ INSERT INTO `villages` VALUES
   ('3316050004', '3316050', 'KAPUAN'),
   ('3316050005', '3316050', 'JIPANG'),
   ('3316050006', '3316050', 'GETAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3316050007', '3316050', 'SUMBERPITU'),
   ('3316050008', '3316050', 'KENTONG'),
   ('3316050010', '3316050', 'MULYOREJO'),
@@ -44540,7 +44540,7 @@ INSERT INTO `villages` VALUES
   ('3316090009', '3316090', 'TURIREJO'),
   ('3316090010', '3316090', 'SEMAMPIR'),
   ('3316090011', '3316090', 'KEMIRI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3316090012', '3316090', 'TEMPELLEMAHBANG'),
   ('3316090013', '3316090', 'JEPON'),
   ('3316090014', '3316090', 'SESO'),
@@ -44591,7 +44591,7 @@ INSERT INTO `villages` VALUES
   ('3316110010', '3316110', 'SUMBERAGUNG'),
   ('3316110011', '3316110', 'KLOPODUWUR'),
   ('3316110012', '3316110', 'GEDONGSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3316110013', '3316110', 'SENDANGWUNGU'),
   ('3316110014', '3316110', 'BALONGREJO'),
   ('3316110015', '3316110', 'KARANGTALUN'),
@@ -44642,7 +44642,7 @@ INSERT INTO `villages` VALUES
   ('3316140011', '3316140', 'SUMBEREJO'),
   ('3316140012', '3316140', 'SENDANGAGUNG'),
   ('3316140013', '3316140', 'SENDANGREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3316140014', '3316140', 'TALOKWOHMOJO'),
   ('3316140015', '3316140', 'TREMBULREJO'),
   ('3316140016', '3316140', 'PUNGGURSUGIH'),
@@ -44693,7 +44693,7 @@ INSERT INTO `villages` VALUES
   ('3316160010', '3316160', 'SENDANG'),
   ('3316160011', '3316160', 'WUKIRSARI'),
   ('3316160012', '3316160', 'KARANGANYAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3316160013', '3316160', 'TODANAN'),
   ('3316160014', '3316160', 'KETILENG'),
   ('3316160015', '3316160', 'COKROWATI'),
@@ -44744,7 +44744,7 @@ INSERT INTO `villages` VALUES
   ('3317030006', '3317030', 'DOWAN'),
   ('3317030009', '3317030', 'KULUTAN'),
   ('3317030010', '3317030', 'SIDOMULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3317030011', '3317030', 'TELGAWAH'),
   ('3317030012', '3317030', 'SENDANGMULYO'),
   ('3317030013', '3317030', 'PANOHAN'),
@@ -44795,7 +44795,7 @@ INSERT INTO `villages` VALUES
   ('3317060006', '3317060', 'SAMBIROTO'),
   ('3317060007', '3317060', 'SEDAN'),
   ('3317060008', '3317060', 'KARANGASEM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3317060009', '3317060', 'SIDOREJO'),
   ('3317060010', '3317060', 'SIDOMULYO'),
   ('3317060011', '3317060', 'KEDUNGRINGIN'),
@@ -44846,7 +44846,7 @@ INSERT INTO `villages` VALUES
   ('3317080015', '3317080', 'PRAGU'),
   ('3317080016', '3317080', 'KEBONAGUNG'),
   ('3317080018', '3317080', 'PRANTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3317080019', '3317080', 'PEDAK'),
   ('3317080020', '3317080', 'LANDOH'),
   ('3317090002', '3317090', 'MAGUAN'),
@@ -44897,7 +44897,7 @@ INSERT INTO `villages` VALUES
   ('3317100026', '3317100', 'SAWAHAN'),
   ('3317100028', '3317100', 'SIDOWAYAH'),
   ('3317100029', '3317100', 'KUTOHARJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3317100030', '3317100', 'PANDEAN'),
   ('3317100031', '3317100', 'SUKOHARJO'),
   ('3317100032', '3317100', 'KABONGAN LOR'),
@@ -44948,7 +44948,7 @@ INSERT INTO `villages` VALUES
   ('3317120024', '3317120', 'PANDANGAN WETAN'),
   ('3317120025', '3317120', 'PANDANGAN KULON'),
   ('3317120026', '3317120', 'SUMURTAWANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3317120027', '3317120', 'SUMBERSARI'),
   ('3317130001', '3317130', 'SANETAN'),
   ('3317130002', '3317130', 'RAKITAN'),
@@ -44999,7 +44999,7 @@ INSERT INTO `villages` VALUES
   ('3318010014', '3318010', 'BATUREJO'),
   ('3318010015', '3318010', 'KASIYAN'),
   ('3318010016', '3318010', 'CENGKALSEWU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3318020001', '3318020', 'JIMBARAN'),
   ('3318020002', '3318020', 'DURENSAWIT'),
   ('3318020005', '3318020', 'PURWOKERTO'),
@@ -45050,7 +45050,7 @@ INSERT INTO `villages` VALUES
   ('3318040017', '3318040', 'KEBOWAN'),
   ('3318040018', '3318040', 'WINONG'),
   ('3318040019', '3318040', 'KLECOREGONANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3318040020', '3318040', 'BUMIHARJO'),
   ('3318040021', '3318040', 'TAWANGREJO'),
   ('3318040022', '3318040', 'BRINGINWARENG'),
@@ -45101,7 +45101,7 @@ INSERT INTO `villages` VALUES
   ('3318060020', '3318060', 'SUMBERARUM'),
   ('3318060021', '3318060', 'SRIWEDARI'),
   ('3318070001', '3318070', 'TLOGOMOJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3318070002', '3318070', 'SUKOAGUNG'),
   ('3318070003', '3318070', 'BULUMULYO'),
   ('3318070004', '3318070', 'TOMPOMULYO'),
@@ -45152,7 +45152,7 @@ INSERT INTO `villages` VALUES
   ('3318090002', '3318090', 'SENDANGSOKO'),
   ('3318090003', '3318090', 'TAMBAHMULYO'),
   ('3318090004', '3318090', 'TONDOKERTO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3318090005', '3318090', 'MANTINGAN TENGAH'),
   ('3318090006', '3318090', 'JATISARI'),
   ('3318090007', '3318090', 'KARANGREJO LOR'),
@@ -45203,7 +45203,7 @@ INSERT INTO `villages` VALUES
   ('3318110002', '3318110', 'KARABAN'),
   ('3318110003', '3318110', 'TLOGOAYU'),
   ('3318110004', '3318110', 'BOGOTANJUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3318110005', '3318110', 'KORYOKALANGAN'),
   ('3318110006', '3318110', 'GABUS'),
   ('3318110007', '3318110', 'TANJUNGANOM'),
@@ -45254,7 +45254,7 @@ INSERT INTO `villages` VALUES
   ('3318130011', '3318130', 'SITILUHUR'),
   ('3318140001', '3318140', 'TAMANSARI'),
   ('3318140002', '3318140', 'SAMBIREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3318140003', '3318140', 'TLOGOREJO'),
   ('3318140004', '3318140', 'PURWOSARI'),
   ('3318140005', '3318140', 'REGALOH'),
@@ -45305,7 +45305,7 @@ INSERT INTO `villages` VALUES
   ('3318170003', '3318170', 'TANJUNGREJO'),
   ('3318170004', '3318170', 'SIDOMUKTI'),
   ('3318170005', '3318170', 'POHIJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3318170006', '3318170', 'KERTOMULYO'),
   ('3318170007', '3318170', 'LANGGENHARJO'),
   ('3318170008', '3318170', 'PANGKALAN'),
@@ -45356,7 +45356,7 @@ INSERT INTO `villages` VALUES
   ('3318200008', '3318200', 'JEPAT LOR'),
   ('3318200009', '3318200', 'TENDAS'),
   ('3318200010', '3318200', 'KEBOROMO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3318200011', '3318200', 'SAMBIROTO'),
   ('3318200012', '3318200', 'TAYU WETAN'),
   ('3318200013', '3318200', 'TAYU KULON'),
@@ -45407,7 +45407,7 @@ INSERT INTO `villages` VALUES
   ('3319020011', '3319020', 'NGANGUK'),
   ('3319020012', '3319020', 'KRAMAT'),
   ('3319020013', '3319020', 'DEMAAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3319020014', '3319020', 'LANGGAR DALEM'),
   ('3319020015', '3319020', 'KAUMAN'),
   ('3319020016', '3319020', 'DAMARAN'),
@@ -45458,7 +45458,7 @@ INSERT INTO `villages` VALUES
   ('3319050009', '3319050', 'MEJOBO'),
   ('3319050010', '3319050', 'GOLANTEPUS'),
   ('3319060001', '3319060', 'SADANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3319060002', '3319060', 'BULUNG CANGKRING'),
   ('3319060003', '3319060', 'BULUNG KULON'),
   ('3319060004', '3319060', 'SIDOMULYO'),
@@ -45509,7 +45509,7 @@ INSERT INTO `villages` VALUES
   ('3319090016', '3319090', 'KUWUKAN'),
   ('3319090017', '3319090', 'COLO'),
   ('3319090018', '3319090', 'JAPAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3320010001', '3320010', 'KEDUNGMALANG'),
   ('3320010002', '3320010', 'KALIANYAR'),
   ('3320010003', '3320010', 'KARANGAJI'),
@@ -45560,7 +45560,7 @@ INSERT INTO `villages` VALUES
   ('3320030009', '3320030', 'KALIPUCANG WETAN'),
   ('3320030010', '3320030', 'KALIPUCANG KULON'),
   ('3320030011', '3320030', 'GIDANGELO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3320030012', '3320030', 'KENDENGSIDIALIT'),
   ('3320030013', '3320030', 'SIDIGEDE'),
   ('3320030014', '3320030', 'TELUKWETAN'),
@@ -45611,7 +45611,7 @@ INSERT INTO `villages` VALUES
   ('3320070005', '3320070', 'PETEKEYAN'),
   ('3320070006', '3320070', 'SUKODONO'),
   ('3320070007', '3320070', 'LANGON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3320070008', '3320070', 'NGABUL'),
   ('3320070009', '3320070', 'TAHUNAN'),
   ('3320070010', '3320070', 'MANTINGAN'),
@@ -45662,7 +45662,7 @@ INSERT INTO `villages` VALUES
   ('3320100022', '3320100', 'BONDO'),
   ('3320100023', '3320100', 'BANJAR AGUNG'),
   ('3320101001', '3320101', 'DUDAKAWU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3320101002', '3320101', 'SUMANDING'),
   ('3320101004', '3320101', 'CEPOGO'),
   ('3320101006', '3320101', 'JINGGOTAN'),
@@ -45713,7 +45713,7 @@ INSERT INTO `villages` VALUES
   ('3321020002', '3321020', 'WONOSEKAR'),
   ('3321020003', '3321020', 'MARGOHAYU'),
   ('3321020004', '3321020', 'TLOGOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3321020006', '3321020', 'REJOSARI'),
   ('3321020007', '3321020', 'KARANGAWEN'),
   ('3321020008', '3321020', 'KURIPAN'),
@@ -45764,7 +45764,7 @@ INSERT INTO `villages` VALUES
   ('3321050003', '3321050', 'PIDODO'),
   ('3321050004', '3321050', 'DONOREJO'),
   ('3321050005', '3321050', 'GROGOL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3321050006', '3321050', 'PLOSO'),
   ('3321050007', '3321050', 'PULOSARI'),
   ('3321050008', '3321050', 'KARANGSARI'),
@@ -45815,7 +45815,7 @@ INSERT INTO `villages` VALUES
   ('3321070017', '3321070', 'KEDONDONG'),
   ('3321070018', '3321070', 'SEDO'),
   ('3321070019', '3321070', 'MULYOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3321080001', '3321080', 'DORENG'),
   ('3321080002', '3321080', 'TLOGODOWO'),
   ('3321080003', '3321080', 'KALIANYAR'),
@@ -45866,7 +45866,7 @@ INSERT INTO `villages` VALUES
   ('3321091014', '3321091', 'SOLOWIRE'),
   ('3321100001', '3321100', 'SURODADI'),
   ('3321100002', '3321100', 'JATISONO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3321100003', '3321100', 'KEDONDONG'),
   ('3321100004', '3321100', 'GEDANGALAS'),
   ('3321100005', '3321100', 'SAMBIROTO'),
@@ -45917,7 +45917,7 @@ INSERT INTO `villages` VALUES
   ('3321130005', '3321130', 'BUKO'),
   ('3321130006', '3321130', 'MANDUNG'),
   ('3321130007', '3321130', 'BERAHAN KULON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3321130008', '3321130', 'BERAHAN WETAN'),
   ('3321130009', '3321130', 'BUNGO'),
   ('3321130011', '3321130', 'JETAK'),
@@ -45968,7 +45968,7 @@ INSERT INTO `villages` VALUES
   ('3322031002', '3322031', 'PAGER'),
   ('3322031003', '3322031', 'UDANWUH'),
   ('3322031005', '3322031', 'PAPRINGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3322031006', '3322031', 'KRADENAN'),
   ('3322031007', '3322031', 'KALIWUNGU'),
   ('3322031008', '3322031', 'MUKIRAN'),
@@ -46019,7 +46019,7 @@ INSERT INTO `villages` VALUES
   ('3322060011', '3322060', 'DELIK'),
   ('3322060012', '3322060', 'TLOGO'),
   ('3322060013', '3322060', 'KARANGTENGAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3322060014', '3322060', 'KARANGANYAR'),
   ('3322060015', '3322060', 'TLOMPAKAN'),
   ('3322060016', '3322060', 'NGAJARAN'),
@@ -46070,7 +46070,7 @@ INSERT INTO `villages` VALUES
   ('3322101004', '3322101', 'BANDUNGAN'),
   ('3322101006', '3322101', 'CANDI'),
   ('3322101007', '3322101', 'BANYUKUNING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3322101008', '3322101', 'JIMBARAN'),
   ('3322101009', '3322101', 'PAKOPEN'),
   ('3322101010', '3322101', 'SIDOMUKTI'),
@@ -46121,7 +46121,7 @@ INSERT INTO `villages` VALUES
   ('3322140006', '3322140', 'BERGAS KIDUL'),
   ('3322140007', '3322140', 'RANDUGUNTING'),
   ('3322140008', '3322140', 'JATIJAJAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3322140009', '3322140', 'DIWAK'),
   ('3322140010', '3322140', 'NGEMPON'),
   ('3322140011', '3322140', 'KARANGJATI'),
@@ -46172,7 +46172,7 @@ INSERT INTO `villages` VALUES
   ('3323011010', '3323011', 'JEKETRO'),
   ('3323011011', '3323011', 'TUKSARI'),
   ('3323011012', '3323011', 'PAPONAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3323011013', '3323011', 'KALIREJO'),
   ('3323012001', '3323012', 'TLOGOWERO'),
   ('3323012002', '3323012', 'BALESARI'),
@@ -46223,7 +46223,7 @@ INSERT INTO `villages` VALUES
   ('3323030029', '3323030', 'SIDOREJO'),
   ('3323030030', '3323030', 'JURANG'),
   ('3323030031', '3323030', 'TLOGOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3323030032', '3323030', 'JOHO'),
   ('3323030033', '3323030', 'WALITELON SELATAN'),
   ('3323030034', '3323030', 'WALITELON UTARA'),
@@ -46274,7 +46274,7 @@ INSERT INTO `villages` VALUES
   ('3323050010', '3323050', 'SANGGRAHAN'),
   ('3323050012', '3323050', 'KEMLOKO'),
   ('3323050013', '3323050', 'GENTAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3323060002', '3323060', 'SOROPADAN'),
   ('3323060004', '3323060', 'PRINGSURAT'),
   ('3323060005', '3323060', 'KARANGWUNI'),
@@ -46325,7 +46325,7 @@ INSERT INTO `villages` VALUES
   ('3323090012', '3323090', 'NGADIMULYO'),
   ('3323090013', '3323090', 'GONDANGWAYANG'),
   ('3323090014', '3323090', 'BOJONEGORO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3323090015', '3323090', 'BANDUNGGEDE'),
   ('3323100001', '3323100', 'KATEKAN'),
   ('3323100002', '3323100', 'BANJARSARI'),
@@ -46376,7 +46376,7 @@ INSERT INTO `villages` VALUES
   ('3323120005', '3323120', 'KRAWITAN'),
   ('3323120007', '3323120', 'MENTO'),
   ('3323120008', '3323120', 'BATURSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3323120009', '3323120', 'LEMPUYANG'),
   ('3323120010', '3323120', 'CANDIROTO'),
   ('3323120011', '3323120', 'GUNUNGPAYUNG'),
@@ -46427,7 +46427,7 @@ INSERT INTO `villages` VALUES
   ('3324010010', '3324010', 'BENDOSARI'),
   ('3324010011', '3324010', 'WADAS'),
   ('3324010012', '3324010', 'MOJOAGUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3324020001', '3324020', 'GENTING GUNUNG'),
   ('3324020002', '3324020', 'BRINGINSARI'),
   ('3324020003', '3324020', 'PURWO SARI'),
@@ -46478,7 +46478,7 @@ INSERT INTO `villages` VALUES
   ('3324050005', '3324050', 'BANYURINGIN'),
   ('3324050006', '3324050', 'KEDUNGSARI'),
   ('3324050007', '3324050', 'NGAREANAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3324050008', '3324050', 'SINGOROJO'),
   ('3324050009', '3324050', 'CACABAN'),
   ('3324050010', '3324050', 'KALIREJO'),
@@ -46529,7 +46529,7 @@ INSERT INTO `villages` VALUES
   ('3324081002', '3324081', 'JERUKGILING'),
   ('3324081003', '3324081', 'DARUPONO'),
   ('3324081004', '3324081', 'PROTOMULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3324081005', '3324081', 'MAGELUNG'),
   ('3324081006', '3324081', 'PLANTARAN'),
   ('3324081007', '3324081', 'SUKOMULYO'),
@@ -46580,7 +46580,7 @@ INSERT INTO `villages` VALUES
   ('3324110023', '3324110', 'GEMUHBLANTEN'),
   ('3324110024', '3324110', 'TAMANGEDE'),
   ('3324110025', '3324110', 'LUMANSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3324110026', '3324110', 'JOHOREJO'),
   ('3324110027', '3324110', 'TLAHAB'),
   ('3324110028', '3324110', 'PUCANGREJO'),
@@ -46631,7 +46631,7 @@ INSERT INTO `villages` VALUES
   ('3324140001', '3324140', 'SENDANGKULON'),
   ('3324140002', '3324140', 'SENDANGDAWUNG'),
   ('3324140003', '3324140', 'SUKODADI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3324140004', '3324140', 'KALIYOSO'),
   ('3324140005', '3324140', 'GEBANGANOM WETAN'),
   ('3324140006', '3324140', 'KADILANGU'),
@@ -46682,7 +46682,7 @@ INSERT INTO `villages` VALUES
   ('3324170004', '3324170', 'JOTANG'),
   ('3324170005', '3324170', 'TUNGGULREJO'),
   ('3324170006', '3324170', 'SIJERUK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3324170007', '3324170', 'JETIS'),
   ('3324170008', '3324170', 'BUGANGIN'),
   ('3324170009', '3324170', 'LANGENHARJO'),
@@ -46733,7 +46733,7 @@ INSERT INTO `villages` VALUES
   ('3325030003', '3325030', 'KEMBANGLANGIT'),
   ('3325030004', '3325030', 'GONDANG'),
   ('3325030005', '3325030', 'BISMO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3325030007', '3325030', 'KALISARI'),
   ('3325030009', '3325030', 'BESANI'),
   ('3325030010', '3325030', 'WONOBODRO'),
@@ -46784,7 +46784,7 @@ INSERT INTO `villages` VALUES
   ('3325050020', '3325050', 'PURBO'),
   ('3325060002', '3325060', 'SENDANG'),
   ('3325060003', '3325060', 'GONDO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3325060004', '3325060', 'BANTENG'),
   ('3325060005', '3325060', 'WANAR'),
   ('3325060006', '3325060', 'SUMURBANGER'),
@@ -46835,7 +46835,7 @@ INSERT INTO `villages` VALUES
   ('3325081007', '3325081', 'BANARAN'),
   ('3325081008', '3325081', 'TIMBANG'),
   ('3325081009', '3325081', 'PENUNDAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3325081011', '3325081', 'KEDAWUNG'),
   ('3325090004', '3325090', 'MENJANGAN'),
   ('3325090005', '3325090', 'KARANGTENGAH'),
@@ -46886,7 +46886,7 @@ INSERT INTO `villages` VALUES
   ('3325101008', '3325101', 'JURAGAN'),
   ('3325101009', '3325101', 'BAKALAN'),
   ('3325101010', '3325101', 'WONOKERSO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3325101011', '3325101', 'KARANGGENENG'),
   ('3325101012', '3325101', 'UJUNGNEGORO'),
   ('3325101013', '3325101', 'DEPOK'),
@@ -46937,7 +46937,7 @@ INSERT INTO `villages` VALUES
   ('3326010008', '3326010', 'LURAGUNG'),
   ('3326010009', '3326010', 'KANDANGSERANG'),
   ('3326010010', '3326010', 'WANGKELANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3326010011', '3326010', 'LAMBUR'),
   ('3326010012', '3326010', 'TAJUR'),
   ('3326010013', '3326010', 'TRAJUMAS'),
@@ -46988,7 +46988,7 @@ INSERT INTO `villages` VALUES
   ('3326050010', '3326050', 'KROMPENG'),
   ('3326060001', '3326060', 'PUNGANGAN'),
   ('3326060002', '3326060', 'SIDOHARJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3326060003', '3326060', 'LEMAH ABANG'),
   ('3326060004', '3326060', 'ROGOSELO'),
   ('3326060005', '3326060', 'HARJOSARI'),
@@ -47039,7 +47039,7 @@ INSERT INTO `villages` VALUES
   ('3326080022', '3326080', 'SANGKAN JOYO'),
   ('3326080023', '3326080', 'SALIT'),
   ('3326080024', '3326080', 'SAMBIROTO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3326080025', '3326080', 'ROWOLAKU'),
   ('3326090001', '3326090', 'WINDUROJO'),
   ('3326090002', '3326090', 'UJUNG NEGORO'),
@@ -47090,7 +47090,7 @@ INSERT INTO `villages` VALUES
   ('3326101007', '3326101', 'TENGENGKULON'),
   ('3326101009', '3326101', 'YOSOREJO'),
   ('3326101010', '3326101', 'SIWALAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3326101011', '3326101', 'BOYO TELUK'),
   ('3326101012', '3326101', 'DEPOK'),
   ('3326101013', '3326101', 'BLACANAN'),
@@ -47141,7 +47141,7 @@ INSERT INTO `villages` VALUES
   ('3326130023', '3326130', 'AMBOKEMBANG'),
   ('3326130024', '3326130', 'PEKAJANGAN'),
   ('3326130025', '3326130', 'TANGKIL TENGAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3326130026', '3326130', 'TANGKIL KULON'),
   ('3326130027', '3326130', 'KARANGDOWO'),
   ('3326130028', '3326130', 'BUGANGAN'),
@@ -47192,7 +47192,7 @@ INSERT INTO `villages` VALUES
   ('3326160008', '3326160', 'WARULOR'),
   ('3326160009', '3326160', 'KAMPIL'),
   ('3326160010', '3326160', 'GUMAWANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3326160011', '3326160', 'KEPATIHAN'),
   ('3326160012', '3326160', 'MAYANGAN'),
   ('3326160018', '3326160', 'KEMPLONG'),
@@ -47243,7 +47243,7 @@ INSERT INTO `villages` VALUES
   ('3327030010', '3327030', 'BULAKAN'),
   ('3327030011', '3327030', 'SIKASUR'),
   ('3327030012', '3327030', 'KALISALEH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3327040001', '3327040', 'TUNDAGAN'),
   ('3327040002', '3327040', 'TLAGASANA'),
   ('3327040003', '3327040', 'BONGAS'),
@@ -47294,7 +47294,7 @@ INSERT INTO `villages` VALUES
   ('3327060015', '3327060', 'KEBON GEDE'),
   ('3327060016', '3327060', 'PAGUYANGAN'),
   ('3327060017', '3327060', 'LENGGERONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3327070001', '3327070', 'KECEPIT'),
   ('3327070002', '3327070', 'GEMBYANG'),
   ('3327070003', '3327070', 'MEJAGONG'),
@@ -47345,7 +47345,7 @@ INSERT INTO `villages` VALUES
   ('3327090013', '3327090', 'SITEMU'),
   ('3327090014', '3327090', 'PEDURUNGAN'),
   ('3327090015', '3327090', 'TAMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3327090016', '3327090', 'WANAREJAN SELATAN'),
   ('3327090017', '3327090', 'WANAREJAN UTARA'),
   ('3327090018', '3327090', 'BEJI'),
@@ -47396,7 +47396,7 @@ INSERT INTO `villages` VALUES
   ('3327120009', '3327120', 'AMBOKULON'),
   ('3327120011', '3327120', 'GINTUNG'),
   ('3327120012', '3327120', 'GANDU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3327120013', '3327120', 'SARWODADI'),
   ('3327120014', '3327120', 'SUSUKAN'),
   ('3327120016', '3327120', 'WONOKROMO'),
@@ -47447,7 +47447,7 @@ INSERT INTO `villages` VALUES
   ('3328020014', '3328020', 'CAWITALI'),
   ('3328020015', '3328020', 'CARUL'),
   ('3328020016', '3328020', 'SUMBAGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3328020017', '3328020', 'SOKATENGAH'),
   ('3328020018', '3328020', 'SOKASARI'),
   ('3328030002', '3328030', 'DUKUHTENGAH'),
@@ -47498,7 +47498,7 @@ INSERT INTO `villages` VALUES
   ('3328050012', '3328050', 'SUROKIDUL'),
   ('3328050013', '3328050', 'PESAREAN'),
   ('3328060001', '3328060', 'TIMBANGREJA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3328060002', '3328060', 'YAMANSARI'),
   ('3328060003', '3328060', 'LEBAKSIU KIDUL'),
   ('3328060004', '3328060', 'LEBAKSIU LOR'),
@@ -47549,7 +47549,7 @@ INSERT INTO `villages` VALUES
   ('3328090012', '3328090', 'GROBOG KULON'),
   ('3328090013', '3328090', 'GROBOG WETAN'),
   ('3328090014', '3328090', 'TALOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3328090015', '3328090', 'PAKETIBAN'),
   ('3328090016', '3328090', 'RANCAWIRU'),
   ('3328090017', '3328090', 'BALAMOA'),
@@ -47600,7 +47600,7 @@ INSERT INTO `villages` VALUES
   ('3328130001', '3328130', 'KETANGGUNGAN'),
   ('3328130002', '3328130', 'PENGARASAN'),
   ('3328130004', '3328130', 'SIDAKATON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3328130005', '3328130', 'SIDAPURNA'),
   ('3328130006', '3328130', 'DUKUHTURI'),
   ('3328130007', '3328130', 'LAWATAN'),
@@ -47651,7 +47651,7 @@ INSERT INTO `villages` VALUES
   ('3328150019', '3328150', 'KESAMIRAN'),
   ('3328150020', '3328150', 'KESADIKAN'),
   ('3328160001', '3328160', 'MEJASEM BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3328160002', '3328160', 'MEJASEM TIMUR'),
   ('3328160003', '3328160', 'DINUK'),
   ('3328160004', '3328160', 'JATILAWANG'),
@@ -47702,7 +47702,7 @@ INSERT INTO `villages` VALUES
   ('3329010006', '3329010', 'GUNUNG SUGIH'),
   ('3329010007', '3329010', 'GANGGAWANG'),
   ('3329010008', '3329010', 'CITIMBANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3329010009', '3329010', 'KADUMANIS'),
   ('3329010010', '3329010', 'GANDOANG'),
   ('3329010011', '3329010', 'CIPUTIH'),
@@ -47753,7 +47753,7 @@ INSERT INTO `villages` VALUES
   ('3329040002', '3329040', 'WINDUAJI'),
   ('3329040003', '3329040', 'WANATIRTA'),
   ('3329040004', '3329040', 'PAGUYANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3329040005', '3329040', 'PAKUJATI'),
   ('3329040006', '3329040', 'TARABAN'),
   ('3329040007', '3329040', 'PAGOJENGAN'),
@@ -47804,7 +47804,7 @@ INSERT INTO `villages` VALUES
   ('3329080004', '3329080', 'PAMEDARAN'),
   ('3329080005', '3329080', 'CIKEUSAL KIDUL'),
   ('3329080006', '3329080', 'CIKEUSAL LOR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3329080007', '3329080', 'BUARA'),
   ('3329080008', '3329080', 'KARANGBANDUNG'),
   ('3329080009', '3329080', 'BAROS'),
@@ -47855,7 +47855,7 @@ INSERT INTO `villages` VALUES
   ('3329100010', '3329100', 'KALIBUNTU'),
   ('3329100012', '3329100', 'RANDUSARI'),
   ('3329100014', '3329100', 'PEKAUMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3329100015', '3329100', 'LOSARI KIDUL'),
   ('3329100016', '3329100', 'LOSARI LOR'),
   ('3329100017', '3329100', 'KECIPIR'),
@@ -47906,7 +47906,7 @@ INSERT INTO `villages` VALUES
   ('3329130014', '3329130', 'BULAKPAREN'),
   ('3329130015', '3329130', 'CIMOHONG'),
   ('3329130016', '3329130', 'GRINTING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3329130017', '3329130', 'BULAKAMBA'),
   ('3329130018', '3329130', 'PAKIJANGAN'),
   ('3329130019', '3329130', 'PULOGADING'),
@@ -47957,7 +47957,7 @@ INSERT INTO `villages` VALUES
   ('3329160016', '3329160', 'KEDUNGTUKANG'),
   ('3329160017', '3329160', 'RENGASBANDUNG'),
   ('3329160018', '3329160', 'TEMBELANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3329160019', '3329160', 'PEDESLOHOR'),
   ('3329160020', '3329160', 'KRAMAT'),
   ('3329160021', '3329160', 'KALIPUCANG'),
@@ -48008,7 +48008,7 @@ INSERT INTO `villages` VALUES
   ('3372010006', '3372010', 'PENUMPING'),
   ('3372010007', '3372010', 'PURWOSARI'),
   ('3372010008', '3372010', 'SONDAKAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3372010010', '3372010', 'JAJAR'),
   ('3372010011', '3372010', 'KARANGASEM'),
   ('3372020001', '3372020', 'JOYOTAKAN'),
@@ -48059,7 +48059,7 @@ INSERT INTO `villages` VALUES
   ('3373020004', '3373020', 'SIDOREJO KIDUL'),
   ('3373020006', '3373020', 'GENDONGAN'),
   ('3373020007', '3373020', 'KUTOWINANGUN KIDUL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3373020008', '3373020', 'KUTOWINANGUN LOR'),
   ('3373030001', '3373030', 'KECANDRAN'),
   ('3373030003', '3373030', 'MANGUNSARI'),
@@ -48110,7 +48110,7 @@ INSERT INTO `villages` VALUES
   ('3374030009', '3374030', 'SRONDOL KULON'),
   ('3374030010', '3374030', 'TINJOMOYO'),
   ('3374040001', '3374040', 'SAMPANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3374040002', '3374040', 'BENDAN DUWUR'),
   ('3374040003', '3374040', 'KARANG REJO'),
   ('3374040004', '3374040', 'GAJAHMUNGKUR'),
@@ -48161,7 +48161,7 @@ INSERT INTO `villages` VALUES
   ('3374090002', '3374090', 'GEBANGSARI'),
   ('3374090003', '3374090', 'GENUKSARI'),
   ('3374090004', '3374090', 'BANGETAYU KULON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3374090005', '3374090', 'BANGETAYU WETAN'),
   ('3374090006', '3374090', 'SEMBUNGHARJO'),
   ('3374090007', '3374090', 'PENGGARON LOR'),
@@ -48212,7 +48212,7 @@ INSERT INTO `villages` VALUES
   ('3374130015', '3374130', 'PENDRIKAN LOR'),
   ('3374140001', '3374140', 'KEMBANGARUM'),
   ('3374140002', '3374140', 'MANYARAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3374140003', '3374140', 'NGEMPLAKSIMONGAN'),
   ('3374140004', '3374140', 'BONGSARI'),
   ('3374140005', '3374140', 'BOJONGSALAMAN'),
@@ -48263,7 +48263,7 @@ INSERT INTO `villages` VALUES
   ('3375030013', '3375030', 'BUARAN KRADENAN'),
   ('3375030014', '3375030', 'KURIPAN KERTOHARJO'),
   ('3375030015', '3375030', 'KURIPAN YOSOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3375030016', '3375030', 'SOKODUWET'),
   ('3375040004', '3375040', 'BANDENGAN'),
   ('3375040005', '3375040', 'KANDANGPANJANG'),
@@ -48314,7 +48314,7 @@ INSERT INTO `villages` VALUES
   ('3401020001', '3401020', 'KARANG WUNI'),
   ('3401020002', '3401020', 'SOGAN'),
   ('3401020003', '3401020', 'KULWARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3401020004', '3401020', 'NGESTIHARJO'),
   ('3401020005', '3401020', 'TRIHARJO'),
   ('3401020006', '3401020', 'BENDUNGAN'),
@@ -48365,7 +48365,7 @@ INSERT INTO `villages` VALUES
   ('3401090002', '3401090', 'GIRIPURWO'),
   ('3401090003', '3401090', 'PENDOWOREJO'),
   ('3401090004', '3401090', 'PURWOSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3401100001', '3401100', 'BANYUROTO'),
   ('3401100002', '3401100', 'DONOMULYO'),
   ('3401100003', '3401100', 'WIJIMULYO'),
@@ -48416,7 +48416,7 @@ INSERT INTO `villages` VALUES
   ('3402090001', '3402090', 'SELOPAMIORO'),
   ('3402090002', '3402090', 'SRIHARJO'),
   ('3402090003', '3402090', 'KEBON AGUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3402090004', '3402090', 'KARANG TENGAH'),
   ('3402090005', '3402090', 'GIRIREJO'),
   ('3402090006', '3402090', 'KARANGTALUN'),
@@ -48467,7 +48467,7 @@ INSERT INTO `villages` VALUES
   ('3403011003', '3403011', 'GIRICAHYO'),
   ('3403011004', '3403011', 'GIRIPURWO'),
   ('3403011005', '3403011', 'GIRITIRTO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3403020001', '3403020', 'KARANG DUWET'),
   ('3403020002', '3403020', 'KARANG ASEM'),
   ('3403020003', '3403020', 'MULUSAN'),
@@ -48518,7 +48518,7 @@ INSERT INTO `villages` VALUES
   ('3403070009', '3403070', 'TAMBAKROMO'),
   ('3403070010', '3403070', 'SAWAHAN'),
   ('3403070011', '3403070', 'UMBUL REJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3403080001', '3403080', 'BENDUNGAN'),
   ('3403080002', '3403080', 'BEJIHARJO'),
   ('3403080003', '3403080', 'WILADEG'),
@@ -48569,7 +48569,7 @@ INSERT INTO `villages` VALUES
   ('3403130001', '3403130', 'KEDUNG KERIS'),
   ('3403130002', '3403130', 'NGLIPAR'),
   ('3403130003', '3403130', 'PENGKOL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3403130004', '3403130', 'KEDUNGPOH'),
   ('3403130005', '3403130', 'KATONGAN'),
   ('3403130006', '3403130', 'PILANG REJO'),
@@ -48620,7 +48620,7 @@ INSERT INTO `villages` VALUES
   ('3404060003', '3404060', 'TLOGOADI'),
   ('3404060004', '3404060', 'SENDANGADI'),
   ('3404060005', '3404060', 'SINDUADI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3404070001', '3404070', 'CATUR TUNGGAL'),
   ('3404070002', '3404070', 'MAGUWOHARJO'),
   ('3404070003', '3404070', 'CONDONG CATUR'),
@@ -48671,7 +48671,7 @@ INSERT INTO `villages` VALUES
   ('3404160003', '3404160', 'HARJO BINANGUN'),
   ('3404160004', '3404160', 'PAKEM BINANGUN'),
   ('3404160005', '3404160', 'HARGO BINANGUN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3404170001', '3404170', 'WUKIR SARI'),
   ('3404170002', '3404170', 'ARGO MULYO'),
   ('3404170003', '3404170', 'GLAGAH HARJO'),
@@ -48722,7 +48722,7 @@ INSERT INTO `villages` VALUES
   ('3471140004', '3471140', 'KARANGWARU'),
   ('3501010001', '3501010', 'WIDORO'),
   ('3501010002', '3501010', 'SAWAHAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3501010003', '3501010', 'KALAK'),
   ('3501010004', '3501010', 'SENDANG'),
   ('3501010006', '3501010', 'GEDOMPOL'),
@@ -48773,7 +48773,7 @@ INSERT INTO `villages` VALUES
   ('3501040017', '3501040', 'PURWOREJO'),
   ('3501040018', '3501040', 'NANGGUNGAN'),
   ('3501040019', '3501040', 'WIDORO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3501040020', '3501040', 'SEMANTEN'),
   ('3501040021', '3501040', 'BANJARSARI'),
   ('3501040022', '3501040', 'BOLOSINGO'),
@@ -48824,7 +48824,7 @@ INSERT INTO `villages` VALUES
   ('3501080006', '3501080', 'WATUPATOK'),
   ('3501080007', '3501080', 'BANGUNSARI'),
   ('3501090001', '3501090', 'KEBONDALEM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3501090002', '3501090', 'GEDANGAN'),
   ('3501090003', '3501090', 'NGRECO'),
   ('3501090004', '3501090', 'KASIHAN'),
@@ -48875,7 +48875,7 @@ INSERT INTO `villages` VALUES
   ('3501120007', '3501120', 'SEMBOWO'),
   ('3501120008', '3501120', 'KARANG MULYO'),
   ('3501120009', '3501120', 'GUNUNG REJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3501120010', '3501120', 'SUMBER REJO'),
   ('3502010001', '3502010', 'BAOSANKIDUL'),
   ('3502010002', '3502010', 'WONODADI'),
@@ -48926,7 +48926,7 @@ INSERT INTO `villages` VALUES
   ('3502040002', '3502040', 'WRINGINANOM'),
   ('3502040003', '3502040', 'NGADISANAN'),
   ('3502040004', '3502040', 'MAGUWAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3502040005', '3502040', 'NGLEWAN'),
   ('3502040006', '3502040', 'BEDINGIN'),
   ('3502040007', '3502040', 'BANCANGAN'),
@@ -48977,7 +48977,7 @@ INSERT INTO `villages` VALUES
   ('3502070018', '3502070', 'BANARAN'),
   ('3502080002', '3502080', 'CANDI'),
   ('3502080003', '3502080', 'TOTOKAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3502080005', '3502080', 'SIWALAN'),
   ('3502080006', '3502080', 'JORESAN'),
   ('3502080007', '3502080', 'NGLUMPANG'),
@@ -49028,7 +49028,7 @@ INSERT INTO `villages` VALUES
   ('3502110009', '3502110', 'DADAPAN'),
   ('3502110010', '3502110', 'SINGKIL'),
   ('3502110011', '3502110', 'KARANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3502110012', '3502110', 'BAJANG'),
   ('3502110013', '3502110', 'BALONG'),
   ('3502110014', '3502110', 'JALEN'),
@@ -49079,7 +49079,7 @@ INSERT INTO `villages` VALUES
   ('3502150003', '3502150', 'GLINGGANG'),
   ('3502150004', '3502150', 'CARANG REJO'),
   ('3502150006', '3502150', 'KUNTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3502150007', '3502150', 'PAGERUKIR'),
   ('3502150008', '3502150', 'POHIJO'),
   ('3502150009', '3502150', 'JENANGAN'),
@@ -49130,7 +49130,7 @@ INSERT INTO `villages` VALUES
   ('3502180006', '3502180', 'GUPOLO'),
   ('3502180007', '3502180', 'POLOREJO'),
   ('3502180008', '3502180', 'BARENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3502180010', '3502180', 'SUKOSARI'),
   ('3502180011', '3502180', 'LEMBAH'),
   ('3502180012', '3502180', 'PONDOK'),
@@ -49181,7 +49181,7 @@ INSERT INTO `villages` VALUES
   ('3503020004', '3503020', 'CRAKEN'),
   ('3503020005', '3503020', 'MASARAN'),
   ('3503020006', '3503020', 'MUNJUNGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3503020007', '3503020', 'TAWING'),
   ('3503020008', '3503020', 'BENDOROTO'),
   ('3503020009', '3503020', 'BANGUN'),
@@ -49232,7 +49232,7 @@ INSERT INTO `villages` VALUES
   ('3503070017', '3503070', 'BULUAGUNG'),
   ('3503070019', '3503070', 'NGENTRONG'),
   ('3503071001', '3503071', 'NGRANDU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3503071003', '3503071', 'WONOKERTO'),
   ('3503071004', '3503071', 'NGLEBO'),
   ('3503071005', '3503071', 'GAMPING'),
@@ -49283,7 +49283,7 @@ INSERT INTO `villages` VALUES
   ('3503110010', '3503110', 'NGARES'),
   ('3503110011', '3503110', 'SUMBERDADI'),
   ('3503110012', '3503110', 'SUKOSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3503110013', '3503110', 'DAWUHAN'),
   ('3503120004', '3503120', 'GONDANG'),
   ('3503120005', '3503120', 'NGLONGSOR'),
@@ -49334,7 +49334,7 @@ INSERT INTO `villages` VALUES
   ('3504030002', '3504030', 'BONO'),
   ('3504030003', '3504030', 'SUKOANYAR'),
   ('3504030005', '3504030', 'TAMBAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3504030006', '3504030', 'NGEBONG'),
   ('3504030007', '3504030', 'SODO'),
   ('3504030008', '3504030', 'GOMBANG'),
@@ -49385,7 +49385,7 @@ INSERT INTO `villages` VALUES
   ('3504070003', '3504070', 'PUCANGLABAN'),
   ('3504070004', '3504070', 'SUMBERBENDO'),
   ('3504070005', '3504070', 'KALIGENTONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3504070006', '3504070', 'MANDING'),
   ('3504070007', '3504070', 'PANGGUNGUNI'),
   ('3504070008', '3504070', 'SUMBERDADAP'),
@@ -49436,7 +49436,7 @@ INSERT INTO `villages` VALUES
   ('3504100016', '3504100', 'SAMBIROBYONG'),
   ('3504110001', '3504110', 'NGRANTI'),
   ('3504110002', '3504110', 'KENDALBULUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3504110003', '3504110', 'BOYOLANGU'),
   ('3504110004', '3504110', 'PUCUNG KIDUL'),
   ('3504110005', '3504110', 'SANGGRAHAN'),
@@ -49487,7 +49487,7 @@ INSERT INTO `villages` VALUES
   ('3504140005', '3504140', 'PINGGIRSARI'),
   ('3504140006', '3504140', 'BENDOSARI'),
   ('3504140007', '3504140', 'NGANTRU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3504140008', '3504140', 'PULEREJO'),
   ('3504140009', '3504140', 'POJOK'),
   ('3504140010', '3504140', 'KEPUHREJO'),
@@ -49538,7 +49538,7 @@ INSERT INTO `villages` VALUES
   ('3504170020', '3504170', 'JARAKAN'),
   ('3504180001', '3504180', 'WONOREJO'),
   ('3504180002', '3504180', 'KEDUNGCANGKRING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3504180003', '3504180', 'MULYOSARI'),
   ('3504180004', '3504180', 'SEGAWE'),
   ('3504180005', '3504180', 'PENJOR'),
@@ -49589,7 +49589,7 @@ INSERT INTO `villages` VALUES
   ('3505040004', '3505040', 'WATES'),
   ('3505040005', '3505040', 'TULUNGREJO'),
   ('3505040006', '3505040', 'PURWOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3505040007', '3505040', 'SUMBERARUM'),
   ('3505040008', '3505040', 'MOJOREJO'),
   ('3505050001', '3505050', 'SALAMREJO'),
@@ -49640,7 +49640,7 @@ INSERT INTO `villages` VALUES
   ('3505080012', '3505080', 'SAWENTAR'),
   ('3505090001', '3505090', 'TUMPANG'),
   ('3505090002', '3505090', 'JABUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3505090003', '3505090', 'JEBLOG'),
   ('3505090004', '3505090', 'BENDOSEWU'),
   ('3505090006', '3505090', 'SRAGI'),
@@ -49691,7 +49691,7 @@ INSERT INTO `villages` VALUES
   ('3505140001', '3505140', 'KLEMUNAN'),
   ('3505140002', '3505140', 'WLINGI'),
   ('3505140003', '3505140', 'TANGKIL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3505140005', '3505140', 'BABADAN'),
   ('3505140006', '3505140', 'TEMBALANG'),
   ('3505140007', '3505140', 'NGADIRENGGO'),
@@ -49742,7 +49742,7 @@ INSERT INTO `villages` VALUES
   ('3505190004', '3505190', 'KAWEDUSAN'),
   ('3505190005', '3505190', 'LANGON'),
   ('3505190006', '3505190', 'DADAPLANGU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3505190007', '3505190', 'KEBONDUREN'),
   ('3505190008', '3505190', 'POJOK'),
   ('3505190009', '3505190', 'PONGGOK'),
@@ -49793,7 +49793,7 @@ INSERT INTO `villages` VALUES
   ('3506010003', '3506010', 'KRANDING'),
   ('3506010004', '3506010', 'MAESAN'),
   ('3506010005', '3506010', 'PONGGOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3506010006', '3506010', 'PETUNGROTO'),
   ('3506010007', '3506010', 'PAMONGAN'),
   ('3506010008', '3506010', 'KEDAWUNG'),
@@ -49844,7 +49844,7 @@ INSERT INTO `villages` VALUES
   ('3506040013', '3506040', 'KANIGORO'),
   ('3506040014', '3506040', 'BANJARANYAR'),
   ('3506040015', '3506040', 'PURWODADI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3506040016', '3506040', 'JAMBEAN'),
   ('3506050001', '3506050', 'JEMEKAN'),
   ('3506050002', '3506050', 'SRIKATON'),
@@ -49895,7 +49895,7 @@ INSERT INTO `villages` VALUES
   ('3506090001', '3506090', 'GONDANG'),
   ('3506090002', '3506090', 'KAYUNAN'),
   ('3506090003', '3506090', 'PANJER');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3506090004', '3506090', 'JARAK'),
   ('3506090005', '3506090', 'SEPAWON'),
   ('3506090006', '3506090', 'PLOSOKIDUL'),
@@ -49946,7 +49946,7 @@ INSERT INTO `villages` VALUES
   ('3506130005', '3506130', 'BANARAN'),
   ('3506130007', '3506130', 'KASREMAN'),
   ('3506130008', '3506130', 'KEMIRI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3506130009', '3506130', 'KARANGTENGAH'),
   ('3506130010', '3506130', 'JERUKWANGI'),
   ('3506130012', '3506130', 'JLUMBANG'),
@@ -49997,7 +49997,7 @@ INSERT INTO `villages` VALUES
   ('3506170006', '3506170', 'PURWOASRI'),
   ('3506170007', '3506170', 'PANDANSARI'),
   ('3506170008', '3506170', 'BLAWE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3506170009', '3506170', 'BELOR'),
   ('3506170012', '3506170', 'PURWODADI'),
   ('3506170014', '3506170', 'KLAMPITAN'),
@@ -50048,7 +50048,7 @@ INSERT INTO `villages` VALUES
   ('3506191011', '3506191', 'NANGGUNGAN'),
   ('3506191012', '3506191', 'SEMAMBUNG'),
   ('3506200010', '3506200', 'JONGBIRU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3506200011', '3506200', 'PUTIH'),
   ('3506200012', '3506200', 'SAMBIREJO'),
   ('3506200016', '3506200', 'SAMBIRESIK'),
@@ -50099,7 +50099,7 @@ INSERT INTO `villages` VALUES
   ('3507010002', '3507010', 'PURWOREJO'),
   ('3507010003', '3507010', 'MENTARAMAN'),
   ('3507010004', '3507010', 'DONOMULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3507010005', '3507010', 'TEMPURSARI'),
   ('3507010006', '3507010', 'TLOGOSARI'),
   ('3507010007', '3507010', 'KEDUNGSALAM'),
@@ -50150,7 +50150,7 @@ INSERT INTO `villages` VALUES
   ('3507060008', '3507060', 'HARJOKUNCARAN'),
   ('3507060009', '3507060', 'ARGOTIRTO'),
   ('3507060010', '3507060', 'RINGINSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3507060012', '3507060', 'SUMBERMANJING WETAN'),
   ('3507060014', '3507060', 'SEKARBANYU'),
   ('3507060015', '3507060', 'SIDOASRI'),
@@ -50201,7 +50201,7 @@ INSERT INTO `villages` VALUES
   ('3507100008', '3507100', 'ARGOSUKO'),
   ('3507100010', '3507100', 'KARANGNONGKO'),
   ('3507100011', '3507100', 'WONOMULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3507100013', '3507100', 'WONOREJO'),
   ('3507100014', '3507100', 'PONCOKUSUMO'),
   ('3507100015', '3507100', 'WRINGINANOM'),
@@ -50252,7 +50252,7 @@ INSERT INTO `villages` VALUES
   ('3507140003', '3507140', 'SUKOSARI'),
   ('3507140004', '3507140', 'PANGGUNGREJO'),
   ('3507140005', '3507140', 'GONDANGLEGI KULON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3507140006', '3507140', 'GONDANGLEGI WETAN'),
   ('3507140007', '3507140', 'SEPANJANG'),
   ('3507140008', '3507140', 'PUTAT KIDUL'),
@@ -50303,7 +50303,7 @@ INSERT INTO `villages` VALUES
   ('3507190002', '3507190', 'PALAAN'),
   ('3507190003', '3507190', 'NGASEM'),
   ('3507190004', '3507190', 'BANJARSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3507190005', '3507190', 'KRANGGAN'),
   ('3507190006', '3507190', 'KESAMBEN'),
   ('3507190007', '3507190', 'BABADAN'),
@@ -50354,7 +50354,7 @@ INSERT INTO `villages` VALUES
   ('3507240003', '3507240', 'KAMBINGAN'),
   ('3507240004', '3507240', 'PANDANAJENG'),
   ('3507240005', '3507240', 'PULUNGDOWO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3507240006', '3507240', 'BOKOR'),
   ('3507240007', '3507240', 'SLAMET'),
   ('3507240008', '3507240', 'WRINGINSONGO'),
@@ -50405,7 +50405,7 @@ INSERT INTO `villages` VALUES
   ('3507270010', '3507270', 'LAWANG'),
   ('3507270011', '3507270', 'KETINDAN'),
   ('3507270012', '3507270', 'WONOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3507280001', '3507280', 'LANGLANG'),
   ('3507280002', '3507280', 'TUNJUNGTIRTO'),
   ('3507280003', '3507280', 'BANJARARUM'),
@@ -50456,7 +50456,7 @@ INSERT INTO `villages` VALUES
   ('3507320005', '3507320', 'NGANTRU'),
   ('3507320006', '3507320', 'BANTUREJO'),
   ('3507320007', '3507320', 'PANDANSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3507320008', '3507320', 'MULYOREJO'),
   ('3507320009', '3507320', 'SUMBERAGUNG'),
   ('3507320010', '3507320', 'KAUMREJO'),
@@ -50507,7 +50507,7 @@ INSERT INTO `villages` VALUES
   ('3508050007', '3508050', 'KALIWUNGU'),
   ('3508050008', '3508050', 'TEMPEH LOR'),
   ('3508050010', '3508050', 'JATISARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3508050011', '3508050', 'PULO'),
   ('3508050012', '3508050', 'GESANG'),
   ('3508050013', '3508050', 'JOKARTO'),
@@ -50558,7 +50558,7 @@ INSERT INTO `villages` VALUES
   ('3508090009', '3508090', 'KARANGREJO'),
   ('3508090011', '3508090', 'KEBONSARI'),
   ('3508090012', '3508090', 'KALIPEPE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3508100001', '3508100', 'NOGOSARI'),
   ('3508100002', '3508100', 'KEDUNGREJO'),
   ('3508100003', '3508100', 'SIDOREJO'),
@@ -50609,7 +50609,7 @@ INSERT INTO `villages` VALUES
   ('3508150006', '3508150', 'PAGOWAN'),
   ('3508150007', '3508150', 'KARANGANOM'),
   ('3508160002', '3508160', 'PURWOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3508160003', '3508160', 'SARIKEMUNING'),
   ('3508160004', '3508160', 'PANDANSARI'),
   ('3508160005', '3508160', 'SENDURO'),
@@ -50660,7 +50660,7 @@ INSERT INTO `villages` VALUES
   ('3508200011', '3508200', 'WATES WETAN'),
   ('3509010001', '3509010', 'PASEBAN'),
   ('3509010002', '3509010', 'CAKRU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3509010003', '3509010', 'KRATON'),
   ('3509010004', '3509010', 'WONOREJO'),
   ('3509010005', '3509010', 'KENCONG'),
@@ -50711,7 +50711,7 @@ INSERT INTO `villages` VALUES
   ('3509070004', '3509070', 'KARANGHARJO'),
   ('3509070005', '3509070', 'SILO'),
   ('3509070006', '3509070', 'SEMPOLAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3509070007', '3509070', 'SUMBERJATI'),
   ('3509070008', '3509070', 'GARAHAN'),
   ('3509070009', '3509070', 'SIDOMULYO'),
@@ -50762,7 +50762,7 @@ INSERT INTO `villages` VALUES
   ('3509140002', '3509140', 'GUNUNGSARI'),
   ('3509140003', '3509140', 'UMBULSARI'),
   ('3509140004', '3509140', 'TANJUNGSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3509140005', '3509140', 'PALERAN'),
   ('3509140006', '3509140', 'UMBULREJO'),
   ('3509140007', '3509140', 'GADINGREJO'),
@@ -50813,7 +50813,7 @@ INSERT INTO `villages` VALUES
   ('3509200002', '3509200', 'GLAGAHWERO'),
   ('3509200004', '3509200', 'PANTI'),
   ('3509200005', '3509200', 'PAKIS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3509200006', '3509200', 'SUCI'),
   ('3509200007', '3509200', 'KEMIRI'),
   ('3509210003', '3509210', 'SUKORAMBI'),
@@ -50864,7 +50864,7 @@ INSERT INTO `villages` VALUES
   ('3509270004', '3509270', 'BALET BARU'),
   ('3509270005', '3509270', 'SUMBER WRINGIN'),
   ('3509270006', '3509270', 'MOJOGEMI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3509270007', '3509270', 'SUKOKERTO'),
   ('3509270008', '3509270', 'SUKOWONO'),
   ('3509270009', '3509270', 'DAWUHAN MANGLI'),
@@ -50915,7 +50915,7 @@ INSERT INTO `villages` VALUES
   ('3510020006', '3510020', 'TEMUREJO'),
   ('3510020007', '3510020', 'BANGOREJO'),
   ('3510020008', '3510020', 'KEBONDALEM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3510030001', '3510030', 'GRAJAGAN'),
   ('3510030002', '3510030', 'SUMBERASRI'),
   ('3510030003', '3510030', 'GLAGAHAGUNG'),
@@ -50966,7 +50966,7 @@ INSERT INTO `villages` VALUES
   ('3510080005', '3510080', 'SEPANJANG'),
   ('3510080006', '3510080', 'TEGALHARJO'),
   ('3510080007', '3510080', 'MARGOMULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3510090001', '3510090', 'KEBONREJO'),
   ('3510090002', '3510090', 'KALIBARU MANIS'),
   ('3510090003', '3510090', 'BANYUANYAR'),
@@ -51017,7 +51017,7 @@ INSERT INTO `villages` VALUES
   ('3510130011', '3510130', 'KEDAYUNAN'),
   ('3510130012', '3510130', 'KABAT'),
   ('3510130013', '3510130', 'MACAN PUTIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3510130014', '3510130', 'TAMBONG'),
   ('3510130015', '3510130', 'PENDARUNGAN'),
   ('3510130016', '3510130', 'KALIREJO'),
@@ -51068,7 +51068,7 @@ INSERT INTO `villages` VALUES
   ('3510180005', '3510180', 'TUKANGKAYU'),
   ('3510180006', '3510180', 'KERTOSARI'),
   ('3510180007', '3510180', 'KARANGREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3510180008', '3510180', 'KEPATIHAN'),
   ('3510180009', '3510180', 'PANDEREJO'),
   ('3510180010', '3510180', 'SINGONEGARAN'),
@@ -51119,7 +51119,7 @@ INSERT INTO `villages` VALUES
   ('3511010012', '3511010', 'GUNUNGSARI'),
   ('3511020001', '3511020', 'SUMBERPANDAN'),
   ('3511020002', '3511020', 'PEKAUMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3511020003', '3511020', 'WANISODO'),
   ('3511020004', '3511020', 'DAWUHAN'),
   ('3511020005', '3511020', 'KABUARAN'),
@@ -51170,7 +51170,7 @@ INSERT INTO `villages` VALUES
   ('3511060007', '3511060', 'SUKOSARI LOR'),
   ('3511060008', '3511060', 'KERANG'),
   ('3511061001', '3511061', 'SUKOSARI KIDUL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3511061002', '3511061', 'TEGAL JATI'),
   ('3511061003', '3511061', 'REJO AGUNG'),
   ('3511061004', '3511061', 'SUKOREJO'),
@@ -51221,7 +51221,7 @@ INSERT INTO `villages` VALUES
   ('3511100011', '3511100', 'PEJATEN'),
   ('3511110001', '3511110', 'JETIS'),
   ('3511110002', '3511110', 'PAKUWESI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3511110003', '3511110', 'KUPANG'),
   ('3511110005', '3511110', 'PENAMBANGAN'),
   ('3511110006', '3511110', 'CURAHPOH'),
@@ -51272,7 +51272,7 @@ INSERT INTO `villages` VALUES
   ('3511141003', '3511141', 'SUMBERKOKAP'),
   ('3511141004', '3511141', 'TAMAN'),
   ('3511141005', '3511141', 'GENTONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3511141006', '3511141', 'KEMUNINGAN'),
   ('3511150005', '3511150', 'KARANGANYAR'),
   ('3511150006', '3511150', 'BLIMBING'),
@@ -51323,7 +51323,7 @@ INSERT INTO `villages` VALUES
   ('3512010002', '3512010', 'BADERAN'),
   ('3512010003', '3512010', 'TAMANKURSI'),
   ('3512010004', '3512010', 'SUMBERARGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3512010005', '3512010', 'KALIREJO'),
   ('3512010006', '3512010', 'TAMAN SARI'),
   ('3512010007', '3512010', 'TLOGOSARI'),
@@ -51374,7 +51374,7 @@ INSERT INTO `villages` VALUES
   ('3512070004', '3512070', 'PASIR PUTIH'),
   ('3512070005', '3512070', 'BUNGATAN'),
   ('3512070006', '3512070', 'BLETOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3512070007', '3512070', 'MLANDINGAN WETAN'),
   ('3512080001', '3512080', 'RAJEKWESI'),
   ('3512080002', '3512080', 'TAMBAK UKIR'),
@@ -51425,7 +51425,7 @@ INSERT INTO `villages` VALUES
   ('3512140001', '3512140', 'CURAH TATAL'),
   ('3512140002', '3512140', 'JATISARI'),
   ('3512140003', '3512140', 'KAYUMAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3512140004', '3512140', 'BAYEMAN'),
   ('3512140005', '3512140', 'KETOWAN'),
   ('3512140006', '3512140', 'KEDUNGDOWO'),
@@ -51476,7 +51476,7 @@ INSERT INTO `villages` VALUES
   ('3513030002', '3513030', 'JATISARI'),
   ('3513030003', '3513030', 'KEDAWUNG'),
   ('3513030004', '3513030', 'KARANGREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3513030005', '3513030', 'RESONGO'),
   ('3513030006', '3513030', 'WRINGINANOM'),
   ('3513030007', '3513030', 'MENYONO'),
@@ -51527,7 +51527,7 @@ INSERT INTO `villages` VALUES
   ('3513080005', '3513080', 'TIRIS'),
   ('3513080006', '3513080', 'RANUAGUNG'),
   ('3513080007', '3513080', 'SEGARAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3513080008', '3513080', 'RANUGEDANG'),
   ('3513080009', '3513080', 'JANGKANG'),
   ('3513080010', '3513080', 'WEDUSAN'),
@@ -51578,7 +51578,7 @@ INSERT INTO `villages` VALUES
   ('3513110014', '3513110', 'ALASPANDAN'),
   ('3513110015', '3513110', 'BUCOR WETAN'),
   ('3513110016', '3513110', 'BUCOR KULON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3513110017', '3513110', 'GLAGAH'),
   ('3513120002', '3513120', 'SAMBIRAMPAK KIDUL'),
   ('3513120003', '3513120', 'SIDOMULYO'),
@@ -51629,7 +51629,7 @@ INSERT INTO `villages` VALUES
   ('3513140015', '3513140', 'ALAS KANDANG'),
   ('3513140016', '3513140', 'ALASSUMUR LOR'),
   ('3513140017', '3513140', 'SUMBERAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3513150001', '3513150', 'KREGENAN'),
   ('3513150002', '3513150', 'RONDOKUNING'),
   ('3513150003', '3513150', 'SEMAMPIR'),
@@ -51680,7 +51680,7 @@ INSERT INTO `villages` VALUES
   ('3513180003', '3513180', 'BRABE'),
   ('3513180004', '3513180', 'MARON KIDUL'),
   ('3513180005', '3513180', 'GERONGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3513180006', '3513180', 'SATREYAN'),
   ('3513180007', '3513180', 'BRANI WETAN'),
   ('3513180008', '3513180', 'BRANI KULON'),
@@ -51731,7 +51731,7 @@ INSERT INTO `villages` VALUES
   ('3513210009', '3513210', 'POHSANGIT NGISOR'),
   ('3513210010', '3513210', 'SEPUHGEMPOL'),
   ('3513210011', '3513210', 'SUMBERKARE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3513220001', '3513220', 'SAPIH'),
   ('3513220002', '3513220', 'NEGOROREJO'),
   ('3513220003', '3513220', 'BRANGGAH'),
@@ -51782,7 +51782,7 @@ INSERT INTO `villages` VALUES
   ('3514020003', '3514020', 'NGADIREJO'),
   ('3514020004', '3514020', 'ANDONO SARI'),
   ('3514020005', '3514020', 'WONOSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3514020006', '3514020', 'GENDRO'),
   ('3514020007', '3514020', 'TLOGOSARI'),
   ('3514020009', '3514020', 'PUNGGING'),
@@ -51833,7 +51833,7 @@ INSERT INTO `villages` VALUES
   ('3514060017', '3514060', 'POHGADING'),
   ('3514070001', '3514070', 'KEDEMUNGAN'),
   ('3514070002', '3514070', 'AMBAL AMBIL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3514070003', '3514070', 'KLANGRONG'),
   ('3514070004', '3514070', 'ORO ORO PULE'),
   ('3514070005', '3514070', 'LOROKAN'),
@@ -51884,7 +51884,7 @@ INSERT INTO `villages` VALUES
   ('3514090014', '3514090', 'PUCANGSARI'),
   ('3514090015', '3514090', 'KAYOMAN'),
   ('3514100001', '3514100', 'JATIARJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3514100002', '3514100', 'WATUAGUNG'),
   ('3514100003', '3514100', 'DAYUREJO'),
   ('3514100004', '3514100', 'BULUKANDANG'),
@@ -51935,7 +51935,7 @@ INSERT INTO `villages` VALUES
   ('3514130001', '3514130', 'WONOSUNYO'),
   ('3514130002', '3514130', 'SUMBER SUKO'),
   ('3514130003', '3514130', 'WONOSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3514130004', '3514130', 'KEPULUNGAN'),
   ('3514130005', '3514130', 'RANDUPITU'),
   ('3514130006', '3514130', 'NGERONG'),
@@ -51986,7 +51986,7 @@ INSERT INTO `villages` VALUES
   ('3514160011', '3514160', 'KEDUNG BANTENG'),
   ('3514160012', '3514160', 'OROOMBO WETAN'),
   ('3514160013', '3514160', 'OROOMBO KULON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3514160014', '3514160', 'PEKOREN'),
   ('3514160015', '3514160', 'PEJANGKUNGAN'),
   ('3514160016', '3514160', 'PANDEAN'),
@@ -52037,7 +52037,7 @@ INSERT INTO `villages` VALUES
   ('3514190013', '3514190', 'PATEGUHAN'),
   ('3514190014', '3514190', 'GROGOL'),
   ('3514190015', '3514190', 'PEKANGKUNGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3514190016', '3514190', 'GONDANG WETAN'),
   ('3514190017', '3514190', 'RANGGEH'),
   ('3514190018', '3514190', 'SEKAR PUTIH'),
@@ -52088,7 +52088,7 @@ INSERT INTO `villages` VALUES
   ('3514220010', '3514220', 'KEDAWUNG KULON'),
   ('3514220011', '3514220', 'KEDAWUNG WETAN'),
   ('3514220012', '3514220', 'SUMBER AGUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3514220013', '3514220', 'RANU KLINDUNGAN'),
   ('3514220014', '3514220', 'SUMBER DAWESARI'),
   ('3514220015', '3514220', 'CUKUR GONDANG'),
@@ -52139,7 +52139,7 @@ INSERT INTO `villages` VALUES
   ('3515010020', '3515010', 'KEDINDING'),
   ('3515020001', '3515020', 'PRAMBON'),
   ('3515020002', '3515020', 'KAJARTENGGULI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3515020003', '3515020', 'GEDANGROWO'),
   ('3515020004', '3515020', 'WIROBITING'),
   ('3515020005', '3515020', 'SIMPANG'),
@@ -52190,7 +52190,7 @@ INSERT INTO `villages` VALUES
   ('3515040018', '3515040', 'KEDUNGBOTO'),
   ('3515040019', '3515040', 'PESAWAHAN'),
   ('3515050001', '3515050', 'PANGGREH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3515050002', '3515050', 'TROMPOASRI'),
   ('3515050003', '3515050', 'KEDUNGREJO'),
   ('3515050004', '3515050', 'KEDUNGPANDAN'),
@@ -52241,7 +52241,7 @@ INSERT INTO `villages` VALUES
   ('3515070018', '3515070', 'SUMOKALI'),
   ('3515070019', '3515070', 'TENGGULUNAN'),
   ('3515070020', '3515070', 'BLIGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3515070021', '3515070', 'WEDORO KLURAK'),
   ('3515070022', '3515070', 'LARANGAN'),
   ('3515070023', '3515070', 'SEPANDE'),
@@ -52292,7 +52292,7 @@ INSERT INTO `villages` VALUES
   ('3515090023', '3515090', 'CANDINEGORO'),
   ('3515100001', '3515100', 'WILAYUT'),
   ('3515100002', '3515100', 'KEBONAGUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3515100003', '3515100', 'ANGGASWANGI'),
   ('3515100004', '3515100', 'JUMPUTREJO'),
   ('3515100006', '3515100', 'PEKARUNGAN'),
@@ -52343,7 +52343,7 @@ INSERT INTO `villages` VALUES
   ('3515120010', '3515120', 'DUKUHTENGAH'),
   ('3515120011', '3515120', 'BANJARSARI'),
   ('3515120012', '3515120', 'WADUNGASIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3515120013', '3515120', 'BANJARKEMANTREN'),
   ('3515120014', '3515120', 'SUKOREJO'),
   ('3515120015', '3515120', 'SIDOKEPUNG'),
@@ -52394,7 +52394,7 @@ INSERT INTO `villages` VALUES
   ('3515160002', '3515160', 'TROSOBO'),
   ('3515160003', '3515160', 'PERTAPAN MADURETNO'),
   ('3515160004', '3515160', 'TANJUNGSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3515160005', '3515160', 'SIDODADI'),
   ('3515160006', '3515160', 'BRINGINBENDO'),
   ('3515160007', '3515160', 'SAMBI BULU'),
@@ -52445,7 +52445,7 @@ INSERT INTO `villages` VALUES
   ('3515180008', '3515180', 'BAKALAN WRINGINPITU'),
   ('3515180009', '3515180', 'GAGANG KEPUHSARI'),
   ('3515180010', '3515180', 'SUWALUH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3515180011', '3515180', 'WATESARI'),
   ('3515180012', '3515180', 'SEKETI'),
   ('3515180013', '3515180', 'KEMANGSEN'),
@@ -52496,7 +52496,7 @@ INSERT INTO `villages` VALUES
   ('3516030003', '3516030', 'PACET'),
   ('3516030004', '3516030', 'PADUSAN'),
   ('3516030005', '3516030', 'CEPOKOLIMO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3516030006', '3516030', 'CLAKET'),
   ('3516030007', '3516030', 'CEMBOR'),
   ('3516030008', '3516030', 'NOGOSARI'),
@@ -52547,7 +52547,7 @@ INSERT INTO `villages` VALUES
   ('3516060004', '3516060', 'SEKARGADUNG'),
   ('3516060005', '3516060', 'TEMPURAN'),
   ('3516060006', '3516060', 'JATILANGKUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3516060007', '3516060', 'BANJARTANGGUL'),
   ('3516060008', '3516060', 'KALIPURO'),
   ('3516060009', '3516060', 'RANDUHARJO'),
@@ -52598,7 +52598,7 @@ INSERT INTO `villages` VALUES
   ('3516080018', '3516080', 'NGIMBANGAN'),
   ('3516080019', '3516080', 'LEMINGGIR'),
   ('3516090001', '3516090', 'SUMBERWONO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3516090002', '3516090', 'PETERONGAN'),
   ('3516090004', '3516090', 'KUTOPORONG'),
   ('3516090005', '3516090', 'NGASTEMI'),
@@ -52649,7 +52649,7 @@ INSERT INTO `villages` VALUES
   ('3516110012', '3516110', 'BALONGMOJO'),
   ('3516110013', '3516110', 'SUMOLAWANG'),
   ('3516110014', '3516110', 'TAMBAKAGUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3516110015', '3516110', 'KENANTEN'),
   ('3516110016', '3516110', 'BANJARAGUNG'),
   ('3516120001', '3516120', 'PAKIS'),
@@ -52700,7 +52700,7 @@ INSERT INTO `villages` VALUES
   ('3516150003', '3516150', 'KEDUNGSARI'),
   ('3516150004', '3516150', 'BERATKULON'),
   ('3516150005', '3516150', 'MOJOJAJAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3516150006', '3516150', 'MOJOSARIREJO'),
   ('3516150007', '3516150', 'MOJOWIRYO'),
   ('3516150008', '3516150', 'MOJOWATESREJO'),
@@ -52751,7 +52751,7 @@ INSERT INTO `villages` VALUES
   ('3517010003', '3517010', 'BARONG SAWAHAN'),
   ('3517010004', '3517010', 'KAYEN'),
   ('3517010005', '3517010', 'GONDANG MANIS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3517010006', '3517010', 'PUCANG SIMO'),
   ('3517010007', '3517010', 'BRODOT'),
   ('3517010008', '3517010', 'BRANGKAL'),
@@ -52802,7 +52802,7 @@ INSERT INTO `villages` VALUES
   ('3517040013', '3517040', 'PUNDONG'),
   ('3517040014', '3517040', 'DIWEK'),
   ('3517040016', '3517040', 'BANDUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3517040017', '3517040', 'KEDAWONG'),
   ('3517040018', '3517040', 'NGUDIREJO'),
   ('3517040019', '3517040', 'BALONG BESUK'),
@@ -52853,7 +52853,7 @@ INSERT INTO `villages` VALUES
   ('3517080001', '3517080', 'GALENGDOWO'),
   ('3517080002', '3517080', 'WONOMERTO'),
   ('3517080003', '3517080', 'JARAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3517080004', '3517080', 'SAMBIREJO'),
   ('3517080005', '3517080', 'WONOSALAM'),
   ('3517080006', '3517080', 'CARANGWULUNG'),
@@ -52904,7 +52904,7 @@ INSERT INTO `villages` VALUES
   ('3517110006', '3517110', 'MAYANGAN'),
   ('3517110007', '3517110', 'SUMBER MULYO'),
   ('3517110009', '3517110', 'TAMBAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3517110010', '3517110', 'JANTI'),
   ('3517110011', '3517110', 'SAMBIREJO'),
   ('3517120002', '3517120', 'KEPLAKSARI'),
@@ -52955,7 +52955,7 @@ INSERT INTO `villages` VALUES
   ('3517150001', '3517150', 'MOJOKRAPAK'),
   ('3517150002', '3517150', 'KALI KEJAMBON'),
   ('3517150003', '3517150', 'KEDUNG LOSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3517150004', '3517150', 'TAMPING MOJO'),
   ('3517150005', '3517150', 'PESANTREN'),
   ('3517150006', '3517150', 'TEMBELANG'),
@@ -53006,7 +53006,7 @@ INSERT INTO `villages` VALUES
   ('3517180004', '3517180', 'PLOSO'),
   ('3517180005', '3517180', 'JATIGEDONG'),
   ('3517180006', '3517180', 'DADI TUNGGAL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3517180007', '3517180', 'GEDONGOMBO'),
   ('3517180008', '3517180', 'JATIBANJAR'),
   ('3517180009', '3517180', 'PAGER TANJUNG'),
@@ -53057,7 +53057,7 @@ INSERT INTO `villages` VALUES
   ('3518020008', '3518020', 'MOJODUWUR'),
   ('3518020009', '3518020', 'KUNCIR'),
   ('3518030001', '3518030', 'SALAMROJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3518030002', '3518030', 'CEPOKO'),
   ('3518030003', '3518030', 'MAGUAN'),
   ('3518030004', '3518030', 'SEMARE'),
@@ -53108,7 +53108,7 @@ INSERT INTO `villages` VALUES
   ('3518050018', '3518050', 'KEPANJEN'),
   ('3518060001', '3518060', 'KEDUNG OMBO'),
   ('3518060004', '3518060', 'KAMPUNGBARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3518060005', '3518060', 'WATES'),
   ('3518060006', '3518060', 'MALANGSARI'),
   ('3518060007', '3518060', 'GETAS'),
@@ -53159,7 +53159,7 @@ INSERT INTO `villages` VALUES
   ('3518090013', '3518090', 'PANDAN TOYO'),
   ('3518100001', '3518100', 'LESTARI'),
   ('3518100002', '3518100', 'PISANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3518100004', '3518100', 'NGROMBOT'),
   ('3518100005', '3518100', 'TIRTOBINANGUN'),
   ('3518100006', '3518100', 'ROWOMARTO'),
@@ -53210,7 +53210,7 @@ INSERT INTO `villages` VALUES
   ('3518140009', '3518140', 'GANUNG KIDUL'),
   ('3518140010', '3518140', 'MANGUN DIKARAN'),
   ('3518140011', '3518140', 'WERUNGOTOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3518140012', '3518140', 'BEGADUNG'),
   ('3518140013', '3518140', 'RINGIN ANOM'),
   ('3518140014', '3518140', 'KEDUNG DOWO'),
@@ -53261,7 +53261,7 @@ INSERT INTO `villages` VALUES
   ('3518170023', '3518170', 'TRITIK'),
   ('3518170024', '3518170', 'BENDA ASRI'),
   ('3518180001', '3518180', 'SUGIHWARAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3518180003', '3518180', 'TEMPURAN'),
   ('3518180004', '3518180', 'LENGKONG LOR'),
   ('3518180005', '3518180', 'GAMPENG'),
@@ -53312,7 +53312,7 @@ INSERT INTO `villages` VALUES
   ('3519020010', '3519020', 'PAGOTAN'),
   ('3519020011', '3519020', 'JOGODAYUH'),
   ('3519020012', '3519020', 'NGLANDUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3519020013', '3519020', 'SAMBEREJO'),
   ('3519020014', '3519020', 'PUTAT'),
   ('3519020015', '3519020', 'SANGEN'),
@@ -53363,7 +53363,7 @@ INSERT INTO `villages` VALUES
   ('3519060006', '3519060', 'RANDUALAS'),
   ('3519060007', '3519060', 'CERMO'),
   ('3519060008', '3519060', 'MORANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3519070001', '3519070', 'BATOK'),
   ('3519070002', '3519070', 'DURENAN'),
   ('3519070003', '3519070', 'WINONG'),
@@ -53414,7 +53414,7 @@ INSERT INTO `villages` VALUES
   ('3519110002', '3519110', 'JATIREJO'),
   ('3519110003', '3519110', 'BANYUKAMBANG'),
   ('3519110004', '3519110', 'SIDOMULYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3519110005', '3519110', 'PLUMPUNGREJO'),
   ('3519110006', '3519110', 'WONOASRI'),
   ('3519110007', '3519110', 'BANCONG'),
@@ -53465,7 +53465,7 @@ INSERT INTO `villages` VALUES
   ('3519150003', '3519150', 'METESIH'),
   ('3519150004', '3519150', 'JIWAN'),
   ('3519150005', '3519150', 'SUKOLILO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3519150006', '3519150', 'KINCANG WETAN'),
   ('3519150007', '3519150', 'KWANGSEN'),
   ('3519150008', '3519150', 'GROBOGAN'),
@@ -53516,7 +53516,7 @@ INSERT INTO `villages` VALUES
   ('3520041005', '3520041', 'NGUNTORONADI'),
   ('3520041006', '3520041', 'DRIYOREJO'),
   ('3520041007', '3520041', 'SIMBATAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3520041008', '3520041', 'PURWOREJO'),
   ('3520041009', '3520041', 'KENONGOMULYO'),
   ('3520050002', '3520050', 'GIRIPURNO'),
@@ -53567,7 +53567,7 @@ INSERT INTO `villages` VALUES
   ('3520070007', '3520070', 'SUMBERAGUNG'),
   ('3520070008', '3520070', 'NITIKAN'),
   ('3520070009', '3520070', 'SIDOMUKTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3520070010', '3520070', 'BULUHARJO'),
   ('3520070011', '3520070', 'PLAOSAN'),
   ('3520070012', '3520070', 'DADI'),
@@ -53618,7 +53618,7 @@ INSERT INTO `villages` VALUES
   ('3520100005', '3520100', 'TEGALARUM'),
   ('3520100006', '3520100', 'BULAK'),
   ('3520100007', '3520100', 'SOCO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3520100008', '3520100', 'CARIKAN'),
   ('3520100009', '3520100', 'BENDO'),
   ('3520100013', '3520100', 'KLECO'),
@@ -53669,7 +53669,7 @@ INSERT INTO `villages` VALUES
   ('3520130008', '3520130', 'KLAGEN'),
   ('3520130014', '3520130', 'BANGUNASRI'),
   ('3520130015', '3520130', 'BLARAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3520130016', '3520130', 'MANGGE'),
   ('3520130017', '3520130', 'JONGGRANG'),
   ('3520130023', '3520130', 'REJOMULYO'),
@@ -53720,7 +53720,7 @@ INSERT INTO `villages` VALUES
   ('3521030006', '3521030', 'TALANG'),
   ('3521030007', '3521030', 'MACANAN'),
   ('3521030009', '3521030', 'JOGOROGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3521030010', '3521030', 'DAWUNG'),
   ('3521030011', '3521030', 'TANJUNGSARI'),
   ('3521030012', '3521030', 'SOCO'),
@@ -53771,7 +53771,7 @@ INSERT INTO `villages` VALUES
   ('3521080001', '3521080', 'CAMPUR ASRI'),
   ('3521080002', '3521080', 'DANGUK'),
   ('3521080003', '3521080', 'GEMPOL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3521080004', '3521080', 'RINGIN ANOM'),
   ('3521080006', '3521080', 'SIDOREJO'),
   ('3521080007', '3521080', 'DUNGMIRI'),
@@ -53822,7 +53822,7 @@ INSERT INTO `villages` VALUES
   ('3521110007', '3521110', 'GRUDO'),
   ('3521110008', '3521110', 'MARGOMULYO'),
   ('3521110009', '3521110', 'KARANG TENGAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3521110011', '3521110', 'KETANGGI'),
   ('3521110012', '3521110', 'KARANGASRI'),
   ('3521110013', '3521110', 'NGAWI'),
@@ -53873,7 +53873,7 @@ INSERT INTO `villages` VALUES
   ('3521150010', '3521150', 'WIDODAREN'),
   ('3521150011', '3521150', 'GENDINGAN'),
   ('3521150012', '3521150', 'KAUMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3521160001', '3521160', 'TAMBAK BOYO'),
   ('3521160002', '3521160', 'PAKAH'),
   ('3521160003', '3521160', 'KEDUNGHARJO'),
@@ -53924,7 +53924,7 @@ INSERT INTO `villages` VALUES
   ('3522030015', '3522030', 'PENGKOL'),
   ('3522030016', '3522030', 'TANJUNG'),
   ('3522030017', '3522030', 'GAMONGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3522030018', '3522030', 'KALISUMBER'),
   ('3522040007', '3522040', 'NGLAMPIN'),
   ('3522040008', '3522040', 'KARANGMANGU'),
@@ -53975,7 +53975,7 @@ INSERT INTO `villages` VALUES
   ('3522080001', '3522080', 'BABAD'),
   ('3522080002', '3522080', 'PEJOK'),
   ('3522080003', '3522080', 'DAYUKIDUL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3522080004', '3522080', 'PANJANG'),
   ('3522080005', '3522080', 'TONDOMULO'),
   ('3522080006', '3522080', 'KESONGO'),
@@ -54026,7 +54026,7 @@ INSERT INTO `villages` VALUES
   ('3522100010', '3522100', 'SUMURAGUNG'),
   ('3522100011', '3522100', 'GAJAH'),
   ('3522100012', '3522100', 'GUNUNGSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3522100013', '3522100', 'KALISARI'),
   ('3522100014', '3522100', 'TANGGUNGAN'),
   ('3522100015', '3522100', 'LEBAKSARI'),
@@ -54077,7 +54077,7 @@ INSERT INTO `villages` VALUES
   ('3522120016', '3522120', 'TULUNGREJO'),
   ('3522120017', '3522120', 'KARANG DINOYO'),
   ('3522120018', '3522120', 'BUTOH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3522120019', '3522120', 'MARGOAGUNG'),
   ('3522120020', '3522120', 'JATIGEDE'),
   ('3522120021', '3522120', 'BOGANGIN'),
@@ -54128,7 +54128,7 @@ INSERT INTO `villages` VALUES
   ('3522150009', '3522150', 'KALIANYAR'),
   ('3522150010', '3522150', 'NGAMPEL'),
   ('3522150011', '3522150', 'SAMBIROTO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3522150012', '3522150', 'TIKUSAN'),
   ('3522150013', '3522150', 'SUKOWATI'),
   ('3522150014', '3522150', 'KLAMPOK'),
@@ -54179,7 +54179,7 @@ INSERT INTO `villages` VALUES
   ('3522180010', '3522180', 'SENDANGREJO'),
   ('3522180011', '3522180', 'KARANGSONO'),
   ('3522180012', '3522180', 'SUMBER AGUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3522180013', '3522180', 'NGUMPAK DALEM'),
   ('3522180014', '3522180', 'SUMBER TLASEH'),
   ('3522180015', '3522180', 'NGULANAN'),
@@ -54230,7 +54230,7 @@ INSERT INTO `villages` VALUES
   ('3522210003', '3522210', 'KEMIRI'),
   ('3522210004', '3522210', 'PETAK'),
   ('3522210005', '3522210', 'KLITEH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3522210006', '3522210', 'SUDAH'),
   ('3522210008', '3522210', 'TAMBAKROMO'),
   ('3522210009', '3522210', 'SUMBEREJO'),
@@ -54281,7 +54281,7 @@ INSERT INTO `villages` VALUES
   ('3523010001', '3523010', 'SOKOGUNUNG'),
   ('3523010002', '3523010', 'JAMPRONG'),
   ('3523010003', '3523010', 'BENDONGLATENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3523010004', '3523010', 'SIDOREJO'),
   ('3523010005', '3523010', 'SOKOGRENJENG'),
   ('3523010006', '3523010', 'SIDOHASRI'),
@@ -54332,7 +54332,7 @@ INSERT INTO `villages` VALUES
   ('3523050006', '3523050', 'JETAK'),
   ('3523050007', '3523050', 'TALUN'),
   ('3523050008', '3523050', 'PUCANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3523050009', '3523050', 'PAKEL'),
   ('3523050010', '3523050', 'MONTONGSEKAR'),
   ('3523050011', '3523050', 'TALANGKEMBAR'),
@@ -54383,7 +54383,7 @@ INSERT INTO `villages` VALUES
   ('3523080004', '3523080', 'TAMBAKREJO'),
   ('3523080005', '3523080', 'KANOREJO'),
   ('3523080006', '3523080', 'NGADIREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3523080007', '3523080', 'SUMBEREJO'),
   ('3523080008', '3523080', 'CAMPUREJO'),
   ('3523080009', '3523080', 'BANJARARUM'),
@@ -54434,7 +54434,7 @@ INSERT INTO `villages` VALUES
   ('3523100015', '3523100', 'MLANGI'),
   ('3523110001', '3523110', 'NGIMBANG'),
   ('3523110002', '3523110', 'WANGUN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3523110003', '3523110', 'KETAMBUL'),
   ('3523110004', '3523110', 'CEPOKOREJO'),
   ('3523110005', '3523110', 'PLIWETAN'),
@@ -54485,7 +54485,7 @@ INSERT INTO `villages` VALUES
   ('3523130016', '3523130', 'KINGKING'),
   ('3523130017', '3523130', 'KARANGSARI'),
   ('3523140001', '3523140', 'KARANGASEM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3523140002', '3523140', 'SOCOREJO'),
   ('3523140003', '3523140', 'TEMAJI'),
   ('3523140004', '3523140', 'PURWOREJO'),
@@ -54536,7 +54536,7 @@ INSERT INTO `villages` VALUES
   ('3523170001', '3523170', 'NGULAHAN'),
   ('3523170002', '3523170', 'DIKIR'),
   ('3523170003', '3523170', 'MANDER');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3523170004', '3523170', 'PLAJAN'),
   ('3523170005', '3523170', 'BELIKANGET'),
   ('3523170006', '3523170', 'COKROWATI'),
@@ -54587,7 +54587,7 @@ INSERT INTO `villages` VALUES
   ('3523190016', '3523190', 'SUKOLILO'),
   ('3523190017', '3523190', 'BULUJOWO'),
   ('3523190018', '3523190', 'BULUMEDURO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3523190019', '3523190', 'BANJAREJO'),
   ('3523190020', '3523190', 'TERGAMBANG'),
   ('3523190021', '3523190', 'SEMBUNGIN'),
@@ -54638,7 +54638,7 @@ INSERT INTO `villages` VALUES
   ('3524040010', '3524040', 'TENGGIRING'),
   ('3524040011', '3524040', 'SEMAMPIREJO'),
   ('3524040012', '3524040', 'SIDOKUMPUL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3524040013', '3524040', 'PASARLEGI'),
   ('3524040014', '3524040', 'SUMBERSARI'),
   ('3524040015', '3524040', 'PATAAN'),
@@ -54689,7 +54689,7 @@ INSERT INTO `villages` VALUES
   ('3524070010', '3524070', 'KEDUNGBANJAR'),
   ('3524070011', '3524070', 'BAKALREJO'),
   ('3524070013', '3524070', 'SUGIO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3524070014', '3524070', 'SEKARBAGUS'),
   ('3524070015', '3524070', 'JUBEL KIDUL'),
   ('3524070016', '3524070', 'JUBEL LOR'),
@@ -54740,7 +54740,7 @@ INSERT INTO `villages` VALUES
   ('3524100004', '3524100', 'GENDONG KULON'),
   ('3524100005', '3524100', 'KURIPAN'),
   ('3524100006', '3524100', 'BULUMARGI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3524100007', '3524100', 'SAMBANGAN'),
   ('3524100008', '3524100', 'KEYONGAN'),
   ('3524100009', '3524100', 'PATIHAN'),
@@ -54791,7 +54791,7 @@ INSERT INTO `villages` VALUES
   ('3524120017', '3524120', 'KEBONSARI'),
   ('3524120018', '3524120', 'SUKOLILO'),
   ('3524120019', '3524120', 'PAJANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3524120020', '3524120', 'MADULEGI'),
   ('3524130001', '3524130', 'RANCANG KENCONO'),
   ('3524130002', '3524130', 'WAJIK'),
@@ -54842,7 +54842,7 @@ INSERT INTO `villages` VALUES
   ('3524150008', '3524150', 'SIDOBINANGUN'),
   ('3524150009', '3524150', 'SUGIHWARAS'),
   ('3524150010', '3524150', 'SIDOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3524150011', '3524150', 'DLANGGU'),
   ('3524150012', '3524150', 'DINOYO'),
   ('3524150013', '3524150', 'BABATAGUNG'),
@@ -54893,7 +54893,7 @@ INSERT INTO `villages` VALUES
   ('3524170014', '3524170', 'SAMBOPINGGIR'),
   ('3524170015', '3524170', 'PUTATBANGAH'),
   ('3524170016', '3524170', 'BANYUURIP');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3524170017', '3524170', 'BANJAREJO'),
   ('3524170018', '3524170', 'PALANGAN'),
   ('3524170019', '3524170', 'MAYONG'),
@@ -54944,7 +54944,7 @@ INSERT INTO `villages` VALUES
   ('3524200006', '3524200', 'KARANGGENENG'),
   ('3524200007', '3524200', 'SUMBERWUDI'),
   ('3524200008', '3524200', 'KARANGWUNGU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3524200009', '3524200', 'JAGRAN'),
   ('3524200010', '3524200', 'KAWISTOLEGI'),
   ('3524200011', '3524200', 'SONOADI'),
@@ -54995,7 +54995,7 @@ INSERT INTO `villages` VALUES
   ('3524230006', '3524230', 'DATENG'),
   ('3524230007', '3524230', 'GELAP'),
   ('3524230008', '3524230', 'MOJO ASEM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3524230009', '3524230', 'SISER'),
   ('3524230010', '3524230', 'BULUTIGO'),
   ('3524230011', '3524230', 'PELANGWOT'),
@@ -55046,7 +55046,7 @@ INSERT INTO `villages` VALUES
   ('3525010003', '3525010', 'WRINGINANOM'),
   ('3525010004', '3525010', 'LEBANISUKO'),
   ('3525010005', '3525010', 'LEBANIWARAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3525010006', '3525010', 'SUMENGKO'),
   ('3525010007', '3525010', 'PASINAN LEMAHPUTIH'),
   ('3525010008', '3525010', 'WATESTANJUNG'),
@@ -55097,7 +55097,7 @@ INSERT INTO `villages` VALUES
   ('3525040013', '3525040', 'SIDOJANGKUNG'),
   ('3525040014', '3525040', 'DOMAS'),
   ('3525040015', '3525040', 'GADINGWATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3525040016', '3525040', 'BETON'),
   ('3525040017', '3525040', 'PUTAT LOR'),
   ('3525040018', '3525040', 'BOTENG'),
@@ -55148,7 +55148,7 @@ INSERT INTO `villages` VALUES
   ('3525060019', '3525060', 'BANTER'),
   ('3525060020', '3525060', 'METATU'),
   ('3525060021', '3525060', 'JOGODALU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3525060022', '3525060', 'PUNDUTTRATE'),
   ('3525060023', '3525060', 'JATIREMBE'),
   ('3525070001', '3525070', 'JOMBANGDELIK'),
@@ -55199,7 +55199,7 @@ INSERT INTO `villages` VALUES
   ('3525090001', '3525090', 'KEDANYANG'),
   ('3525090002', '3525090', 'PRAMBANGAN'),
   ('3525090003', '3525090', 'GULOMANTUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3525090004', '3525090', 'SUKOREJO'),
   ('3525090005', '3525090', 'SEGOROMADU'),
   ('3525090006', '3525090', 'TENGGULUNAN'),
@@ -55250,7 +55250,7 @@ INSERT INTO `villages` VALUES
   ('3525110010', '3525110', 'MANYAREJO'),
   ('3525110011', '3525110', 'MANYARSIDOMUKTI'),
   ('3525110012', '3525110', 'MANYARSIDORUKUN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3525110013', '3525110', 'BANYUWANGI'),
   ('3525110014', '3525110', 'KARANGREJO'),
   ('3525110015', '3525110', 'SEMBAYAT'),
@@ -55301,7 +55301,7 @@ INSERT INTO `villages` VALUES
   ('3525130017', '3525130', 'SROWO'),
   ('3525130018', '3525130', 'GOLOKAN'),
   ('3525130019', '3525130', 'SAMBIPONDOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3525130020', '3525130', 'WADENG'),
   ('3525130021', '3525130', 'GEDANGAN'),
   ('3525140001', '3525140', 'SAWO'),
@@ -55352,7 +55352,7 @@ INSERT INTO `villages` VALUES
   ('3525160011', '3525160', 'BANYUURIP'),
   ('3525160012', '3525160', 'PANGKAH KULON'),
   ('3525160013', '3525160', 'PANGKAH WETAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3525170001', '3525170', 'KUMALASA'),
   ('3525170002', '3525170', 'LEBAK'),
   ('3525170003', '3525170', 'BULULANJANG'),
@@ -55403,7 +55403,7 @@ INSERT INTO `villages` VALUES
   ('3526020013', '3526020', 'PETAPAN'),
   ('3526030002', '3526030', 'KWANYAR BARAT'),
   ('3526030003', '3526030', 'PASANGGRAHAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3526030004', '3526030', 'KARANGANYAR'),
   ('3526030005', '3526030', 'BATAH BARAT'),
   ('3526030006', '3526030', 'BATAH TIMUR'),
@@ -55454,7 +55454,7 @@ INSERT INTO `villages` VALUES
   ('3526060002', '3526060', 'DURIN BARAT'),
   ('3526060003', '3526060', 'KANEGARAH'),
   ('3526060004', '3526060', 'BATOKABAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3526060005', '3526060', 'DURIN TIMUR'),
   ('3526060006', '3526060', 'PAKES'),
   ('3526060007', '3526060', 'BANDUNG'),
@@ -55505,7 +55505,7 @@ INSERT INTO `villages` VALUES
   ('3526080020', '3526080', 'MRECAH'),
   ('3526080021', '3526080', 'BUDDAN'),
   ('3526080022', '3526080', 'POTER');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3526080023', '3526080', 'BASANAH'),
   ('3526090001', '3526090', 'ALANG ALANG'),
   ('3526090002', '3526090', 'KEMONENG'),
@@ -55556,7 +55556,7 @@ INSERT INTO `villages` VALUES
   ('3526120009', '3526120', 'SOBIH'),
   ('3526120010', '3526120', 'TONJUNG'),
   ('3526120011', '3526120', 'KAPOR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3526120012', '3526120', 'AROK'),
   ('3526130001', '3526130', 'PANDAN LANJANG'),
   ('3526130002', '3526130', 'BATONAONG'),
@@ -55607,7 +55607,7 @@ INSERT INTO `villages` VALUES
   ('3526160009', '3526160', 'TELAGA BIRU'),
   ('3526160010', '3526160', 'TANJUNG BUMI'),
   ('3526160011', '3526160', 'MACAJAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3526160012', '3526160', 'TLANGOH'),
   ('3526160013', '3526160', 'BANYU SANGKAH'),
   ('3526160014', '3526160', 'AENGTABAR'),
@@ -55658,7 +55658,7 @@ INSERT INTO `villages` VALUES
   ('3527010012', '3527010', 'JUNOK'),
   ('3527020007', '3527020', 'DULANG'),
   ('3527020008', '3527020', 'PATARONGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3527020009', '3527020', 'PANGONGSEAN'),
   ('3527020010', '3527020', 'KRAMPON'),
   ('3527020011', '3527020', 'BRINGIN NONGGAL'),
@@ -55709,7 +55709,7 @@ INSERT INTO `villages` VALUES
   ('3527050001', '3527050', 'KEBUN SAREH'),
   ('3527050002', '3527050', 'KARANG NANGGER'),
   ('3527050003', '3527050', 'NAPOLAOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3527050004', '3527050', 'ASTAPAH'),
   ('3527050005', '3527050', 'GERSEMPAL'),
   ('3527050007', '3527050', 'MADULANG'),
@@ -55760,7 +55760,7 @@ INSERT INTO `villages` VALUES
   ('3527080003', '3527080', 'SAMARAN'),
   ('3527080004', '3527080', 'BERINGIN'),
   ('3527080005', '3527080', 'MAMBULU BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3527080006', '3527080', 'BARUNG GAGAH'),
   ('3527080007', '3527080', 'TAMBELANGAN'),
   ('3527080008', '3527080', 'SOMBER'),
@@ -55811,7 +55811,7 @@ INSERT INTO `villages` VALUES
   ('3527110009', '3527110', 'KETAPANG DAYA'),
   ('3527110010', '3527110', 'KETAPANG LAOK'),
   ('3527110011', '3527110', 'KETAPANG BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3527110012', '3527110', 'PAOPALE DAYA'),
   ('3527110013', '3527110', 'RABIYAN'),
   ('3527110014', '3527110', 'BANYUSOKAH'),
@@ -55862,7 +55862,7 @@ INSERT INTO `villages` VALUES
   ('3528030001', '3528030', 'KONANG'),
   ('3528030002', '3528030', 'PANDAN'),
   ('3528030004', '3528030', 'GALIS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3528030005', '3528030', 'BULAY'),
   ('3528030006', '3528030', 'TOBUNGAN'),
   ('3528030007', '3528030', 'PAGENDINGAN'),
@@ -55913,7 +55913,7 @@ INSERT INTO `villages` VALUES
   ('3528060011', '3528060', 'PANGBATOK'),
   ('3528060012', '3528060', 'PANAGUAN'),
   ('3528060013', '3528060', 'CAMPOR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3528060014', '3528060', 'JAMBRINGIN'),
   ('3528060015', '3528060', 'PROPPO'),
   ('3528060016', '3528060', 'MAPPER'),
@@ -55964,7 +55964,7 @@ INSERT INTO `villages` VALUES
   ('3528100001', '3528100', 'BICORONG'),
   ('3528100002', '3528100', 'KLOMPANG BARAT'),
   ('3528100003', '3528100', 'KLOMPANG TIMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3528100004', '3528100', 'BAJANG'),
   ('3528100006', '3528100', 'BANBAN'),
   ('3528100007', '3528100', 'SOMALANG'),
@@ -56015,7 +56015,7 @@ INSERT INTO `villages` VALUES
   ('3529010008', '3529010', 'PAKAMBAN LAOK'),
   ('3529010009', '3529010', 'JADDUNG'),
   ('3529010010', '3529010', 'PRAGAAN LAOK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3529010011', '3529010', 'PRAGAAN DAYA'),
   ('3529010012', '3529010', 'PRENDUAN'),
   ('3529010013', '3529010', 'AENGPANAS'),
@@ -56066,7 +56066,7 @@ INSERT INTO `villages` VALUES
   ('3529050003', '3529050', 'ESSANG'),
   ('3529050004', '3529050', 'KOMBANG'),
   ('3529050005', '3529050', 'POTERAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3529050006', '3529050', 'PALASA'),
   ('3529050007', '3529050', 'GAPURANA'),
   ('3529050008', '3529050', 'TALANGO'),
@@ -56117,7 +56117,7 @@ INSERT INTO `villages` VALUES
   ('3529080017', '3529080', 'ELLAK DAYA'),
   ('3529080018', '3529080', 'ELLAK LAOK'),
   ('3529080019', '3529080', 'LENTENG TIMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3529080020', '3529080', 'LENTENG BARAT'),
   ('3529090001', '3529090', 'KETAWANG PAREBAAN'),
   ('3529090002', '3529090', 'BATAAL BARAT'),
@@ -56168,7 +56168,7 @@ INSERT INTO `villages` VALUES
   ('3529120013', '3529120', 'BELUK ARES'),
   ('3529120015', '3529120', 'BELUK RAJA'),
   ('3529130001', '3529130', 'BASOKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3529130002', '3529130', 'MANDALA'),
   ('3529130003', '3529130', 'KARANGNANGKA'),
   ('3529130004', '3529130', 'PAKONDANG'),
@@ -56219,7 +56219,7 @@ INSERT INTO `villages` VALUES
   ('3529160013', '3529160', 'BULAAN'),
   ('3529160014', '3529160', 'SERGANG'),
   ('3529170001', '3529170', 'POJA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3529170002', '3529170', 'BERAJI'),
   ('3529170003', '3529170', 'KARANG BUDI'),
   ('3529170004', '3529170', 'BABAN'),
@@ -56270,7 +56270,7 @@ INSERT INTO `villages` VALUES
   ('3529200002', '3529200', 'SOKARAME TIMUR'),
   ('3529200003', '3529200', 'TANAHMERAH'),
   ('3529200004', '3529200', 'SOMBER');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3529200005', '3529200', 'SONOK'),
   ('3529200006', '3529200', 'NONGGUNONG'),
   ('3529200007', '3529200', 'ROSONG'),
@@ -56321,7 +56321,7 @@ INSERT INTO `villages` VALUES
   ('3529240020', '3529240', 'SUMBERNANGKA'),
   ('3529240021', '3529240', 'KALIKATAK'),
   ('3529240022', '3529240', 'ANGON ANGON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3529240023', '3529240', 'SAMBAKATI'),
   ('3529240024', '3529240', 'PANDEMAN'),
   ('3529240025', '3529240', 'PABIAN'),
@@ -56372,7 +56372,7 @@ INSERT INTO `villages` VALUES
   ('3571030002', '3571030', 'BAWANG'),
   ('3571030004', '3571030', 'TOSAREN'),
   ('3571030005', '3571030', 'BANARAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3571030006', '3571030', 'NGLETIH'),
   ('3571030007', '3571030', 'TEMPUREJO'),
   ('3571030008', '3571030', 'KETAMI'),
@@ -56423,7 +56423,7 @@ INSERT INTO `villages` VALUES
   ('3573020008', '3573020', 'BANDULAN'),
   ('3573020009', '3573020', 'TANJUNGREJO'),
   ('3573020010', '3573020', 'PISANG CANDI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3573020011', '3573020', 'KARANG BESUKI'),
   ('3573030001', '3573030', 'KASIN'),
   ('3573030002', '3573030', 'SUKOHARJO'),
@@ -56474,7 +56474,7 @@ INSERT INTO `villages` VALUES
   ('3574020002', '3574020', 'JREBENG KIDUL'),
   ('3574020003', '3574020', 'PAKISTAJI'),
   ('3574020004', '3574020', 'KEDUNGGALENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3574020005', '3574020', 'KEDUNGASEM'),
   ('3574020006', '3574020', 'SUMBERTAMAN'),
   ('3574030005', '3574030', 'WIROBORANG'),
@@ -56525,7 +56525,7 @@ INSERT INTO `villages` VALUES
   ('3576010005', '3576010', 'BLOOTO'),
   ('3576010006', '3576010', 'MENTIKAN'),
   ('3576010007', '3576010', 'KAUMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3576010008', '3576010', 'PULOREJO'),
   ('3576020002', '3576020', 'GUNUNG GEDANGAN'),
   ('3576020004', '3576020', 'BALONGSARI'),
@@ -56576,7 +56576,7 @@ INSERT INTO `villages` VALUES
   ('3578040001', '3578040', 'SIWALANKERTO'),
   ('3578040002', '3578040', 'JEMUR WONOSARI'),
   ('3578040003', '3578040', 'MARGOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3578040004', '3578040', 'BENDUL MERISI'),
   ('3578040005', '3578040', 'SIDOSERMO'),
   ('3578050001', '3578050', 'KUTISARI'),
@@ -56627,7 +56627,7 @@ INSERT INTO `villages` VALUES
   ('3578130004', '3578130', 'JAJAR TUNGGAL'),
   ('3578140001', '3578140', 'BANGKINGAN'),
   ('3578140003', '3578140', 'LIDAH WETAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3578140004', '3578140', 'LIDAH KULON'),
   ('3578140006', '3578140', 'LAKARSANTRI'),
   ('3578141001', '3578141', 'MADE'),
@@ -56678,7 +56678,7 @@ INSERT INTO `villages` VALUES
   ('3578211006', '3578211', 'SUKOLILO BARU'),
   ('3578220001', '3578220', 'KAPASAN'),
   ('3578220002', '3578220', 'TAMBAKREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3578220003', '3578220', 'SIMOKERTO'),
   ('3578220004', '3578220', 'SIDODADI'),
   ('3578220005', '3578220', 'SIMOLAWANG'),
@@ -56729,7 +56729,7 @@ INSERT INTO `villages` VALUES
   ('3579030002', '3579030', 'BUMIAJI'),
   ('3579030003', '3579030', 'BULUKERTO'),
   ('3579030004', '3579030', 'GUNUNGSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3579030006', '3579030', 'TULUNGREJO'),
   ('3579030007', '3579030', 'SUMBERGONDO'),
   ('3579030008', '3579030', 'GIRIPURNO'),
@@ -56780,7 +56780,7 @@ INSERT INTO `villages` VALUES
   ('3601040009', '3601040', 'RANCASENENG'),
   ('3601040010', '3601040', 'SUKASENENG'),
   ('3601040011', '3601040', 'CIKEUSIK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3601040012', '3601040', 'LEUWIBALANG'),
   ('3601040013', '3601040', 'CURUGCIUNG'),
   ('3601040014', '3601040', 'CIKADONGDONG'),
@@ -56831,7 +56831,7 @@ INSERT INTO `villages` VALUES
   ('3601072005', '3601072', 'PASIRTENJO'),
   ('3601072006', '3601072', 'SINDANGRESMI'),
   ('3601072007', '3601072', 'PASIRLANCAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3601072008', '3601072', 'PASIRDURUNG'),
   ('3601072009', '3601072', 'KADUMALATI'),
   ('3601080001', '3601080', 'CIHERANG'),
@@ -56882,7 +56882,7 @@ INSERT INTO `villages` VALUES
   ('3601110026', '3601110', 'SURAKARTA'),
   ('3601110027', '3601110', 'HARAPANKARYA'),
   ('3601110029', '3601110', 'MONTOR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3601110030', '3601110', 'KARTASANA'),
   ('3601110031', '3601110', 'SENANGSARI'),
   ('3601110032', '3601110', 'SINDANGLAYA'),
@@ -56933,7 +56933,7 @@ INSERT INTO `villages` VALUES
   ('3601130014', '3601130', 'BABADSARI'),
   ('3601130015', '3601130', 'JANAKA'),
   ('3601130016', '3601130', 'SUKAMANAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3601130018', '3601130', 'SIKULAN'),
   ('3601130019', '3601130', 'CITAMAN'),
   ('3601130020', '3601130', 'JAYAMEKAR'),
@@ -56984,7 +56984,7 @@ INSERT INTO `villages` VALUES
   ('3601160008', '3601160', 'KADUDODOL'),
   ('3601160009', '3601160', 'GUNUNGDATAR'),
   ('3601160011', '3601160', 'SEKONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3601160019', '3601160', 'CIMANUK'),
   ('3601160020', '3601160', 'BATUBANTAR'),
   ('3601160021', '3601160', 'ROCEK'),
@@ -57035,7 +57035,7 @@ INSERT INTO `villages` VALUES
   ('3601180004', '3601180', 'BABAKAN KALANGANYAR'),
   ('3601180005', '3601180', 'KABAYAN'),
   ('3601180006', '3601180', 'PANDEGLANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3601181001', '3601181', 'SUKARATU'),
   ('3601181002', '3601181', 'KARATON'),
   ('3601181003', '3601181', 'CILAJA'),
@@ -57086,7 +57086,7 @@ INSERT INTO `villages` VALUES
   ('3602011003', '3602011', 'SUKATANI'),
   ('3602011004', '3602011', 'CIKEUSIK'),
   ('3602011005', '3602011', 'BEJOD');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3602011006', '3602011', 'CIPEDANG'),
   ('3602011007', '3602011', 'CISARAP'),
   ('3602011008', '3602011', 'PARUNGSARI'),
@@ -57137,7 +57137,7 @@ INSERT INTO `villages` VALUES
   ('3602031010', '3602031', 'GUNUNGBATU'),
   ('3602040001', '3602040', 'CIKOTOK'),
   ('3602040002', '3602040', 'CIBEBER');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3602040003', '3602040', 'WARUNGBANTEN'),
   ('3602040004', '3602040', 'NEGLASARI'),
   ('3602040005', '3602040', 'MEKARSARI'),
@@ -57188,7 +57188,7 @@ INSERT INTO `villages` VALUES
   ('3602060009', '3602060', 'JALUPANG GIRANG'),
   ('3602060010', '3602060', 'CIDAHU'),
   ('3602060011', '3602060', 'KEUSIK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3602060012', '3602060', 'CIRUJI'),
   ('3602060013', '3602060', 'CIBATURKEUSIK'),
   ('3602060014', '3602060', 'BENDUNGAN'),
@@ -57239,7 +57239,7 @@ INSERT INTO `villages` VALUES
   ('3602091008', '3602091', 'CEMPAKA'),
   ('3602091009', '3602091', 'BADUR'),
   ('3602091010', '3602091', 'CIBARANI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3602100001', '3602100', 'KANEKES'),
   ('3602100002', '3602100', 'NAYAGATI'),
   ('3602100003', '3602100', 'BOJONG MENTENG'),
@@ -57290,7 +57290,7 @@ INSERT INTO `villages` VALUES
   ('3602120020', '3602120', 'HARUMSARI'),
   ('3602121001', '3602121', 'LEBAKGEDONG'),
   ('3602121002', '3602121', 'LEBAKSITU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3602121003', '3602121', 'CILADAEUN'),
   ('3602121004', '3602121', 'BANJARSARI'),
   ('3602121005', '3602121', 'LEBAKSANGKA'),
@@ -57341,7 +57341,7 @@ INSERT INTO `villages` VALUES
   ('3602150012', '3602150', 'PARAGE'),
   ('3602150013', '3602150', 'PASIR GINTUNG'),
   ('3602160001', '3602160', 'PASIRTANGKIL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3602160002', '3602160', 'SUKARENDAH'),
   ('3602160003', '3602160', 'SELARAJA'),
   ('3602160004', '3602160', 'WARUNGGUNUNG'),
@@ -57392,7 +57392,7 @@ INSERT INTO `villages` VALUES
   ('3602181006', '3602181', 'SANGIANG TANJUNG'),
   ('3602181007', '3602181', 'CIKATAPIS'),
   ('3602190008', '3602190', 'CILANGKAP');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3602190009', '3602190', 'PASIR KECAPI'),
   ('3602190012', '3602190', 'MEKARSARI'),
   ('3602190013', '3602190', 'SANGIANG'),
@@ -57443,7 +57443,7 @@ INSERT INTO `villages` VALUES
   ('3603020018', '3603020', 'TEGALSARI'),
   ('3603020019', '3603020', 'PEMATANG'),
   ('3603020020', '3603020', 'PASIR NANGKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3603020021', '3603020', 'CISEREH'),
   ('3603020022', '3603020', 'PASIR BOLANG'),
   ('3603021001', '3603021', 'MEKARSARI'),
@@ -57494,7 +57494,7 @@ INSERT INTO `villages` VALUES
   ('3603060004', '3603060', 'CIRARAB'),
   ('3603060005', '3603060', 'CARINGIN'),
   ('3603060006', '3603060', 'BABAKAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3603060007', '3603060', 'KAMUNING'),
   ('3603060008', '3603060', 'PALA SARI'),
   ('3603060009', '3603060', 'SERDANG WETAN'),
@@ -57545,7 +57545,7 @@ INSERT INTO `villages` VALUES
   ('3603131002', '3603131', 'PASIR MUNCANG'),
   ('3603131003', '3603131', 'SUMUR BANDUNG'),
   ('3603131004', '3603131', 'CIKANDE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3603131005', '3603131', 'PASIR GINTUNG'),
   ('3603131006', '3603131', 'PANGKAT'),
   ('3603131007', '3603131', 'DANG DEUR'),
@@ -57596,7 +57596,7 @@ INSERT INTO `villages` VALUES
   ('3603160019', '3603160', 'TEGAL KUNIR LOR'),
   ('3603160020', '3603160', 'BANYU ASIH'),
   ('3603160021', '3603160', 'MAUK TIMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3603160022', '3603160', 'MAUK BARAT'),
   ('3603160023', '3603160', 'KETAPANG'),
   ('3603160024', '3603160', 'MARGA MULYA'),
@@ -57647,7 +57647,7 @@ INSERT INTO `villages` VALUES
   ('3603190001', '3603190', 'BUNISARI'),
   ('3603190002', '3603190', 'RAWA BONI'),
   ('3603190003', '3603190', 'KIARA PAYUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3603190004', '3603190', 'GAGA'),
   ('3603190005', '3603190', 'LAKSANA'),
   ('3603190006', '3603190', 'BUARAN BAMBU'),
@@ -57698,7 +57698,7 @@ INSERT INTO `villages` VALUES
   ('3604010014', '3604010', 'BAROS JAYA'),
   ('3604020001', '3604020', 'CIBOJONG'),
   ('3604020002', '3604020', 'KRAMATLABAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3604020003', '3604020', 'KADUBEUREUM'),
   ('3604020004', '3604020', 'PADARINCANG'),
   ('3604020006', '3604020', 'KALUMPANG'),
@@ -57749,7 +57749,7 @@ INSERT INTO `villages` VALUES
   ('3604050013', '3604050', 'CISALAM'),
   ('3604050014', '3604050', 'SUKA INDAH'),
   ('3604060009', '3604060', 'KADUGENEP');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3604060010', '3604060', 'PADASUKA'),
   ('3604060011', '3604060', 'SANDING'),
   ('3604060012', '3604060', 'SINDANGSARI'),
@@ -57800,7 +57800,7 @@ INSERT INTO `villages` VALUES
   ('3604090008', '3604090', 'KAMPUNG BARU'),
   ('3604090010', '3604090', 'PASIRLIMUS'),
   ('3604090011', '3604090', 'PASIR KEMBANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3604091001', '3604091', 'PANGAWINAN'),
   ('3604091002', '3604091', 'MANDER'),
   ('3604091003', '3604091', 'PANAMPING'),
@@ -57851,7 +57851,7 @@ INSERT INTO `villages` VALUES
   ('3604121008', '3604121', 'KETOS'),
   ('3604121009', '3604121', 'SUKAMAJU'),
   ('3604130001', '3604130', 'SILEBU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3604130002', '3604130', 'SUKAJADI'),
   ('3604130003', '3604130', 'PEMATANG'),
   ('3604130004', '3604130', 'KRAMATJATI'),
@@ -57902,7 +57902,7 @@ INSERT INTO `villages` VALUES
   ('3604210002', '3604210', 'KERTASANA'),
   ('3604210003', '3604210', 'MANGKUNEGARA'),
   ('3604210004', '3604210', 'KARANGKEPUH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3604210005', '3604210', 'LAMBANGSARI'),
   ('3604210006', '3604210', 'BOJONEGARA'),
   ('3604210007', '3604210', 'MARGAGIRI'),
@@ -57953,7 +57953,7 @@ INSERT INTO `villages` VALUES
   ('3604250002', '3604250', 'SUKANEGARA'),
   ('3604250007', '3604250', 'KALAPIAN'),
   ('3604250008', '3604250', 'KESERANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3604250009', '3604250', 'PULO KENCANA'),
   ('3604250010', '3604250', 'LINDUK'),
   ('3604250011', '3604250', 'KUBANG PUJI'),
@@ -58004,7 +58004,7 @@ INSERT INTO `villages` VALUES
   ('3604271007', '3604271', 'TANARA'),
   ('3604271008', '3604271', 'PEDALEMAN'),
   ('3604271009', '3604271', 'TENJO AYU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3671010001', '3671010', 'TAJUR'),
   ('3671010002', '3671010', 'PARUNG SERAB'),
   ('3671010003', '3671010', 'PANINGGILAN'),
@@ -58055,7 +58055,7 @@ INSERT INTO `villages` VALUES
   ('3671030014', '3671030', 'SUKASARI'),
   ('3671030015', '3671030', 'BUARAN INDAH'),
   ('3671030016', '3671030', 'TANAH TINGGI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3671030017', '3671030', 'SUKAASIH'),
   ('3671030018', '3671030', 'SUKARASA'),
   ('3671031001', '3671031', 'KARAWACI BARU'),
@@ -58106,7 +58106,7 @@ INSERT INTO `villages` VALUES
   ('3671060002', '3671060', 'JURUMUDI BARU'),
   ('3671060003', '3671060', 'JURUMUDI'),
   ('3671060004', '3671060', 'PAJANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3671060005', '3671060', 'BENDA'),
   ('3672010001', '3672010', 'GUNUNGSUGIH'),
   ('3672010003', '3672010', 'RANDAKARI'),
@@ -58157,7 +58157,7 @@ INSERT INTO `villages` VALUES
   ('3673010006', '3673010', 'SUKALAKSANA'),
   ('3673010007', '3673010', 'SUKAWANA'),
   ('3673010009', '3673010', 'SUKAJAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3673010010', '3673010', 'CILAKU'),
   ('3673020001', '3673020', 'NYAPAH'),
   ('3673020002', '3673020', 'LEBAKWANGI'),
@@ -58208,7 +58208,7 @@ INSERT INTO `villages` VALUES
   ('3673060003', '3673060', 'MESJID PRIYAYI'),
   ('3673060006', '3673060', 'SAWAH LUHUR'),
   ('3673060007', '3673060', 'KILASAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3673060008', '3673060', 'MARGALUYU'),
   ('3673060009', '3673060', 'KASUNYATAN'),
   ('3673060010', '3673060', 'BANTEN'),
@@ -58259,7 +58259,7 @@ INSERT INTO `villages` VALUES
   ('3674060011', '3674060', 'PONDOK BETUNG'),
   ('3674070001', '3674070', 'LENGKONG KARYA'),
   ('3674070002', '3674070', 'JELUPANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('3674070003', '3674070', 'PONDOK JAGUNG'),
   ('3674070004', '3674070', 'PONDOK JAGUNG TIMUR'),
   ('3674070005', '3674070', 'PAKULONAN'),
@@ -58310,7 +58310,7 @@ INSERT INTO `villages` VALUES
   ('5101040006', '5101040', 'PENGERAGOAN'),
   ('5101040007', '5101040', 'ASAHDUREN'),
   ('5101040008', '5101040', 'MANGGISSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5102010002', '5102010', 'ANTAP'),
   ('5102010004', '5102010', 'BAJERA'),
   ('5102010006', '5102010', 'SERAMPINGAN'),
@@ -58361,7 +58361,7 @@ INSERT INTO `villages` VALUES
   ('5102030008', '5102030', 'DENBANTAS'),
   ('5102030009', '5102030', 'BUAHAN'),
   ('5102030011', '5102030', 'WANASARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5102030012', '5102030', 'SESANDAN'),
   ('5102040001', '5102040', 'PANGKUNG TIBAH'),
   ('5102040002', '5102040', 'BELALANG'),
@@ -58412,7 +58412,7 @@ INSERT INTO `villages` VALUES
   ('5102070012', '5102070', 'BABAHAN'),
   ('5102070013', '5102070', 'SENGANAN'),
   ('5102070014', '5102070', 'JATILUWIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5102070015', '5102070', 'WONGAYA GEDE'),
   ('5102070016', '5102070', 'PESAGI'),
   ('5102070017', '5102070', 'TEGALINGGAH'),
@@ -58463,7 +58463,7 @@ INSERT INTO `villages` VALUES
   ('5103040018', '5103040', 'SOBANGAN'),
   ('5103050001', '5103050', 'DARMASABA'),
   ('5103050002', '5103050', 'SIBANG GEDE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5103050003', '5103050', 'JAGAPATI'),
   ('5103050004', '5103050', 'ANGANTAKA'),
   ('5103050005', '5103050', 'SEDANG'),
@@ -58514,7 +58514,7 @@ INSERT INTO `villages` VALUES
   ('5104030010', '5104030', 'BITERA'),
   ('5104030011', '5104030', 'BAKBAKAN'),
   ('5104030012', '5104030', 'SIANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5104030013', '5104030', 'SUWAT'),
   ('5104030014', '5104030', 'PETAK'),
   ('5104030015', '5104030', 'PETAK KAJA'),
@@ -58565,7 +58565,7 @@ INSERT INTO `villages` VALUES
   ('5105020001', '5105020', 'NEGARI'),
   ('5105020002', '5105020', 'TAKMUNG'),
   ('5105020003', '5105020', 'BANJARANGKAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5105020004', '5105020', 'TUSAN'),
   ('5105020005', '5105020', 'BAKAS'),
   ('5105020006', '5105020', 'GETAKAN'),
@@ -58616,7 +58616,7 @@ INSERT INTO `villages` VALUES
   ('5106020001', '5106020', 'BUNUTIN'),
   ('5106020002', '5106020', 'TAMAN BALI'),
   ('5106020003', '5106020', 'BEBALANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5106020004', '5106020', 'KAWAN'),
   ('5106020005', '5106020', 'CEMPAGA'),
   ('5106020007', '5106020', 'KAYUBIHI'),
@@ -58667,7 +58667,7 @@ INSERT INTO `villages` VALUES
   ('5106040041', '5106040', 'DAUP'),
   ('5106040042', '5106040', 'BANTANG'),
   ('5106040044', '5106040', 'SUKAWANA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5106040045', '5106040', 'SUBAYA'),
   ('5106040046', '5106040', 'SIYAKIN'),
   ('5106040047', '5106040', 'PINGGAN'),
@@ -58718,7 +58718,7 @@ INSERT INTO `villages` VALUES
   ('5107050009', '5107050', 'CULIK'),
   ('5107050010', '5107050', 'DATAH'),
   ('5107050011', '5107050', 'LABA SARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5107050012', '5107050', 'PURWAKERTI'),
   ('5107050013', '5107050', 'BUNUTAN'),
   ('5107050014', '5107050', 'TRI BUANA'),
@@ -58769,7 +58769,7 @@ INSERT INTO `villages` VALUES
   ('5108020008', '5108020', 'RINGDIKIT'),
   ('5108020009', '5108020', 'JOANYAR'),
   ('5108020010', '5108020', 'KALIANGET');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5108020011', '5108020', 'TANGGUWISIA'),
   ('5108020012', '5108020', 'SULANYAH'),
   ('5108020013', '5108020', 'BUBUNAN'),
@@ -58820,7 +58820,7 @@ INSERT INTO `villages` VALUES
   ('5108050009', '5108050', 'SUKASADA'),
   ('5108050010', '5108050', 'SAMBANGAN'),
   ('5108050011', '5108050', 'PANJI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5108050012', '5108050', 'PANJI ANOM'),
   ('5108050013', '5108050', 'TEGAL LINGGAH'),
   ('5108050014', '5108050', 'SELAT'),
@@ -58871,7 +58871,7 @@ INSERT INTO `villages` VALUES
   ('5108080003', '5108080', 'BONTIHING'),
   ('5108080004', '5108080', 'TAJUN'),
   ('5108080006', '5108080', 'DEPEHA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5108080007', '5108080', 'BULIAN'),
   ('5108080008', '5108080', 'TAMBLANG'),
   ('5108080009', '5108080', 'BILA'),
@@ -58922,7 +58922,7 @@ INSERT INTO `villages` VALUES
   ('5171030011', '5171030', 'PADANGSAMBIAN KAJA'),
   ('5171031001', '5171031', 'PEMECUTAN KAJA'),
   ('5171031002', '5171031', 'DAUH PURI KAJA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5171031003', '5171031', 'DANGIN PURI KAUH'),
   ('5171031004', '5171031', 'DANGIN PURI KAJA'),
   ('5171031005', '5171031', 'DANGIN PURI KANGIN'),
@@ -58973,7 +58973,7 @@ INSERT INTO `villages` VALUES
   ('5201030010', '5201030', 'LABU API'),
   ('5201030011', '5201030', 'KURANJI DALANG'),
   ('5201030012', '5201030', 'BAGIK POLAK BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5201040005', '5201040', 'JAGARAGA INDAH'),
   ('5201040006', '5201040', 'MONTONG ARE'),
   ('5201040007', '5201040', 'KEDIRI'),
@@ -59024,7 +59024,7 @@ INSERT INTO `villages` VALUES
   ('5201060001', '5201060', 'JATI SELA'),
   ('5201060002', '5201060', 'SESELA'),
   ('5201060003', '5201060', 'MIDANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5201060004', '5201060', 'KEKERI'),
   ('5201060005', '5201060', 'PENIMBUNG'),
   ('5201060006', '5201060', 'MAMBALAN'),
@@ -59075,7 +59075,7 @@ INSERT INTO `villages` VALUES
   ('5202020007', '5202020', 'PENGENGAT'),
   ('5202020008', '5202020', 'TERUWAI'),
   ('5202020009', '5202020', 'GAPURA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5202020010', '5202020', 'KAWO'),
   ('5202020011', '5202020', 'SEGALE ANYAR'),
   ('5202020012', '5202020', 'SENGKOL'),
@@ -59126,7 +59126,7 @@ INSERT INTO `villages` VALUES
   ('5202060024', '5202060', 'MONTONG TEREP'),
   ('5202060025', '5202060', 'MEKAR DAMAI'),
   ('5202061001', '5202061', 'JONTLAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5202061002', '5202061', 'GERANTUNG'),
   ('5202061003', '5202061', 'SASAKE'),
   ('5202061004', '5202061', 'LAJUT'),
@@ -59177,7 +59177,7 @@ INSERT INTO `villages` VALUES
   ('5203010008', '5203010', 'SEPIT'),
   ('5203010009', '5203010', 'KERUAK'),
   ('5203010010', '5203010', 'BATU PUTIK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5203010011', '5203010', 'SENYIUR'),
   ('5203010012', '5203010', 'KETAPANG RAYA'),
   ('5203010013', '5203010', 'PIJOT UTARA'),
@@ -59228,7 +59228,7 @@ INSERT INTO `villages` VALUES
   ('5203021016', '5203021', 'RENSING BAT'),
   ('5203021017', '5203021', 'KEMBANG ARE SAMPAI'),
   ('5203021018', '5203021', 'GERISAK SEMANGGLENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5203022001', '5203022', 'GELANGGANG'),
   ('5203022002', '5203022', 'SURABAYA'),
   ('5203022003', '5203022', 'LEPAK'),
@@ -59279,7 +59279,7 @@ INSERT INTO `villages` VALUES
   ('5203050002', '5203050', 'PAOK MOTONG'),
   ('5203050003', '5203050', 'MASBAGIK SELATAN'),
   ('5203050004', '5203050', 'MASBAGIK TIMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5203050007', '5203050', 'MASBAGIK UTARA'),
   ('5203050008', '5203050', 'DANGER'),
   ('5203050009', '5203050', 'LENDANG NANGKA'),
@@ -59330,7 +59330,7 @@ INSERT INTO `villages` VALUES
   ('5203070013', '5203070', 'KELAYU SELATAN'),
   ('5203070014', '5203070', 'KELAYU UTARA'),
   ('5203070015', '5203070', 'DENGGEN TIMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5203071001', '5203071', 'PENEDAGANDOR'),
   ('5203071002', '5203071', 'LABUHAN HAJI'),
   ('5203071003', '5203071', 'TEROS'),
@@ -59381,7 +59381,7 @@ INSERT INTO `villages` VALUES
   ('5203090019', '5203090', 'LENEK KALI BAMBANG'),
   ('5203090020', '5203090', 'KALIJAGA TENGAH'),
   ('5203090021', '5203090', 'BAGIK NYAKA SANTRI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5203090022', '5203090', 'AIK PRAPA'),
   ('5203090023', '5203090', 'SUKAREMA'),
   ('5203090024', '5203090', 'KALIJAGA BARU'),
@@ -59432,7 +59432,7 @@ INSERT INTO `villages` VALUES
   ('5204050006', '5204050', 'LUAR'),
   ('5204050007', '5204050', 'BARU'),
   ('5204050008', '5204050', 'KALIMANGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5204050009', '5204050', 'JURANALAS'),
   ('5204050010', '5204050', 'DALAM'),
   ('5204050011', '5204050', 'PULAU BUNGIN'),
@@ -59483,7 +59483,7 @@ INSERT INTO `villages` VALUES
   ('5204081007', '5204081', 'BUGIS MEDANG'),
   ('5204082001', '5204082', 'PELAT'),
   ('5204082003', '5204082', 'BOAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5204082004', '5204082', 'PUNGKA'),
   ('5204082005', '5204082', 'JOROK'),
   ('5204082006', '5204082', 'KERATO'),
@@ -59534,7 +59534,7 @@ INSERT INTO `villages` VALUES
   ('5204122005', '5204122', 'BERORA'),
   ('5204122006', '5204122', 'MAMA'),
   ('5204122007', '5204122', 'TATEDE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5204130006', '5204130', 'SEPAKAT'),
   ('5204130007', '5204130', 'SP I PRODE'),
   ('5204130008', '5204130', 'SP II PRODE'),
@@ -59585,7 +59585,7 @@ INSERT INTO `villages` VALUES
   ('5205011005', '5205011', 'LEPADI'),
   ('5205011006', '5205011', 'TEMBA LAE'),
   ('5205020001', '5205020', 'MBAWI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5205020002', '5205020', 'DOREBARA'),
   ('5205020004', '5205020', 'KANDAI SATU'),
   ('5205020005', '5205020', 'KARIJAWA'),
@@ -59636,7 +59636,7 @@ INSERT INTO `villages` VALUES
   ('5205051008', '5205051', 'SUKA DAMAI'),
   ('5205051009', '5205051', 'TANJU'),
   ('5205051010', '5205051', 'KAMPAS MECI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5205051011', '5205051', 'PERSIAPAN TEKA SIRE'),
   ('5205051012', '5205051', 'PERSIAPAN ANAMINA'),
   ('5205060001', '5205060', 'DOROPETI'),
@@ -59687,7 +59687,7 @@ INSERT INTO `villages` VALUES
   ('5206021006', '5206021', 'MONGGO'),
   ('5206021007', '5206021', 'NDANO'),
   ('5206021008', '5206021', 'TONDA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5206021010', '5206021', 'BOLO'),
   ('5206021011', '5206021', 'MADA WAU'),
   ('5206021012', '5206021', 'NCANDI'),
@@ -59738,7 +59738,7 @@ INSERT INTO `villages` VALUES
   ('5206051008', '5206051', 'KARUMBU'),
   ('5206051009', '5206051', 'KALODU'),
   ('5206051011', '5206051', 'KANGGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5206051012', '5206051', 'KARAMPI'),
   ('5206051013', '5206051', 'WADU RUKA'),
   ('5206051015', '5206051', 'ROMPO'),
@@ -59789,7 +59789,7 @@ INSERT INTO `villages` VALUES
   ('5206070008', '5206070', 'HIDIRASA'),
   ('5206070009', '5206070', 'NUNGGI'),
   ('5206070010', '5206070', 'WORA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5206070015', '5206070', 'TADEWA'),
   ('5206070016', '5206070', 'NANGA WERA'),
   ('5206070017', '5206070', 'KALAJENA'),
@@ -59840,7 +59840,7 @@ INSERT INTO `villages` VALUES
   ('5207010006', '5207010', 'TALONANG BARU'),
   ('5207010007', '5207010', 'KEMUNING'),
   ('5207010008', '5207010', 'UPT TONGO II SP.2');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5207020002', '5207020', 'BELO'),
   ('5207020004', '5207020', 'GOA'),
   ('5207020006', '5207020', 'DASAN ANYAR'),
@@ -59891,7 +59891,7 @@ INSERT INTO `villages` VALUES
   ('5207051002', '5207051', 'MANTAR'),
   ('5207051003', '5207051', 'KIANTAR'),
   ('5207051004', '5207051', 'POTO TANO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5207051005', '5207051', 'UPT TAMBAK SARI'),
   ('5207051006', '5207051', 'TUA NANGA'),
   ('5207051007', '5207051', 'TEBO'),
@@ -59942,7 +59942,7 @@ INSERT INTO `villages` VALUES
   ('5271011005', '5271011', 'KEKALIK JAYA'),
   ('5271020001', '5271020', 'PAGESANGAN'),
   ('5271020002', '5271020', 'MATARAM TIMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5271020003', '5271020', 'PAGESANGAN BARAT'),
   ('5271020004', '5271020', 'PAGESANGAN TIMUR'),
   ('5271020005', '5271020', 'PEJANGGIK'),
@@ -59993,7 +59993,7 @@ INSERT INTO `villages` VALUES
   ('5272011009', '5272011', 'SANTI'),
   ('5272011010', '5272011', 'MATAKANDO'),
   ('5272020001', '5272020', 'LAMPE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5272020002', '5272020', 'DODU'),
   ('5272020003', '5272020', 'NUNGGA'),
   ('5272020014', '5272020', 'OI FO\'O'),
@@ -60044,7 +60044,7 @@ INSERT INTO `villages` VALUES
   ('5301023003', '5301023', 'PATIALA DETE'),
   ('5301023004', '5301023', 'HARONA KALA'),
   ('5301050001', '5301050', 'DEDE KADU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5301050002', '5301050', 'WEE KAROU'),
   ('5301050003', '5301050', 'SOBA WAWI'),
   ('5301050005', '5301050', 'BERA DOLU'),
@@ -60095,7 +60095,7 @@ INSERT INTO `villages` VALUES
   ('5302010015', '5302010', 'RAKAWATU'),
   ('5302010017', '5302010', 'KAMBU HAPANG'),
   ('5302010018', '5302010', 'MATAWAI PAWALI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5302010019', '5302010', 'BIDI HUNGA'),
   ('5302011005', '5302011', 'PULU PANJANG'),
   ('5302011006', '5302011', 'MAKAMENGGIT'),
@@ -60146,7 +60146,7 @@ INSERT INTO `villages` VALUES
   ('5302031005', '5302031', 'NANGGA'),
   ('5302031010', '5302031', 'JANGGA MANGU'),
   ('5302031012', '5302031', 'ANANJAKI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5302032001', '5302032', 'KARIPI'),
   ('5302032002', '5302032', 'WANGGAMETI'),
   ('5302032003', '5302032', 'KATIKUWAI'),
@@ -60197,7 +60197,7 @@ INSERT INTO `villages` VALUES
   ('5302051008', '5302051', 'KAYURI'),
   ('5302052003', '5302052', 'LAIRURU'),
   ('5302052004', '5302052', 'WATU PUDA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5302052005', '5302052', 'UMALULU'),
   ('5302052013', '5302052', 'LUMBUKORE'),
   ('5302052014', '5302052', 'WATU HADANG'),
@@ -60248,7 +60248,7 @@ INSERT INTO `villages` VALUES
   ('5303100005', '5303100', 'BOKONUSAN'),
   ('5303100006', '5303100', 'OTAN'),
   ('5303100007', '5303100', 'UITAO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5303100008', '5303100', 'HUILELOT'),
   ('5303100009', '5303100', 'UIASA'),
   ('5303100010', '5303100', 'HANSISI'),
@@ -60299,7 +60299,7 @@ INSERT INTO `villages` VALUES
   ('5303121007', '5303121', 'BAUMATA BARAT'),
   ('5303121008', '5303121', 'BAUMATA UTARA'),
   ('5303130012', '5303130', 'OESENA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5303130013', '5303130', 'NONBES'),
   ('5303130014', '5303130', 'KOTABES'),
   ('5303130015', '5303130', 'PONAIN'),
@@ -60350,7 +60350,7 @@ INSERT INTO `villages` VALUES
   ('5303142003', '5303142', 'KAIRANE'),
   ('5303142004', '5303142', 'NIUNBAUN'),
   ('5303142005', '5303142', 'RAKNAMO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5303142006', '5303142', 'FATUTETA'),
   ('5303142007', '5303142', 'OEFETO'),
   ('5303150001', '5303150', 'SULAMU'),
@@ -60401,7 +60401,7 @@ INSERT INTO `villages` VALUES
   ('5303182001', '5303182', 'FATUMONAS'),
   ('5303182002', '5303182', 'BINAFUN'),
   ('5303182003', '5303182', 'BONMUTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5303182004', '5303182', 'BITOBE'),
   ('5303190007', '5303190', 'AFOAN'),
   ('5303190008', '5303190', 'NAIKLIU'),
@@ -60452,7 +60452,7 @@ INSERT INTO `villages` VALUES
   ('5304013001', '5304013', 'NOEBESI'),
   ('5304013002', '5304013', 'LILIANA'),
   ('5304013003', '5304013', 'NUNBENA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5304013004', '5304013', 'TANEOTOP'),
   ('5304013005', '5304013', 'FETOMONE'),
   ('5304020004', '5304020', 'TUASENE'),
@@ -60503,7 +60503,7 @@ INSERT INTO `villages` VALUES
   ('5304040015', '5304040', 'NIFUKANI'),
   ('5304041001', '5304041', 'OEBOBO'),
   ('5304041002', '5304041', 'TUPPAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5304041003', '5304041', 'BOENTUKA'),
   ('5304041004', '5304041', 'OEHALA'),
   ('5304041005', '5304041', 'TUAKOLE'),
@@ -60554,7 +60554,7 @@ INSERT INTO `villages` VALUES
   ('5304070011', '5304070', 'MAUNUM NIKI NIKI'),
   ('5304070012', '5304070', 'TAEBESA'),
   ('5304070013', '5304070', 'NAKFUNU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5304070014', '5304070', 'OEEKAM'),
   ('5304070015', '5304070', 'BAKI'),
   ('5304070017', '5304070', 'NOEBESA'),
@@ -60605,7 +60605,7 @@ INSERT INTO `villages` VALUES
   ('5304090007', '5304090', 'TESI AYOFANU'),
   ('5304090010', '5304090', 'BOTI'),
   ('5304090011', '5304090', 'OENAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5304090012', '5304090', 'OINLASI'),
   ('5304090013', '5304090', 'NAPI'),
   ('5304090014', '5304090', 'FALLAS'),
@@ -60656,7 +60656,7 @@ INSERT INTO `villages` VALUES
   ('5304104003', '5304104', 'POLI'),
   ('5304104004', '5304104', 'MANUFUI'),
   ('5304104005', '5304104', 'NAIFATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5304110004', '5304110', 'LILO'),
   ('5304110005', '5304110', 'TAUANAS'),
   ('5304110006', '5304110', 'FATILO'),
@@ -60707,7 +60707,7 @@ INSERT INTO `villages` VALUES
   ('5305012006', '5305012', 'BATNES'),
   ('5305013001', '5305013', 'TASINIFU'),
   ('5305013002', '5305013', 'NAEKAKE A');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5305013003', '5305013', 'NAEKAKE B'),
   ('5305013004', '5305013', 'NOELELO'),
   ('5305020032', '5305020', 'OESENA'),
@@ -60758,7 +60758,7 @@ INSERT INTO `villages` VALUES
   ('5305025001', '5305025', 'FAENNAKE'),
   ('5305025002', '5305025', 'BAAS'),
   ('5305025003', '5305025', 'HAUMENI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5305025004', '5305025', 'NAPAN'),
   ('5305025006', '5305025', 'SAINONI'),
   ('5305025007', '5305025', 'BANAIN'),
@@ -60809,7 +60809,7 @@ INSERT INTO `villages` VALUES
   ('5305042010', '5305042', 'NIFUNENAS'),
   ('5305042011', '5305042', 'OABIKASE'),
   ('5305042012', '5305042', 'LETNEO SELATAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5305043001', '5305043', 'LANAUS'),
   ('5305043002', '5305043', 'LETMAFO'),
   ('5305043003', '5305043', 'MAUBESI'),
@@ -60860,7 +60860,7 @@ INSERT INTO `villages` VALUES
   ('5305061008', '5305061', 'OEMANU'),
   ('5305061009', '5305061', 'NIFUTASI'),
   ('5305062001', '5305062', 'MANUMEAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5305062002', '5305062', 'KULUAN'),
   ('5305062003', '5305062', 'NAKU'),
   ('5305062004', '5305062', 'MAKUN'),
@@ -60911,7 +60911,7 @@ INSERT INTO `villages` VALUES
   ('5306070006', '5306070', 'TULAKADI'),
   ('5306070007', '5306070', 'SILAWAN'),
   ('5306070008', '5306070', 'S A D I');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5306070009', '5306070', 'SARABAU'),
   ('5306070010', '5306070', 'BAUHO'),
   ('5306070017', '5306070', 'HALIMODOK'),
@@ -60962,7 +60962,7 @@ INSERT INTO `villages` VALUES
   ('5307011013', '5307011', 'PIRING SINA'),
   ('5307011014', '5307011', 'ILLU'),
   ('5307012002', '5307012', 'LALAFANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5307012004', '5307012', 'KALEB'),
   ('5307012005', '5307012', 'BUNGA BALI'),
   ('5307012006', '5307012', 'KAERA'),
@@ -61013,7 +61013,7 @@ INSERT INTO `villages` VALUES
   ('5307021005', '5307021', 'MATARU TIMUR'),
   ('5307021006', '5307021', 'MATARU UTARA'),
   ('5307021007', '5307021', 'MATARU BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5307030001', '5307030', 'PADANG ALANG'),
   ('5307030002', '5307030', 'MAIKANG'),
   ('5307030003', '5307030', 'SIDABUI'),
@@ -61064,7 +61064,7 @@ INSERT INTO `villages` VALUES
   ('5307050012', '5307050', 'KALABAHI TIMUR'),
   ('5307050013', '5307050', 'MUTIARA'),
   ('5307050017', '5307050', 'WELAI TIMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5307050020', '5307050', 'WELAI BARAT'),
   ('5307050021', '5307050', 'FANATING'),
   ('5307051001', '5307051', 'LAWAHING'),
@@ -61115,7 +61115,7 @@ INSERT INTO `villages` VALUES
   ('5307063003', '5307063', 'T A S I'),
   ('5307063005', '5307063', 'LEMBUR TIMUR'),
   ('5307063006', '5307063', 'LUBA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5308010001', '5308010', 'PASIR PUTIH'),
   ('5308010002', '5308010', 'LOLONG'),
   ('5308010003', '5308010', 'BABOKERONG'),
@@ -61166,7 +61166,7 @@ INSERT INTO `villages` VALUES
   ('5308030001', '5308030', 'KOLONTOBO'),
   ('5308030002', '5308030', 'LARANWUNTUN'),
   ('5308030003', '5308030', 'MURUONA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5308030004', '5308030', 'WATODIRI'),
   ('5308030013', '5308030', 'NAPASABOK'),
   ('5308030014', '5308030', 'BUNGAMUDA'),
@@ -61217,7 +61217,7 @@ INSERT INTO `villages` VALUES
   ('5308050008', '5308050', 'LEWOLEBA BARAT'),
   ('5308050009', '5308050', 'LEWOLEBA UTARA'),
   ('5308050010', '5308050', 'LEWOLEBA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5308050011', '5308050', 'LEWOLEBA TENGAH'),
   ('5308050012', '5308050', 'LEWOLEBA TIMUR'),
   ('5308050013', '5308050', 'LITEULUMADO'),
@@ -61268,7 +61268,7 @@ INSERT INTO `villages` VALUES
   ('5308070018', '5308070', 'KALIKUR'),
   ('5308070019', '5308070', 'RUMANG'),
   ('5308070020', '5308070', 'ATU WALUPANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5309010001', '5309010', 'OJAN DETUN'),
   ('5309010002', '5309010', 'HEWA'),
   ('5309010003', '5309010', 'PANTAI OA'),
@@ -61319,7 +61319,7 @@ INSERT INTO `villages` VALUES
   ('5309020023', '5309020', 'LATON LIWO II'),
   ('5309021001', '5309021', 'LEWOBELE'),
   ('5309021002', '5309021', 'ILE PADUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5309021003', '5309021', 'BANTALA'),
   ('5309021004', '5309021', 'RIANGKOTEK'),
   ('5309021005', '5309021', 'SINAR HADING'),
@@ -61370,7 +61370,7 @@ INSERT INTO `villages` VALUES
   ('5309040012', '5309040', 'PAMAKAYO'),
   ('5309040013', '5309040', 'BALAWELING I'),
   ('5309040014', '5309040', 'BALAWELING II');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5309040015', '5309040', 'DANI WATO'),
   ('5309040016', '5309040', 'NURHALOLON'),
   ('5309040017', '5309040', 'RITAEBANG'),
@@ -61421,7 +61421,7 @@ INSERT INTO `villages` VALUES
   ('5309061004', '5309061', 'TANAH TUKAN'),
   ('5309061005', '5309061', 'SAMASOGE'),
   ('5309061006', '5309061', 'NAYUBAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5309061007', '5309061', 'OYANGBARANG'),
   ('5309061008', '5309061', 'KAWELA'),
   ('5309061009', '5309061', 'BLIKO'),
@@ -61472,7 +61472,7 @@ INSERT INTO `villages` VALUES
   ('5309071009', '5309071', 'HARUBALA'),
   ('5309071010', '5309071', 'NELELAMADIKEN'),
   ('5309071011', '5309071', 'BOLENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5309071012', '5309071', 'GAYAK'),
   ('5309071013', '5309071', 'NELEBLOLONG'),
   ('5309071014', '5309071', 'NELE LAMAWANGI'),
@@ -61523,7 +61523,7 @@ INSERT INTO `villages` VALUES
   ('5310010002', '5310010', 'MAULOO'),
   ('5310010004', '5310010', 'PAGA'),
   ('5310010008', '5310010', 'LENANDARETA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5310010015', '5310010', 'MASEBEWA'),
   ('5310010016', '5310010', 'WOLOREGA'),
   ('5310010017', '5310010', 'WOLOWONA'),
@@ -61574,7 +61574,7 @@ INSERT INTO `villages` VALUES
   ('5310040015', '5310040', 'TALIBURA'),
   ('5310040016', '5310040', 'DARAT GUNUNG'),
   ('5310040017', '5310040', 'DARAT PANTAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5310040019', '5310040', 'HIKONG'),
   ('5310040020', '5310040', 'KRINGA'),
   ('5310040021', '5310040', 'OJANG'),
@@ -61625,7 +61625,7 @@ INSERT INTO `villages` VALUES
   ('5310061004', '5310061', 'MALURIWU'),
   ('5310061005', '5310061', 'KESOKOJA'),
   ('5310061006', '5310061', 'LADOLAKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5310061007', '5310061', 'TUANGGEO'),
   ('5310061008', '5310061', 'ROKIROLE'),
   ('5310062001', '5310062', 'KOTING C'),
@@ -61676,7 +61676,7 @@ INSERT INTO `villages` VALUES
   ('5311010001', '5311010', 'ONDOREA'),
   ('5311010002', '5311010', 'KEL. NDORUREA'),
   ('5311010003', '5311010', 'ZOZOZEA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5311010004', '5311010', 'NGGOREA'),
   ('5311010005', '5311010', 'RAPORENDU'),
   ('5311010006', '5311010', 'RAPOWAWO'),
@@ -61727,7 +61727,7 @@ INSERT INTO `villages` VALUES
   ('5311020005', '5311020', 'RANDOTONDA'),
   ('5311020006', '5311020', 'RABURIA'),
   ('5311020007', '5311020', 'TOMBERABU I');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5311020008', '5311020', 'TOMBERABU II'),
   ('5311020009', '5311020', 'TINABANI'),
   ('5311020010', '5311020', 'WOLOGAI'),
@@ -61778,7 +61778,7 @@ INSERT INTO `villages` VALUES
   ('5311033006', '5311033', 'WATUSIPI'),
   ('5311033007', '5311033', 'KEL. ROWORENA BARAT'),
   ('5311033008', '5311033', 'MBOMBA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5311033009', '5311033', 'EMBUNDOA'),
   ('5311033010', '5311033', 'RATERUA'),
   ('5311040001', '5311040', 'NANGANESA'),
@@ -61829,7 +61829,7 @@ INSERT INTO `villages` VALUES
   ('5311052002', '5311052', 'KEL. WATUNESO'),
   ('5311052003', '5311052', 'WOLOSAMBI'),
   ('5311052004', '5311052', 'LIABEKE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5311052005', '5311052', 'WOLOLELE A'),
   ('5311052006', '5311052', 'DETUPERA'),
   ('5311052007', '5311052', 'WOLOARO'),
@@ -61880,7 +61880,7 @@ INSERT INTO `villages` VALUES
   ('5311061012', '5311061', 'LISELANDE'),
   ('5311061013', '5311061', 'TOU BARAT'),
   ('5311061014', '5311061', 'RANGALAKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5311061015', '5311061', 'PISE'),
   ('5311061016', '5311061', 'NUANAGA'),
   ('5311061017', '5311061', 'NEOTONDA'),
@@ -61931,7 +61931,7 @@ INSERT INTO `villages` VALUES
   ('5311070041', '5311070', 'TURUNALU'),
   ('5311071001', '5311071', 'MBOTULAKA'),
   ('5311071002', '5311071', 'MAUTENDA BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5311071003', '5311071', 'RATEWATI'),
   ('5311071004', '5311071', 'MUKUSAKI'),
   ('5311071005', '5311071', 'AEMURI'),
@@ -61982,7 +61982,7 @@ INSERT INTO `villages` VALUES
   ('5312012006', '5312012', 'KELITEI'),
   ('5312012007', '5312012', 'MANUBHARA'),
   ('5312012008', '5312012', 'TIWURANA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5312012009', '5312012', 'WAEBELA'),
   ('5312012010', '5312012', 'LEGERIWU'),
   ('5312020001', '5312020', 'BAJAWA'),
@@ -62033,7 +62033,7 @@ INSERT INTO `villages` VALUES
   ('5312031012', '5312031', 'RADAMASA'),
   ('5312032001', '5312032', 'BEA PAWE'),
   ('5312032002', '5312032', 'WATUNAY');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5312032003', '5312032', 'RAKATEDA I'),
   ('5312032004', '5312032', 'RAKATEDA II'),
   ('5312032005', '5312032', 'DIZI GEDHA'),
@@ -62084,7 +62084,7 @@ INSERT INTO `villages` VALUES
   ('5312080021', '5312080', 'LENGKOSAMBI UTARA'),
   ('5312080022', '5312080', 'SAMBINASI BARAT'),
   ('5312081001', '5312081', 'WOLOMEZE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5312081002', '5312081', 'RIA'),
   ('5312081003', '5312081', 'LANAMAI'),
   ('5312081004', '5312081', 'BENTENG TAWA'),
@@ -62135,7 +62135,7 @@ INSERT INTO `villages` VALUES
   ('5313041021', '5313041', 'WONGKA'),
   ('5313041022', '5313041', 'CAMBIR LECA'),
   ('5313042001', '5313042', 'RENDA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5313042002', '5313042', 'TODO'),
   ('5313042004', '5313042', 'POPO'),
   ('5313042005', '5313042', 'LIA'),
@@ -62186,7 +62186,7 @@ INSERT INTO `villages` VALUES
   ('5313121002', '5313121', 'BANGKA KENDA'),
   ('5313121004', '5313121', 'BANGKA JONG'),
   ('5313121005', '5313121', 'WAE RII');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5313121006', '5313121', 'LONGKO'),
   ('5313121007', '5313121', 'RANAKA'),
   ('5313121008', '5313121', 'GOLO MENDO'),
@@ -62237,7 +62237,7 @@ INSERT INTO `villages` VALUES
   ('5313130027', '5313130', 'GOLO NCUANG'),
   ('5313131002', '5313131', 'LENDA'),
   ('5313131003', '5313131', 'COMPANG CIBAL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5313131004', '5313131', 'BANGKA ARA'),
   ('5313131005', '5313131', 'WAE CODI'),
   ('5313131006', '5313131', 'TIMBU'),
@@ -62288,7 +62288,7 @@ INSERT INTO `villages` VALUES
   ('5314020009', '5314020', 'NETENAEN'),
   ('5314020010', '5314020', 'INGGUINAK'),
   ('5314020011', '5314020', 'OELUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5314020012', '5314020', 'TOLAMA'),
   ('5314020013', '5314020', 'OEBELA'),
   ('5314020014', '5314020', 'BONI'),
@@ -62339,7 +62339,7 @@ INSERT INTO `villages` VALUES
   ('5314061003', '5314061', 'DAIAMA'),
   ('5314061004', '5314061', 'LIFULEO'),
   ('5314061005', '5314061', 'DAURENDALE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5314061006', '5314061', 'PUKUAFU'),
   ('5314070001', '5314070', 'OENGGAUT'),
   ('5314070002', '5314070', 'NEMBERALA'),
@@ -62390,7 +62390,7 @@ INSERT INTO `villages` VALUES
   ('5315020006', '5315020', 'GOLO MANTING'),
   ('5315020007', '5315020', 'GOLO NDARING'),
   ('5315020008', '5315020', 'GOLO KEMPO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5315020009', '5315020', 'NAMPAR MACING'),
   ('5315020010', '5315020', 'GOLO LELENG'),
   ('5315020019', '5315020', 'WAE LOLOS'),
@@ -62441,7 +62441,7 @@ INSERT INTO `villages` VALUES
   ('5315031012', '5315031', 'RACANG WELAK'),
   ('5315031013', '5315031', 'ROBO'),
   ('5315031014', '5315031', 'WEWA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5315031015', '5315031', 'GOLO NDARI'),
   ('5315031016', '5315031', 'SEWAR'),
   ('5315032001', '5315032', 'NANGA BERE'),
@@ -62492,7 +62492,7 @@ INSERT INTO `villages` VALUES
   ('5315041015', '5315041', 'GOLO KELI'),
   ('5315050001', '5315050', 'LOHA'),
   ('5315050002', '5315050', 'COMPANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5315050003', '5315050', 'GOLO LAJANG'),
   ('5315050004', '5315050', 'PACAR'),
   ('5315050005', '5315050', 'KOMBO'),
@@ -62543,7 +62543,7 @@ INSERT INTO `villages` VALUES
   ('5316020008', '5316020', 'MADERI'),
   ('5316020009', '5316020', 'PRAI MADETA'),
   ('5316020010', '5316020', 'SAMBALI LOKU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5316020011', '5316020', 'WANGGA WAIYENGU'),
   ('5316020012', '5316020', 'UMBU PABAL SELATAN'),
   ('5316020013', '5316020', 'UMBU JODU'),
@@ -62594,7 +62594,7 @@ INSERT INTO `villages` VALUES
   ('5317010015', '5317010', 'DELU DEPA'),
   ('5317010016', '5317010', 'MERAKEHE'),
   ('5317010017', '5317010', 'WAIKANINYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5317010018', '5317010', 'ANA GOGKA'),
   ('5317010019', '5317010', 'MALITI BONDO ATE'),
   ('5317010020', '5317010', 'ANA LEWE'),
@@ -62645,7 +62645,7 @@ INSERT INTO `villages` VALUES
   ('5317030011', '5317030', 'BUKAMBERO'),
   ('5317030013', '5317030', 'WAITARU'),
   ('5317030014', '5317030', 'HOMBA PARE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5317030015', '5317030', 'KADAGHU TANA'),
   ('5317030016', '5317030', 'HAMELI ATE'),
   ('5317030017', '5317030', 'KADU ETA'),
@@ -62696,7 +62696,7 @@ INSERT INTO `villages` VALUES
   ('5317060007', '5317060', 'KALEMBU NDARA MANE'),
   ('5317060017', '5317060', 'WEELIMBU'),
   ('5317060018', '5317060', 'LETEKAMOUNA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5317060019', '5317060', 'MATA PYAWU'),
   ('5317060020', '5317060', 'WEE LIMA'),
   ('5317060021', '5317060', 'KADI WONE'),
@@ -62747,7 +62747,7 @@ INSERT INTO `villages` VALUES
   ('5317080011', '5317080', 'LETE KONDA'),
   ('5317080012', '5317080', 'BONDO BOGHILA'),
   ('5317080013', '5317080', 'WEE KAMBALA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5317080014', '5317080', 'PAYOLA UMBU'),
   ('5317080015', '5317080', 'POGO TENA'),
   ('5317080016', '5317080', 'LOKA KALADA'),
@@ -62798,7 +62798,7 @@ INSERT INTO `villages` VALUES
   ('5318020013', '5318020', 'LADOLIMA TIMUR'),
   ('5318020014', '5318020', 'LADOLIMA UTARA'),
   ('5318020015', '5318020', 'PAUMALI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5318020016', '5318020', 'WAJO TIMUR'),
   ('5318030002', '5318030', 'PODENURA'),
   ('5318030003', '5318030', 'TONGGO'),
@@ -62849,7 +62849,7 @@ INSERT INTO `villages` VALUES
   ('5318050004', '5318050', 'RENDUWAWO'),
   ('5318050005', '5318050', 'RENDU BUTOWE'),
   ('5318050006', '5318050', 'WAJOMARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5318050007', '5318050', 'RENDUTUTUBADHA'),
   ('5318060001', '5318060', 'TEDAMUDE'),
   ('5318060002', '5318060', 'TEDAKISA'),
@@ -62900,7 +62900,7 @@ INSERT INTO `villages` VALUES
   ('5319011006', '5319011', 'SITA'),
   ('5319011007', '5319011', 'TOROK GOLO'),
   ('5319011008', '5319011', 'GOLO ROS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5319011009', '5319011', 'SANO LOKOM'),
   ('5319011010', '5319011', 'RONDO WOING'),
   ('5319011011', '5319011', 'LIDI'),
@@ -62951,7 +62951,7 @@ INSERT INTO `villages` VALUES
   ('5319030029', '5319030', 'KAJU WANGI'),
   ('5319031001', '5319031', 'GOLO WUAS'),
   ('5319031002', '5319031', 'SIPI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5319031003', '5319031', 'PAAN WARU'),
   ('5319031004', '5319031', 'NANGA MEJE'),
   ('5319031005', '5319031', 'LANGGASAI'),
@@ -63002,7 +63002,7 @@ INSERT INTO `villages` VALUES
   ('5319050027', '5319050', 'MELO'),
   ('5319050028', '5319050', 'GOLO NDARI'),
   ('5319050029', '5319050', 'COMPANG WESANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5319050030', '5319050', 'BANGKA LELENG'),
   ('5319050031', '5319050', 'LENTO'),
   ('5319050036', '5319050', 'GOLO RENGKET'),
@@ -63053,7 +63053,7 @@ INSERT INTO `villages` VALUES
   ('5320010001', '5320010', 'KOLORAE'),
   ('5320010002', '5320010', 'BOLUA'),
   ('5320010005', '5320010', 'BALLU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5320020001', '5320020', 'LOBOHEDE'),
   ('5320020002', '5320020', 'RAMEDUE'),
   ('5320020003', '5320020', 'LEDEAE'),
@@ -63104,7 +63104,7 @@ INSERT INTO `villages` VALUES
   ('5320060003', '5320060', 'EIADA'),
   ('5320060005', '5320060', 'BOLOU'),
   ('5320060006', '5320060', 'LIMAGGU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5320060007', '5320060', 'LOBORAI'),
   ('5320060008', '5320060', 'BODAE'),
   ('5320060009', '5320060', 'KUJIRATU'),
@@ -63155,7 +63155,7 @@ INSERT INTO `villages` VALUES
   ('5321040006', '5321040', 'NAIUSU'),
   ('5321040007', '5321040', 'NANIN'),
   ('5321040009', '5321040', 'WEAIN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5321040010', '5321040', 'BIUDUKFOHO'),
   ('5321040011', '5321040', 'NABUTAEK'),
   ('5321040012', '5321040', 'NITI'),
@@ -63206,7 +63206,7 @@ INSERT INTO `villages` VALUES
   ('5321090003', '5321090', 'BONIBAIS'),
   ('5321090004', '5321090', 'NAEKEKUSA'),
   ('5321090005', '5321090', 'OENAEK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5321090006', '5321090', 'KAPITANMEO'),
   ('5321090007', '5321090', 'TNIUMANU'),
   ('5321090008', '5321090', 'TESA'),
@@ -63257,7 +63257,7 @@ INSERT INTO `villages` VALUES
   ('5371030012', '5371030', 'TUAK DAUN MERAH'),
   ('5371030013', '5371030', 'KAYU PUTIH'),
   ('5371030014', '5371030', 'LILIBA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('5371031001', '5371031', 'BAKUNASE'),
   ('5371031002', '5371031', 'BAKUNASE II'),
   ('5371031003', '5371031', 'AIR NONA'),
@@ -63308,7 +63308,7 @@ INSERT INTO `villages` VALUES
   ('6101021004', '6101021', 'SEMPARUK'),
   ('6101021005', '6101021', 'SINGARAYA'),
   ('6101022001', '6101022', 'PARIT BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6101022002', '6101022', 'SALATIGA'),
   ('6101022003', '6101022', 'SUNGAI TOMAN'),
   ('6101022005', '6101022', 'SERUNAI'),
@@ -63359,7 +63359,7 @@ INSERT INTO `villages` VALUES
   ('6101040040', '6101040', 'SEMANGAU'),
   ('6101041001', '6101041', 'TEBUAH ELOK'),
   ('6101041002', '6101041', 'MENSADE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6101041003', '6101041', 'SEI SAPAK'),
   ('6101041004', '6101041', 'SEMPURNA'),
   ('6101041005', '6101041', 'BUKIT MULYA'),
@@ -63410,7 +63410,7 @@ INSERT INTO `villages` VALUES
   ('6101060006', '6101060', 'KUBANGGA'),
   ('6101060007', '6101060', 'TAMBATAN'),
   ('6101060008', '6101060', 'LELA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6101060009', '6101060', 'SUNGAI KUMPAI'),
   ('6101060010', '6101060', 'SEKURA'),
   ('6101060011', '6101060', 'SEPADU'),
@@ -63461,7 +63461,7 @@ INSERT INTO `villages` VALUES
   ('6101080004', '6101080', 'SANTABAN'),
   ('6101080005', '6101080', 'SEI BENING'),
   ('6101090001', '6101090', 'KALIMANTAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6101090002', '6101090', 'MATANG DANAU'),
   ('6101090003', '6101090', 'TANAH HITAM'),
   ('6101090004', '6101090', 'MALEK'),
@@ -63512,7 +63512,7 @@ INSERT INTO `villages` VALUES
   ('6102032008', '6102032', 'JANYAT'),
   ('6102040008', '6102040', 'BHAKTI MULYA'),
   ('6102040009', '6102040', 'TIRTA KENCANA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6102040014', '6102040', 'BUMI EMAS'),
   ('6102040015', '6102040', 'BANI AMAS'),
   ('6102040017', '6102040', 'SETIA BUDI'),
@@ -63563,7 +63563,7 @@ INSERT INTO `villages` VALUES
   ('6102060005', '6102060', 'BANGE'),
   ('6102060006', '6102060', 'LEMBANG'),
   ('6102060007', '6102060', 'SANGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6102060008', '6102060', 'GUA'),
   ('6102060009', '6102060', 'DANTI'),
   ('6102061001', '6102061', 'BENGKILU'),
@@ -63614,7 +63614,7 @@ INSERT INTO `villages` VALUES
   ('6103030031', '6103030', 'AMANG'),
   ('6103031001', '6103031', 'DARA ITAM I'),
   ('6103031002', '6103031', 'BALAI PELUNTAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6103031003', '6103031', 'ANGAN TEMBAWANG'),
   ('6103031004', '6103031', 'KAYU ARA'),
   ('6103031005', '6103031', 'PAWIS HILIR'),
@@ -63665,7 +63665,7 @@ INSERT INTO `villages` VALUES
   ('6103070007', '6103070', 'SAMPURO'),
   ('6103070009', '6103070', 'SEI LAKI'),
   ('6103070010', '6103070', 'KARANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6103070011', '6103070', 'GARU'),
   ('6103070012', '6103070', 'BABATN'),
   ('6103070013', '6103070', 'PAHOKNG'),
@@ -63716,7 +63716,7 @@ INSERT INTO `villages` VALUES
   ('6103090004', '6103090', 'SELANGE'),
   ('6103090005', '6103090', 'MORO BETUNG'),
   ('6103090006', '6103090', 'TAHU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6103100002', '6103100', 'KEDAMA'),
   ('6103100003', '6103100', 'TANJUNG BALAI'),
   ('6103100004', '6103100', 'KUALA BEHE'),
@@ -63767,7 +63767,7 @@ INSERT INTO `villages` VALUES
   ('6104091004', '6104091', 'PAK BULU'),
   ('6104091005', '6104091', 'DEMA'),
   ('6104091006', '6104091', 'KEPAYANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6104100001', '6104100', 'TANJUNG'),
   ('6104100002', '6104100', 'KUALA SECAPAH'),
   ('6104100007', '6104100', 'TENGAH'),
@@ -63818,7 +63818,7 @@ INSERT INTO `villages` VALUES
   ('6105020003', '6105020', 'PAMPANG DUA'),
   ('6105020004', '6105020', 'HARAPAN MAKMUR'),
   ('6105020005', '6105020', 'SUNGAI KEMBAYAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6105020006', '6105020', 'KUALA ROSAN'),
   ('6105020007', '6105020', 'KUALA BUAYAN'),
   ('6105020008', '6105020', 'BAKTI JAYA'),
@@ -63869,7 +63869,7 @@ INSERT INTO `villages` VALUES
   ('6105120001', '6105120', 'TERATI'),
   ('6105120002', '6105120', 'SELAMPUNG'),
   ('6105120003', '6105120', 'SAPE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6105120004', '6105120', 'SEMIRAU'),
   ('6105120005', '6105120', 'BALAI SEBUT'),
   ('6105120006', '6105120', 'SEMOMBAT'),
@@ -63920,7 +63920,7 @@ INSERT INTO `villages` VALUES
   ('6105160004', '6105160', 'BULU BALA'),
   ('6105160005', '6105160', 'TEMIANG TABA'),
   ('6105160006', '6105160', 'SENYABANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6105160007', '6105160', 'KEBADU'),
   ('6105160008', '6105160', 'HILIR'),
   ('6105160009', '6105160', 'TEMIANG MALI'),
@@ -63971,7 +63971,7 @@ INSERT INTO `villages` VALUES
   ('6105220001', '6105220', 'NEKAN'),
   ('6105220002', '6105220', 'SEMANGET'),
   ('6105220003', '6105220', 'ENTIKONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6105220004', '6105220', 'PALAPASANG'),
   ('6105220005', '6105220', 'SURUH TEMBAWANG'),
   ('6106010001', '6106010', 'AIR HITAM BESAR'),
@@ -64022,7 +64022,7 @@ INSERT INTO `villages` VALUES
   ('6106030019', '6106030', 'RANDAI'),
   ('6106030020', '6106030', 'RIAM BATU GADING'),
   ('6106030021', '6106030', 'BATU PAYUNG DUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6106030022', '6106030', 'BANTAN SARI'),
   ('6106030023', '6106030', 'PELANJAU JAYA'),
   ('6106030024', '6106030', 'RANGKUNG'),
@@ -64073,7 +64073,7 @@ INSERT INTO `villages` VALUES
   ('6106050006', '6106050', 'SERENGKAH'),
   ('6106050007', '6106050', 'NATAI PANJANG'),
   ('6106050008', '6106050', 'TUMBANG TITI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6106050009', '6106050', 'BATU TAJAM'),
   ('6106050010', '6106050', 'SENGKAHARAK'),
   ('6106050022', '6106050', 'SEGAR WANGI'),
@@ -64124,7 +64124,7 @@ INSERT INTO `villages` VALUES
   ('6106061003', '6106061', 'NEGERI BARU'),
   ('6106061004', '6106061', 'MULIA KERTA'),
   ('6106061005', '6106061', 'SUNGAI KINJIL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6106061006', '6106061', 'KAUMAN'),
   ('6106061007', '6106061', 'BARU'),
   ('6106061008', '6106061', 'SUKA BARU'),
@@ -64175,7 +64175,7 @@ INSERT INTO `villages` VALUES
   ('6106100001', '6106100', 'PENJAWAAN'),
   ('6106100002', '6106100', 'SANDAI'),
   ('6106100003', '6106100', 'MUARA JEKAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6106100004', '6106100', 'PETAI PATAH'),
   ('6106100005', '6106100', 'RANDAU JUNGKAL'),
   ('6106100009', '6106100', 'RANDAU'),
@@ -64226,7 +64226,7 @@ INSERT INTO `villages` VALUES
   ('6106120012', '6106120', 'PAOH CONCONG'),
   ('6106120013', '6106120', 'LEGONG'),
   ('6106120014', '6106120', 'KENANGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6106120015', '6106120', 'SEKUCING KUALAN'),
   ('6106120016', '6106120', 'BALAI PINANG HULU'),
   ('6106120017', '6106120', 'LABAI HILIR'),
@@ -64277,7 +64277,7 @@ INSERT INTO `villages` VALUES
   ('6107070001', '6107070', 'BUNTUT SABON'),
   ('6107070002', '6107070', 'NANGA MENAKON'),
   ('6107070003', '6107070', 'NANGA KESANGE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6107070004', '6107070', 'NANGA KEMANGAI'),
   ('6107070005', '6107070', 'NANGA AMBALAU'),
   ('6107070006', '6107070', 'NANGA SAKE'),
@@ -64328,7 +64328,7 @@ INSERT INTO `villages` VALUES
   ('6107080020', '6107080', 'TONAK GONEH'),
   ('6107080021', '6107080', 'EMPAKAN'),
   ('6107080022', '6107080', 'TANAH MERAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6107080023', '6107080', 'MERAH ARAI'),
   ('6107080024', '6107080', 'TAPANG MANUA'),
   ('6107080025', '6107080', 'NANGKAK LESTARI'),
@@ -64379,7 +64379,7 @@ INSERT INTO `villages` VALUES
   ('6107110040', '6107110', 'SUNGAI JAUNG'),
   ('6107120001', '6107120', 'BENUA KENCANA'),
   ('6107120002', '6107120', 'MERTI JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6107120003', '6107120', 'GURUNG MALI'),
   ('6107120004', '6107120', 'KUALA TIGA'),
   ('6107120005', '6107120', 'PULAU JAYA'),
@@ -64430,7 +64430,7 @@ INSERT INTO `villages` VALUES
   ('6107130024', '6107130', 'SABANG SURAI'),
   ('6107130025', '6107130', 'BALAI AGUNG'),
   ('6107130026', '6107130', 'KUNYAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6107140002', '6107140', 'MUNGGUK BANTOK'),
   ('6107140003', '6107140', 'TANJUNG PURI'),
   ('6107140004', '6107140', 'BANING KOTA'),
@@ -64481,7 +64481,7 @@ INSERT INTO `villages` VALUES
   ('6107150020', '6107150', 'SUNGAI TAPANG'),
   ('6107150021', '6107150', 'GANDIS HULU'),
   ('6107150022', '6107150', 'HULU DEDAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6107150023', '6107150', 'APIN BARU'),
   ('6107150024', '6107150', 'JANGKANG'),
   ('6107150025', '6107150', 'BELINYUK SIBAU'),
@@ -64532,7 +64532,7 @@ INSERT INTO `villages` VALUES
   ('6107160040', '6107160', 'SUNGAI PENGGA'),
   ('6107160041', '6107160', 'BATU NETAK'),
   ('6107160042', '6107160', 'NERAN BAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6107160043', '6107160', 'MONBAI BEGUNUNK'),
   ('6107170001', '6107170', 'KEBONG'),
   ('6107170002', '6107170', 'MERPAK'),
@@ -64583,7 +64583,7 @@ INSERT INTO `villages` VALUES
   ('6107190020', '6107190', 'RATU DAMAI'),
   ('6107190021', '6107190', 'LEPUNG PANTAK'),
   ('6107190022', '6107190', 'PAMPANG DUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6107190023', '6107190', 'MUNGGUK KEPALA'),
   ('6107190024', '6107190', 'MAUNG'),
   ('6107200001', '6107200', 'BAGELANG JAYA'),
@@ -64634,7 +64634,7 @@ INSERT INTO `villages` VALUES
   ('6107210017', '6107210', 'BEKUAN LUYANG'),
   ('6107210018', '6107210', 'SUNGAI PISAU'),
   ('6107210019', '6107210', 'MUNGGUK ENTAWAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6107210020', '6107210', 'EMBALIH'),
   ('6107210022', '6107210', 'RIAM SEJAWAK'),
   ('6107210024', '6107210', 'SUNGAI KELIK'),
@@ -64685,7 +64685,7 @@ INSERT INTO `villages` VALUES
   ('6108040002', '6108040', 'SELAUP'),
   ('6108040003', '6108040', 'NANGA SEMANGUT'),
   ('6108040005', '6108040', 'NANGA SURUK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6108040006', '6108040', 'RIAM PIYANG'),
   ('6108040007', '6108040', 'NANGA PAYANG'),
   ('6108040008', '6108040', 'BATU TIGA'),
@@ -64736,7 +64736,7 @@ INSERT INTO `villages` VALUES
   ('6108080006', '6108080', 'TANJUNG JATI'),
   ('6108080007', '6108080', 'KEDAMIN DARAT'),
   ('6108080008', '6108080', 'SAYUT/SIYUT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6108080009', '6108080', 'SUKA MAJU'),
   ('6108080010', '6108080', 'CEMPAKA BARU'),
   ('6108080011', '6108080', 'BERINGIN JAYA'),
@@ -64787,7 +64787,7 @@ INSERT INTO `villages` VALUES
   ('6108120006', '6108120', 'KERANGAN PANJANG'),
   ('6108120007', '6108120', 'HULU PENGKADAN'),
   ('6108120008', '6108120', 'PINANG LAKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6108120009', '6108120', 'SASAN'),
   ('6108120010', '6108120', 'PENGKADAN HILIR'),
   ('6108120011', '6108120', 'SIRA JAYA'),
@@ -64838,7 +64838,7 @@ INSERT INTO `villages` VALUES
   ('6108160003', '6108160', 'BELUIS HARUM'),
   ('6108160005', '6108160', 'BATI'),
   ('6108160006', '6108160', 'SENEBAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6108160007', '6108160', 'BELIKAI'),
   ('6108160008', '6108160', 'PALA KOTA'),
   ('6108160009', '6108160', 'EMPERIANG'),
@@ -64889,7 +64889,7 @@ INSERT INTO `villages` VALUES
   ('6108210006', '6108210', 'LABIAN'),
   ('6108210007', '6108210', 'MENSIAU'),
   ('6108210008', '6108210', 'SUNGAI SENUNUK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6108210009', '6108210', 'LANJAK DERAS'),
   ('6108210010', '6108210', 'LABIAN IRAANG'),
   ('6108220001', '6108220', 'PULAU MANAK'),
@@ -64940,7 +64940,7 @@ INSERT INTO `villages` VALUES
   ('6109020005', '6109020', 'PANTOK'),
   ('6109020006', '6109020', 'MERAGUN'),
   ('6109020007', '6109020', 'RIRANG JATI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6109020008', '6109020', 'NANGA TAMAN'),
   ('6109020009', '6109020', 'SENANGAK'),
   ('6109020010', '6109020', 'SUNGAI LAWAK'),
@@ -64991,7 +64991,7 @@ INSERT INTO `villages` VALUES
   ('6109060002', '6109060', 'BELITANG DUA'),
   ('6109060003', '6109060', 'PADAK'),
   ('6109060005', '6109060', 'NANGA ANSAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6109060006', '6109060', 'MANUA PRAMA'),
   ('6109060007', '6109060', 'MABOH PERMAI'),
   ('6109070001', '6109070', 'KUMPANG ILONG'),
@@ -65042,7 +65042,7 @@ INSERT INTO `villages` VALUES
   ('6110021004', '6110021', 'PELITA JAYA'),
   ('6110021005', '6110021', 'BUKIT RAYA'),
   ('6110021006', '6110021', 'ULAK MUID');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6110021007', '6110021', 'LINTAH TAUM'),
   ('6110021008', '6110021', 'LAJA'),
   ('6110021009', '6110021', 'HARAPAN JAYA'),
@@ -65093,7 +65093,7 @@ INSERT INTO `villages` VALUES
   ('6110050010', '6110050', 'PORING'),
   ('6110050011', '6110050', 'TANJUNG SARI'),
   ('6110050012', '6110050', 'TEMBAWANG PANJANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6110050013', '6110050', 'PAAL'),
   ('6110050014', '6110050', 'TANJUNG NIAGA'),
   ('6110050015', '6110050', 'SIDO MULYO'),
@@ -65144,7 +65144,7 @@ INSERT INTO `villages` VALUES
   ('6110060005', '6110060', 'NANGA KALAN'),
   ('6110060006', '6110060', 'NANGA ELLA HILIR'),
   ('6110060007', '6110060', 'NANGA NUAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6110060008', '6110060', 'LENGKONG NYADOM'),
   ('6110060009', '6110060', 'JABAI'),
   ('6110060010', '6110060', 'SUNGAI LABUK'),
@@ -65195,7 +65195,7 @@ INSERT INTO `villages` VALUES
   ('6111020009', '6111020', 'PAMPANG HARAPAN'),
   ('6111020010', '6111020', 'RIAM BERASAPJAYA'),
   ('6111030001', '6111030', 'PADU BANJAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6111030002', '6111030', 'PULAU KUMBANG'),
   ('6111030003', '6111030', 'PEMANGKAT'),
   ('6111030004', '6111030', 'NIPAH KUNING'),
@@ -65246,7 +65246,7 @@ INSERT INTO `villages` VALUES
   ('6112020009', '6112020', 'BETUAH'),
   ('6112020010', '6112020', 'RADAK BARU'),
   ('6112030001', '6112030', 'DABUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6112030003', '6112030', 'SUNGAI TERUS'),
   ('6112030004', '6112030', 'TELUK NANGKA'),
   ('6112030005', '6112030', 'JANGKANG I'),
@@ -65297,7 +65297,7 @@ INSERT INTO `villages` VALUES
   ('6112060003', '6112060', 'RASAU JAYA III'),
   ('6112060004', '6112060', 'RASAU JAYA I'),
   ('6112060005', '6112060', 'RASAU JAYA II');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6112060006', '6112060', 'PEMATANG TUJUH'),
   ('6112070001', '6112070', 'SUNGAI RAYA'),
   ('6112070002', '6112070', 'KAPUR'),
@@ -65348,7 +65348,7 @@ INSERT INTO `villages` VALUES
   ('6171011003', '6171011', 'BANSIR LAUT'),
   ('6171011004', '6171011', 'BANSIR DARAT'),
   ('6171020001', '6171020', 'PARIT MAYOR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6171020002', '6171020', 'BANJAR SERASAN'),
   ('6171020003', '6171020', 'SAIGON'),
   ('6171020004', '6171020', 'TANJUNG HULU'),
@@ -65399,7 +65399,7 @@ INSERT INTO `villages` VALUES
   ('6201040003', '6201040', 'SAKABULIN'),
   ('6201040004', '6201040', 'KINJIL'),
   ('6201040005', '6201040', 'KOTA WARINGIN HILIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6201040006', '6201040', 'RIAM DURIAN'),
   ('6201040007', '6201040', 'DAWAK'),
   ('6201040008', '6201040', 'KOTAWARINGIN HULU'),
@@ -65450,7 +65450,7 @@ INSERT INTO `villages` VALUES
   ('6201061002', '6201061', 'MULYA JADI'),
   ('6201061003', '6201061', 'AMIN JAYA'),
   ('6201061004', '6201061', 'NATAI KERBAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6201061005', '6201061', 'KARANGMULYA'),
   ('6201061006', '6201061', 'MARGA MULYA'),
   ('6201061007', '6201061', 'ARGA MULYA'),
@@ -65501,7 +65501,7 @@ INSERT INTO `villages` VALUES
   ('6202021003', '6202021', 'BASAWANG'),
   ('6202021004', '6202021', 'PAREBOK'),
   ('6202021005', '6202021', 'KUIN PERMAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6202021006', '6202021', 'REGEI LESTARI'),
   ('6202050001', '6202050', 'SATIRUK'),
   ('6202050002', '6202050', 'BAPINANG HILIR LAUT'),
@@ -65552,7 +65552,7 @@ INSERT INTO `villages` VALUES
   ('6202110014', '6202110', 'BAJARUM'),
   ('6202110015', '6202110', 'RASAU TUMBUH'),
   ('6202110016', '6202110', 'SOREN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6202111001', '6202111', 'SEBABI'),
   ('6202111002', '6202111', 'TANAH PUTIH'),
   ('6202111003', '6202111', 'SUMBER MAKMUR'),
@@ -65603,7 +65603,7 @@ INSERT INTO `villages` VALUES
   ('6202201006', '6202201', 'WONOSARI'),
   ('6202201007', '6202201', 'MERAH'),
   ('6202201008', '6202201', 'DAMAR MAKMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6202201009', '6202201', 'MEKAR SARI'),
   ('6202201010', '6202201', 'LUWUK SAMPUN'),
   ('6202201011', '6202201', 'TANJUNG JORONG'),
@@ -65654,7 +65654,7 @@ INSERT INTO `villages` VALUES
   ('6202230031', '6202230', 'TUMBANG GAGU'),
   ('6202231001', '6202231', 'TUKANG LANGIT'),
   ('6202231002', '6202231', 'BUANA MUSTIKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6202231003', '6202231', 'TANJUNG HARAPAN'),
   ('6202231004', '6202231', 'TUMBANG SANGAI'),
   ('6202231005', '6202231', 'BERINGIN AGUNG'),
@@ -65705,7 +65705,7 @@ INSERT INTO `villages` VALUES
   ('6203040011', '6203040', 'SELAT HILIR'),
   ('6203040012', '6203040', 'SELAT TENGAH'),
   ('6203040013', '6203040', 'SELAT HULU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6203040014', '6203040', 'SELAT DALAM'),
   ('6203040015', '6203040', 'PULAU TELO'),
   ('6203040016', '6203040', 'PANAMAS'),
@@ -65756,7 +65756,7 @@ INSERT INTO `villages` VALUES
   ('6203090005', '6203090', 'PALANGKAI'),
   ('6203090006', '6203090', 'SEI TATAS'),
   ('6203090007', '6203090', 'HANDIWUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6203090008', '6203090', 'ANJIR PALAMBANG'),
   ('6203090009', '6203090', 'SEI TATAS HILIR'),
   ('6203090010', '6203090', 'MAWAR MEKAR'),
@@ -65807,7 +65807,7 @@ INSERT INTO `villages` VALUES
   ('6203110005', '6203110', 'PANTAI'),
   ('6203110006', '6203110', 'SAKA TAMIANG'),
   ('6203110007', '6203110', 'PENDA KETAPI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6203110008', '6203110', 'TELUK HIRI'),
   ('6203110009', '6203110', 'SEI DUSUN'),
   ('6203110010', '6203110', 'BASUTA RAYA'),
@@ -65858,7 +65858,7 @@ INSERT INTO `villages` VALUES
   ('6203160005', '6203160', 'LUNGKU LAYANG'),
   ('6203160006', '6203160', 'DANAU PANTAU'),
   ('6203160007', '6203160', 'LAWANG KAMAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6203160008', '6203160', 'TUMBANG RANDANG'),
   ('6203160009', '6203160', 'BATAPAH'),
   ('6203170001', '6203170', 'MASARAN'),
@@ -65909,7 +65909,7 @@ INSERT INTO `villages` VALUES
   ('6203181010', '6203181', 'MASUPA RIA'),
   ('6204010003', '6204010', 'TABATAN JAYA'),
   ('6204010004', '6204010', 'SUKAKARYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6204010005', '6204010', 'TAMPULANG'),
   ('6204010006', '6204010', 'RANTAU BAHUANG'),
   ('6204010007', '6204010', 'RANTAU KUJANG'),
@@ -65960,7 +65960,7 @@ INSERT INTO `villages` VALUES
   ('6204040024', '6204040', 'PARARAPAK'),
   ('6204040025', '6204040', 'TELUK MAMPUN'),
   ('6204040026', '6204040', 'TANJUNG JAWA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6204040027', '6204040', 'DANAU MASURA'),
   ('6204050001', '6204050', 'PENDANG'),
   ('6204050002', '6204050', 'MAJUNDRE'),
@@ -66011,7 +66011,7 @@ INSERT INTO `villages` VALUES
   ('6205010007', '6205010', 'RUBEI'),
   ('6205010008', '6205010', 'RUJI'),
   ('6205010009', '6205010', 'PARING LAHUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6205010010', '6205010', 'KAMAWEN'),
   ('6205020001', '6205020', 'MALUNGAI'),
   ('6205020002', '6205020', 'RARAWA'),
@@ -66062,7 +66062,7 @@ INSERT INTO `villages` VALUES
   ('6205050023', '6205050', 'BERINGIN RAYA'),
   ('6205050027', '6205050', 'DATAI NIRUI'),
   ('6205051001', '6205051', 'JINGAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6205051002', '6205051', 'JAMBU'),
   ('6205051003', '6205051', 'LIANG NAGA'),
   ('6205051004', '6205051', 'SABUH'),
@@ -66113,7 +66113,7 @@ INSERT INTO `villages` VALUES
   ('6206011003', '6206011', 'SUNGAI CABANG BARAT'),
   ('6206011004', '6206011', 'SUNGAI PASIR'),
   ('6206020001', '6206020', 'MENDAWAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6206020002', '6206020', 'NATAI SEDAWAK'),
   ('6206020004', '6206020', 'PADANG'),
   ('6206020005', '6206020', 'KARTA MULIA'),
@@ -66164,7 +66164,7 @@ INSERT INTO `villages` VALUES
   ('6207012006', '6207012', 'MUKTI MANUNGGAL'),
   ('6207012007', '6207012', 'MODANG MAS'),
   ('6207012008', '6207012', 'NANUAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6207012009', '6207012', 'TOPALAN'),
   ('6207012010', '6207012', 'BATU AMPAR'),
   ('6207012011', '6207012', 'LUBUK HIJU'),
@@ -66215,7 +66215,7 @@ INSERT INTO `villages` VALUES
   ('6207031001', '6207031', 'BATU TAMBUN'),
   ('6207031002', '6207031', 'KINIPAN'),
   ('6207031003', '6207031', 'GINIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6207031004', '6207031', 'BENAKITAN'),
   ('6207031005', '6207031', 'LIKU'),
   ('6207031006', '6207031', 'MENGKALANG'),
@@ -66266,7 +66266,7 @@ INSERT INTO `villages` VALUES
   ('6208031006', '6208031', 'TANJUNG RANGAS II'),
   ('6208040003', '6208040', 'BUMI JAYA'),
   ('6208040004', '6208040', 'SUKOREJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6208040008', '6208040', 'SUKA MAJU'),
   ('6208040009', '6208040', 'SUKA MAKMUR'),
   ('6208040011', '6208040', 'SUKA JAYA'),
@@ -66317,7 +66317,7 @@ INSERT INTO `villages` VALUES
   ('6208051001', '6208051', 'TUMBANG MAGIN'),
   ('6208051002', '6208051', 'TUMBANG SETOLI'),
   ('6208051003', '6208051', 'TUMBANG HENTAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6208051004', '6208051', 'TUMBANG LANGKAI'),
   ('6208051005', '6208051', 'TANJUNG TUKAL'),
   ('6208051006', '6208051', 'RANGKANG MUNDUK'),
@@ -66368,7 +66368,7 @@ INSERT INTO `villages` VALUES
   ('6209050003', '6209050', 'KASONGAN BARU'),
   ('6209050004', '6209050', 'KASONGAN LAMA'),
   ('6209050005', '6209050', 'TALIAN KERENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6209050006', '6209050', 'BANUT KALANAMAN'),
   ('6209050007', '6209050', 'TELANGKAH'),
   ('6209050008', '6209050', 'HAMPALIT'),
@@ -66419,7 +66419,7 @@ INSERT INTO `villages` VALUES
   ('6209090006', '6209090', 'KULUK HABUHUS'),
   ('6209090007', '6209090', 'TUMBANG KANEI'),
   ('6209090008', '6209090', 'TUMBANG TARANEI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6209090009', '6209090', 'TUMBANG PANGKA'),
   ('6209090010', '6209090', 'TUMBANG ATEI'),
   ('6209090011', '6209090', 'TUMBANG KAWEI'),
@@ -66470,7 +66470,7 @@ INSERT INTO `villages` VALUES
   ('6209110025', '6209110', 'TUMBANG KUAI'),
   ('6209110027', '6209110', 'KULUK SAPANGI'),
   ('6209110029', '6209110', 'DEHES ASEM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6209110031', '6209110', 'RANGAN KAWIT'),
   ('6209110033', '6209110', 'KIHAM BATANG'),
   ('6209111001', '6209111', 'TUMBANG KATAEI'),
@@ -66521,7 +66521,7 @@ INSERT INTO `villages` VALUES
   ('6210020014', '6210020', 'KANTAN DALAM'),
   ('6210020015', '6210020', 'KANTAN ATAS'),
   ('6210020016', '6210020', 'KARYA BERSAMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6210030001', '6210030', 'GANDANG'),
   ('6210030002', '6210030', 'GARANTUNG'),
   ('6210030003', '6210030', 'MALIKU BARU'),
@@ -66572,7 +66572,7 @@ INSERT INTO `villages` VALUES
   ('6210060003', '6210060', 'LAWANG URU'),
   ('6210060005', '6210060', 'HANUA'),
   ('6210060006', '6210060', 'RAMANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6210060007', '6210060', 'TAMBAK'),
   ('6210060008', '6210060', 'PAHAWAN'),
   ('6210060009', '6210060', 'GOHA'),
@@ -66623,7 +66623,7 @@ INSERT INTO `villages` VALUES
   ('6211021010', '6211021', 'SEI ANTAI'),
   ('6211021011', '6211021', 'TUMBANG TUWE'),
   ('6211022001', '6211022', 'HUJUNG PATA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6211022002', '6211022', 'TUMBANG JALEMU KAJUEI'),
   ('6211022003', '6211022', 'JALEMU  RAYA'),
   ('6211022004', '6211022', 'JALEMU MASULAN'),
@@ -66674,7 +66674,7 @@ INSERT INTO `villages` VALUES
   ('6211050012', '6211050', 'BATU  NYAPAU'),
   ('6211050013', '6211050', 'RANGAN MIHING'),
   ('6211050014', '6211050', 'TELUK LAWAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6211050015', '6211050', 'TAJA URAP'),
   ('6211050016', '6211050', 'KARASON'),
   ('6211060005', '6211060', 'TUMBANG HAMPUTUNG'),
@@ -66725,7 +66725,7 @@ INSERT INTO `villages` VALUES
   ('6212020008', '6212020', 'HARINGEN'),
   ('6212020009', '6212020', 'DORONG'),
   ('6212020010', '6212020', 'DIDI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6212020011', '6212020', 'KARANG LANGIT'),
   ('6212020012', '6212020', 'HARARA'),
   ('6212020013', '6212020', 'MANGKARAP'),
@@ -66776,7 +66776,7 @@ INSERT INTO `villages` VALUES
   ('6212051006', '6212051', 'TURAN AMIS'),
   ('6212051007', '6212051', 'TANGKUM'),
   ('6212051008', '6212051', 'SIBUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6212051009', '6212051', 'MALINTUT'),
   ('6212052001', '6212052', 'TAMPA'),
   ('6212052002', '6212052', 'RUNGGU RAYA'),
@@ -66827,7 +66827,7 @@ INSERT INTO `villages` VALUES
   ('6213011005', '6213011', 'TAMBELUM'),
   ('6213011006', '6213011', 'TUMBANG APAT'),
   ('6213020001', '6213020', 'DIRUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6213020002', '6213020', 'MALASAN'),
   ('6213020003', '6213020', 'BATU PUTIH'),
   ('6213020004', '6213020', 'MANGKAHUI'),
@@ -66878,7 +66878,7 @@ INSERT INTO `villages` VALUES
   ('6213031008', '6213031', 'TUMBANG BAUH'),
   ('6213031009', '6213031', 'HINGAN TOKUNG'),
   ('6213031010', '6213031', 'BATU TOJAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6213031011', '6213031', 'TUMBANG BALOI'),
   ('6213040007', '6213040', 'SUNGAI LUNUK'),
   ('6213040008', '6213040', 'TINO TALIH'),
@@ -66929,7 +66929,7 @@ INSERT INTO `villages` VALUES
   ('6213051006', '6213051', 'TUMBANG JOJANG'),
   ('6213051007', '6213051', 'TAKAJUNG'),
   ('6213052001', '6213052', 'TUMBANG OLONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6213052002', '6213052', 'TUMBANG OLONG II'),
   ('6213052003', '6213052', 'KALASIN'),
   ('6213052004', '6213052', 'TUMBANG TUJANG'),
@@ -66980,7 +66980,7 @@ INSERT INTO `villages` VALUES
   ('6301020006', '6301020', 'BENUA TENGAH'),
   ('6301020007', '6301020', 'BENUA LAWAS'),
   ('6301020008', '6301020', 'RANGGANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6301020009', '6301020', 'BATILAI'),
   ('6301020010', '6301020', 'RANGGANG DALAM'),
   ('6301020011', '6301020', 'PEGATAN BESAR'),
@@ -67031,7 +67031,7 @@ INSERT INTO `villages` VALUES
   ('6301050010', '6301050', 'MARTADAH BARU'),
   ('6301060001', '6301060', 'SUNGAI RIAM'),
   ('6301060002', '6301060', 'KAMPUNG BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6301060003', '6301060', 'SUMBER MULIA'),
   ('6301060004', '6301060', 'TAMPANG'),
   ('6301060005', '6301060', 'SARANG HALANG'),
@@ -67082,7 +67082,7 @@ INSERT INTO `villages` VALUES
   ('6301080008', '6301080', 'ASRI MULIA'),
   ('6301080009', '6301080', 'ASAM ASAM'),
   ('6301080010', '6301080', 'BATALANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6301080011', '6301080', 'SIMPANG EMPAT SUNGAI BARU'),
   ('6301090001', '6301090', 'PANDANSARI'),
   ('6301090002', '6301090', 'SALAMAN'),
@@ -67133,7 +67133,7 @@ INSERT INTO `villages` VALUES
   ('6302030016', '6302030', 'TANJUNG SELOKA UTARA'),
   ('6302031001', '6302031', 'PULAU KERAYAAN'),
   ('6302031002', '6302031', 'KERAYAAN UTARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6302031003', '6302031', 'PULAU KERUMPUTAN'),
   ('6302031004', '6302031', 'PULAU KERASIAN'),
   ('6302031005', '6302031', 'TELUK KEMUNING'),
@@ -67184,7 +67184,7 @@ INSERT INTO `villages` VALUES
   ('6302060027', '6302060', 'SIGAM'),
   ('6302061001', '6302061', 'SEMISIR'),
   ('6302061002', '6302061', 'SUNGAI PASIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6302061003', '6302061', 'SALINO'),
   ('6302061004', '6302061', 'MEKAR PURA'),
   ('6302061005', '6302061', 'SELARU'),
@@ -67235,7 +67235,7 @@ INSERT INTO `villages` VALUES
   ('6302150008', '6302150', 'TEROMBONG SARI'),
   ('6302150009', '6302150', 'BULUH KUNING'),
   ('6302160001', '6302160', 'TANJUNG BATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6302160002', '6302160', 'SUNGAI PINANG'),
   ('6302160003', '6302160', 'SUNGAI PUNGGAWA'),
   ('6302160004', '6302160', 'TANJUNG SELAYAR'),
@@ -67286,7 +67286,7 @@ INSERT INTO `villages` VALUES
   ('6302200007', '6302200', 'KALIAN'),
   ('6302200008', '6302200', 'BINTURUNG'),
   ('6302200009', '6302200', 'HARAPAN BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6302200010', '6302200', 'TAMIYANG'),
   ('6302200011', '6302200', 'LINTANG JAYA'),
   ('6302200012', '6302200', 'MULYO HARJO'),
@@ -67337,7 +67337,7 @@ INSERT INTO `villages` VALUES
   ('6303020007', '6303020', 'TAMBAK SIRANG BARU'),
   ('6303020008', '6303020', 'TAMBAK SIRANG LAUT'),
   ('6303020009', '6303020', 'MALINTANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6303020010', '6303020', 'MALINTANG BARU'),
   ('6303020011', '6303020', 'KAYU BAWANG'),
   ('6303020012', '6303020', 'GAMBUT'),
@@ -67388,7 +67388,7 @@ INSERT INTO `villages` VALUES
   ('6303040017', '6303040', 'LOKBUNTAR'),
   ('6303040018', '6303040', 'PEJAMBUAN'),
   ('6303040019', '6303040', 'SUNGAI BANGKAL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6303040020', '6303040', 'KELILING BENTENG ILIR'),
   ('6303040021', '6303040', 'TAJAU LANDUNG'),
   ('6303050001', '6303050', 'CINDAI ALUS'),
@@ -67439,7 +67439,7 @@ INSERT INTO `villages` VALUES
   ('6303052001', '6303052', 'PENGGALAMAN'),
   ('6303052002', '6303052', 'SUNGAI BATANG'),
   ('6303052003', '6303052', 'TELOK SELONG ULU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6303052004', '6303052', 'TELOK SELONG'),
   ('6303052005', '6303052', 'TANGKAS'),
   ('6303052006', '6303052', 'SUNGAI BATANG ILIR'),
@@ -67490,7 +67490,7 @@ INSERT INTO `villages` VALUES
   ('6303070016', '6303070', 'PASAR LAMA'),
   ('6303070017', '6303070', 'PANDAK DAUN'),
   ('6303070018', '6303070', 'JINGAH HABANG ULU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6303070019', '6303070', 'JINGAH HABANG ILIR'),
   ('6303070020', '6303070', 'SUNGAI ARFAT'),
   ('6303070021', '6303070', 'MALI MALI'),
@@ -67541,7 +67541,7 @@ INSERT INTO `villages` VALUES
   ('6303101002', '6303101', 'BATU TANAM'),
   ('6303101003', '6303101', 'GUNUNG BATU'),
   ('6303101004', '6303101', 'BALIANGIN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6303101005', '6303101', 'BATANG BANYU'),
   ('6303101006', '6303101', 'SUNGAI LURUS'),
   ('6303101007', '6303101', 'PASAR BARU'),
@@ -67592,7 +67592,7 @@ INSERT INTO `villages` VALUES
   ('6303121004', '6303121', 'RAMPAH'),
   ('6304010001', '6304010', 'KUALA LUPAK'),
   ('6304010002', '6304010', 'SUNGAI TELAN BESAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6304010003', '6304010', 'SUNGAI TELAN KECIL'),
   ('6304010004', '6304010', 'SUNGAI TELAN MUARA'),
   ('6304010005', '6304010', 'TABUNGANEN MUARA'),
@@ -67643,7 +67643,7 @@ INSERT INTO `villages` VALUES
   ('6304040011', '6304040', 'BANYIUR'),
   ('6304040012', '6304040', 'DANAU KARYA'),
   ('6304040013', '6304040', 'MENTAREN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6304040014', '6304040', 'GANDARIA'),
   ('6304040015', '6304040', 'GANDARAYA'),
   ('6304050001', '6304050', 'ANJIR SERAPAT BARU I'),
@@ -67694,7 +67694,7 @@ INSERT INTO `villages` VALUES
   ('6304070013', '6304070', 'ANTASAN SEGARA'),
   ('6304070014', '6304070', 'PANTAI HAMBAWANG'),
   ('6304071001', '6304071', 'CAHAYA BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6304071002', '6304071', 'SAMPURNA'),
   ('6304071003', '6304071', 'BAHANDANG'),
   ('6304071004', '6304071', 'JEJANGKIT MUARA'),
@@ -67745,7 +67745,7 @@ INSERT INTO `villages` VALUES
   ('6304110005', '6304110', 'SUNGAI BAMBAN'),
   ('6304110006', '6304110', 'SUNGAI GAMPA'),
   ('6304110007', '6304110', 'SUNGAI SAHURAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6304110008', '6304110', 'SIMPANG ARJA'),
   ('6304110009', '6304110', 'SINAR BARU'),
   ('6304120001', '6304120', 'SUNGAI RASAU'),
@@ -67796,7 +67796,7 @@ INSERT INTO `villages` VALUES
   ('6305010001', '6305010', 'TUNGKAP'),
   ('6305010002', '6305010', 'A YANI PURA'),
   ('6305010003', '6305010', 'GUNUNG BATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6305010012', '6305010', 'PADANG SARI'),
   ('6305010013', '6305010', 'PUALAM SARI'),
   ('6305010014', '6305010', 'BINUANG'),
@@ -67847,7 +67847,7 @@ INSERT INTO `villages` VALUES
   ('6305030015', '6305030', 'PANDAHAN'),
   ('6305030016', '6305030', 'PEMATANG KARANGAN HILIR'),
   ('6305030017', '6305030', 'HIYUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6305040001', '6305040', 'PARING GULING'),
   ('6305040002', '6305040', 'RANTAU BUJUR'),
   ('6305040003', '6305040', 'HANGUI'),
@@ -67898,7 +67898,7 @@ INSERT INTO `villages` VALUES
   ('6305080005', '6305080', 'WARINGIN'),
   ('6305080006', '6305080', 'TANGKAWANG BARU'),
   ('6305080007', '6305080', 'TANGKAWANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6305080008', '6305080', 'GADUNG KARAMAT'),
   ('6305080009', '6305080', 'KETAPANG'),
   ('6305080011', '6305080', 'GADUNG'),
@@ -67949,7 +67949,7 @@ INSERT INTO `villages` VALUES
   ('6306020003', '6306020', 'PANGGUNGAN'),
   ('6306020004', '6306020', 'LUMPANGI'),
   ('6306020005', '6306020', 'MALINAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6306020006', '6306020', 'HULU BANYU'),
   ('6306020007', '6306020', 'TUMINGKI'),
   ('6306020008', '6306020', 'KAMAWAKAN'),
@@ -68000,7 +68000,7 @@ INSERT INTO `villages` VALUES
   ('6306060001', '6306060', 'BUMI BARKAT'),
   ('6306060004', '6306060', 'IDA MANGGALA'),
   ('6306060005', '6306060', 'BATANG KULUR TENGAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6306060006', '6306060', 'BATANG KULUR KANAN'),
   ('6306060010', '6306060', 'TAMIYANG'),
   ('6306060012', '6306060', 'ASAM'),
@@ -68051,7 +68051,7 @@ INSERT INTO `villages` VALUES
   ('6306090020', '6306090', 'BANJAR BARU'),
   ('6306090021', '6306090', 'BAYANAN'),
   ('6306090022', '6306090', 'PANDAN SARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6306090023', '6306090', 'PIHANIN RAYA'),
   ('6306091001', '6306091', 'BAJAYAU LAMA'),
   ('6306091002', '6306091', 'TANJUNG SELOR'),
@@ -68102,7 +68102,7 @@ INSERT INTO `villages` VALUES
   ('6307020011', '6307020', 'BARU'),
   ('6307020013', '6307020', 'ALUAN MATI'),
   ('6307020015', '6307020', 'ALUAN SUMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6307020017', '6307020', 'KALI BARU'),
   ('6307020018', '6307020', 'LAYUH'),
   ('6307020020', '6307020', 'KAHAKAN'),
@@ -68153,7 +68153,7 @@ INSERT INTO `villages` VALUES
   ('6307050002', '6307050', 'PAJUKUNGAN'),
   ('6307050004', '6307050', 'BUKAT'),
   ('6307050005', '6307050', 'BARABAI BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6307050006', '6307050', 'BARABAI UTARA'),
   ('6307050007', '6307050', 'BARABAI SELATAN'),
   ('6307050008', '6307050', 'BARABAI DARAT'),
@@ -68204,7 +68204,7 @@ INSERT INTO `villages` VALUES
   ('6307070033', '6307070', 'SAMHURANG'),
   ('6307080001', '6307080', 'MASIRAAN'),
   ('6307080003', '6307080', 'JARANIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6307080004', '6307080', 'BANUA HANYAR'),
   ('6307080006', '6307080', 'BANUA ASAM'),
   ('6307080009', '6307080', 'MATANG GINALUN'),
@@ -68255,7 +68255,7 @@ INSERT INTO `villages` VALUES
   ('6308010011', '6308010', 'MANARAP'),
   ('6308010012', '6308010', 'LONG KONG'),
   ('6308010013', '6308010', 'BITIN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6308010014', '6308010', 'BARU'),
   ('6308010015', '6308010', 'TELUK MESJID'),
   ('6308010016', '6308010', 'DARUSSALAM'),
@@ -68306,7 +68306,7 @@ INSERT INTO `villages` VALUES
   ('6308030010', '6308030', 'JALAN LURUS'),
   ('6308030011', '6308030', 'TELUK MESJID'),
   ('6308030012', '6308030', 'BANYU TAJUN HILIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6308030013', '6308030', 'TATAH LABAN'),
   ('6308030014', '6308030', 'RANTAU KARAU HULU'),
   ('6308030015', '6308030', 'RANTAU KARAU TENGAH'),
@@ -68357,7 +68357,7 @@ INSERT INTO `villages` VALUES
   ('6308040012', '6308040', 'SIMPANG EMPAT'),
   ('6308040013', '6308040', 'RUKAM HULU'),
   ('6308040014', '6308040', 'RUKAM HILIR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6308040015', '6308040', 'KUTAI KECIL'),
   ('6308040016', '6308040', 'PADANG DARAT'),
   ('6308040017', '6308040', 'TELAGA HANYAR'),
@@ -68408,7 +68408,7 @@ INSERT INTO `villages` VALUES
   ('6308060003', '6308060', 'BERINGIN'),
   ('6308060004', '6308060', 'KALINTAMUI'),
   ('6308060005', '6308060', 'PALANJUNGAN SARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6308060006', '6308060', 'KALUDAN BESAR'),
   ('6308060007', '6308060', 'KALUDAN KECIL'),
   ('6308060008', '6308060', 'RANTAU BUJUR'),
@@ -68459,7 +68459,7 @@ INSERT INTO `villages` VALUES
   ('6308071009', '6308071', 'HAUR GADING'),
   ('6308071010', '6308071', 'SUNGAI LIMAS'),
   ('6308071011', '6308071', 'PIHAUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6308071012', '6308071', 'KERAMAT'),
   ('6308071013', '6308071', 'TELUK HAUR'),
   ('6308071014', '6308071', 'WARINGIN'),
@@ -68510,7 +68510,7 @@ INSERT INTO `villages` VALUES
   ('6309040007', '6309040', 'MURUNG KARANGAN'),
   ('6309050001', '6309050', 'WALANGKIR'),
   ('6309050002', '6309050', 'PULAU KU\'U');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6309050003', '6309050', 'TAMIYANG'),
   ('6309050004', '6309050', 'WARUKIN'),
   ('6309050005', '6309050', 'PADANG PANJANG'),
@@ -68561,7 +68561,7 @@ INSERT INTO `villages` VALUES
   ('6309080035', '6309080', 'NAWIN'),
   ('6309080036', '6309080', 'MARINDI'),
   ('6309081001', '6309081', 'WALING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6309081002', '6309081', 'USIH'),
   ('6309081003', '6309081', 'BINTANG ARA'),
   ('6309081004', '6309081', 'ARGO MULYO'),
@@ -68612,7 +68612,7 @@ INSERT INTO `villages` VALUES
   ('6310010014', '6310010', 'PULAU SATU'),
   ('6310010015', '6310010', 'KAMPUNG BARU'),
   ('6310010016', '6310010', 'PENYOLONGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6310010017', '6310010', 'TANETTE'),
   ('6310010018', '6310010', 'MUARA PAGATAN TENGAH'),
   ('6310010019', '6310010', 'MUARA PAGATAN'),
@@ -68663,7 +68663,7 @@ INSERT INTO `villages` VALUES
   ('6310030021', '6310030', 'MAKMUR MULIA'),
   ('6310030022', '6310030', 'AL KAUTSAR'),
   ('6310030025', '6310030', 'SINAR BULAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6310030026', '6310030', 'PENDAMARAN JAYA'),
   ('6310031001', '6310031', 'SUMBER BARU'),
   ('6310031002', '6310031', 'ANGSANA'),
@@ -68714,7 +68714,7 @@ INSERT INTO `villages` VALUES
   ('6310051002', '6310051', 'PEMATANG ULIN'),
   ('6310051003', '6310051', 'KARANG BINTANG'),
   ('6310051004', '6310051', 'BATULICIN IRIGASI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6310051005', '6310051', 'PANDAN SARI'),
   ('6310051006', '6310051', 'SELA SELILAU'),
   ('6310051007', '6310051', 'MANUNGGAL'),
@@ -68765,7 +68765,7 @@ INSERT INTO `villages` VALUES
   ('6311010018', '6311010', 'MATANG HANAU'),
   ('6311010019', '6311010', 'LAMPIHONG KIRI'),
   ('6311010020', '6311010', 'SUNGAI AWANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6311010021', '6311010', 'PUPUYUAN'),
   ('6311010022', '6311010', 'LAJAR'),
   ('6311010023', '6311010', 'KUPANG'),
@@ -68816,7 +68816,7 @@ INSERT INTO `villages` VALUES
   ('6311031004', '6311031', 'DAYAK PITAP'),
   ('6311031005', '6311031', 'LANGKAP'),
   ('6311031006', '6311031', 'MAYANAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6311031007', '6311031', 'SIMPANG BUMBUAN'),
   ('6311031008', '6311031', 'SIMPANG NADUNG'),
   ('6311031009', '6311031', 'GUNUNG BATU'),
@@ -68867,7 +68867,7 @@ INSERT INTO `villages` VALUES
   ('6311050010', '6311050', 'MUNGKUR UYAM'),
   ('6311050011', '6311050', 'SIRAP'),
   ('6311050012', '6311050', 'HAMARUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6311050013', '6311050', 'HUKAI'),
   ('6311050014', '6311050', 'MUARA NINIAN'),
   ('6311050015', '6311050', 'MARIAS'),
@@ -68918,7 +68918,7 @@ INSERT INTO `villages` VALUES
   ('6371020005', '6371020', 'KURIPAN'),
   ('6371020011', '6371020', 'SUNGAI BILU'),
   ('6371020012', '6371020', 'PENGAMBANGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6371020013', '6371020', 'BENUA ANYAR'),
   ('6371020014', '6371020', 'PEMURUS LUAR'),
   ('6371030001', '6371030', 'TELUK TIRAM'),
@@ -68969,7 +68969,7 @@ INSERT INTO `villages` VALUES
   ('6372031003', '6372031', 'KOMET'),
   ('6372031004', '6372031', 'SUNGAI ULIN'),
   ('6372032001', '6372032', 'LOKTABAT SELATAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6372032002', '6372032', 'KEMUNING'),
   ('6372032003', '6372032', 'GUNTUNG PAIKAT'),
   ('6372032004', '6372032', 'SUNGAI BESAR'),
@@ -69020,7 +69020,7 @@ INSERT INTO `villages` VALUES
   ('6401030010', '6401030', 'SULILIRAN'),
   ('6401030011', '6401030', 'LABURAN BARU'),
   ('6401030012', '6401030', 'LABURAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6401030013', '6401030', 'OLONG PINANG'),
   ('6401030014', '6401030', 'SUNGE BATU'),
   ('6401030015', '6401030', 'SUATANG KETEBAN'),
@@ -69071,7 +69071,7 @@ INSERT INTO `villages` VALUES
   ('6401060016', '6401060', 'OLUNG'),
   ('6401060017', '6401060', 'KAYUNGO SARI'),
   ('6401060018', '6401060', 'KERTA BHAKTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6401060019', '6401060', 'SEKUROU JAYA'),
   ('6401060020', '6401060', 'LONG GELANG'),
   ('6401060021', '6401060', 'TIWEI'),
@@ -69122,7 +69122,7 @@ INSERT INTO `villages` VALUES
   ('6402010008', '6402010', 'SIRAM JAYA'),
   ('6402010009', '6402010', 'RESAK'),
   ('6402010010', '6402010', 'TANJUNG SARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6402010011', '6402010', 'JAMBUK MAKMUR'),
   ('6402010012', '6402010', 'BUKIT HARAPAN'),
   ('6402010013', '6402010', 'JAMBUK'),
@@ -69173,7 +69173,7 @@ INSERT INTO `villages` VALUES
   ('6402041015', '6402041', 'TEBISAQ'),
   ('6402041016', '6402041', 'MUARA PONAQ'),
   ('6402050010', '6402050', 'MUARA BEGAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6402050011', '6402050', 'LOTAQ'),
   ('6402050012', '6402050', 'PAYANG'),
   ('6402050013', '6402050', 'CEMPEDAS'),
@@ -69224,7 +69224,7 @@ INSERT INTO `villages` VALUES
   ('6402070010', '6402070', 'JUAQ ASA'),
   ('6402070011', '6402070', 'OMBAU ASA'),
   ('6402070012', '6402070', 'NGENYAN ASA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6402070013', '6402070', 'GEMUHAN ASA'),
   ('6402070014', '6402070', 'GELEO BARU'),
   ('6402070015', '6402070', 'GELEO ASA'),
@@ -69275,7 +69275,7 @@ INSERT INTO `villages` VALUES
   ('6402082016', '6402082', 'TONDOH'),
   ('6402090011', '6402090', 'ANAH'),
   ('6402090013', '6402090', 'MUARA LEBAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6402090014', '6402090', 'LONGIRAM SEBERANG'),
   ('6402090015', '6402090', 'LONG IRAM ILIR'),
   ('6402090016', '6402090', 'LONG IRAM KOTA'),
@@ -69326,7 +69326,7 @@ INSERT INTO `villages` VALUES
   ('6403020004', '6403020', 'MUARA JAWA ULU'),
   ('6403020005', '6403020', 'DONDANG'),
   ('6403020006', '6403020', 'TAMAPOLE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6403020007', '6403020', 'MUARA KEMBANG'),
   ('6403020008', '6403020', 'MUARA JAWA PESISIR'),
   ('6403030001', '6403030', 'JAWA'),
@@ -69377,7 +69377,7 @@ INSERT INTO `villages` VALUES
   ('6403070005', '6403070', 'MELINTANG'),
   ('6403070006', '6403070', 'ENGGELAM'),
   ('6403070007', '6403070', 'MUARA ENGGELAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6403080001', '6403080', 'KOTA BANGUN III'),
   ('6403080002', '6403080', 'KOTA BANGUN II'),
   ('6403080003', '6403080', 'KOTA BANGUN I'),
@@ -69428,7 +69428,7 @@ INSERT INTO `villages` VALUES
   ('6403100014', '6403100', 'MEKAR JAYA'),
   ('6403110001', '6403110', 'LOA LEPU'),
   ('6403110002', '6403110', 'TELUK DALAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6403110003', '6403110', 'PERJIWA'),
   ('6403110004', '6403110', 'LOA RAYA'),
   ('6403110005', '6403110', 'LOA ULUNG'),
@@ -69479,7 +69479,7 @@ INSERT INTO `villages` VALUES
   ('6403140011', '6403140', 'SEMANGKOK'),
   ('6403150001', '6403150', 'BENUA PUHUN'),
   ('6403150002', '6403150', 'TERATAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6403150003', '6403150', 'BUNGA JADI'),
   ('6403150004', '6403150', 'PANCA JAYA'),
   ('6403150005', '6403150', 'SIDO MUKTI'),
@@ -69530,7 +69530,7 @@ INSERT INTO `villages` VALUES
   ('6403180011', '6403180', 'UMAQ BEKUAI'),
   ('6403180012', '6403180', 'SIDOMULYO'),
   ('6403180013', '6403180', 'MUARA TIQ');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6403180014', '6403180', 'TABANG LAMA'),
   ('6403180015', '6403180', 'MUARA SALUNG'),
   ('6403180016', '6403180', 'MUARA KEBAQ'),
@@ -69581,7 +69581,7 @@ INSERT INTO `villages` VALUES
   ('6404022005', '6404022', 'MARGA MULIA'),
   ('6404022006', '6404022', 'MAKMUR JAYA'),
   ('6404022007', '6404022', 'MIAU BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6404030001', '6404030', 'SENAMBAH'),
   ('6404030002', '6404030', 'NGAYAU'),
   ('6404030003', '6404030', 'MUARA BENGKAL ILIR'),
@@ -69632,7 +69632,7 @@ INSERT INTO `villages` VALUES
   ('6404050002', '6404050', 'BENUA BARU ILIR'),
   ('6404050003', '6404050', 'SEMPAYAU'),
   ('6404050004', '6404050', 'TEPIAN TERAP');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6404050005', '6404050', 'PELAWAN'),
   ('6404050006', '6404050', 'MANDU DALAM'),
   ('6404050007', '6404050', 'SAKA'),
@@ -69683,7 +69683,7 @@ INSERT INTO `villages` VALUES
   ('6405010009', '6405010', 'LONG BELIU'),
   ('6405010010', '6405010', 'LONG DUHUNG'),
   ('6405010011', '6405010', 'LONG KELUH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6405010012', '6405010', 'LONG PELAY'),
   ('6405010013', '6405010', 'LONG LAMCIN'),
   ('6405010014', '6405010', 'LONG SULUI'),
@@ -69734,7 +69734,7 @@ INSERT INTO `villages` VALUES
   ('6405060003', '6405060', 'SUNGAI BEDUNGUN'),
   ('6405060004', '6405060', 'TANJUNG REDEB'),
   ('6405060005', '6405060', 'BUGIS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6405060006', '6405060', 'GUNUNG PANJANG'),
   ('6405060007', '6405060', 'KARANG AMBUN'),
   ('6405060008', '6405060', 'GAYAM'),
@@ -69785,7 +69785,7 @@ INSERT INTO `villages` VALUES
   ('6405110008', '6405110', 'BIATAN ILIR'),
   ('6409010001', '6409010', 'GUNUNG MAKMUR'),
   ('6409010002', '6409010', 'GUNUNG INTAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6409010003', '6409010', 'SUMBER SARI'),
   ('6409010004', '6409010', 'SRI RAHARJA'),
   ('6409010005', '6409010', 'RAWA MULIA'),
@@ -69836,7 +69836,7 @@ INSERT INTO `villages` VALUES
   ('6409040015', '6409040', 'BINUANG'),
   ('6411010001', '6411010', 'NYARIBUNGAN'),
   ('6411010002', '6411010', 'LONG GELAWANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6411010003', '6411010', 'DANUM PAROI'),
   ('6411010004', '6411010', 'MUARA RATAH'),
   ('6411010005', '6411010', 'LAHAM'),
@@ -69887,7 +69887,7 @@ INSERT INTO `villages` VALUES
   ('6411050010', '6411050', 'LONG APARI'),
   ('6471010006', '6471010', 'GUNUNG BAHAGIA'),
   ('6471010007', '6471010', 'SEPINGGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6471010008', '6471010', 'DAMAI BARU'),
   ('6471010009', '6471010', 'DAMAI BAHAGIA'),
   ('6471010010', '6471010', 'SUNGAI NANGKA'),
@@ -69938,7 +69938,7 @@ INSERT INTO `villages` VALUES
   ('6472022001', '6472022', 'PULAU ATAS'),
   ('6472022002', '6472022', 'SINDANG SARI'),
   ('6472022003', '6472022', 'MAKROMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6472022004', '6472022', 'SAMBUTAN'),
   ('6472022005', '6472022', 'SUNGAI KAPIH'),
   ('6472030001', '6472030', 'MESJID'),
@@ -69989,7 +69989,7 @@ INSERT INTO `villages` VALUES
   ('6474020001', '6474020', 'BONTANG KUALA'),
   ('6474020002', '6474020', 'BONTANG BARU'),
   ('6474020003', '6474020', 'API-API');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6474020004', '6474020', 'GUNUNG LAI'),
   ('6474020005', '6474020', 'LOK TUAN'),
   ('6474030001', '6474030', 'KANAAN'),
@@ -70040,7 +70040,7 @@ INSERT INTO `villages` VALUES
   ('6501080003', '6501080', 'NAHAKRAMO BARU'),
   ('6501080005', '6501080', 'LONG LAKE'),
   ('6501080006', '6501080', 'HALANGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6501080007', '6501080', 'PUNAN MIRAU'),
   ('6501080008', '6501080', 'LONG RAT'),
   ('6501090001', '6501090', 'LANGAP'),
@@ -70091,7 +70091,7 @@ INSERT INTO `villages` VALUES
   ('6501140003', '6501140', 'SEMPAYANG'),
   ('6501140004', '6501140', 'KUALA LAPANG'),
   ('6501140005', '6501140', 'TANJUNG LAPANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6501140006', '6501140', 'TARAS'),
   ('6501140007', '6501140', 'LONG KENIPE'),
   ('6501140008', '6501140', 'SENTABAN'),
@@ -70142,7 +70142,7 @@ INSERT INTO `villages` VALUES
   ('6502050008', '6502050', 'TANJUNG SELOR TIMUR'),
   ('6502050009', '6502050', 'TANJUNG SELOR HILIR'),
   ('6502060001', '6502060', 'MANGKU PADI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6502060002', '6502060', 'TANAH KUNING'),
   ('6502060003', '6502060', 'BINAI'),
   ('6502060004', '6502060', 'SAJAU'),
@@ -70193,7 +70193,7 @@ INSERT INTO `villages` VALUES
   ('6503020004', '6503020', 'TIDENG PALE'),
   ('6503020005', '6503020', 'TIDENG PALE TIMUR'),
   ('6503020006', '6503020', 'SEBIDAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6503020007', '6503020', 'SEBAWANG'),
   ('6503030001', '6503030', 'MENDUPO'),
   ('6503030002', '6503030', 'PERIUK'),
@@ -70244,7 +70244,7 @@ INSERT INTO `villages` VALUES
   ('6504020021', '6504020', 'LIANG BIADUNG'),
   ('6504020022', '6504020', 'WA LAYA'),
   ('6504020023', '6504020', 'LONG MATUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6504020024', '6504020', 'LONG RUPAN'),
   ('6504020025', '6504020', 'LONG KATUNG'),
   ('6504020028', '6504020', 'PA TERUTUN'),
@@ -70295,7 +70295,7 @@ INSERT INTO `villages` VALUES
   ('6504022018', '6504022', 'PA MERING'),
   ('6504022019', '6504022', 'LEPATAR'),
   ('6504022020', '6504022', 'LIANG BUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6504022021', '6504022', 'PA PIRIT'),
   ('6504022022', '6504022', 'MA LIBU'),
   ('6504022023', '6504022', 'PA LUTUT'),
@@ -70346,7 +70346,7 @@ INSERT INTO `villages` VALUES
   ('6504030045', '6504030', 'TETAGAS'),
   ('6504030046', '6504030', 'BULU LAUN HULU'),
   ('6504030047', '6504030', 'TANTU LIBING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6504030048', '6504030', 'KALISUN'),
   ('6504030049', '6504030', 'LEPAGA'),
   ('6504040001', '6504040', 'SANGKUP'),
@@ -70397,7 +70397,7 @@ INSERT INTO `villages` VALUES
   ('6504060010', '6504060', 'TEPIAN'),
   ('6504070001', '6504070', 'SUJAU'),
   ('6504070003', '6504070', 'MELASU BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6504070004', '6504070', 'BEBANAS'),
   ('6504070005', '6504070', 'TETABAN'),
   ('6504070006', '6504070', 'KUNYIT'),
@@ -70448,7 +70448,7 @@ INSERT INTO `villages` VALUES
   ('6504150004', '6504150', 'BUKIT HARAPAN'),
   ('6504160001', '6504160', 'LAPRI'),
   ('6504160002', '6504160', 'PANCANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('6504160003', '6504160', 'SEBERANG'),
   ('6571010001', '6571010', 'MAMBURUNGAN'),
   ('6571010002', '6571010', 'MAMBURUNGAN TIMUR'),
@@ -70499,7 +70499,7 @@ INSERT INTO `villages` VALUES
   ('7101022022', '7101022', 'DONDOMON UTARA'),
   ('7101022023', '7101022', 'DONDOMON SELATAN'),
   ('7101023001', '7101023', 'TONOM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7101023002', '7101023', 'MOGOYUNGGUNG'),
   ('7101023003', '7101023', 'IMANDI'),
   ('7101023004', '7101023', 'PINONOBATUAN'),
@@ -70550,7 +70550,7 @@ INSERT INTO `villages` VALUES
   ('7101060001', '7101060', 'MOPUSI'),
   ('7101060002', '7101060', 'MATALI BARU'),
   ('7101060003', '7101060', 'BAKAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7101060004', '7101060', 'TANOYAN SELATAN'),
   ('7101060005', '7101060', 'TANOYAN UTARA'),
   ('7101060006', '7101060', 'LOLAYAN'),
@@ -70601,7 +70601,7 @@ INSERT INTO `villages` VALUES
   ('7101090004', '7101090', 'NONAPAN DUA'),
   ('7101090005', '7101090', 'NONAPAN SATU'),
   ('7101090006', '7101090', 'WINERU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7101090007', '7101090', 'GOGALUMAN'),
   ('7101090008', '7101090', 'TIBERIAS'),
   ('7101090009', '7101090', 'POIGAR II'),
@@ -70652,7 +70652,7 @@ INSERT INTO `villages` VALUES
   ('7101110015', '7101110', 'PINDOL'),
   ('7101110016', '7101110', 'PINDOLILI'),
   ('7101110017', '7101110', 'LOLAK TOMBOLANGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7101110018', '7101110', 'LOLAK II'),
   ('7101110019', '7101110', 'BATURAPA II'),
   ('7101110020', '7101110', 'BUNTALO TIMUR'),
@@ -70703,7 +70703,7 @@ INSERT INTO `villages` VALUES
   ('7102093004', '7102093', 'ATEP'),
   ('7102093005', '7102093', 'MANEMBO'),
   ('7102093006', '7102093', 'WINEBETAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7102093007', '7102093', 'KAAYURAN ATAS'),
   ('7102093008', '7102093', 'KAAYURAN BAWAH'),
   ('7102093009', '7102093', 'KAWATAK'),
@@ -70754,7 +70754,7 @@ INSERT INTO `villages` VALUES
   ('7102121007', '7102121', 'TOMBASIAN ATAS SATU'),
   ('7102121008', '7102121', 'TOMBASIAN BAWAH'),
   ('7102121009', '7102121', 'KAYUUWI SATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7102121010', '7102121', 'KAYUUWI'),
   ('7102122001', '7102122', 'TALIKURAN BARAT'),
   ('7102122002', '7102122', 'TALIKURAN'),
@@ -70805,7 +70805,7 @@ INSERT INTO `villages` VALUES
   ('7102170002', '7102170', 'WAREMBUNGAN'),
   ('7102170003', '7102170', 'PINELENG DUA'),
   ('7102170004', '7102170', 'KALI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7102170011', '7102170', 'PINELENG SATU'),
   ('7102170012', '7102170', 'SEA'),
   ('7102170018', '7102170', 'SEA I'),
@@ -70856,7 +70856,7 @@ INSERT INTO `villages` VALUES
   ('7102191007', '7102191', 'TATAARAN DUA'),
   ('7102191008', '7102191', 'MAESA UNIMA'),
   ('7102200001', '7102200', 'PULUTAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7102200002', '7102200', 'SINUIAN'),
   ('7102200003', '7102200', 'KAIMA'),
   ('7102200004', '7102200', 'PAREPEY'),
@@ -70907,7 +70907,7 @@ INSERT INTO `villages` VALUES
   ('7102230004', '7102230', 'MAUMBI'),
   ('7102230005', '7102230', 'TANDENGAN'),
   ('7102230006', '7102230', 'RANOMERUT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7102230007', '7102230', 'TOULIANG OKI'),
   ('7102230008', '7102230', 'TANDENGAN SATU'),
   ('7102240001', '7102240', 'TULAP'),
@@ -70958,7 +70958,7 @@ INSERT INTO `villages` VALUES
   ('7103041002', '7103041', 'MAHENGETANG'),
   ('7103041003', '7103041', 'KAHAKITANG'),
   ('7103041004', '7103041', 'KALAMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7103041005', '7103041', 'DALAKO BEMBANAHE'),
   ('7103041006', '7103041', 'TALEKO BATUSAIKI'),
   ('7103041007', '7103041', 'PARA I'),
@@ -71009,7 +71009,7 @@ INSERT INTO `villages` VALUES
   ('7103062006', '7103062', 'MALISADE'),
   ('7103070001', '7103070', 'BOWONGKALI'),
   ('7103070002', '7103070', 'KULUR II');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7103070003', '7103070', 'KULUR I'),
   ('7103070004', '7103070', 'BIRA'),
   ('7103070005', '7103070', 'KUMA'),
@@ -71060,7 +71060,7 @@ INSERT INTO `villages` VALUES
   ('7103091008', '7103091', 'TONA II'),
   ('7103092001', '7103092', 'PANANEKENG'),
   ('7103092002', '7103092', 'ANGGES');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7103092003', '7103092', 'MITUNG'),
   ('7103092004', '7103092', 'BEHA'),
   ('7103092005', '7103092', 'AKEMBAWI'),
@@ -71111,7 +71111,7 @@ INSERT INTO `villages` VALUES
   ('7104010010', '7104010', 'KORDAKEL'),
   ('7104010012', '7104010', 'RARANGE'),
   ('7104010013', '7104010', 'TADUNA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7104010014', '7104010', 'KABARUAN TIMUR'),
   ('7104010015', '7104010', 'PANTUGE BARAT'),
   ('7104010016', '7104010', 'BULUDE SELATAN'),
@@ -71162,7 +71162,7 @@ INSERT INTO `villages` VALUES
   ('7104031002', '7104031', 'TULE UTARA'),
   ('7104031003', '7104031', 'TULE TENGAH'),
   ('7104031004', '7104031', 'BAWOMBARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7104031005', '7104031', 'BAWOMBARU TENGAH'),
   ('7104031006', '7104031', 'BAWOMBARU UTARA'),
   ('7104040006', '7104040', 'BEO'),
@@ -71213,7 +71213,7 @@ INSERT INTO `villages` VALUES
   ('7104052005', '7104052', 'DARAN UTARA'),
   ('7104060006', '7104060', 'ESSANG'),
   ('7104060007', '7104060', 'LALUE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7104060009', '7104060', 'ESSANG SELATAN'),
   ('7104060010', '7104060', 'LALUE TENGAH'),
   ('7104060011', '7104060', 'LALUE UTARA'),
@@ -71264,7 +71264,7 @@ INSERT INTO `villages` VALUES
   ('7105010010', '7105010', 'PINASUNGKULAN UTARA'),
   ('7105020009', '7105020', 'RARAATEAN'),
   ('7105020010', '7105020', 'SION');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7105020011', '7105020', 'TOMPASO BARU DUA'),
   ('7105020012', '7105020', 'KINALAWIRAN'),
   ('7105020013', '7105020', 'TOMPASO BARU SATU'),
@@ -71315,7 +71315,7 @@ INSERT INTO `villages` VALUES
   ('7105082001', '7105082', 'TOYOPON'),
   ('7105082002', '7105082', 'KEROIT'),
   ('7105082003', '7105082', 'RAANAN BARU I');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7105082004', '7105082', 'RAANAN BARU'),
   ('7105082005', '7105082', 'RAANAN BARU II'),
   ('7105082006', '7105082', 'TONDEI SATU'),
@@ -71366,7 +71366,7 @@ INSERT INTO `villages` VALUES
   ('7105111004', '7105111', 'UWURAN DUA'),
   ('7105111006', '7105111', 'RANOKETANG TUA'),
   ('7105111007', '7105111', 'BITUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7105111008', '7105111', 'KILOMETER TIGA'),
   ('7105112001', '7105112', 'PONDOS'),
   ('7105112002', '7105112', 'ELUSAN'),
@@ -71417,7 +71417,7 @@ INSERT INTO `villages` VALUES
   ('7105130008', '7105130', 'TUMPAAN BARU'),
   ('7105130009', '7105130', 'TUMPAAN DUA'),
   ('7105130010', '7105130', 'MATANI SATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7105131002', '7105131', 'PASLATEN'),
   ('7105131003', '7105131', 'BAJO'),
   ('7105131004', '7105131', 'POPARENG'),
@@ -71468,7 +71468,7 @@ INSERT INTO `villages` VALUES
   ('7106040008', '7106040', 'KOLONGAN TETEMPANGAN'),
   ('7106040009', '7106040', 'KAWANGKOAN BARU'),
   ('7106040010', '7106040', 'KALAWAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7106040011', '7106040', 'WATUTUMOU II'),
   ('7106040012', '7106040', 'WATUTUMOU III'),
   ('7106050002', '7106050', 'MATUNGKAS'),
@@ -71519,7 +71519,7 @@ INSERT INTO `villages` VALUES
   ('7106070005', '7106070', 'PAPUTUNGAN'),
   ('7106070006', '7106070', 'TANAH PUTIH'),
   ('7106070007', '7106070', 'SONSILO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7106070008', '7106070', 'TARABITAN'),
   ('7106070010', '7106070', 'BAHOI'),
   ('7106070013', '7106070', 'GANGGA SATU'),
@@ -71570,7 +71570,7 @@ INSERT INTO `villages` VALUES
   ('7107010015', '7107010', 'SUKA MAKMUR'),
   ('7107010016', '7107010', 'MOKUSATO'),
   ('7107020001', '7107020', 'MOME');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7107020003', '7107020', 'PIMPI'),
   ('7107020004', '7107020', 'BUNIA'),
   ('7107020005', '7107020', 'KOPI'),
@@ -71621,7 +71621,7 @@ INSERT INTO `villages` VALUES
   ('7107040014', '7107040', 'BOLANG ITANG II'),
   ('7107040015', '7107040', 'TALAGA'),
   ('7107040016', '7107040', 'PAKU SELATAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7107040017', '7107040', 'KEIMANGA'),
   ('7107040018', '7107040', 'TANJUNG BUAYA'),
   ('7107050001', '7107050', 'KOMUS DUA'),
@@ -71672,7 +71672,7 @@ INSERT INTO `villages` VALUES
   ('7108020005', '7108020', 'BATUMAWIRA'),
   ('7108020006', '7108020', 'BIRARIKEI'),
   ('7108030005', '7108030', 'LAINGPATEHI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7108030007', '7108030', 'BAHOI'),
   ('7108030008', '7108030', 'MAHANGIANG'),
   ('7108030009', '7108030', 'TULUSAN'),
@@ -71723,7 +71723,7 @@ INSERT INTO `villages` VALUES
   ('7108070023', '7108070', 'BUMBIHA'),
   ('7108070025', '7108070', 'MAKALEHI TIMUR'),
   ('7108070026', '7108070', 'MAKALEHI UTARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7108080001', '7108080', 'LAI'),
   ('7108080002', '7108080', 'SALILI'),
   ('7108080003', '7108080', 'BEONG'),
@@ -71774,7 +71774,7 @@ INSERT INTO `villages` VALUES
   ('7109020005', '7109020', 'TATENGESAN'),
   ('7109020006', '7109020', 'BENTENAN'),
   ('7109020007', '7109020', 'WIAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7109020008', '7109020', 'BENTENAN INDAH'),
   ('7109020009', '7109020', 'MINANGA TIMUR'),
   ('7109020010', '7109020', 'MINANGA DUA'),
@@ -71825,7 +71825,7 @@ INSERT INTO `villages` VALUES
   ('7109041010', '7109041', 'LIWUTUNG SATU'),
   ('7109041011', '7109041', 'LIWUTUNG DUA'),
   ('7109042001', '7109042', 'WIOY');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7109042002', '7109042', 'WIOY SATU'),
   ('7109042003', '7109042', 'WIOY DUA'),
   ('7109042004', '7109042', 'WIOY TIGA'),
@@ -71876,7 +71876,7 @@ INSERT INTO `villages` VALUES
   ('7109060021', '7109060', 'LOBU KOTA'),
   ('7109060022', '7109060', 'LOBU ATAS'),
   ('7109061001', '7109061', 'LOWANTAG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7109061002', '7109061', 'BANGA'),
   ('7109061003', '7109061', 'SUHUYON'),
   ('7109061004', '7109061', 'TAMBELANG'),
@@ -71927,7 +71927,7 @@ INSERT INTO `villages` VALUES
   ('7110020013', '7110020', 'TOLUAYA'),
   ('7110020014', '7110020', 'MOLIBAGU'),
   ('7110020015', '7110020', 'POPODU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7110020016', '7110020', 'SONDANA'),
   ('7110020017', '7110020', 'TOLONDADU II'),
   ('7110020018', '7110020', 'TOLONDADU I'),
@@ -71978,7 +71978,7 @@ INSERT INTO `villages` VALUES
   ('7110050011', '7110050', 'PERJUANGAN'),
   ('7110050012', '7110050', 'ONGGUNOI SELATAN'),
   ('7111010001', '7111010', 'JIKO BELANGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7111010002', '7111010', 'MATABULU'),
   ('7111010003', '7111010', 'LOYOW'),
   ('7111010004', '7111010', 'IYOK'),
@@ -72029,7 +72029,7 @@ INSERT INTO `villages` VALUES
   ('7111040003', '7111040', 'MODAYAG III'),
   ('7111040004', '7111040', 'TOBONGON'),
   ('7111040005', '7111040', 'BADARO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7111040006', '7111040', 'LANUT'),
   ('7111040007', '7111040', 'BUYANDI'),
   ('7111040008', '7111040', 'PURWOREJO'),
@@ -72080,7 +72080,7 @@ INSERT INTO `villages` VALUES
   ('7171021003', '7171021', 'RANOTANA WERU'),
   ('7171021004', '7171021', 'PAKOWA'),
   ('7171021005', '7171021', 'BUMI NYIUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7171021006', '7171021', 'TELING ATAS'),
   ('7171021007', '7171021', 'WANEA'),
   ('7171021008', '7171021', 'TANJUNG BATU'),
@@ -72131,7 +72131,7 @@ INSERT INTO `villages` VALUES
   ('7171052001', '7171052', 'SINDULANG SATU'),
   ('7171052002', '7171052', 'KAMPUNG ISLAM'),
   ('7171052003', '7171052', 'SINDULANG DUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7171052004', '7171052', 'BITUNG KARANG RIA'),
   ('7171052005', '7171052', 'MAASING'),
   ('7171052006', '7171052', 'TUMINTING'),
@@ -72182,7 +72182,7 @@ INSERT INTO `villages` VALUES
   ('7172022002', '7172022', 'PINTUKOTA'),
   ('7172022003', '7172022', 'BATUKOTA'),
   ('7172022004', '7172022', 'GUNUNG WOKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7172022005', '7172022', 'POSOKAN'),
   ('7172022006', '7172022', 'MOTTO'),
   ('7172022007', '7172022', 'LIRANG'),
@@ -72233,7 +72233,7 @@ INSERT INTO `villages` VALUES
   ('7173020002', '7173020', 'MATANI DUA'),
   ('7173020003', '7173020', 'MATANI SATU'),
   ('7173020005', '7173020', 'KOLONGAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7173020011', '7173020', 'KAMASI'),
   ('7173020016', '7173020', 'TALETE SATU'),
   ('7173020017', '7173020', 'TALETE DUA'),
@@ -72284,7 +72284,7 @@ INSERT INTO `villages` VALUES
   ('7174030001', '7174030', 'MONGKONAI'),
   ('7174030002', '7174030', 'MOLINOW'),
   ('7174030003', '7174030', 'MOGOLAING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7174030004', '7174030', 'GOGAGOMAN'),
   ('7174030005', '7174030', 'KOTAMOBAGU'),
   ('7174030006', '7174030', 'MONGKONAI BARAT'),
@@ -72335,7 +72335,7 @@ INSERT INTO `villages` VALUES
   ('7201041008', '7201041', 'GANSAL'),
   ('7201041009', '7201041', 'BOBU'),
   ('7201042001', '7201042', 'PALAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7201042002', '7201042', 'LUK SAGU'),
   ('7201042003', '7201042', 'TATAKALAI'),
   ('7201042004', '7201042', 'PONDING-PONDING'),
@@ -72386,7 +72386,7 @@ INSERT INTO `villages` VALUES
   ('7201061002', '7201061', 'PANDALUK'),
   ('7201061003', '7201061', 'PALABATU DUA'),
   ('7201061004', '7201061', 'TATARANDANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7201061006', '7201061', 'OSAN'),
   ('7201061007', '7201061', 'BALALON'),
   ('7201061008', '7201061', 'SABELAK'),
@@ -72437,7 +72437,7 @@ INSERT INTO `villages` VALUES
   ('7201071009', '7201071', 'LELANG MATAMALING'),
   ('7201071010', '7201071', 'LANDONAN BEBEAU'),
   ('7201071011', '7201071', 'SAPELANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7202010015', '7202010', 'TOHITI SARI'),
   ('7202010017', '7202010', 'PIONDO'),
   ('7202010018', '7202010', 'BUKIT JAYA'),
@@ -72488,7 +72488,7 @@ INSERT INTO `villages` VALUES
   ('7202012007', '7202012', 'SLAMETHARJO'),
   ('7202012008', '7202012', 'TOILI'),
   ('7202012009', '7202012', 'SALUAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7202012010', '7202012', 'MOILONG'),
   ('7202012011', '7202012', 'KARYA JAYA'),
   ('7202012012', '7202012', 'SUMBER HARJO'),
@@ -72539,7 +72539,7 @@ INSERT INTO `villages` VALUES
   ('7202030045', '7202030', 'KALUMBANGAN'),
   ('7202030046', '7202030', 'DEMANGAN JAYA'),
   ('7202030048', '7202030', 'KALAKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7202030049', '7202030', 'KOILI'),
   ('7202031001', '7202031', 'BANGKETA'),
   ('7202031002', '7202031', 'TOBELOMBANG'),
@@ -72590,7 +72590,7 @@ INSERT INTO `villages` VALUES
   ('7202050010', '7202050', 'BARU'),
   ('7202050011', '7202050', 'SOHO'),
   ('7202050012', '7202050', 'BUNGIN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7202050013', '7202050', 'LUMPOKNYO'),
   ('7202050023', '7202050', 'KARATON'),
   ('7202050026', '7202050', 'BUNGIN TIMUR'),
@@ -72641,7 +72641,7 @@ INSERT INTO `villages` VALUES
   ('7202060002', '7202060', 'ASAAN'),
   ('7202060011', '7202060', 'PAKOWA'),
   ('7202060012', '7202060', 'LAMO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7202060013', '7202060', 'NAIN'),
   ('7202060014', '7202060', 'PINAPUAN'),
   ('7202060015', '7202060', 'SINAMPANGNYO'),
@@ -72692,7 +72692,7 @@ INSERT INTO `villages` VALUES
   ('7202061021', '7202061', 'SALIPI'),
   ('7202062001', '7202062', 'BAHINGIN'),
   ('7202062002', '7202062', 'BALEAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7202062003', '7202062', 'UHA-UHANGON'),
   ('7202062004', '7202062', 'KADODI'),
   ('7202062005', '7202062', 'NIUBULAN'),
@@ -72743,7 +72743,7 @@ INSERT INTO `villages` VALUES
   ('7202080017', '7202080', 'TANOTU'),
   ('7202080018', '7202080', 'PADANG'),
   ('7202080019', '7202080', 'MAMPING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7202080020', '7202080', 'BALANTAK'),
   ('7202080021', '7202080', 'LUOK'),
   ('7202080027', '7202080', 'BOLOAK'),
@@ -72794,7 +72794,7 @@ INSERT INTO `villages` VALUES
   ('7203010024', '7203010', 'TANONA'),
   ('7203020001', '7203020', 'SAINOA'),
   ('7203020002', '7203020', 'POLEWALI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7203020003', '7203020', 'PULAU DUA'),
   ('7203020005', '7203020', 'JAWI JAWI'),
   ('7203020006', '7203020', 'BUTON'),
@@ -72845,7 +72845,7 @@ INSERT INTO `villages` VALUES
   ('7203030017', '7203030', 'MARSAOLEH'),
   ('7203030018', '7203030', 'LAMBEREA'),
   ('7203030019', '7203030', 'BUNGI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7203030020', '7203030', 'MATANO'),
   ('7203030021', '7203030', 'MATANSALA'),
   ('7203030022', '7203030', 'BAHORURU'),
@@ -72896,7 +72896,7 @@ INSERT INTO `villages` VALUES
   ('7203042008', '7203042', 'SOLONSA JAYA'),
   ('7203042009', '7203042', 'SOLONSA'),
   ('7204010001', '7204010', 'MAYOA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7204010002', '7204010', 'MAYA SARI'),
   ('7204010013', '7204010', 'PANDA JAYA'),
   ('7204010014', '7204010', 'MAYA JAYA'),
@@ -72947,7 +72947,7 @@ INSERT INTO `villages` VALUES
   ('7204030031', '7204030', 'SOE'),
   ('7204030032', '7204030', 'WERA'),
   ('7204031001', '7204031', 'MASEWE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7204031002', '7204031', 'PANCASILA I'),
   ('7204031003', '7204031', 'OLUMOKUNDE'),
   ('7204031004', '7204031', 'KAMBA'),
@@ -72998,7 +72998,7 @@ INSERT INTO `villages` VALUES
   ('7204050004', '7204050', 'BEGA'),
   ('7204050005', '7204050', 'KASIGUNCU'),
   ('7204050006', '7204050', 'MASAMBA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7204050007', '7204050', 'SAATU'),
   ('7204050008', '7204050', 'PINEDAPA'),
   ('7204050009', '7204050', 'MASANI'),
@@ -73049,7 +73049,7 @@ INSERT INTO `villages` VALUES
   ('7204070010', '7204070', 'GEBANGREJO TIMUR'),
   ('7204070011', '7204070', 'GEBANGREJO BARAT'),
   ('7204070012', '7204070', 'KAYAMANYA SENTRAL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7204071001', '7204071', 'BONESOMPE'),
   ('7204071002', '7204071', 'KASINTUWU'),
   ('7204071003', '7204071', 'LOMBUGIA'),
@@ -73100,7 +73100,7 @@ INSERT INTO `villages` VALUES
   ('7205080030', '7205080', 'LOLI DONDO'),
   ('7205080031', '7205080', 'LOLI SALURAN'),
   ('7205081002', '7205081', 'SALUMPAKU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7205081003', '7205081', 'WATATU'),
   ('7205081004', '7205081', 'SURUMANA'),
   ('7205081005', '7205081', 'LALOMBI'),
@@ -73151,7 +73151,7 @@ INSERT INTO `villages` VALUES
   ('7205100006', '7205100', 'MASAINGI'),
   ('7205100007', '7205100', 'MARANA'),
   ('7205100016', '7205100', 'LERO TATARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7205100017', '7205100', 'TOAYA VUNTA'),
   ('7205100018', '7205100', 'KUMBASA'),
   ('7205100020', '7205100', 'AMAL'),
@@ -73202,7 +73202,7 @@ INSERT INTO `villages` VALUES
   ('7205131007', '7205131', 'POMOLULU'),
   ('7205131008', '7205131', 'PALAU'),
   ('7205140001', '7205140', 'KAMBAYANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7205140002', '7205140', 'BUDIMUKTI'),
   ('7205140003', '7205140', 'TALAGA'),
   ('7205140004', '7205140', 'SABANG'),
@@ -73253,7 +73253,7 @@ INSERT INTO `villages` VALUES
   ('7206030001', '7206030', 'LUOK MANIPI'),
   ('7206030002', '7206030', 'SALUMBIA'),
   ('7206030003', '7206030', 'BAMBAPUN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7206030004', '7206030', 'OGOWELE'),
   ('7206030005', '7206030', 'LAIS'),
   ('7206030006', '7206030', 'OGOGASANG'),
@@ -73304,7 +73304,7 @@ INSERT INTO `villages` VALUES
   ('7206041005', '7206041', 'OYOM'),
   ('7206041006', '7206041', 'SALUGAN'),
   ('7206041007', '7206041', 'LAMPASIO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7206041008', '7206041', 'TINADING'),
   ('7206041009', '7206041', 'OGOMATANANG'),
   ('7206050001', '7206050', 'OGOMOLI'),
@@ -73355,7 +73355,7 @@ INSERT INTO `villages` VALUES
   ('7207012006', '7207012', 'MENDAAN'),
   ('7207012007', '7207012', 'MOKUPO'),
   ('7207020006', '7207020', 'MOMUNU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7207020007', '7207020', 'TALUAN'),
   ('7207020008', '7207020', 'PINAMULA'),
   ('7207020009', '7207020', 'PUJIMULYO'),
@@ -73406,7 +73406,7 @@ INSERT INTO `villages` VALUES
   ('7207031011', '7207031', 'MOOYONG'),
   ('7207031012', '7207031', 'BINUANG'),
   ('7207031013', '7207031', 'BUKAL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7207031014', '7207031', 'MULAT'),
   ('7207040001', '7207040', 'LONU'),
   ('7207040002', '7207040', 'BUNOBOGU'),
@@ -73457,7 +73457,7 @@ INSERT INTO `villages` VALUES
   ('7208010017', '7208010', 'TALIABO'),
   ('7208010018', '7208010', 'SAUSU TAMBU'),
   ('7208010019', '7208010', 'SAUSU AUMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7208011001', '7208011', 'TOLAI'),
   ('7208011002', '7208011', 'PURWOSARI'),
   ('7208011003', '7208011', 'TORUE'),
@@ -73508,7 +73508,7 @@ INSERT INTO `villages` VALUES
   ('7208023010', '7208023', 'SAKINAH JAYA'),
   ('7208024001', '7208024', 'PETAPA'),
   ('7208024002', '7208024', 'BINANGGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7208024003', '7208024', 'PELAWA'),
   ('7208024004', '7208024', 'MATOLELE'),
   ('7208024005', '7208024', 'PELAWA BARU'),
@@ -73559,7 +73559,7 @@ INSERT INTO `villages` VALUES
   ('7208032007', '7208032', 'SIBALAGO'),
   ('7208032008', '7208032', 'TOMOLI UTARA'),
   ('7208032009', '7208032', 'TORIBULU SELATAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7208033001', '7208033', 'MARANTALE'),
   ('7208033002', '7208033', 'TANDAIGI'),
   ('7208033003', '7208033', 'SILANGA'),
@@ -73610,7 +73610,7 @@ INSERT INTO `villages` VALUES
   ('7208042004', '7208042', 'SIDOAN SELATAN'),
   ('7208042005', '7208042', 'SIDOAN TIMUR'),
   ('7208042006', '7208042', 'SIDOAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7208042007', '7208042', 'SIDOAN BARAT'),
   ('7208042008', '7208042', 'OGOBAGIS'),
   ('7208042009', '7208042', 'MUARA JAYA'),
@@ -73661,7 +73661,7 @@ INSERT INTO `villages` VALUES
   ('7208060001', '7208060', 'MOUTONG TIMUR'),
   ('7208060002', '7208060', 'MOUTONG TENGAH'),
   ('7208060003', '7208060', 'MOUTONG BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7208060004', '7208060', 'TULADENGGI PANTAI'),
   ('7208060006', '7208060', 'GIO'),
   ('7208060023', '7208060', 'LOBU'),
@@ -73712,7 +73712,7 @@ INSERT INTO `villages` VALUES
   ('7208063006', '7208063', 'LEMBAH BOMBAN'),
   ('7208063007', '7208063', 'BOLANO BARAT'),
   ('7208063008', '7208063', 'WANAMUKTI UTARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7208063009', '7208063', 'BOLANO TENGAH'),
   ('7208063010', '7208063', 'BOLANO UTARA'),
   ('7208063011', '7208063', 'SIDOMUKTI'),
@@ -73763,7 +73763,7 @@ INSERT INTO `villages` VALUES
   ('7209020028', '7209020', 'BANANO'),
   ('7209020030', '7209020', 'BUYUNTARIPA'),
   ('7209020031', '7209020', 'KALEMBA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7209030001', '7209030', 'MIRE'),
   ('7209030002', '7209030', 'UEMATOPA'),
   ('7209030003', '7209030', 'PARANONGE'),
@@ -73814,7 +73814,7 @@ INSERT INTO `villages` VALUES
   ('7209050017', '7209050', 'SALUABA'),
   ('7209051005', '7209051', 'UENTANAGA ATAS'),
   ('7209051006', '7209051', 'SUMOLI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7209051007', '7209051', 'UENTANAGA BAWAH'),
   ('7209051008', '7209051', 'DONDO'),
   ('7209051009', '7209051', 'LABUAN'),
@@ -73865,7 +73865,7 @@ INSERT INTO `villages` VALUES
   ('7209080012', '7209080', 'OLILAN'),
   ('7209080013', '7209080', 'KOLAMI'),
   ('7209080015', '7209080', 'LOE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7209081001', '7209081', 'SALINGGOHA'),
   ('7209081002', '7209081', 'MALAPO'),
   ('7209081003', '7209081', 'PASOKAN'),
@@ -73916,7 +73916,7 @@ INSERT INTO `villages` VALUES
   ('7210030003', '7210030', 'RANTEWULU'),
   ('7210030004', '7210030', 'TOWULU'),
   ('7210030005', '7210030', 'WINATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7210030006', '7210030', 'LONCA'),
   ('7210030007', '7210030', 'BOLADANGKO'),
   ('7210030008', '7210030', 'TANGKULOWI'),
@@ -73967,7 +73967,7 @@ INSERT INTO `villages` VALUES
   ('7210070006', '7210070', 'KALAWARA'),
   ('7210070007', '7210070', 'PAKULI UTARA'),
   ('7210080001', '7210080', 'BANGGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7210080002', '7210080', 'WALATANA'),
   ('7210080004', '7210080', 'BALUASE'),
   ('7210080005', '7210080', 'ROGO'),
@@ -74018,7 +74018,7 @@ INSERT INTO `villages` VALUES
   ('7210120013', '7210120', 'MPANAU'),
   ('7210120014', '7210120', 'LORU'),
   ('7210120015', '7210120', 'NGATABARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7210120016', '7210120', 'SIDONDO III'),
   ('7210120017', '7210120', 'SIDONDO IV'),
   ('7210120018', '7210120', 'UPT LEMBAH PALU'),
@@ -74069,7 +74069,7 @@ INSERT INTO `villages` VALUES
   ('7211020001', '7211020', 'BONTOSI'),
   ('7211020002', '7211020', 'LIPUTALAS'),
   ('7211020003', '7211020', 'LIPULALONGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7211020004', '7211020', 'ALASAN'),
   ('7211020005', '7211020', 'PADINGKIAN'),
   ('7211020006', '7211020', 'PAISULAMO'),
@@ -74120,7 +74120,7 @@ INSERT INTO `villages` VALUES
   ('7211070014', '7211070', 'TIMPAUS'),
   ('7211070015', '7211070', 'KASUARI'),
   ('7211070016', '7211070', 'SONIT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7212010001', '7212010', 'KASINGOLI'),
   ('7212010003', '7212010', 'SAEMBA'),
   ('7212010004', '7212010', 'SAEMBA WALATI'),
@@ -74171,7 +74171,7 @@ INSERT INTO `villages` VALUES
   ('7212040012', '7212040', 'BUNTA'),
   ('7212050001', '7212050', 'KOROMATANTU'),
   ('7212050002', '7212050', 'KOROLOLAMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7212050003', '7212050', 'KOROLOLAKI'),
   ('7212050004', '7212050', 'KOYA'),
   ('7212050005', '7212050', 'GILILANA'),
@@ -74222,7 +74222,7 @@ INSERT INTO `villages` VALUES
   ('7212090013', '7212090', 'KALOMBANG'),
   ('7212090014', '7212090', 'TIRONGAN BAWAH'),
   ('7212090015', '7212090', 'SILITI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7212090016', '7212090', 'OPO'),
   ('7212090017', '7212090', 'TANAKU RAYA'),
   ('7212090018', '7212090', 'LEMO'),
@@ -74273,7 +74273,7 @@ INSERT INTO `villages` VALUES
   ('7271031002', '7271031', 'TANAMODINDI'),
   ('7271031003', '7271031', 'LASOANI'),
   ('7271031004', '7271031', 'KAWATUNA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7271031005', '7271031', 'POBOYA'),
   ('7271031006', '7271031', 'TONDO'),
   ('7271031007', '7271031', 'LAYANA INDAH'),
@@ -74324,7 +74324,7 @@ INSERT INTO `villages` VALUES
   ('7301022004', '7301022', 'BONTOBARU'),
   ('7301022005', '7301022', 'BONTOJATI'),
   ('7301030001', '7301030', 'POLASSI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7301030002', '7301030', 'TAMBOLONGAN'),
   ('7301030003', '7301030', 'APPATANAH'),
   ('7301030004', '7301030', 'LOWA'),
@@ -74375,7 +74375,7 @@ INSERT INTO `villages` VALUES
   ('7301051005', '7301051', 'BUKI'),
   ('7301051006', '7301051', 'MEKAR INDAH'),
   ('7301051007', '7301051', 'BUKI TIMUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7302010001', '7302010', 'MARIORENNU'),
   ('7302010002', '7302010', 'JALANJANG'),
   ('7302010003', '7302010', 'MATTEKKO'),
@@ -74426,7 +74426,7 @@ INSERT INTO `villages` VALUES
   ('7302030006', '7302030', 'TANAH BERU'),
   ('7302030007', '7302030', 'SAPOLOHE'),
   ('7302030008', '7302030', 'BENJALA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7302040001', '7302040', 'CARAMMING'),
   ('7302040002', '7302040', 'PAKUBALAHO'),
   ('7302040003', '7302040', 'TRITIRO'),
@@ -74477,7 +74477,7 @@ INSERT INTO `villages` VALUES
   ('7302070009', '7302070', 'BALANG TAROANG'),
   ('7302070010', '7302070', 'KAMBUNO'),
   ('7302070011', '7302070', 'BARUGAE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7302070012', '7302070', 'BALANG PESOANG'),
   ('7302070013', '7302070', 'JAWI - JAWI'),
   ('7302070014', '7302070', 'TIBONA'),
@@ -74528,7 +74528,7 @@ INSERT INTO `villages` VALUES
   ('7303011008', '7303011', 'BONTO DAENG'),
   ('7303011009', '7303011', 'BONTO TANGNGA'),
   ('7303011010', '7303011', 'BONTO MARANNU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7303011011', '7303011', 'BONTO LOJONG'),
   ('7303012001', '7303012', 'BONTO MATENE'),
   ('7303012002', '7303012', 'BONTO TIRO'),
@@ -74579,7 +74579,7 @@ INSERT INTO `villages` VALUES
   ('7303032004', '7303032', 'BAJIMINASA'),
   ('7303032005', '7303032', 'KALOLING'),
   ('7303032006', '7303032', 'GANTARANGKEKE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7304010001', '7304010', 'MALLASORO'),
   ('7304010002', '7304010', 'PUNAGAYA'),
   ('7304010003', '7304010', 'BONTORANNU'),
@@ -74630,7 +74630,7 @@ INSERT INTO `villages` VALUES
   ('7304030005', '7304030', 'SIDENRE'),
   ('7304030006', '7304030', 'EMPOANG SELATAN'),
   ('7304030007', '7304030', 'EMPOANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7304030008', '7304030', 'BALANG TOA'),
   ('7304030009', '7304030', 'BALANG'),
   ('7304030010', '7304030', 'BALANG BERU'),
@@ -74681,7 +74681,7 @@ INSERT INTO `villages` VALUES
   ('7304051001', '7304051', 'BONTOMANAI'),
   ('7304051002', '7304051', 'RUMBIA'),
   ('7304051003', '7304051', 'LEBANG MANAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7304051004', '7304051', 'LEBANG MANAI UTARA'),
   ('7304051005', '7304051', 'PALLANTIKANG'),
   ('7304051006', '7304051', 'BONTO CINI'),
@@ -74732,7 +74732,7 @@ INSERT INTO `villages` VALUES
   ('7305031004', '7305031', 'MARADEKAYA'),
   ('7305031005', '7305031', 'KALABBIRANG'),
   ('7305031006', '7305031', 'SOMBALA BELLA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7305031007', '7305031', 'BAJENG'),
   ('7305031008', '7305031', 'SABINTANG'),
   ('7305031009', '7305031', 'SALAKA'),
@@ -74783,7 +74783,7 @@ INSERT INTO `villages` VALUES
   ('7305060003', '7305060', 'BONTO SUNGGU'),
   ('7305060004', '7305060', 'TAMASAJU'),
   ('7305060005', '7305060', 'BONTOLEBANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7305060006', '7305060', 'TAMALATE'),
   ('7305060007', '7305060', 'AENG BATU-BATU'),
   ('7305060008', '7305060', 'BONTO LANRA'),
@@ -74834,7 +74834,7 @@ INSERT INTO `villages` VALUES
   ('7306021010', '7306021', 'MANDALLE'),
   ('7306021011', '7306021', 'MANJALLING'),
   ('7306021020', '7306021', 'KALEMANDALLE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7306021021', '7306021', 'BONTOMANAI'),
   ('7306030006', '7306030', 'JENETALLASA'),
   ('7306030007', '7306030', 'TETEBATU'),
@@ -74885,7 +74885,7 @@ INSERT INTO `villages` VALUES
   ('7306051007', '7306051', 'TIMBUSENG'),
   ('7306051008', '7306051', 'SUNGGUMANAI'),
   ('7306051009', '7306051', 'PATTALASSANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7306051010', '7306051', 'PALLANTIKANG'),
   ('7306051011', '7306051', 'PACELLEKANG'),
   ('7306051013', '7306051', 'BORONG PA\'LALA'),
@@ -74936,7 +74936,7 @@ INSERT INTO `villages` VALUES
   ('7306081007', '7306081', 'PALADINGANG'),
   ('7306081008', '7306081', 'BONTOLOE'),
   ('7306081009', '7306081', 'LASSA LASSA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7306081010', '7306081', 'BONTOLEMPANGAN'),
   ('7306081011', '7306081', 'JULUMATENE'),
   ('7306081012', '7306081', 'PARANG LAMPOA'),
@@ -74987,7 +74987,7 @@ INSERT INTO `villages` VALUES
   ('7307030008', '7307030', 'PALAE'),
   ('7307030009', '7307030', 'TALLE'),
   ('7307030010', '7307030', 'BULU KAMASE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7307030011', '7307030', 'ALENANGKA'),
   ('7307030012', '7307030', 'GARECCING'),
   ('7307040001', '7307040', 'KALOBBA'),
@@ -75038,7 +75038,7 @@ INSERT INTO `villages` VALUES
   ('7307080006', '7307080', 'LAMATTI RIAWANG'),
   ('7307080007', '7307080', 'LAPPA CINRANA'),
   ('7307090001', '7307090', 'PULAU BUHUNG PITUE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7307090002', '7307090', 'PULAU HARAPAN'),
   ('7307090003', '7307090', 'PULAU PADAELO'),
   ('7307090004', '7307090', 'PULAU PERSATUAN'),
@@ -75089,7 +75089,7 @@ INSERT INTO `villages` VALUES
   ('7308030009', '7308030', 'MINASA UPA'),
   ('7308030010', '7308030', 'TUPABIRING'),
   ('7308030011', '7308030', 'AMPEKALE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7308040007', '7308040', 'KALABBIRANG'),
   ('7308040008', '7308040', 'MINASA BAJI'),
   ('7308040009', '7308040', 'ALATENGAE'),
@@ -75140,7 +75140,7 @@ INSERT INTO `villages` VALUES
   ('7308070005', '7308070', 'SABILA'),
   ('7308070006', '7308070', 'MATTAMPAPOLE'),
   ('7308070007', '7308070', 'BATU PUTIH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7308070008', '7308070', 'ULUDAYA'),
   ('7308070009', '7308070', 'SAMAENRE'),
   ('7308070010', '7308070', 'GATTARENG MATINGGI'),
@@ -75191,7 +75191,7 @@ INSERT INTO `villages` VALUES
   ('7309041003', '7309041', 'PANAIKANG'),
   ('7309041004', '7309041', 'BONTOKIO'),
   ('7309041005', '7309041', 'BIRAENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7309041006', '7309041', 'MINASATENE'),
   ('7309041007', '7309041', 'KALABBIRANG'),
   ('7309041008', '7309041', 'BONTOA'),
@@ -75242,7 +75242,7 @@ INSERT INTO `villages` VALUES
   ('7309091005', '7309091', 'BAWASALO'),
   ('7309091006', '7309091', 'BONE'),
   ('7309092002', '7309092', 'MANGGALUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7309092003', '7309092', 'BODDIE'),
   ('7309092004', '7309092', 'TAMARUPA'),
   ('7309092005', '7309092', 'COPPO TOMPONG'),
@@ -75293,7 +75293,7 @@ INSERT INTO `villages` VALUES
   ('7310041005', '7310041', 'LAMPOKO'),
   ('7310041006', '7310041', 'BALUSU'),
   ('7310050001', '7310050', 'CILELLANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7310050002', '7310050', 'MANUBA'),
   ('7310050003', '7310050', 'NEPO'),
   ('7310050004', '7310050', 'PALANRO'),
@@ -75344,7 +75344,7 @@ INSERT INTO `villages` VALUES
   ('7311030010', '7311030', 'GONA'),
   ('7311030011', '7311030', 'WAETUWO'),
   ('7311030012', '7311030', 'BULU TANAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7311030013', '7311030', 'KALERO'),
   ('7311030014', '7311030', 'LAPPA BOSSE'),
   ('7311030016', '7311030', 'ANCU'),
@@ -75395,7 +75395,7 @@ INSERT INTO `villages` VALUES
   ('7311070017', '7311070', 'MATTIRO DECENG'),
   ('7311070019', '7311070', 'MALLINRUNG'),
   ('7311070020', '7311070', 'MATTIRO BULU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7311080001', '7311080', 'LAPPA UPANG'),
   ('7311080002', '7311080', 'BATU GADING'),
   ('7311080003', '7311080', 'LAPASA'),
@@ -75446,7 +75446,7 @@ INSERT INTO `villages` VALUES
   ('7311110001', '7311110', 'CEMPANIGA'),
   ('7311110002', '7311110', 'BACU'),
   ('7311110003', '7311110', 'CINGKANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7311110004', '7311110', 'CONGKO'),
   ('7311110005', '7311110', 'CINNONG'),
   ('7311110006', '7311110', 'LAMPOKO'),
@@ -75497,7 +75497,7 @@ INSERT INTO `villages` VALUES
   ('7311141003', '7311141', 'SAMAENRE'),
   ('7311141004', '7311141', 'TELLANGKERE'),
   ('7311141005', '7311141', 'POLEWALI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7311141006', '7311141', 'LAGORI'),
   ('7311141007', '7311141', 'GAYA BARU'),
   ('7311141008', '7311141', 'BATU PUTIH'),
@@ -75548,7 +75548,7 @@ INSERT INTO `villages` VALUES
   ('7311180006', '7311180', 'MALLARI'),
   ('7311180007', '7311180', 'KADING'),
   ('7311180008', '7311180', 'CAKKE BONE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7311180009', '7311180', 'LAPPO ASE'),
   ('7311180010', '7311180', 'CUMPIGA'),
   ('7311180011', '7311180', 'AWO LAGADING'),
@@ -75599,7 +75599,7 @@ INSERT INTO `villages` VALUES
   ('7311210007', '7311210', 'LABISSA'),
   ('7311210008', '7311210', 'OPO'),
   ('7311210009', '7311210', 'PINCENG PUTE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7311210010', '7311210', 'WELADO'),
   ('7311210011', '7311210', 'POMPANUA'),
   ('7311210012', '7311210', 'POMPANUA RIATTANG'),
@@ -75650,7 +75650,7 @@ INSERT INTO `villages` VALUES
   ('7311720004', '7311720', 'MANURUNGNGE'),
   ('7311720005', '7311720', 'WATAMPONE'),
   ('7311720006', '7311720', 'BUKAKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7311720007', '7311720', 'WALENNAE'),
   ('7311720008', '7311720', 'PAPPOLO'),
   ('7311730001', '7311730', 'TIBOJONG'),
@@ -75701,7 +75701,7 @@ INSERT INTO `villages` VALUES
   ('7312040002', '7312040', 'CABENGE'),
   ('7312040003', '7312040', 'PAROTO'),
   ('7312040004', '7312040', 'PALANGISENG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7312040005', '7312040', 'TETEWATU'),
   ('7312040006', '7312040', 'ABBANUANGE'),
   ('7312040007', '7312040', 'PARENRING'),
@@ -75752,7 +75752,7 @@ INSERT INTO `villages` VALUES
   ('7313020009', '7313020', 'BULUPABBULU'),
   ('7313020010', '7313020', 'LAPONGKODA'),
   ('7313020011', '7313020', 'TEDDAOPU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7313020012', '7313020', 'SALOMENRALENG'),
   ('7313020013', '7313020', 'LAELO'),
   ('7313020014', '7313020', 'WATALLIPUE'),
@@ -75803,7 +75803,7 @@ INSERT INTO `villages` VALUES
   ('7313060015', '7313060', 'AKKOTENGENG'),
   ('7313060016', '7313060', 'ALEWADENG'),
   ('7313060017', '7313060', 'BARANGMAMASE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7313060018', '7313060', 'SAKKOLI'),
   ('7313060019', '7313060', 'TOWALIDA'),
   ('7313061001', '7313061', 'PENRANG'),
@@ -75854,7 +75854,7 @@ INSERT INTO `villages` VALUES
   ('7313090001', '7313090', 'LEPPANGENG'),
   ('7313090002', '7313090', 'LAUTANG'),
   ('7313090003', '7313090', 'LIMPO RILAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7313090004', '7313090', 'BELAWA'),
   ('7313090005', '7313090', 'MACERO'),
   ('7313090006', '7313090', 'MALAKKE'),
@@ -75905,7 +75905,7 @@ INSERT INTO `villages` VALUES
   ('7313120018', '7313120', 'BAU - BAU'),
   ('7313120019', '7313120', 'ALE LEBBAE'),
   ('7313120020', '7313120', 'BULU SIWA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7313120021', '7313120', 'BOTTO TENGNGA'),
   ('7313120022', '7313120', 'KALUKU'),
   ('7313120023', '7313120', 'MATTIROWALIE'),
@@ -75956,7 +75956,7 @@ INSERT INTO `villages` VALUES
   ('7314050005', '7314050', 'BULO'),
   ('7314050006', '7314050', 'BULO WATTANG'),
   ('7314050007', '7314050', 'LALEBATA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7314050008', '7314050', 'RAPPANG'),
   ('7314051001', '7314051', 'MARIO'),
   ('7314051002', '7314051', 'RIJANG PANUA'),
@@ -76007,7 +76007,7 @@ INSERT INTO `villages` VALUES
   ('7314080010', '7314080', 'BILA'),
   ('7314080011', '7314080', 'KAMPALE'),
   ('7314081001', '7314081', 'BOLA BULU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7314081002', '7314081', 'BOTTO'),
   ('7314081003', '7314081', 'BILA RIASE'),
   ('7314081004', '7314081', 'LAGADING'),
@@ -76058,7 +76058,7 @@ INSERT INTO `villages` VALUES
   ('7315040003', '7315040', 'SIPATOKKONG'),
   ('7315040004', '7315040', 'PENRANG'),
   ('7315040005', '7315040', 'JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7315040006', '7315040', 'SAWITTO'),
   ('7315040013', '7315040', 'MACORAWALIE'),
   ('7315041001', '7315041', 'BENTENG SAWITTO'),
@@ -76109,7 +76109,7 @@ INSERT INTO `villages` VALUES
   ('7315071003', '7315071', 'WATANG KASSA'),
   ('7315071004', '7315071', 'BATULAPPA'),
   ('7315071005', '7315071', 'KASERALAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7315080001', '7315080', 'BINANGA KARAENG'),
   ('7315080002', '7315080', 'SABBANG PARU'),
   ('7315080003', '7315080', 'TADOKKONG'),
@@ -76160,7 +76160,7 @@ INSERT INTO `villages` VALUES
   ('7316020013', '7316020', 'KALUPPINI'),
   ('7316020014', '7316020', 'TOBALU'),
   ('7316020015', '7316020', 'TOKKONAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7316020017', '7316020', 'KARUENG'),
   ('7316020018', '7316020', 'CEMBA'),
   ('7316020019', '7316020', 'TUNGKA'),
@@ -76211,7 +76211,7 @@ INSERT INTO `villages` VALUES
   ('7316040013', '7316040', 'SALU DEWATA'),
   ('7316040014', '7316040', 'MAMPU'),
   ('7316040015', '7316040', 'BATU NONI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7316040016', '7316040', 'SARURAN'),
   ('7316040017', '7316040', 'TAMPO'),
   ('7316040018', '7316040', 'MANDATTE'),
@@ -76262,7 +76262,7 @@ INSERT INTO `villages` VALUES
   ('7317010016', '7317010', 'BUKIT SUTRA'),
   ('7317010017', '7317010', 'RANTE ALANG'),
   ('7317010018', '7317010', 'LUMARING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7317010019', '7317010', 'LAROMPONG'),
   ('7317010020', '7317010', 'RIWANG SELATAN'),
   ('7317010021', '7317010', 'BUNTU PASIK'),
@@ -76313,7 +76313,7 @@ INSERT INTO `villages` VALUES
   ('7317031004', '7317031', 'CILALLANG'),
   ('7317031005', '7317031', 'WARA'),
   ('7317031006', '7317031', 'SALU PAREMANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7317031007', '7317031', 'BUNGA EJA'),
   ('7317031008', '7317031', 'SALUPAREMANG SELATAN'),
   ('7317032001', '7317032', 'LEBANI'),
@@ -76364,7 +76364,7 @@ INSERT INTO `villages` VALUES
   ('7317051005', '7317051', 'TOBARU'),
   ('7317051006', '7317051', 'ULUSALU'),
   ('7317051007', '7317051', 'BONEPOSI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7317051008', '7317051', 'RANTE BALLA'),
   ('7317051009', '7317051', 'PANGI'),
   ('7317051010', '7317051', 'TABANG'),
@@ -76415,7 +76415,7 @@ INSERT INTO `villages` VALUES
   ('7317062015', '7317062', 'TO\'BIA'),
   ('7317062016', '7317062', 'BASSIANG TIMUR'),
   ('7317070001', '7317070', 'LARE-LARE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7317070002', '7317070', 'KARANG-KARANGAN'),
   ('7317070003', '7317070', 'LENGKONG'),
   ('7317070004', '7317070', 'RAJA'),
@@ -76466,7 +76466,7 @@ INSERT INTO `villages` VALUES
   ('7317091008', '7317091', 'PONGKO'),
   ('7317091009', '7317091', 'SITEBA'),
   ('7317091010', '7317091', 'LIMBONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7317091011', '7317091', 'BOSSO TIMUR'),
   ('7317092001', '7317092', 'ILAN BATU'),
   ('7317092002', '7317092', 'ILAN BATU URU'),
@@ -76517,7 +76517,7 @@ INSERT INTO `villages` VALUES
   ('7318020035', '7318020', 'KELURAHAN TENGAN'),
   ('7318020037', '7318020', 'LEMBANG RANTEDADA'),
   ('7318020038', '7318020', 'LEMBANG PA\'TENGKO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7318020040', '7318020', 'KELURAHAN  RANTE KALUA'),
   ('7318020041', '7318020', 'LEMBANG BUNTU TANGTI'),
   ('7318020042', '7318020', 'LEMBANG BUNTU DATU'),
@@ -76568,7 +76568,7 @@ INSERT INTO `villages` VALUES
   ('7318040039', '7318040', 'KELURAHAN LAPANDAN'),
   ('7318041001', '7318041', 'LEMBANG  PA\'BUARAN'),
   ('7318041002', '7318041', 'LEMBANG RANDAN BATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7318041003', '7318041', 'KELURAHAN TIROMANDA'),
   ('7318041004', '7318041', 'KELURAHAN TOSAPAN'),
   ('7318041005', '7318041', 'LEMBANG BO\'NE BUNTU SISONG'),
@@ -76619,7 +76619,7 @@ INSERT INTO `villages` VALUES
   ('7318052013', '7318052', 'LEMBANG BUA TARUNG'),
   ('7318053001', '7318053', 'LEMBANG BELAU'),
   ('7318053002', '7318053', 'LEMBANG PAKU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7318053003', '7318053', 'LEMBANG SESE SALU'),
   ('7318053004', '7318053', 'LEMBANG RATTE'),
   ('7318053005', '7318053', 'LEMBANG PONDINGAO'),
@@ -76670,7 +76670,7 @@ INSERT INTO `villages` VALUES
   ('7322020004', '7322020', 'MUKTI JAYA'),
   ('7322020005', '7322020', 'MUKTI TAMA'),
   ('7322020006', '7322020', 'MARIO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7322020007', '7322020', 'POLEWALI'),
   ('7322020008', '7322020', 'PALANDAN'),
   ('7322020009', '7322020', 'BUMI HARAPAN'),
@@ -76721,7 +76721,7 @@ INSERT INTO `villages` VALUES
   ('7322040007', '7322040', 'RAWAMANGUN'),
   ('7322040008', '7322040', 'MULYOREJO'),
   ('7322040009', '7322040', 'TOLANGI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7322040010', '7322040', 'SIDORAHARJO'),
   ('7322040011', '7322040', 'SUKAMUKTI'),
   ('7322040012', '7322040', 'SUKAHARAPAN'),
@@ -76772,7 +76772,7 @@ INSERT INTO `villages` VALUES
   ('7322120022', '7322120', 'KAMIRI'),
   ('7322120023', '7322120', 'KASIMBONG'),
   ('7322120024', '7322120', 'PANDAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7322120025', '7322120', 'BALIASE'),
   ('7322120026', '7322120', 'MASAMBA'),
   ('7322120030', '7322120', 'SEPAKAT'),
@@ -76823,7 +76823,7 @@ INSERT INTO `villages` VALUES
   ('7322131011', '7322131', 'HONO'),
   ('7322131012', '7322131', 'HOYANE'),
   ('7325010001', '7325010', 'LAUWO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7325010002', '7325010', 'LAGEGO'),
   ('7325010003', '7325010', 'BURAU'),
   ('7325010005', '7325010', 'JALAJJA'),
@@ -76874,7 +76874,7 @@ INSERT INTO `villages` VALUES
   ('7325031006', '7325031', 'KERTARAHARJO'),
   ('7325031007', '7325031', 'MARGOMULYO'),
   ('7325031018', '7325031', 'PURWOSARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7325031019', '7325031', 'PATENGKO'),
   ('7325031020', '7325031', 'CENDANA HITAM TIMUR'),
   ('7325040001', '7325040', 'MALIWOWO'),
@@ -76925,7 +76925,7 @@ INSERT INTO `villages` VALUES
   ('7325070016', '7325070', 'MAGANI'),
   ('7325070021', '7325070', 'MATANO'),
   ('7325070022', '7325070', 'NUHA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7325071001', '7325071', 'BALAMBANO'),
   ('7325071002', '7325071', 'TABARANO'),
   ('7325071018', '7325071', 'WASUPONDA'),
@@ -76976,7 +76976,7 @@ INSERT INTO `villages` VALUES
   ('7326040004', '7326040', 'KELURAHAN TONGKONAN BASSE'),
   ('7326040005', '7326040', 'LEMBANG ISSONG KALUA'),
   ('7326040006', '7326040', 'KELURAHAN TALLANG SURA\'');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7326050001', '7326050', 'LEMBANG RANTE BUA SANGGALANGI'),
   ('7326050002', '7326050', 'LEMBANG RANTE BUA SAMALU'),
   ('7326050003', '7326050', 'LEMBANG RANTE BUA'),
@@ -77027,7 +77027,7 @@ INSERT INTO `villages` VALUES
   ('7326110003', '7326110', 'KELURAHAN DERI'),
   ('7326110004', '7326110', 'LEMBANG BORI RANTATELOK'),
   ('7326110005', '7326110', 'KELURAHAN BORI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7326110006', '7326110', 'LEMBANG BORI LOMBONGAN'),
   ('7326110007', '7326110', 'KELURAHAN PANGLI SELATAN'),
   ('7326110008', '7326110', 'KELURAHAN PANGLI'),
@@ -77078,7 +77078,7 @@ INSERT INTO `villages` VALUES
   ('7326180004', '7326180', 'LEMBANG BUNTU KARUA'),
   ('7326190001', '7326190', 'LEMBANG BUNTU BATU'),
   ('7326190002', '7326190', 'KELURAHAN PANGALA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7326190003', '7326190', 'LEMBANG AMPANG BATU'),
   ('7326190004', '7326190', 'KELURAHAN PANGALA UTARA'),
   ('7326190005', '7326190', 'LEMBANG MAI\'TING'),
@@ -77129,7 +77129,7 @@ INSERT INTO `villages` VALUES
   ('7371030003', '7371030', 'MACCINI SOMBALA'),
   ('7371030004', '7371030', 'BALANG BARU'),
   ('7371030005', '7371030', 'JONGAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7371030006', '7371030', 'BONGAYA'),
   ('7371030007', '7371030', 'PA\'BAENG-BAENG'),
   ('7371030008', '7371030', 'MANNURUKI'),
@@ -77180,7 +77180,7 @@ INSERT INTO `villages` VALUES
   ('7371070001', '7371070', 'GADDONG'),
   ('7371070002', '7371070', 'WAJO BARU'),
   ('7371070003', '7371070', 'TOMPO BALANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7371070004', '7371070', 'MALIMONGAN BARU'),
   ('7371070005', '7371070', 'TIMUNGAN LOMPOA'),
   ('7371070006', '7371070', 'BARAYA'),
@@ -77231,7 +77231,7 @@ INSERT INTO `villages` VALUES
   ('7371101002', '7371101', 'BANGKALA'),
   ('7371101003', '7371101', 'TAMANGAPA'),
   ('7371101004', '7371101', 'MANGGALA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7371101005', '7371101', 'ANTANG'),
   ('7371101006', '7371101', 'BATUA'),
   ('7371101007', '7371101', 'BITOWA'),
@@ -77282,7 +77282,7 @@ INSERT INTO `villages` VALUES
   ('7373011005', '7373011', 'MAWA'),
   ('7373011006', '7373011', 'PETA'),
   ('7373011007', '7373011', 'SENDANA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7373020003', '7373020', 'AMASSANGAN'),
   ('7373020004', '7373020', 'TOMPOTIKKA'),
   ('7373020005', '7373020', 'LAGALIGO'),
@@ -77333,7 +77333,7 @@ INSERT INTO `villages` VALUES
   ('7401050026', '7401050', 'WAGARI'),
   ('7401050027', '7401050', 'SRIBATARA'),
   ('7401050028', '7401050', 'TOGO MANGURA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7401050029', '7401050', 'WASAMBAA'),
   ('7401050030', '7401050', 'TALAGA BARU'),
   ('7401050031', '7401050', 'NAMBO'),
@@ -77384,7 +77384,7 @@ INSERT INTO `villages` VALUES
   ('7401060023', '7401060', 'KANCINAA'),
   ('7401060024', '7401060', 'WINNING'),
   ('7401060029', '7401060', 'HOLIMOMBO JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7401060030', '7401060', 'KABAWOKOLE'),
   ('7401060031', '7401060', 'MANTOWU'),
   ('7401061025', '7401061', 'KAUMBU'),
@@ -77435,7 +77435,7 @@ INSERT INTO `villages` VALUES
   ('7402011001', '7402011', 'KULIDAWA'),
   ('7402011002', '7402011', 'WAALE-ALE'),
   ('7402011003', '7402011', 'LABASA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7402011004', '7402011', 'KATUMPU'),
   ('7402011005', '7402011', 'OE WAUNGKA'),
   ('7402011006', '7402011', 'LIANOSA'),
@@ -77486,7 +77486,7 @@ INSERT INTO `villages` VALUES
   ('7402031003', '7402031', 'KABANGKA'),
   ('7402031004', '7402031', 'SARIMULYO'),
   ('7402031005', '7402031', 'WAKOBALU AGUNG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7402031006', '7402031', 'WANSUGI'),
   ('7402031007', '7402031', 'WATALIKU'),
   ('7402031008', '7402031', 'LAKANDITO'),
@@ -77537,7 +77537,7 @@ INSERT INTO `villages` VALUES
   ('7402071012', '7402071', 'MANTOBUA BARAT'),
   ('7402072001', '7402072', 'BANGGAI'),
   ('7402072002', '7402072', 'LASUNAPA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7402072003', '7402072', 'GHONSUME'),
   ('7402072004', '7402072', 'WAPUNTO'),
   ('7402072005', '7402072', 'GHONE BHALANO'),
@@ -77588,7 +77588,7 @@ INSERT INTO `villages` VALUES
   ('7402092002', '7402092', 'MATA INDAHA'),
   ('7402092003', '7402092', 'LAMBELU'),
   ('7402092004', '7402092', 'TAMPUNABALE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7402092005', '7402092', 'MAATAMPE'),
   ('7402092006', '7402092', 'LANTOGALALO'),
   ('7402111004', '7402111', 'POHORUA'),
@@ -77639,7 +77639,7 @@ INSERT INTO `villages` VALUES
   ('7403100018', '7403100', 'RAWUA'),
   ('7403100019', '7403100', 'BAO-BAO'),
   ('7403100020', '7403100', 'P U U L O R O');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7403100021', '7403100', 'BONDOALA'),
   ('7403100022', '7403100', 'ANDAROA'),
   ('7403100023', '7403100', 'TOTOMBE JAYA'),
@@ -77690,7 +77690,7 @@ INSERT INTO `villages` VALUES
   ('7403104006', '7403104', 'PUUSAWAH'),
   ('7403104007', '7403104', 'ANDOBEU JAYA'),
   ('7403104008', '7403104', 'GALU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7403104009', '7403104', 'PUUSANGI'),
   ('7403104010', '7403104', 'TABANGGELE'),
   ('7403105001', '7403105', 'MENDIKONU'),
@@ -77741,7 +77741,7 @@ INSERT INTO `villages` VALUES
   ('7403132009', '7403132', 'LALONGGATU'),
   ('7403132010', '7403132', 'TETEWATU'),
   ('7403132011', '7403132', 'MOKALELEO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7403132012', '7403132', 'UNGGULINO'),
   ('7403132013', '7403132', 'TETEHAKA'),
   ('7403132014', '7403132', 'PUUHOPA'),
@@ -77792,7 +77792,7 @@ INSERT INTO `villages` VALUES
   ('7403141025', '7403141', 'POLANDANGI'),
   ('7403141026', '7403141', 'TAWAROLONDO'),
   ('7403141029', '7403141', 'LANGGONAWE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7403142001', '7403142', 'MATA BURA'),
   ('7403142002', '7403142', 'WAWOHINE'),
   ('7403142003', '7403142', 'DUNGGUA'),
@@ -77843,7 +77843,7 @@ INSERT INTO `villages` VALUES
   ('7403151005', '7403151', 'WOERAHI'),
   ('7403151006', '7403151', 'TUDAMEASO'),
   ('7403151007', '7403151', 'AHULOA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7403151008', '7403151', 'SAMBASULE'),
   ('7403151009', '7403151', 'LALOPISI'),
   ('7403152001', '7403152', 'KONAWE'),
@@ -77894,7 +77894,7 @@ INSERT INTO `villages` VALUES
   ('7403180035', '7403180', 'PADANGGUNI UTAMA'),
   ('7403180042', '7403180', 'ARUBIA'),
   ('7403180043', '7403180', 'KASUWURA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7403180044', '7403180', 'ANGGORO'),
   ('7403181001', '7403181', 'AMBEKAERI UTAMA'),
   ('7403181002', '7403181', 'LATOMA JAYA'),
@@ -77945,7 +77945,7 @@ INSERT INTO `villages` VALUES
   ('7403185002', '7403185', 'WAWORODA JAYA'),
   ('7403185003', '7403185', 'SANUANGGAMO'),
   ('7403185004', '7403185', 'OLO ONUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7403185005', '7403185', 'PUUDOMBI'),
   ('7403185006', '7403185', 'OLUAAO'),
   ('7403185007', '7403185', 'ANGGOHU'),
@@ -77996,7 +77996,7 @@ INSERT INTO `villages` VALUES
   ('7404012007', '7404012', 'HORONGKULI'),
   ('7404012008', '7404012', 'WONUA RAYA'),
   ('7404012009', '7404012', 'RAHABITE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7404012010', '7404012', 'RANO SANGIA'),
   ('7404013001', '7404013', 'PUUDONGI'),
   ('7404013002', '7404013', 'TANGGEAU'),
@@ -78047,7 +78047,7 @@ INSERT INTO `villages` VALUES
   ('7404061001', '7404061', 'INDUHA'),
   ('7404061002', '7404061', 'ULUNGGOLAKA'),
   ('7404061003', '7404061', 'MANGOLO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7404061004', '7404061', 'KOLAKAASIH'),
   ('7404061005', '7404061', 'SEA'),
   ('7404061006', '7404061', 'LATAMBAGA'),
@@ -78098,7 +78098,7 @@ INSERT INTO `villages` VALUES
   ('7405010001', '7405010', 'LANOWULU'),
   ('7405010002', '7405010', 'RORAYA'),
   ('7405010005', '7405010', 'TELUTU JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7405010006', '7405010', 'LAPOA'),
   ('7405010007', '7405010', 'ASINGI'),
   ('7405010008', '7405010', 'NGAPAAHA'),
@@ -78149,7 +78149,7 @@ INSERT INTO `villages` VALUES
   ('7405020015', '7405020', 'POTORO'),
   ('7405020016', '7405020', 'ALENGGE AGUNG'),
   ('7405020031', '7405020', 'PUUNGGAPU INDAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7405020033', '7405020', 'ATAKU'),
   ('7405021001', '7405021', 'PELANDIA'),
   ('7405021002', '7405021', 'PUUDARIA JAYA'),
@@ -78200,7 +78200,7 @@ INSERT INTO `villages` VALUES
   ('7405031007', '7405031', 'WATUMBOHOTI'),
   ('7405031008', '7405031', 'PARASI'),
   ('7405031009', '7405031', 'MONDOE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7405031010', '7405031', 'WAWO WONUA'),
   ('7405032001', '7405032', 'TOLIHE'),
   ('7405032002', '7405032', 'SAMBAHULE'),
@@ -78251,7 +78251,7 @@ INSERT INTO `villages` VALUES
   ('7405050009', '7405050', 'SAWAH'),
   ('7405050010', '7405050', 'KOLONO'),
   ('7405050011', '7405050', 'MONDOE JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7405050012', '7405050', 'ULUSENA JAYA'),
   ('7405050013', '7405050', 'LAMOTAU'),
   ('7405050014', '7405050', 'AWUNIO'),
@@ -78302,7 +78302,7 @@ INSERT INTO `villages` VALUES
   ('7405070027', '7405070', 'LAKOMEA'),
   ('7405070028', '7405070', 'MARGA CINTA'),
   ('7405070029', '7405070', 'MORAMO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7405070030', '7405070', 'TAMBOSUPA'),
   ('7405070031', '7405070', 'AMOHOLA'),
   ('7405070040', '7405070', 'WAWONDENGI'),
@@ -78353,7 +78353,7 @@ INSERT INTO `villages` VALUES
   ('7405090008', '7405090', 'AMBAIPUA'),
   ('7405090009', '7405090', 'ONEWILA'),
   ('7405090010', '7405090', 'RANOOHA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7405090011', '7405090', 'RANOMEETO'),
   ('7405090012', '7405090', 'KOTA BANGUN'),
   ('7405090013', '7405090', 'LANGGEA'),
@@ -78404,7 +78404,7 @@ INSERT INTO `villages` VALUES
   ('7405101020', '7405101', 'WONUA MONAPA'),
   ('7405102001', '7405102', 'KORONUA'),
   ('7405102002', '7405102', 'WATU-WATU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7405102003', '7405102', 'ULU SABULAKOA'),
   ('7405102004', '7405102', 'WONUA MORINI'),
   ('7405102005', '7405102', 'WONUA KOA'),
@@ -78455,7 +78455,7 @@ INSERT INTO `villages` VALUES
   ('7405112004', '7405112', 'IWOI MENDORO'),
   ('7405112005', '7405112', 'EPEESI'),
   ('7405112006', '7405112', 'BASALA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7405112007', '7405112', 'LIPU MASAGENA'),
   ('7405112008', '7405112', 'POLO-POLOLI'),
   ('7405112010', '7405112', 'TEPOROMBUA'),
@@ -78506,7 +78506,7 @@ INSERT INTO `villages` VALUES
   ('7406031007', '7406031', 'BATU SEMPE INDAH'),
   ('7406031008', '7406031', 'LALOA'),
   ('7406031009', '7406031', 'MAWAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7406031010', '7406031', 'TAJUNCU'),
   ('7406031011', '7406031', 'PUU WAEYA'),
   ('7406032001', '7406032', 'MASALOKA'),
@@ -78557,7 +78557,7 @@ INSERT INTO `villages` VALUES
   ('7406051001', '7406051', 'ROMPU ROMPU'),
   ('7406051002', '7406051', 'TOBURI'),
   ('7406051003', '7406051', 'TAMPAWULU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7406051004', '7406051', 'TANAH POLEANG'),
   ('7406051005', '7406051', 'KARYA BARU'),
   ('7406051006', '7406051', 'LAWATU EA'),
@@ -78608,7 +78608,7 @@ INSERT INTO `villages` VALUES
   ('7407010007', '7407010', 'LAGONGGA'),
   ('7407010008', '7407010', 'KAMPO-KAMPO'),
   ('7407010009', '7407010', 'PALAHIDU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7407010010', '7407010', 'MAKORO'),
   ('7407010011', '7407010', 'PALAHIDU BARAT'),
   ('7407010012', '7407010', 'RUKUWA'),
@@ -78659,7 +78659,7 @@ INSERT INTO `villages` VALUES
   ('7407031014', '7407031', 'LANGGE'),
   ('7407031015', '7407031', 'TANOMEHA'),
   ('7407031016', '7407031', 'LENTEA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7407031017', '7407031', 'DARAWA'),
   ('7407031018', '7407031', 'PEROPA'),
   ('7407031019', '7407031', 'TANJUNG'),
@@ -78710,7 +78710,7 @@ INSERT INTO `villages` VALUES
   ('7408010008', '7408010', 'TOROTUO'),
   ('7408010016', '7408010', 'LAWEKARA'),
   ('7408010017', '7408010', 'LANDOLIA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7408010018', '7408010', 'MAROKO'),
   ('7408011001', '7408011', 'LAPASI-PASI'),
   ('7408011002', '7408011', 'LAMBAI'),
@@ -78761,7 +78761,7 @@ INSERT INTO `villages` VALUES
   ('7408031003', '7408031', 'WATUMEA'),
   ('7408031004', '7408031', 'TIWU'),
   ('7408031005', '7408031', 'TAHIBUA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7408031006', '7408031', 'LAPOLU'),
   ('7408031007', '7408031', 'TANGGEAO'),
   ('7408040003', '7408040', 'NGAPA'),
@@ -78812,7 +78812,7 @@ INSERT INTO `villages` VALUES
   ('7408052007', '7408052', 'POWALAA'),
   ('7408052008', '7408052', 'TO\'LEMO'),
   ('7408052009', '7408052', 'SALULOTONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7408052010', '7408052', 'KALAHUNDE'),
   ('7408060001', '7408060', 'LATOWU'),
   ('7408060002', '7408060', 'BATU API'),
@@ -78863,7 +78863,7 @@ INSERT INTO `villages` VALUES
   ('7409101010', '7409101', 'BALUARA'),
   ('7409101011', '7409101', 'BUBU BARAT'),
   ('7409110010', '7409110', 'MATALAGI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7409110011', '7409110', 'LAEYA'),
   ('7409110012', '7409110', 'LABARAGA'),
   ('7409110013', '7409110', 'LASIWA'),
@@ -78914,7 +78914,7 @@ INSERT INTO `villages` VALUES
   ('7409121012', '7409121', 'LABULANDA'),
   ('7409121013', '7409121', 'LAPANDEWA'),
   ('7409121015', '7409121', 'KARYA MULIA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7409122001', '7409122', 'ULUNAMBO'),
   ('7409122002', '7409122', 'WAODE BURI'),
   ('7409122003', '7409122', 'LELAMO'),
@@ -78965,7 +78965,7 @@ INSERT INTO `villages` VALUES
   ('7410020006', '7410020', 'PASIR PUTIH'),
   ('7410020007', '7410020', 'PADALEU'),
   ('7410020008', '7410020', 'PUULEMO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7410020009', '7410020', 'ALO-ALO'),
   ('7410020010', '7410020', 'LAPULU'),
   ('7410020011', '7410020', 'LARAMO'),
@@ -79016,7 +79016,7 @@ INSERT INTO `villages` VALUES
   ('7410050012', '7410050', 'WALALINDU'),
   ('7410050013', '7410050', 'TAPUWATU'),
   ('7410050014', '7410050', 'WALASOLO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7410050015', '7410050', 'A S E R A'),
   ('7410050016', '7410050', 'AMOROME'),
   ('7410050017', '7410050', 'ASEMI NUNULAI'),
@@ -79067,7 +79067,7 @@ INSERT INTO `villages` VALUES
   ('7410060004', '7410060', 'LAMERURU'),
   ('7410060005', '7410060', 'UPT.MOROMBO/TOBIMEITA'),
   ('7410060006', '7410060', 'PARIAMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7410060007', '7410060', 'POLORA INDAH'),
   ('7410060008', '7410060', 'ALENGGO'),
   ('7410060009', '7410060', 'MEKAR JAYA'),
@@ -79118,7 +79118,7 @@ INSERT INTO `villages` VALUES
   ('7411020004', '7411020', 'ONEMANU'),
   ('7411020005', '7411020', 'BOU'),
   ('7411020006', '7411020', 'LOWA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7411020007', '7411020', 'LERE JAYA'),
   ('7411020008', '7411020', 'ATOLANU'),
   ('7411020009', '7411020', 'INOTU'),
@@ -79169,7 +79169,7 @@ INSERT INTO `villages` VALUES
   ('7411060005', '7411060', 'IWOIKONDO'),
   ('7411060006', '7411060', 'PEATOA'),
   ('7411060007', '7411060', 'LALOWURA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7411060008', '7411060', 'LOEA'),
   ('7411060009', '7411060', 'SIMBALAI'),
   ('7411070001', '7411070', 'LALINGATO'),
@@ -79220,7 +79220,7 @@ INSERT INTO `villages` VALUES
   ('7411110004', '7411110', 'SANGGONA'),
   ('7411110005', '7411110', 'LALOMBAI'),
   ('7411110006', '7411110', 'UNDOLO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7411110007', '7411110', 'TAWANGA'),
   ('7411110008', '7411110', 'AMOLOLU'),
   ('7411110009', '7411110', 'AMOKUNI'),
@@ -79271,7 +79271,7 @@ INSERT INTO `villages` VALUES
   ('7412030008', '7412030', 'NOKO'),
   ('7412030009', '7412030', 'BANGUN MEKAR'),
   ('7412030010', '7412030', 'WATUONDO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7412040001', '7412040', 'MATA IWOI'),
   ('7412040002', '7412040', 'WAWOROPE'),
   ('7412040003', '7412040', 'DONGKALAEA'),
@@ -79322,7 +79322,7 @@ INSERT INTO `villages` VALUES
   ('7412070006', '7412070', 'LANGARA LAUT'),
   ('7412070007', '7412070', 'LANGARA INDAH'),
   ('7412070008', '7412070', 'LANGARA BAJO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7412070009', '7412070', 'WAWOBILI'),
   ('7412070010', '7412070', 'WAWOLAA'),
   ('7412070011', '7412070', 'LANOWATU'),
@@ -79373,7 +79373,7 @@ INSERT INTO `villages` VALUES
   ('7413060015', '7413060', 'LATUGHO'),
   ('7413060033', '7413060', 'WATUMELA'),
   ('7413070001', '7413070', 'LAWADA JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7413070002', '7413070', 'LAKALAMBA'),
   ('7413070003', '7413070', 'MAROBEA'),
   ('7413070004', '7413070', 'ONDOKE'),
@@ -79424,7 +79424,7 @@ INSERT INTO `villages` VALUES
   ('7414020002', '7414020', 'KANCE BUNGI'),
   ('7414020003', '7414020', 'GUMAMANO'),
   ('7414020006', '7414020', 'MATARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7414020007', '7414020', 'WASILOMATA I'),
   ('7414020008', '7414020', 'WASILOMATA II'),
   ('7414020009', '7414020', 'NAPA'),
@@ -79475,7 +79475,7 @@ INSERT INTO `villages` VALUES
   ('7414060002', '7414060', 'KOLOWA'),
   ('7414060008', '7414060', 'RAHIA'),
   ('7414060009', '7414060', 'WAKEA KEA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7414060010', '7414060', 'WALIKO'),
   ('7414060011', '7414060', 'BOMBONAWULU'),
   ('7414060012', '7414060', 'WALANDO'),
@@ -79526,7 +79526,7 @@ INSERT INTO `villages` VALUES
   ('7415040013', '7415040', 'LAOMPO'),
   ('7415040014', '7415040', 'BUSOA'),
   ('7415040015', '7415040', 'LAWELA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7415040016', '7415040', 'LAMPANAIRI'),
   ('7415040017', '7415040', 'LAWELA SELATAN'),
   ('7415040018', '7415040', 'LAKAMBAU'),
@@ -79577,7 +79577,7 @@ INSERT INTO `villages` VALUES
   ('7471012017', '7471012', 'LALODATI'),
   ('7471012018', '7471012', 'ABELI DALAM'),
   ('7471013006', '7471013', 'KADIA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7471013009', '7471013', 'ANAIWOI'),
   ('7471013010', '7471013', 'WOWAWANGGU'),
   ('7471013012', '7471013', 'PONDAMBEA'),
@@ -79628,7 +79628,7 @@ INSERT INTO `villages` VALUES
   ('7472010001', '7472010', 'SULAA'),
   ('7472010002', '7472010', 'WABOROBO'),
   ('7472010008', '7472010', 'LIPU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7472010009', '7472010', 'KATOBENGKE'),
   ('7472010010', '7472010', 'LABALAWA'),
   ('7472011001', '7472011', 'BAADIA'),
@@ -79679,7 +79679,7 @@ INSERT INTO `villages` VALUES
   ('7501031008', '7501031', 'KERAMAT'),
   ('7501031009', '7501031', 'TABULO SELATAN'),
   ('7501040007', '7501040', 'LAMU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7501040008', '7501040', 'BAJO'),
   ('7501040009', '7501040', 'PENTADU BARAT'),
   ('7501040010', '7501040', 'MODELOMO'),
@@ -79730,7 +79730,7 @@ INSERT INTO `villages` VALUES
   ('7501050031', '7501050', 'BATU KRAMAT'),
   ('7501050032', '7501050', 'SOSIAL'),
   ('7501050033', '7501050', 'BUALO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7501051001', '7501051', 'MEKAR JAYA'),
   ('7501051002', '7501051', 'HARAPAN'),
   ('7501051003', '7501051', 'SUKA MAJU'),
@@ -79781,7 +79781,7 @@ INSERT INTO `villages` VALUES
   ('7502021002', '7502021', 'BATULAYAR'),
   ('7502021003', '7502021', 'MOLAS'),
   ('7502021004', '7502021', 'TOHUPO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7502021005', '7502021', 'MOLOPATODU'),
   ('7502021006', '7502021', 'UPOMELA'),
   ('7502021007', '7502021', 'DULAMAYO'),
@@ -79832,7 +79832,7 @@ INSERT INTO `villages` VALUES
   ('7502031003', '7502031', 'PULUBALA'),
   ('7502031004', '7502031', 'TRIDARMA'),
   ('7502031005', '7502031', 'PONGONGAILA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7502031006', '7502031', 'PUNCAK'),
   ('7502031007', '7502031', 'MOLAMAHU'),
   ('7502031008', '7502031', 'MOLALAHU'),
@@ -79883,7 +79883,7 @@ INSERT INTO `villages` VALUES
   ('7502043002', '7502043', 'MOHIYOLO'),
   ('7502043003', '7502043', 'KARYA INDAH'),
   ('7502043004', '7502043', 'PANGAHU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7502043005', '7502043', 'TIOHU'),
   ('7502043006', '7502043', 'PRIMA'),
   ('7502043007', '7502043', 'KARYA BARU'),
@@ -79934,7 +79934,7 @@ INSERT INTO `villages` VALUES
   ('7502081001', '7502081', 'LUPOYO'),
   ('7502081002', '7502081', 'PANTUNGO'),
   ('7502081003', '7502081', 'DUMATI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7502081004', '7502081', 'TULADENGGI'),
   ('7502081005', '7502081', 'ULAPATO.A'),
   ('7502081006', '7502081', 'PENTADIO TIMUR'),
@@ -79985,7 +79985,7 @@ INSERT INTO `villages` VALUES
   ('7503012007', '7503012', 'KELAPA LIMA'),
   ('7503020001', '7503020', 'LOMULI'),
   ('7503020002', '7503020', 'LEMITO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7503020003', '7503020', 'WONGGARASI BARAT'),
   ('7503020008', '7503020', 'KENARI'),
   ('7503020009', '7503020', 'LEMITO UTARA'),
@@ -80036,7 +80036,7 @@ INSERT INTO `villages` VALUES
   ('7503040006', '7503040', 'SARI MURNI'),
   ('7503040013', '7503040', 'PATUHU'),
   ('7503040014', '7503040', 'AYULA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7503040015', '7503040', 'OMAYUWA'),
   ('7503040016', '7503040', 'BANUROJA'),
   ('7503040017', '7503040', 'PELAMBANE'),
@@ -80087,7 +80087,7 @@ INSERT INTO `villages` VALUES
   ('7504012004', '7504012', 'AYULA UTARA'),
   ('7504012005', '7504012', 'AYULA TILANGO'),
   ('7504012006', '7504012', 'LAMAHU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7504012007', '7504012', 'HUNTU BARAT'),
   ('7504012008', '7504012', 'AYULA TIMUR'),
   ('7504012009', '7504012', 'SEJAHTERA'),
@@ -80138,7 +80138,7 @@ INSERT INTO `villages` VALUES
   ('7504022026', '7504022', 'BERLIAN'),
   ('7504022027', '7504022', 'BONGOHULAWA'),
   ('7504030011', '7504030', 'TINGKOHUBU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7504030012', '7504030', 'BOLUDAWA'),
   ('7504030014', '7504030', 'HULUDUOTAMO'),
   ('7504030019', '7504030', 'BUBEYA'),
@@ -80189,7 +80189,7 @@ INSERT INTO `villages` VALUES
   ('7504040014', '7504040', 'KAMIRI'),
   ('7504040015', '7504040', 'PELITA HIJAU'),
   ('7504041001', '7504041', 'HUANGOBOTU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7504041002', '7504041', 'MOLOTABU'),
   ('7504041003', '7504041', 'OLUHUTA'),
   ('7504041004', '7504041', 'BOTUBARANI'),
@@ -80240,7 +80240,7 @@ INSERT INTO `villages` VALUES
   ('7505010011', '7505010', 'BUATA'),
   ('7505010012', '7505010', 'WAPALO'),
   ('7505010013', '7505010', 'ILOHELUMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7505010014', '7505010', 'SIGASO'),
   ('7505010015', '7505010', 'OLUHUTA'),
   ('7505010016', '7505010', 'KOTAJIN UTARA'),
@@ -80291,7 +80291,7 @@ INSERT INTO `villages` VALUES
   ('7505022004', '7505022', 'MALAMBE'),
   ('7505030004', '7505030', 'TOLANGO'),
   ('7505030005', '7505030', 'ILANGATA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7505030006', '7505030', 'POPALO'),
   ('7505030007', '7505030', 'TOLONGIO'),
   ('7505030008', '7505030', 'DUDEPO'),
@@ -80342,7 +80342,7 @@ INSERT INTO `villages` VALUES
   ('7505050008', '7505050', 'CEMPAKA PUTIH'),
   ('7505050009', '7505050', 'MOLANGGA'),
   ('7505050012', '7505050', 'ILOTUNGGULA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7505050013', '7505050', 'TOLITE JAYA'),
   ('7505050017', '7505050', 'ILOMANGGA'),
   ('7505051001', '7505051', 'BIAU'),
@@ -80393,7 +80393,7 @@ INSERT INTO `villages` VALUES
   ('7571030005', '7571030', 'WONGKADITI BARAT'),
   ('7571030011', '7571030', 'DULOMO SELATAN'),
   ('7571030012', '7571030', 'DULOMO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7571030015', '7571030', 'DEMBE JAYA'),
   ('7571031001', '7571031', 'WUMIALO'),
   ('7571031002', '7571031', 'DULALOWO'),
@@ -80444,7 +80444,7 @@ INSERT INTO `villages` VALUES
   ('7601030005', '7601030', 'TALLUM BANUA'),
   ('7601030011', '7601030', 'PUNDAU'),
   ('7601030012', '7601030', 'BUKIT SAMANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7601030013', '7601030', 'LIMBUA'),
   ('7601030014', '7601030', 'LALATEDONG'),
   ('7601030015', '7601030', 'PAMINGGALAN'),
@@ -80495,7 +80495,7 @@ INSERT INTO `villages` VALUES
   ('7602010014', '7602010', 'BATULAYA'),
   ('7602010018', '7602010', 'TINAMBUNG'),
   ('7602010019', '7602010', 'LEKOPADIS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7602010021', '7602010', 'GALUNG LOMBOK'),
   ('7602011001', '7602011', 'BALANIPA'),
   ('7602011002', '7602011', 'TAMMANGALLE'),
@@ -80546,7 +80546,7 @@ INSERT INTO `villages` VALUES
   ('7602030006', '7602030', 'BONDE'),
   ('7602030007', '7602030', 'PARAPPE'),
   ('7602030008', '7602030', 'PANYAMPA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7602030009', '7602030', 'LEMO'),
   ('7602030010', '7602030', 'KATUMBANGAN'),
   ('7602030011', '7602030', 'LAMPOKO'),
@@ -80597,7 +80597,7 @@ INSERT INTO `villages` VALUES
   ('7602042003', '7602042', 'DAKKA'),
   ('7602042004', '7602042', 'PELITAKAN'),
   ('7602042005', '7602042', 'TAPANGO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7602042006', '7602042', 'TAPANGO BARAT'),
   ('7602042007', '7602042', 'BATU'),
   ('7602042008', '7602042', 'PALATTA'),
@@ -80648,7 +80648,7 @@ INSERT INTO `villages` VALUES
   ('7602052005', '7602052', 'DUAMPANUA'),
   ('7602052006', '7602052', 'KUNYI'),
   ('7602061001', '7602061', 'LILLI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7602061002', '7602061', 'TAPUA'),
   ('7602061003', '7602061', 'MATANGNGA'),
   ('7602061004', '7602061', 'RANGOAN'),
@@ -80699,7 +80699,7 @@ INSERT INTO `villages` VALUES
   ('7603040003', '7603040', 'TADO\' KALUA'),
   ('7603040004', '7603040', 'MASUPPU'),
   ('7603040005', '7603040', 'BAKADISURA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7603040006', '7603040', 'KALAMA\''),
   ('7603040007', '7603040', 'SALUKONA'),
   ('7603050001', '7603050', 'MAMASA'),
@@ -80750,7 +80750,7 @@ INSERT INTO `villages` VALUES
   ('7603071004', '7603071', 'RANTETANGNGA'),
   ('7603080001', '7603080', 'MAMBI'),
   ('7603080002', '7603080', 'TALIPPUKI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7603080004', '7603080', 'RANTEBULAHAN'),
   ('7603080006', '7603080', 'SONDONG LAJUK'),
   ('7603080010', '7603080', 'SALUBANUA'),
@@ -80801,7 +80801,7 @@ INSERT INTO `villages` VALUES
   ('7603083009', '7603083', 'KONDO'),
   ('7603083010', '7603083', 'ULUMEA'),
   ('7603083011', '7603083', 'SALUBALO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7603090001', '7603090', 'ARALLE'),
   ('7603090003', '7603090', 'RALLEANAK'),
   ('7603090004', '7603090', 'PANETEAN'),
@@ -80852,7 +80852,7 @@ INSERT INTO `villages` VALUES
   ('7604011002', '7604011', 'DUNGKAIT'),
   ('7604011003', '7604011', 'LABUANG RANO'),
   ('7604011004', '7604011', 'LEBANI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7604011005', '7604011', 'TANETE PAO'),
   ('7604011006', '7604011', 'AHU'),
   ('7604011007', '7604011', 'PANGASAAN'),
@@ -80903,7 +80903,7 @@ INSERT INTO `villages` VALUES
   ('7604032006', '7604032', 'SAMPAGA'),
   ('7604032007', '7604032', 'LOSSO'),
   ('7604033001', '7604033', 'TAMEMONGGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7604033002', '7604033', 'TOMMO'),
   ('7604033003', '7604033', 'BUANA SAKTI'),
   ('7604033004', '7604033', 'CAMPALOGA'),
@@ -80954,7 +80954,7 @@ INSERT INTO `villages` VALUES
   ('7605012003', '7605012', 'TARANGGI'),
   ('7605012004', '7605012', 'SIPAKAINGA'),
   ('7605020001', '7605020', 'BARAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7605020002', '7605020', 'BALANTI'),
   ('7605020003', '7605020', 'MOTU'),
   ('7605020012', '7605020', 'BULU PARIGI'),
@@ -81005,7 +81005,7 @@ INSERT INTO `villages` VALUES
   ('7606010001', '7606010', 'PANGALE'),
   ('7606010002', '7606010', 'LEMO-LEMO'),
   ('7606010003', '7606010', 'POLOPANGALE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7606010004', '7606010', 'SARTANAMAJU'),
   ('7606010005', '7606010', 'KOMBILING'),
   ('7606010006', '7606010', 'LAMBA-LAMBA'),
@@ -81056,7 +81056,7 @@ INSERT INTO `villages` VALUES
   ('7606050010', '7606050', 'KADAILA'),
   ('7606050011', '7606050', 'BENGGAULU'),
   ('7606050012', '7606050', 'MORA IV');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('7606050013', '7606050', 'SANJANGO'),
   ('8101040001', '8101040', 'LERMATANG'),
   ('8101040002', '8101040', 'LATDALAM'),
@@ -81107,7 +81107,7 @@ INSERT INTO `villages` VALUES
   ('8101051006', '8101051', 'ADODO FORDATA'),
   ('8101052001', '8101052', 'KILON'),
   ('8101052002', '8101052', 'ABAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8101052003', '8101052', 'LABOBAR'),
   ('8101052004', '8101052', 'WUNLAH'),
   ('8101052005', '8101052', 'KARATAT'),
@@ -81158,7 +81158,7 @@ INSERT INTO `villages` VALUES
   ('8102012002', '8102012', 'MADWAER'),
   ('8102012003', '8102012', 'SOMLAIN'),
   ('8102012004', '8102012', 'OHOIREN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8102012005', '8102012', 'OHOIRA'),
   ('8102012006', '8102012', 'UR PULAU'),
   ('8102012007', '8102012', 'TANIMBAR KEI'),
@@ -81209,7 +81209,7 @@ INSERT INTO `villages` VALUES
   ('8102016007', '8102016', 'NGURSOIN'),
   ('8102016008', '8102016', 'ELAAR LAMAGORANG'),
   ('8102016009', '8102016', 'ELAAR LET');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8102016011', '8102016', 'GARARA'),
   ('8102020015', '8102020', 'OHOIWAIT'),
   ('8102020016', '8102020', 'OHOIEL'),
@@ -81260,7 +81260,7 @@ INSERT INTO `villages` VALUES
   ('8102021012', '8102021', 'YAMTIMUR'),
   ('8102021013', '8102021', 'HOLLAT SOLAIR'),
   ('8102021014', '8102021', 'HOKO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8102021015', '8102021', 'HOLLAY'),
   ('8102021016', '8102021', 'OHOIFARUAN'),
   ('8102021017', '8102021', 'BANDA EFRUAN'),
@@ -81311,7 +81311,7 @@ INSERT INTO `villages` VALUES
   ('8102023023', '8102023', 'HOOR KRISTEN'),
   ('8102023024', '8102023', 'WAER'),
   ('8102023025', '8102023', 'WAERAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8102024001', '8102024', 'WEDUAR FEER'),
   ('8102024002', '8102024', 'RAHANGIAR'),
   ('8102024003', '8102024', 'UAT'),
@@ -81362,7 +81362,7 @@ INSERT INTO `villages` VALUES
   ('8103041009', '8103041', 'LAHA KABA'),
   ('8103041010', '8103041', 'ULAHAHAN'),
   ('8103050009', '8103050', 'BANDA BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8103050010', '8103050', 'YAFILA'),
   ('8103050011', '8103050', 'HOLLO'),
   ('8103050012', '8103050', 'MAKARIKI'),
@@ -81413,7 +81413,7 @@ INSERT INTO `villages` VALUES
   ('8103081005', '8103081', 'NALAHIA'),
   ('8103081006', '8103081', 'SILA'),
   ('8103081007', '8103081', 'LEINITU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8103082001', '8103082', 'OUW'),
   ('8103082002', '8103082', 'ULLATH'),
   ('8103082003', '8103082', 'SIRI SORI'),
@@ -81464,7 +81464,7 @@ INSERT INTO `villages` VALUES
   ('8103140015', '8103140', 'WAHAI'),
   ('8103140016', '8103140', 'AIR BESAR'),
   ('8103140017', '8103140', 'PASAHARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8103140018', '8103140', 'KALOA'),
   ('8103140039', '8103140', 'MALAKU'),
   ('8103140041', '8103140', 'BESI'),
@@ -81515,7 +81515,7 @@ INSERT INTO `villages` VALUES
   ('8103143012', '8103143', 'WONOSARI'),
   ('8104020001', '8104020', 'JAMILU'),
   ('8104020002', '8104020', 'SANLEKO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8104020003', '8104020', 'SIAHONI'),
   ('8104020004', '8104020', 'NAMLEA'),
   ('8104020005', '8104020', 'LALA'),
@@ -81566,7 +81566,7 @@ INSERT INTO `villages` VALUES
   ('8104026006', '8104026', 'TIFU'),
   ('8104026007', '8104026', 'WANAKARTA'),
   ('8104026008', '8104026', 'WABLOY');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8104026009', '8104026', 'KUBALAHIN'),
   ('8104026010', '8104026', 'OHILAHIN'),
   ('8104027001', '8104027', 'WAEPERANG'),
@@ -81617,7 +81617,7 @@ INSERT INTO `villages` VALUES
   ('8105011004', '8105011', 'SIYA'),
   ('8105011006', '8105011', 'DOSIMAR'),
   ('8105011007', '8105011', 'KAREY');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8105011008', '8105011', 'JORANG'),
   ('8105011009', '8105011', 'GOMARMETI'),
   ('8105011012', '8105011', 'GOMARSUNGAI'),
@@ -81668,7 +81668,7 @@ INSERT INTO `villages` VALUES
   ('8105022005', '8105022', 'GOMO GOMO'),
   ('8105022006', '8105022', 'JAMBU AIR'),
   ('8105022007', '8105022', 'WARABAL');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8105030073', '8105030', 'NAPAR'),
   ('8105030074', '8105030', 'KOBRAUR'),
   ('8105030075', '8105030', 'LAU LAU'),
@@ -81719,7 +81719,7 @@ INSERT INTO `villages` VALUES
   ('8106010013', '8106010', 'TONU JAYA'),
   ('8106010014', '8106010', 'ALANG ASAUDE'),
   ('8106011001', '8106011', 'TUNIWARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8106011002', '8106011', 'BUANO HATUPUTIH'),
   ('8106011003', '8106011', 'TUMALEHU BARAT'),
   ('8106011004', '8106011', 'TUMALEHU TIMUR'),
@@ -81770,7 +81770,7 @@ INSERT INTO `villages` VALUES
   ('8106040003', '8106040', 'LATURAKE'),
   ('8106040004', '8106040', 'BURIA'),
   ('8106040005', '8106040', 'RIRING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8106040006', '8106040', 'NINIARI'),
   ('8106040007', '8106040', 'MORNATEN'),
   ('8106040008', '8106040', 'NIKULUKAN'),
@@ -81821,7 +81821,7 @@ INSERT INTO `villages` VALUES
   ('8107010046', '8107010', 'SIKARU KATALOKA'),
   ('8107010047', '8107010', 'USUN KATALOKA'),
   ('8107010048', '8107010', 'BUAN KATALOKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8107010049', '8107010', 'RUMANAMA KOTAWOUW KATALOKA'),
   ('8107011002', '8107011', 'TAMHER WARAT'),
   ('8107011003', '8107011', 'KELANGAN'),
@@ -81872,7 +81872,7 @@ INSERT INTO `villages` VALUES
   ('8107013020', '8107013', 'MIRAN RUMUAR'),
   ('8107013021', '8107013', 'MIRAN KILIAN MANABAN'),
   ('8107013022', '8107013', 'MIRAN KELEDAR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8107013023', '8107013', 'MIRAN GOTA'),
   ('8107014001', '8107014', 'LALASA'),
   ('8107014002', '8107014', 'P. PANJANG'),
@@ -81923,7 +81923,7 @@ INSERT INTO `villages` VALUES
   ('8107023006', '8107023', 'KETA RUMADAN'),
   ('8107023007', '8107023', 'KIANLAUT'),
   ('8107023008', '8107023', 'SALAGOR KOTA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8107023009', '8107023', 'SALAGOR AIR'),
   ('8107023010', '8107023', 'ARUAN GAUR'),
   ('8107024001', '8107024', 'KIANDARAT'),
@@ -81974,7 +81974,7 @@ INSERT INTO `villages` VALUES
   ('8107041005', '8107041', 'SUMBER AGUNG'),
   ('8107041006', '8107041', 'BENGGOI'),
   ('8107041007', '8107041', 'JAKARTA BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8107041008', '8107041', 'WAIKETAM BARU'),
   ('8107041009', '8107041', 'WAIMATAKABU'),
   ('8107041010', '8107041', 'WAISAMET'),
@@ -82025,7 +82025,7 @@ INSERT INTO `villages` VALUES
   ('8108021003', '8108021', 'LEBELAU'),
   ('8108022002', '8108022', 'HILA'),
   ('8108022003', '8108022', 'SOLATH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8108030001', '8108030', 'NUWEWANG'),
   ('8108030002', '8108030', 'TOMRA'),
   ('8108030003', '8108030', 'TUTUWARU'),
@@ -82076,7 +82076,7 @@ INSERT INTO `villages` VALUES
   ('8108071007', '8108071', 'RUMAH LEWANG KECIL'),
   ('8108071008', '8108071', 'NUSIATA'),
   ('8108080001', '8108080', 'EMPALWAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8108080002', '8108080', 'TUTUWAWANG'),
   ('8108080003', '8108080', 'MANUARI'),
   ('8108080004', '8108080', 'ANALUTUR'),
@@ -82127,7 +82127,7 @@ INSERT INTO `villages` VALUES
   ('8109020007', '8109020', 'MEPA'),
   ('8109020008', '8109020', 'LEKSULA'),
   ('8109020009', '8109020', 'NALBESSY');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8109020010', '8109020', 'KASE'),
   ('8109020015', '8109020', 'SLEALALE'),
   ('8109020017', '8109020', 'NEATH'),
@@ -82178,7 +82178,7 @@ INSERT INTO `villages` VALUES
   ('8109050003', '8109050', 'ELARA'),
   ('8109050004', '8109050', 'LUMOY'),
   ('8109050005', '8109050', 'MASAWOY');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8109050006', '8109050', 'ULIMA'),
   ('8109050007', '8109050', 'KAMPUNG BARU'),
   ('8171010001', '8171010', 'LATUHALAT'),
@@ -82229,7 +82229,7 @@ INSERT INTO `villages` VALUES
   ('8171031005', '8171031', 'RUMAH TIGA'),
   ('8171031006', '8171031', 'TIHU'),
   ('8171031007', '8171031', 'POKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8171031008', '8171031', 'HUNUTH/DURIAN PATAH'),
   ('8172010001', '8172010', 'TUBYAL'),
   ('8172010002', '8172010', 'FINUALEN'),
@@ -82280,7 +82280,7 @@ INSERT INTO `villages` VALUES
   ('8201090031', '8201090', 'IDAMDEHE GAMSUNGI'),
   ('8201090032', '8201090', 'JALAN BARU'),
   ('8201090033', '8201090', 'MARIMABATI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8201090034', '8201090', 'GAMTALA'),
   ('8201090035', '8201090', 'SOAKONORA'),
   ('8201090036', '8201090', 'LOLORI'),
@@ -82331,7 +82331,7 @@ INSERT INTO `villages` VALUES
   ('8201100030', '8201100', 'LAKO AKEDIRI'),
   ('8201100031', '8201100', 'JARAKORE'),
   ('8201100032', '8201100', 'ROPU TENGAH BALU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8201100033', '8201100', 'BALISOAN UTARA'),
   ('8201100035', '8201100', 'SASUR PANTAI'),
   ('8201101001', '8201101', 'IDAM GAMLAMO'),
@@ -82382,7 +82382,7 @@ INSERT INTO `villages` VALUES
   ('8201131012', '8201131', 'GAMKONORA'),
   ('8201131013', '8201131', 'SARAU'),
   ('8201131014', '8201131', 'TUGUAER');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8201131015', '8201131', 'NGALO NGALO'),
   ('8201131016', '8201131', 'GAMSIDA'),
   ('8201132001', '8201132', 'PODOL'),
@@ -82433,7 +82433,7 @@ INSERT INTO `villages` VALUES
   ('8202030019', '8202030', 'NURWEDA'),
   ('8202030020', '8202030', 'FIDI JAYA'),
   ('8202030021', '8202030', 'SIDANGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8202030022', '8202030', 'WEDANA'),
   ('8202030023', '8202030', 'GOENG'),
   ('8202031001', '8202031', 'KLUTING JAYA'),
@@ -82484,7 +82484,7 @@ INSERT INTO `villages` VALUES
   ('8202044002', '8202044', 'BANEMO'),
   ('8202044003', '8202044', 'BOBANE JAYA'),
   ('8202044004', '8202044', 'MOREALA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8202044005', '8202044', 'SIBENPOPO'),
   ('8202045001', '8202045', 'PENITI'),
   ('8202045002', '8202045', 'MASURE'),
@@ -82535,7 +82535,7 @@ INSERT INTO `villages` VALUES
   ('8203030006', '8203030', 'WAITINA'),
   ('8203030007', '8203030', 'KOW'),
   ('8203030008', '8203030', 'WAI-TAMELA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8203030009', '8203030', 'NAFLOW'),
   ('8203030010', '8203030', 'KARAMAT TITDOY'),
   ('8203031001', '8203031', 'BARU AKOL'),
@@ -82586,7 +82586,7 @@ INSERT INTO `villages` VALUES
   ('8204020021', '8204020', 'KAWASI'),
   ('8204020022', '8204020', 'AIR MANGGA'),
   ('8204021001', '8204021', 'MANATAHAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8204021002', '8204021', 'JIKOHAY'),
   ('8204021003', '8204021', 'ALAM KENANGA'),
   ('8204021004', '8204021', 'SOA SANGAJI'),
@@ -82637,7 +82637,7 @@ INSERT INTO `villages` VALUES
   ('8204033010', '8204033', 'PAPALOANG'),
   ('8204034001', '8204034', 'KAMPUNG BARU'),
   ('8204034002', '8204034', 'BATUTAGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8204034003', '8204034', 'PARAPAKANDA'),
   ('8204034004', '8204034', 'TANJUNG OBIT'),
   ('8204034005', '8204034', 'BAJO'),
@@ -82688,7 +82688,7 @@ INSERT INTO `villages` VALUES
   ('8204052001', '8204052', 'TAWA BACAN BARAT'),
   ('8204052002', '8204052', 'MARITOSU'),
   ('8204052003', '8204052', 'LOLEO JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8204052004', '8204052', 'KOUBALABALA'),
   ('8204052005', '8204052', 'LOLEO MEKAR'),
   ('8204052006', '8204052', 'KASIRUTA DALAM'),
@@ -82739,7 +82739,7 @@ INSERT INTO `villages` VALUES
   ('8204070011', '8204070', 'RABUTDAIO'),
   ('8204070012', '8204070', 'WAIGITANG'),
   ('8204070017', '8204070', 'SANGAPATI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8204070018', '8204070', 'GITANG'),
   ('8204070019', '8204070', 'DALAM'),
   ('8204070020', '8204070', 'WALO'),
@@ -82790,7 +82790,7 @@ INSERT INTO `villages` VALUES
   ('8204083007', '8204083', 'LIBOBA HIJRAH'),
   ('8204090006', '8204090', 'WOSI'),
   ('8204090007', '8204090', 'SAKETA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8204090008', '8204090', 'AKELAMO'),
   ('8204090009', '8204090', 'BUKIT INDAH'),
   ('8204090010', '8204090', 'RAWA JAYA'),
@@ -82841,7 +82841,7 @@ INSERT INTO `villages` VALUES
   ('8205010031', '8205010', 'GAYOK'),
   ('8205010032', '8205010', 'WANGEOTAK'),
   ('8205010033', '8205010', 'BUKIT TINGGI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8205010034', '8205010', 'TERPADU'),
   ('8205011001', '8205011', 'PASIR PUTIH'),
   ('8205011002', '8205011', 'BOBANEIGO'),
@@ -82892,7 +82892,7 @@ INSERT INTO `villages` VALUES
   ('8205022002', '8205022', 'DORO'),
   ('8205022003', '8205022', 'BOULAMO'),
   ('8205022004', '8205022', 'DARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8205022005', '8205022', 'BOBALE'),
   ('8205022006', '8205022', 'BORI'),
   ('8205022007', '8205022', 'PEDIWANG'),
@@ -82943,7 +82943,7 @@ INSERT INTO `villages` VALUES
   ('8205041006', '8205041', 'W K O'),
   ('8205041007', '8205041', 'MAHIA'),
   ('8205041008', '8205041', 'WOSIA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8205041009', '8205041', 'TANJUNG NIARA'),
   ('8205042001', '8205042', 'GORUA SELATAN'),
   ('8205042002', '8205042', 'GORUA'),
@@ -82994,7 +82994,7 @@ INSERT INTO `villages` VALUES
   ('8205060004', '8205060', 'NGAJAM'),
   ('8205060005', '8205060', 'DORUME'),
   ('8205060006', '8205060', 'KAILUPA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8205060007', '8205060', 'GISIK'),
   ('8205060008', '8205060', 'KAPA KAPA'),
   ('8205060009', '8205060', 'POCAO'),
@@ -83045,7 +83045,7 @@ INSERT INTO `villages` VALUES
   ('8206020014', '8206020', 'NANAS'),
   ('8206020015', '8206020', 'SONDO-SONDO'),
   ('8206020016', '8206020', 'TALAGA JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8206020017', '8206020', 'AKE JAWI'),
   ('8206020018', '8206020', 'INO JAYA'),
   ('8206020019', '8206020', 'JIKOMOI'),
@@ -83096,7 +83096,7 @@ INSERT INTO `villages` VALUES
   ('8206040018', '8206040', 'GAMESAN'),
   ('8206040019', '8206040', 'BABURINO'),
   ('8206041001', '8206041', 'BERINGIN LAMO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8206041002', '8206041', 'BEBSILI'),
   ('8206041004', '8206041', 'WAYAMLI'),
   ('8206041006', '8206041', 'MIAF'),
@@ -83147,7 +83147,7 @@ INSERT INTO `villages` VALUES
   ('8207010025', '8207010', 'DAEO MAJIKO'),
   ('8207020001', '8207020', 'SAMBIKI'),
   ('8207020002', '8207020', 'SAMBIKI BARU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8207020003', '8207020', 'SANGOWO'),
   ('8207020004', '8207020', 'MIRA'),
   ('8207020005', '8207020', 'RAHMAT'),
@@ -83198,7 +83198,7 @@ INSERT INTO `villages` VALUES
   ('8207050002', '8207050', 'YAO'),
   ('8207050003', '8207050', 'TAWAKALI'),
   ('8207050004', '8207050', 'SAKITA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8207050005', '8207050', 'LELEO JAYA'),
   ('8207050006', '8207050', 'KENARI'),
   ('8207050008', '8207050', 'LOSUO'),
@@ -83249,7 +83249,7 @@ INSERT INTO `villages` VALUES
   ('8208050003', '8208050', 'PARIGI'),
   ('8208050004', '8208050', 'SAMUYA'),
   ('8208060002', '8208060', 'NATANG KUNING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8208060004', '8208060', 'PADANG'),
   ('8208060005', '8208060', 'TIKONG'),
   ('8208060006', '8208060', 'SAHU'),
@@ -83300,7 +83300,7 @@ INSERT INTO `villages` VALUES
   ('8271014001', '8271014', 'KULABA'),
   ('8271014002', '8271014', 'BULA'),
   ('8271014003', '8271014', 'TOBOLOLO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8271014004', '8271014', 'TOGAFO'),
   ('8271014005', '8271014', 'SULAMADAHA'),
   ('8271014006', '8271014', 'LOTO'),
@@ -83351,7 +83351,7 @@ INSERT INTO `villages` VALUES
   ('8271030018', '8271030', 'SANGAJI UTARA'),
   ('8271030019', '8271030', 'AKEHUDA'),
   ('8271030020', '8271030', 'TUBO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8272010001', '8272010', 'MAREKOFO'),
   ('8272010002', '8272010', 'MAREGAM'),
   ('8272010003', '8272010', 'TONGOWAI'),
@@ -83402,7 +83402,7 @@ INSERT INTO `villages` VALUES
   ('8272040010', '8272040', 'KOLI'),
   ('8272040011', '8272040', 'BALE'),
   ('8272040012', '8272040', 'TULUI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('8272040013', '8272040', 'SIGELA YEF'),
   ('8272040014', '8272040', 'TODAPA'),
   ('8272040015', '8272040', 'TALASI'),
@@ -83453,7 +83453,7 @@ INSERT INTO `villages` VALUES
   ('9101051006', '9101051', 'MALAKULI'),
   ('9101051007', '9101051', 'KIABA'),
   ('9101052001', '9101052', 'WASERAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9101052002', '9101052', 'KALAMANUK'),
   ('9101052003', '9101052', 'KOTAM'),
   ('9101052004', '9101052', 'KWAMA'),
@@ -83504,7 +83504,7 @@ INSERT INTO `villages` VALUES
   ('9101080027', '9101080', 'MAMBUNIIBUNI'),
   ('9101080028', '9101080', 'MANDONI'),
   ('9101080029', '9101080', 'BATUFIAFAS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9101080030', '9101080', 'PATIMBURAK'),
   ('9101080031', '9101080', 'SEKAR'),
   ('9101080032', '9101080', 'KOKAS KOTA'),
@@ -83555,7 +83555,7 @@ INSERT INTO `villages` VALUES
   ('9101085007', '9101085', 'GORAS SELATAN'),
   ('9101086001', '9101086', 'TANEHAMUR'),
   ('9101086002', '9101086', 'RUMBATI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9101086003', '9101086', 'TAWAR'),
   ('9101086004', '9101086', 'SALAKITI'),
   ('9101086005', '9101086', 'WERFA'),
@@ -83606,7 +83606,7 @@ INSERT INTO `villages` VALUES
   ('9102020027', '9102020', 'BOFUWER'),
   ('9102020028', '9102020', 'WARWASI'),
   ('9102020029', '9102020', 'SAWIA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9102020030', '9102020', 'WESWASA'),
   ('9102020031', '9102020', 'BOROGERBA'),
   ('9102020032', '9102020', 'PIGO'),
@@ -83657,7 +83657,7 @@ INSERT INTO `villages` VALUES
   ('9102040003', '9102040', 'BOIYA'),
   ('9102040004', '9102040', 'NARIKI'),
   ('9102040005', '9102040', 'RURUMO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9102041001', '9102041', 'HAIRAPARA'),
   ('9102041002', '9102041', 'COREMURI/OMBAPAMUKU'),
   ('9102041003', '9102041', 'WOSOKUNO'),
@@ -83708,7 +83708,7 @@ INSERT INTO `villages` VALUES
   ('9103041004', '9103041', 'INDAY'),
   ('9103041005', '9103041', 'SYABES'),
   ('9103041006', '9103041', 'MENA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9103050002', '9103050', 'YOPMEOS'),
   ('9103050003', '9103050', 'WAMESA TENGAH'),
   ('9103050006', '9103050', 'SOMBOKORO'),
@@ -83759,7 +83759,7 @@ INSERT INTO `villages` VALUES
   ('9104021005', '9104021', 'FORADA'),
   ('9104021006', '9104021', 'AGODA'),
   ('9104021007', '9104021', 'ONAR LAMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9104021008', '9104021', 'ONAR BARU'),
   ('9104022001', '9104022', 'AROBA'),
   ('9104022002', '9104022', 'YARU'),
@@ -83810,7 +83810,7 @@ INSERT INTO `villages` VALUES
   ('9104050022', '9104050', 'ROSIB'),
   ('9104050023', '9104050', 'AUABA'),
   ('9104050024', '9104050', 'IMBRIJ');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9104050025', '9104050', 'DACNA'),
   ('9104051001', '9104051', 'BUMI SANIARI (SP III)'),
   ('9104051002', '9104051', 'BANJAR AUSOY (SP IV)'),
@@ -83861,7 +83861,7 @@ INSERT INTO `villages` VALUES
   ('9104070012', '9104070', 'YAKORA'),
   ('9104070013', '9104070', 'IRIRA'),
   ('9104070014', '9104070', 'BOTONIK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9104070015', '9104070', 'KANDARIN'),
   ('9104071001', '9104071', 'KALITAMI II'),
   ('9104071002', '9104071', 'KALITAMI'),
@@ -83912,7 +83912,7 @@ INSERT INTO `villages` VALUES
   ('9104082001', '9104082', 'MEYERGA'),
   ('9104082002', '9104082', 'MACOK'),
   ('9104082003', '9104082', 'ISTIKEM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9104082004', '9104082', 'MAJNIK'),
   ('9104082005', '9104082', 'MEYOHDA'),
   ('9104082006', '9104082', 'INOKRA'),
@@ -83963,7 +83963,7 @@ INSERT INTO `villages` VALUES
   ('9104092001', '9104092', 'MASYETA'),
   ('9104092002', '9104092', 'MESTOFU'),
   ('9104092003', '9104092', 'KALIBIRU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9104092004', '9104092', 'MESOMDA'),
   ('9104092005', '9104092', 'MESUSUGA'),
   ('9104092006', '9104092', 'MEYGERA'),
@@ -84014,7 +84014,7 @@ INSERT INTO `villages` VALUES
   ('9105110020', '9105110', 'KWAU'),
   ('9105110021', '9105110', 'INDOBEY'),
   ('9105110022', '9105110', 'FIGOUD');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9105110023', '9105110', 'SYOU'),
   ('9105110024', '9105110', 'MINGGRE'),
   ('9105110025', '9105110', 'DUEIBEI'),
@@ -84065,7 +84065,7 @@ INSERT INTO `villages` VALUES
   ('9105143006', '9105143', 'YOOM I'),
   ('9105143007', '9105143', 'MEINYUMFOKA'),
   ('9105143008', '9105143', 'LEBAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9105143009', '9105143', 'SAUBEBA'),
   ('9105143010', '9105143', 'YOOM II'),
   ('9105143011', '9105143', 'TANAH RUBU'),
@@ -84116,7 +84116,7 @@ INSERT INTO `villages` VALUES
   ('9105146023', '9105146', 'INDIBO'),
   ('9105146024', '9105146', 'WARMARWAY'),
   ('9105146030', '9105146', 'WEDONI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9105146031', '9105146', 'WAMIGTI'),
   ('9105146032', '9105146', 'UKEMBOUSI'),
   ('9105146033', '9105146', 'MEINYUMFOKU'),
@@ -84167,7 +84167,7 @@ INSERT INTO `villages` VALUES
   ('9106010017', '9106010', 'SERKOS'),
   ('9106010019', '9106010', 'SOLTA BARU'),
   ('9106010021', '9106010', 'NOGIBI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9106010022', '9106010', 'ODEARE'),
   ('9106010023', '9106010', 'SIRI-SIRI'),
   ('9106011001', '9106011', 'MUGIM'),
@@ -84218,7 +84218,7 @@ INSERT INTO `villages` VALUES
   ('9106060003', '9106060', 'MOSWAREN'),
   ('9106060004', '9106060', 'JOSHIRO'),
   ('9106060005', '9106060', 'KAMISABE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9106060006', '9106060', 'HARARO'),
   ('9106060007', '9106060', 'TOKASS'),
   ('9106070008', '9106070', 'WERSAR'),
@@ -84269,7 +84269,7 @@ INSERT INTO `villages` VALUES
   ('9106080004', '9106080', 'SASNEK'),
   ('9106080006', '9106080', 'SAWIAT'),
   ('9106080010', '9106080', 'WENDI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9106080011', '9106080', 'SFAGYO'),
   ('9106080012', '9106080', 'SUDROFOYO'),
   ('9106080013', '9106080', 'WENSOUG'),
@@ -84320,7 +84320,7 @@ INSERT INTO `villages` VALUES
   ('9107111003', '9107111', 'WARIAU (SP I)'),
   ('9107111004', '9107111', 'KLAWANA'),
   ('9107111005', '9107111', 'KLAMONO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9107111008', '9107111', 'GISIM DARAT'),
   ('9107111009', '9107111', 'KLALOMON'),
   ('9107111011', '9107111', 'WONOSARI'),
@@ -84371,7 +84371,7 @@ INSERT INTO `villages` VALUES
   ('9107116007', '9107116', 'MAGATARUM'),
   ('9107116008', '9107116', 'TANAH TINGGI'),
   ('9107116009', '9107116', 'MARIK MAY');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9107118001', '9107118', 'BOTAIN'),
   ('9107118002', '9107118', 'KLAFLUK'),
   ('9107118003', '9107118', 'MAMSIT'),
@@ -84422,7 +84422,7 @@ INSERT INTO `villages` VALUES
   ('9107124007', '9107124', 'MOOS'),
   ('9107130005', '9107130', 'KASIM'),
   ('9107130006', '9107130', 'MALABAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9107130008', '9107130', 'KASIMLE'),
   ('9107130009', '9107130', 'WAWENAGU'),
   ('9107130010', '9107130', 'KLAYAS'),
@@ -84473,7 +84473,7 @@ INSERT INTO `villages` VALUES
   ('9107180009', '9107180', 'YORBES'),
   ('9107180011', '9107180', 'KLAIN'),
   ('9107180012', '9107180', 'SAMUSA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9107180013', '9107180', 'KLAMINTU'),
   ('9107181001', '9107181', 'KLATIM'),
   ('9107181002', '9107181', 'BOUSUI'),
@@ -84524,7 +84524,7 @@ INSERT INTO `villages` VALUES
   ('9108022004', '9108022', 'USAHA JAYA'),
   ('9108022005', '9108022', 'LIMALAS TIMUR'),
   ('9108022006', '9108022', 'LIMALAS BARAT');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9108022007', '9108022', 'AUDAM'),
   ('9108023001', '9108023', 'PULAU TIKUS'),
   ('9108023002', '9108023', 'WEJIM BARAT'),
@@ -84575,7 +84575,7 @@ INSERT INTO `villages` VALUES
   ('9108043002', '9108043', 'SAPORDANCO'),
   ('9108043003', '9108043', 'BONKAWIR'),
   ('9108043004', '9108043', 'WARMASEN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9108044001', '9108044', 'BEO'),
   ('9108044002', '9108044', 'ARAWAI'),
   ('9108044003', '9108044', 'KABILOL'),
@@ -84626,7 +84626,7 @@ INSERT INTO `villages` VALUES
   ('9109011004', '9109011', 'SYUJAK'),
   ('9109011005', '9109011', 'REFANE'),
   ('9109012001', '9109012', 'ASES');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9109012002', '9109012', 'ASUON'),
   ('9109012003', '9109012', 'SAFOETIEK'),
   ('9109012004', '9109012', 'FRASAYUOH'),
@@ -84677,7 +84677,7 @@ INSERT INTO `villages` VALUES
   ('9109042003', '9109042', 'KWESEFO'),
   ('9109042004', '9109042', 'KRANFOTSU'),
   ('9109042005', '9109042', 'BAO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9109042006', '9109042', 'SYUMBI'),
   ('9109042007', '9109042', 'JOKBUJOKER'),
   ('9109050001', '9109050', 'SAUSAPOR'),
@@ -84728,7 +84728,7 @@ INSERT INTO `villages` VALUES
   ('9109071005', '9109071', 'KASI INOM'),
   ('9109071006', '9109071', 'IREJI'),
   ('9109071007', '9109071', 'MEY COCFORGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9109071008', '9109071', 'UNTOREY'),
   ('9109071009', '9109071', 'KARAWI'),
   ('9109071010', '9109071', 'SITORI'),
@@ -84779,7 +84779,7 @@ INSERT INTO `villages` VALUES
   ('9109091005', '9109091', 'WARPAPERI'),
   ('9109092001', '9109092', 'BONDOPI'),
   ('9109092002', '9109092', 'SASUI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9109092003', '9109092', 'MANGGAEW'),
   ('9109092004', '9109092', 'SAURABON'),
   ('9109092005', '9109092', 'WASAWMONTEN'),
@@ -84830,7 +84830,7 @@ INSERT INTO `villages` VALUES
   ('9110021001', '9110021', 'EROK WERO'),
   ('9110021002', '9110021', 'YAKSORO'),
   ('9110021003', '9110021', 'SIRA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9110021004', '9110021', 'AWIT'),
   ('9110021005', '9110021', 'ITIGAH'),
   ('9110021006', '9110021', 'SIRA TEE'),
@@ -84881,7 +84881,7 @@ INSERT INTO `villages` VALUES
   ('9110061005', '9110061', 'ISUSU'),
   ('9110070006', '9110070', 'MEFKAJIM II'),
   ('9110070009', '9110070', 'FRAHAROH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9110070010', '9110070', 'AYAMARU'),
   ('9110070011', '9110070', 'FRAMU'),
   ('9110070024', '9110070', 'SMUSUWIOH'),
@@ -84932,7 +84932,7 @@ INSERT INTO `villages` VALUES
   ('9110100004', '9110100', 'AYAWASI TIMUR'),
   ('9110100005', '9110100', 'MAAN'),
   ('9110100006', '9110100', 'KONJA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9110100007', '9110100', 'JARAT'),
   ('9110100008', '9110100', 'SUSAI'),
   ('9110100009', '9110100', 'MOSUN'),
@@ -84983,7 +84983,7 @@ INSERT INTO `villages` VALUES
   ('9111040006', '9111040', 'DEMINI'),
   ('9111050001', '9111050', 'HAMAWI'),
   ('9111050002', '9111050', 'BAMAHA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9111050003', '9111050', 'ABRESSO'),
   ('9111050004', '9111050', 'RANSIKI KOTA'),
   ('9111050005', '9111050', 'TOBOUW'),
@@ -85034,7 +85034,7 @@ INSERT INTO `villages` VALUES
   ('9112020011', '9112020', 'ANUK'),
   ('9112020012', '9112020', 'TOMSTERA'),
   ('9112030001', '9112030', 'ITKAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9112030002', '9112030', 'TUABYAM'),
   ('9112030003', '9112030', 'SIBIOGUD'),
   ('9112030004', '9112030', 'TOMBROK'),
@@ -85085,7 +85085,7 @@ INSERT INTO `villages` VALUES
   ('9112070018', '9112070', 'HUMEYSI'),
   ('9112070019', '9112070', 'KWAIYEHEP'),
   ('9112070020', '9112070', 'IKIMABOW');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9112070021', '9112070', 'NTAP'),
   ('9112070022', '9112070', 'HEATIE BOUW'),
   ('9112070023', '9112070', 'ARION'),
@@ -85136,7 +85136,7 @@ INSERT INTO `villages` VALUES
   ('9112090005', '9112090', 'BINGWAIMOD'),
   ('9112090006', '9112090', 'MINMO'),
   ('9112090007', '9112090', 'IJIGREK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9112090008', '9112090', 'TIMTOU'),
   ('9112090009', '9112090', 'MINHOU'),
   ('9112090010', '9112090', 'CATUBOU'),
@@ -85187,7 +85187,7 @@ INSERT INTO `villages` VALUES
   ('9171021009', '9171021', 'MATALAMAGI'),
   ('9171022002', '9171022', 'KLADEMAK'),
   ('9171022003', '9171022', 'REMU UTARA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9171022006', '9171022', 'KOFKERBU'),
   ('9171023001', '9171023', 'KLALIGI'),
   ('9171023002', '9171023', 'MALAWEI'),
@@ -85238,7 +85238,7 @@ INSERT INTO `villages` VALUES
   ('9401013002', '9401013', 'PADUA'),
   ('9401013003', '9401013', 'WOGEKEL'),
   ('9401013004', '9401013', 'WANAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9401020004', '9401020', 'WAMBI'),
   ('9401020005', '9401020', 'DUFMIRA'),
   ('9401020006', '9401020', 'IWOL'),
@@ -85289,7 +85289,7 @@ INSERT INTO `villages` VALUES
   ('9401040007', '9401040', 'RIMBA JAYA'),
   ('9401040008', '9401040', 'WASUR'),
   ('9401040014', '9401040', 'KELAPA LIMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9401040015', '9401040', 'MARO'),
   ('9401040016', '9401040', 'MANDALA'),
   ('9401040017', '9401040', 'SAMKAI'),
@@ -85340,7 +85340,7 @@ INSERT INTO `villages` VALUES
   ('9401044004', '9401044', 'ERAMBU'),
   ('9401044005', '9401044', 'TORAY'),
   ('9401045001', '9401045', 'KONDO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9401045002', '9401045', 'TOMERAU'),
   ('9401045003', '9401045', 'TOMER'),
   ('9401045004', '9401045', 'ONGGAYA'),
@@ -85391,7 +85391,7 @@ INSERT INTO `villages` VALUES
   ('9402110048', '9402110', 'PAREMA'),
   ('9402110054', '9402110', 'AGAMOA'),
   ('9402110055', '9402110', 'BATU MERAH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9402110056', '9402110', 'HONELAMA II'),
   ('9402110057', '9402110', 'ONAIMA'),
   ('9402110058', '9402110', 'LANTIPO'),
@@ -85442,7 +85442,7 @@ INSERT INTO `villages` VALUES
   ('9402117019', '9402117', 'YAGARA'),
   ('9402117020', '9402117', 'ASOJELIPELE'),
   ('9402117021', '9402117', 'LANITIPO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9402117022', '9402117', 'PAWEKAMA'),
   ('9402117023', '9402117', 'PAPENAS'),
   ('9402117024', '9402117', 'TULIMA'),
@@ -85493,7 +85493,7 @@ INSERT INTO `villages` VALUES
   ('9402122004', '9402122', 'YAGAROBAK'),
   ('9402122005', '9402122', 'IBELE'),
   ('9402122006', '9402122', 'ZAPMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9402122012', '9402122', 'AYUBAIBUR'),
   ('9402122017', '9402122', 'HOLALIBA'),
   ('9402122018', '9402122', 'ZINAI'),
@@ -85544,7 +85544,7 @@ INSERT INTO `villages` VALUES
   ('9402183018', '9402183', 'YONGGIME'),
   ('9402183019', '9402183', 'ALGONIK'),
   ('9402183020', '9402183', 'PERABAGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9402183021', '9402183', 'YALINGGUME'),
   ('9402183022', '9402183', 'ABONERI'),
   ('9402183037', '9402183', 'GOBALIMO'),
@@ -85595,7 +85595,7 @@ INSERT INTO `villages` VALUES
   ('9402193006', '9402193', 'WENABUBAGA'),
   ('9402193024', '9402193', 'KILUBAGA'),
   ('9402193025', '9402193', 'MUSALFAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9402193026', '9402193', 'PUNAKUL'),
   ('9402194001', '9402194', 'WADANGKU'),
   ('9402194003', '9402194', 'AGULIMO'),
@@ -85646,7 +85646,7 @@ INSERT INTO `villages` VALUES
   ('9402223034', '9402223', 'ONGGOBALO'),
   ('9402223038', '9402223', 'LAPEYO'),
   ('9402223039', '9402223', 'YORDANIA TULAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9402223040', '9402223', 'WANDINGGUNIE'),
   ('9402223041', '9402223', 'GUME KUPARI'),
   ('9402223042', '9402223', 'MULUGAME'),
@@ -85697,7 +85697,7 @@ INSERT INTO `villages` VALUES
   ('9402612002', '9402612', 'NOAGALO'),
   ('9402612003', '9402612', 'YUMOGIMA'),
   ('9402612004', '9402612', 'ISAWA HIMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9402612005', '9402612', 'SEKAN'),
   ('9402612006', '9402612', 'MANIKA'),
   ('9402612007', '9402612', 'SEKAN DALAM'),
@@ -85748,7 +85748,7 @@ INSERT INTO `villages` VALUES
   ('9403150010', '9403150', 'BRASO'),
   ('9403150012', '9403150', 'HYANSIP'),
   ('9403150013', '9403150', 'JAGRANG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9403150015', '9403150', 'SWENTAB'),
   ('9403151001', '9403151', 'KLAISU'),
   ('9403151002', '9403151', 'BANGAI'),
@@ -85799,7 +85799,7 @@ INSERT INTO `villages` VALUES
   ('9403201003', '9403201', 'ENDOKISI'),
   ('9403201004', '9403201', 'SNAMAI'),
   ('9403201005', '9403201', 'BUSERYO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9403210001', '9403210', 'KENDATE'),
   ('9403210002', '9403210', 'ENTIYEBO'),
   ('9403210003', '9403210', 'WAIYA'),
@@ -85850,7 +85850,7 @@ INSERT INTO `villages` VALUES
   ('9404050016', '9404050', 'TOPO JAYA'),
   ('9404050017', '9404050', 'GAMEI JAYA'),
   ('9404050019', '9404050', 'TOPO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9404050020', '9404050', 'GAMEI BIRU'),
   ('9404051001', '9404051', 'LOKODIMI'),
   ('9404051002', '9404051', 'YEGEUGI'),
@@ -85901,7 +85901,7 @@ INSERT INTO `villages` VALUES
   ('9404090010', '9404090', 'NAPAN'),
   ('9404090011', '9404090', 'WEINAMI'),
   ('9404090012', '9404090', 'MOSAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9404091001', '9404091', 'MANUNGGAL JAYA'),
   ('9404091002', '9404091', 'MAIDEI'),
   ('9404091003', '9404091', 'LEGARI JAYA'),
@@ -85952,7 +85952,7 @@ INSERT INTO `villages` VALUES
   ('9408042003', '9408042', 'KAROAIPI'),
   ('9408042004', '9408042', 'RANDAWAYA'),
   ('9408042005', '9408042', 'AYARI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9408042006', '9408042', 'WARIRONI'),
   ('9408042007', '9408042', 'WAITA'),
   ('9408042008', '9408042', 'TAREI'),
@@ -86003,7 +86003,7 @@ INSERT INTO `villages` VALUES
   ('9408051021', '9408051', 'MARAWI'),
   ('9408051022', '9408051', 'AIWARANGGANI'),
   ('9408052001', '9408052', 'BORAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9408052002', '9408052', 'KABUAENA'),
   ('9408052003', '9408052', 'YAPANANI'),
   ('9408052004', '9408052', 'KONTIUNAI'),
@@ -86054,7 +86054,7 @@ INSERT INTO `villages` VALUES
   ('9408070013', '9408070', 'KAIRAWI'),
   ('9408070014', '9408070', 'SASAWA'),
   ('9408070015', '9408070', 'YENUSI MARAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9408070016', '9408070', 'MARAU'),
   ('9408070017', '9408070', 'INOWA'),
   ('9408070018', '9408070', 'MANIRI'),
@@ -86105,7 +86105,7 @@ INSERT INTO `villages` VALUES
   ('9409010019', '9409010', 'RIMBA RAYA'),
   ('9409010020', '9409010', 'SEMAYEN'),
   ('9409010021', '9409010', 'MAMBONDO SAWAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9409010022', '9409010', 'POMDORI SUP'),
   ('9409011001', '9409011', 'WANSRA'),
   ('9409011002', '9409011', 'MASYARA'),
@@ -86156,7 +86156,7 @@ INSERT INTO `villages` VALUES
   ('9409030018', '9409030', 'SOKANI'),
   ('9409030019', '9409030', 'PAIDORI'),
   ('9409031001', '9409031', 'MEOS MANGGUANDI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9409031002', '9409031', 'SUPRAIMA'),
   ('9409031003', '9409031', 'SAMBER PASI'),
   ('9409031004', '9409031', 'PASI'),
@@ -86207,7 +86207,7 @@ INSERT INTO `villages` VALUES
   ('9409041012', '9409041', 'SAURI'),
   ('9409041013', '9409041', 'MAKMAKERBO'),
   ('9409041014', '9409041', 'YENSAMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9409050001', '9409050', 'INGGIRI'),
   ('9409050002', '9409050', 'SORIDO'),
   ('9409050003', '9409050', 'SARAMOM'),
@@ -86258,7 +86258,7 @@ INSERT INTO `villages` VALUES
   ('9409070015', '9409070', 'BINYERI'),
   ('9409070016', '9409070', 'AMYABENRAM'),
   ('9409070017', '9409070', 'INPENDI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9409070018', '9409070', 'BIRUBI'),
   ('9409070019', '9409070', 'PADWA PANTAI'),
   ('9409080001', '9409080', 'KOBEOSER'),
@@ -86309,7 +86309,7 @@ INSERT INTO `villages` VALUES
   ('9409090028', '9409090', 'MAMFIAS'),
   ('9409091001', '9409091', 'KARMON'),
   ('9409091002', '9409091', 'SOR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9409091003', '9409091', 'YAWOSI/FANINDI'),
   ('9409091004', '9409091', 'WASORI'),
   ('9409091005', '9409091', 'BOSNABRAIDI'),
@@ -86360,7 +86360,7 @@ INSERT INTO `villages` VALUES
   ('9410030009', '9410030', 'KOPO'),
   ('9410030012', '9410030', 'PAPATO'),
   ('9410030013', '9410030', 'MADI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9410030015', '9410030', 'IPAKIJE'),
   ('9410030018', '9410030', 'TIMIDA'),
   ('9410030019', '9410030', 'AIKAI'),
@@ -86411,7 +86411,7 @@ INSERT INTO `villages` VALUES
   ('9410080004', '9410080', 'OBANO'),
   ('9410080005', '9410080', 'KEGOUDA'),
   ('9410080006', '9410080', 'TIPAKAGOUDA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9410080007', '9410080', 'BEKO'),
   ('9410080009', '9410080', 'WIYOGA / GEIKETAGO'),
   ('9410081001', '9410081', 'IKOTU / BUA'),
@@ -86462,7 +86462,7 @@ INSERT INTO `villages` VALUES
   ('9411050026', '9411050', 'PEPERA'),
   ('9411050027', '9411050', 'MULIAGAMBUT'),
   ('9411050028', '9411050', 'TRIKORA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9411050029', '9411050', 'TUWOGI'),
   ('9411050030', '9411050', 'BIRAKAMBUT'),
   ('9411053001', '9411053', 'YAMBI'),
@@ -86513,7 +86513,7 @@ INSERT INTO `villages` VALUES
   ('9411060020', '9411060', 'PINDEBAGA'),
   ('9411060030', '9411060', 'DOLINGGAME'),
   ('9411060034', '9411060', 'MAKA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9411060035', '9411060', 'MOBIGI'),
   ('9411060036', '9411060', 'YAURIA I'),
   ('9411060037', '9411060', 'BELANTARA'),
@@ -86564,7 +86564,7 @@ INSERT INTO `villages` VALUES
   ('9411064006', '9411064', 'NAKOGWE'),
   ('9411064007', '9411064', 'GINILOME'),
   ('9411064008', '9411064', 'YALIBATE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9411064009', '9411064', 'WURUNIKIME'),
   ('9411064010', '9411064', 'LERAWERA'),
   ('9411064011', '9411064', 'ANDIRON'),
@@ -86615,7 +86615,7 @@ INSERT INTO `villages` VALUES
   ('9411067015', '9411067', 'JINGGI'),
   ('9411067016', '9411067', 'GINILUME'),
   ('9411067017', '9411067', 'LINGGUNI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9411068001', '9411068', 'ANDUGIR'),
   ('9411068002', '9411068', 'MUARA MIGUNI'),
   ('9411068003', '9411068', 'GUNA'),
@@ -86666,7 +86666,7 @@ INSERT INTO `villages` VALUES
   ('9411072002', '9411072', 'GEREJA LAMA'),
   ('9411072003', '9411072', 'ANGGALO'),
   ('9411072004', '9411072', 'NANEGEME');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9411072005', '9411072', 'PONGGONAME'),
   ('9411072006', '9411072', 'YUNGGWI'),
   ('9411072007', '9411072', 'PERNALUK'),
@@ -86717,7 +86717,7 @@ INSERT INTO `villages` VALUES
   ('9411091002', '9411091', 'URAGE'),
   ('9411091003', '9411091', 'NUNGWAWI'),
   ('9411091004', '9411091', 'NOWONERI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9411091005', '9411091', 'NOWOME'),
   ('9411091006', '9411091', 'IMULINERI'),
   ('9411091007', '9411091', 'MOLOBAK'),
@@ -86768,7 +86768,7 @@ INSERT INTO `villages` VALUES
   ('9412022005', '9412022', 'AYUKA'),
   ('9412030004', '9412030', 'KOPERAPOKA'),
   ('9412030012', '9412030', 'TIMIKA JAYA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9412030013', '9412030', 'KWAMKI BARU'),
   ('9412030015', '9412030', 'NAYARO'),
   ('9412030016', '9412030', 'TIMIKA INDAH'),
@@ -86819,7 +86819,7 @@ INSERT INTO `villages` VALUES
   ('9412035003', '9412035', 'LANDUM MEKAR'),
   ('9412035004', '9412035', 'OLAROA'),
   ('9412035005', '9412035', 'BINTANG LIMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9412035006', '9412035', 'DAMAI'),
   ('9412035007', '9412035', 'WALANI'),
   ('9412035008', '9412035', 'AMOLE'),
@@ -86870,7 +86870,7 @@ INSERT INTO `villages` VALUES
   ('9412044004', '9412044', 'KULAMOGAN'),
   ('9412044005', '9412044', 'JAWA'),
   ('9412044006', '9412044', 'PUTI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9413010007', '9413010', 'GETENTIRI'),
   ('9413010008', '9413010', 'BUTIPTIRI'),
   ('9413010009', '9413010', 'ANGGAI'),
@@ -86921,7 +86921,7 @@ INSERT INTO `villages` VALUES
   ('9413031004', '9413031', 'HAMKHU'),
   ('9413031005', '9413031', 'HELLO'),
   ('9413031006', '9413031', 'DOMO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9413031007', '9413031', 'SOHOKANGGO'),
   ('9413031008', '9413031', 'NAVINI'),
   ('9413032001', '9413032', 'PATRIOT'),
@@ -86972,7 +86972,7 @@ INSERT INTO `villages` VALUES
   ('9413051001', '9413051', 'ANYUMKA'),
   ('9413051003', '9413051', 'NYUM / AWAKEN'),
   ('9413051004', '9413051', 'KOLOPKAM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9413051005', '9413051', 'ARIMBIT'),
   ('9413052004', '9413052', 'NINATI'),
   ('9413052006', '9413052', 'KAWAKTETBUT'),
@@ -87023,7 +87023,7 @@ INSERT INTO `villages` VALUES
   ('9414022006', '9414022', 'OGOTO'),
   ('9414023001', '9414023', 'YELOBA'),
   ('9414023002', '9414023', 'KONEBI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9414023003', '9414023', 'SIBI'),
   ('9414023004', '9414023', 'TAGAIMON SIWO'),
   ('9414023005', '9414023', 'TAGAIMON KORAME'),
@@ -87074,7 +87074,7 @@ INSERT INTO `villages` VALUES
   ('9414040007', '9414040', 'WIYAGE'),
   ('9414040008', '9414040', 'TSEMTAIPIM'),
   ('9414040009', '9414040', 'AMAGATSU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9414040010', '9414040', 'ATSIPIM'),
   ('9414040011', '9414040', 'OKOR'),
   ('9414040012', '9414040', 'WAROGOM'),
@@ -87125,7 +87125,7 @@ INSERT INTO `villages` VALUES
   ('9414063001', '9414063', 'SAGIS'),
   ('9414063002', '9414063', 'KUMABAN'),
   ('9414063003', '9414063', 'TUGUMAU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9414063004', '9414063', 'BASMAN'),
   ('9414063005', '9414063', 'MEROKIMA'),
   ('9414063007', '9414063', 'PIER'),
@@ -87176,7 +87176,7 @@ INSERT INTO `villages` VALUES
   ('9415020003', '9415020', 'OCENEP'),
   ('9415020004', '9415020', 'PIRIEN'),
   ('9415020005', '9415020', 'BIOPIS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9415020006', '9415020', 'NANAI (NANAY)'),
   ('9415020013', '9415020', 'AIS'),
   ('9415020014', '9415020', 'YAWAS'),
@@ -87227,7 +87227,7 @@ INSERT INTO `villages` VALUES
   ('9415040008', '9415040', 'BUBIS'),
   ('9415040009', '9415040', 'BINAM'),
   ('9415040010', '9415040', 'BURBIS');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9415040011', '9415040', 'WAGANU DUA'),
   ('9415040014', '9415040', 'SORAI'),
   ('9415040015', '9415040', 'WAGABUS'),
@@ -87278,7 +87278,7 @@ INSERT INTO `villages` VALUES
   ('9415051008', '9415051', 'DAWER'),
   ('9415060001', '9415060', 'BERITEN'),
   ('9415060004', '9415060', 'YOMOTH');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9415060005', '9415060', 'ASUWETSY'),
   ('9415060006', '9415060', 'BIS AGATS'),
   ('9415060007', '9415060', 'BISMAM'),
@@ -87329,7 +87329,7 @@ INSERT INTO `villages` VALUES
   ('9415073005', '9415073', 'YUFRI'),
   ('9415073006', '9415073', 'YAUN'),
   ('9415074001', '9415074', 'WEO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9415074002', '9415074', 'AS'),
   ('9415074003', '9415074', 'ATAT'),
   ('9415074004', '9415074', 'KAPI'),
@@ -87380,7 +87380,7 @@ INSERT INTO `villages` VALUES
   ('9416013009', '9416013', 'KOKAMU'),
   ('9416013010', '9416013', 'TOMON I'),
   ('9416013011', '9416013', 'SOKAMU');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9416013012', '9416013', 'TOMON II'),
   ('9416014002', '9416014', 'OBIO'),
   ('9416014004', '9416014', 'UJIN'),
@@ -87431,7 +87431,7 @@ INSERT INTO `villages` VALUES
   ('9416018005', '9416018', 'SUOK'),
   ('9416018007', '9416018', 'KOLODOMA'),
   ('9416018008', '9416018', 'SANGATUR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9416018009', '9416018', 'SOWALING'),
   ('9416018010', '9416018', 'YEREKAMA'),
   ('9416018011', '9416018', 'WALKUNA'),
@@ -87482,7 +87482,7 @@ INSERT INTO `villages` VALUES
   ('9416023002', '9416023', 'ALIRJI'),
   ('9416023003', '9416023', 'LARYI'),
   ('9416023004', '9416023', 'KAP-KAP/KIKMAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9416023005', '9416023', 'YALAR'),
   ('9416023006', '9416023', 'WASUMURJI'),
   ('9416023007', '9416023', 'KIRABUK'),
@@ -87533,7 +87533,7 @@ INSERT INTO `villages` VALUES
   ('9416028010', '9416028', 'DOLBOL'),
   ('9416028011', '9416028', 'HEMUKA'),
   ('9416028012', '9416028', 'SULDA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9416028013', '9416028', 'MEKDUA'),
   ('9416028014', '9416028', 'BERA'),
   ('9416028015', '9416028', 'HOLDOMEN'),
@@ -87584,7 +87584,7 @@ INSERT INTO `villages` VALUES
   ('9416033005', '9416033', 'ULDAM'),
   ('9416033006', '9416033', 'TIPLE'),
   ('9416033007', '9416033', 'WAHE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9416033008', '9416033', 'HOMBUKA'),
   ('9416033009', '9416033', 'WESALTEK'),
   ('9416033010', '9416033', 'KONOSA'),
@@ -87635,7 +87635,7 @@ INSERT INTO `villages` VALUES
   ('9416041009', '9416041', 'HUGILOKON'),
   ('9416042001', '9416042', 'TANGMA'),
   ('9416042002', '9416042', 'WAMAREK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9416042003', '9416042', 'HIPELA'),
   ('9416042004', '9416042', 'HUEWI'),
   ('9416042005', '9416042', 'PUNNO'),
@@ -87686,7 +87686,7 @@ INSERT INTO `villages` VALUES
   ('9416047005', '9416047', 'JIBUK'),
   ('9416047006', '9416047', 'WENAPONG'),
   ('9416047007', '9416047', 'MUARA BALIM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9416047008', '9416047', 'HUNISI'),
   ('9416047009', '9416047', 'BOOR'),
   ('9416047010', '9416047', 'WIRILU'),
@@ -87737,7 +87737,7 @@ INSERT INTO `villages` VALUES
   ('9416053007', '9416053', 'YASIP'),
   ('9416053008', '9416053', 'MASOMDUBA'),
   ('9416053009', '9416053', 'SAMBOGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9416054001', '9416054', 'KABIANGGAMA'),
   ('9416054002', '9416054', 'SOHOPMA'),
   ('9416054003', '9416054', 'SOHAL'),
@@ -87788,7 +87788,7 @@ INSERT INTO `villages` VALUES
   ('9416061001', '9416061', 'TIBUL'),
   ('9416061002', '9416061', 'LELAMBO'),
   ('9416061003', '9416061', 'KIKILA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9416061004', '9416061', 'BARI'),
   ('9416061006', '9416061', 'PALUKAE'),
   ('9416061007', '9416061', 'WUBRI'),
@@ -87839,7 +87839,7 @@ INSERT INTO `villages` VALUES
   ('9417011006', '9417011', 'KAWOR'),
   ('9417011007', '9417011', 'ATER'),
   ('9417011008', '9417011', 'UMDING');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9417012001', '9417012', 'TARUP'),
   ('9417012002', '9417012', 'MARANTIKIN'),
   ('9417012003', '9417012', 'IMSIN'),
@@ -87890,7 +87890,7 @@ INSERT INTO `villages` VALUES
   ('9417024003', '9417024', 'TULO'),
   ('9417024004', '9417024', 'ARINKOP'),
   ('9417024005', '9417024', 'IMIK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9417025001', '9417025', 'MIMIN'),
   ('9417025002', '9417025', 'OKSOP'),
   ('9417025004', '9417025', 'ATENAR'),
@@ -87941,7 +87941,7 @@ INSERT INTO `villages` VALUES
   ('9417032020', '9417032', 'SERABUM'),
   ('9417032021', '9417032', 'KWEREDALA'),
   ('9417032022', '9417032', 'MUNGKONA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9417032023', '9417032', 'MALINGDAM'),
   ('9417033001', '9417033', 'WEIME'),
   ('9417033002', '9417033', 'TARAMLU'),
@@ -87992,7 +87992,7 @@ INSERT INTO `villages` VALUES
   ('9417041008', '9417041', 'AMASE'),
   ('9417042001', '9417042', 'TUPOPLYON'),
   ('9417042002', '9417042', 'SABIN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9417042003', '9417042', 'BORBAN'),
   ('9417042004', '9417042', 'MAKSUM'),
   ('9417042005', '9417042', 'YAPIL'),
@@ -88043,7 +88043,7 @@ INSERT INTO `villages` VALUES
   ('9417052004', '9417052', 'MANGABIT'),
   ('9417053001', '9417053', 'OKELWEL'),
   ('9417053002', '9417053', 'KOTYOBAKON');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9417053003', '9417053', 'OKTENENG'),
   ('9417053004', '9417053', 'TENGNONG'),
   ('9417054001', '9417054', 'OKLIP'),
@@ -88094,7 +88094,7 @@ INSERT INTO `villages` VALUES
   ('9417062005', '9417062', 'TUAL'),
   ('9418010009', '9418010', 'AULANI'),
   ('9418010010', '9418010', 'KANGGIME');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9418010022', '9418010', 'LOGON'),
   ('9418010023', '9418010', 'MARLO'),
   ('9418010032', '9418010', 'LIGIMBAK'),
@@ -88145,7 +88145,7 @@ INSERT INTO `villages` VALUES
   ('9418014012', '9418014', 'GULAK'),
   ('9418014013', '9418014', 'TOWOLOME'),
   ('9418015003', '9418015', 'POSMAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9418015004', '9418015', 'KOGAGI'),
   ('9418015005', '9418015', 'TIONGGI'),
   ('9418015006', '9418015', 'YELI'),
@@ -88196,7 +88196,7 @@ INSERT INTO `villages` VALUES
   ('9418021011', '9418021', 'WIJAMURIK'),
   ('9418021012', '9418021', 'TIGIR'),
   ('9418021013', '9418021', 'BOPA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9418021014', '9418021', 'ANGKASA'),
   ('9418021015', '9418021', 'GILOK'),
   ('9418021016', '9418021', 'WOJI'),
@@ -88247,7 +88247,7 @@ INSERT INTO `villages` VALUES
   ('9418025009', '9418025', 'UMAGA'),
   ('9418025010', '9418025', 'KURIK'),
   ('9418025012', '9418025', 'MENGGENAGAME');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9418025013', '9418025', 'LUANGGI'),
   ('9418025014', '9418025', 'KONDEGUN'),
   ('9418025015', '9418025', 'JINULIRA'),
@@ -88298,7 +88298,7 @@ INSERT INTO `villages` VALUES
   ('9418031013', '9418031', 'WERI'),
   ('9418031014', '9418031', 'TANABUME'),
   ('9418031015', '9418031', 'KANERE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9418031016', '9418031', 'WONAGA'),
   ('9418031017', '9418031', 'WARINGGA'),
   ('9418032001', '9418032', 'WANGGULAM'),
@@ -88349,7 +88349,7 @@ INSERT INTO `villages` VALUES
   ('9418042012', '9418042', 'WAMA'),
   ('9418042014', '9418042', 'POPAGA'),
   ('9418042015', '9418042', 'PIRILUK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9418043003', '9418043', 'PANAGA'),
   ('9418043004', '9418043', 'IBUNUH'),
   ('9418043006', '9418043', 'SIAK'),
@@ -88400,7 +88400,7 @@ INSERT INTO `villages` VALUES
   ('9418048006', '9418048', 'WIKI'),
   ('9418048008', '9418048', 'FRIJI'),
   ('9418048009', '9418048', 'DORERA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9418048010', '9418048', 'YANORA'),
   ('9418048011', '9418048', 'MUNA'),
   ('9418048012', '9418048', 'BELEISE'),
@@ -88451,7 +88451,7 @@ INSERT INTO `villages` VALUES
   ('9418061001', '9418061', 'YALIPURA'),
   ('9418061002', '9418061', 'ANAWI'),
   ('9418061003', '9418061', 'KOTORI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9418061004', '9418061', 'LINGGIR'),
   ('9418061005', '9418061', 'IMURIK'),
   ('9418061006', '9418061', 'TALIKOBAK'),
@@ -88502,7 +88502,7 @@ INSERT INTO `villages` VALUES
   ('9418080014', '9418080', 'KARAGIGELOK'),
   ('9418080015', '9418080', 'JINUWANU'),
   ('9418081001', '9418081', 'KAIGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9418081002', '9418081', 'BAWI'),
   ('9418081003', '9418081', 'TINA'),
   ('9418081004', '9418081', 'KURBAYA'),
@@ -88553,7 +88553,7 @@ INSERT INTO `villages` VALUES
   ('9418121005', '9418121', 'WENOME'),
   ('9418121006', '9418121', 'WONABUNGGAME'),
   ('9418121007', '9418121', 'TENABAGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9418121009', '9418121', 'KANGGILO'),
   ('9418121010', '9418121', 'YUDIMBA'),
   ('9418121011', '9418121', 'UMAR'),
@@ -88604,7 +88604,7 @@ INSERT INTO `villages` VALUES
   ('9418543013', '9418543', 'TAMOK  LAMALUK'),
   ('9418543014', '9418543', 'WANUK'),
   ('9418543015', '9418543', 'RUMBEPAGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9418543016', '9418543', 'YIMBANIME'),
   ('9419021004', '9419021', 'DABE'),
   ('9419021006', '9419021', 'VINYABOR'),
@@ -88655,7 +88655,7 @@ INSERT INTO `villages` VALUES
   ('9419040008', '9419040', 'SAKRON TANE'),
   ('9419041001', '9419041', 'BORA BORA'),
   ('9419041002', '9419041', 'TOGONFO / TEMINABOR');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9419041003', '9419041', 'WAAF'),
   ('9419041004', '9419041', 'SEGAR TOR'),
   ('9419050004', '9419050', 'SARMO'),
@@ -88706,7 +88706,7 @@ INSERT INTO `villages` VALUES
   ('9419063001', '9419063', 'KAPESO'),
   ('9419063002', '9419063', 'PINA'),
   ('9419063003', '9419063', 'AIRORAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9419063004', '9419063', 'MURARA'),
   ('9419063005', '9419063', 'MANIWA'),
   ('9420010002', '9420010', 'SEMOGRAFI'),
@@ -88757,7 +88757,7 @@ INSERT INTO `villages` VALUES
   ('9420041014', '9420041', 'AMYU'),
   ('9420042001', '9420042', 'UPT ARSO X / YATURAHARJA'),
   ('9420042002', '9420042', 'UPT ARSO XI / IFIA-FIA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9420042003', '9420042', 'UPT ARSO VI / YAMMUA'),
   ('9420042004', '9420042', 'UPT ARSO VIII / DUKWIA'),
   ('9420042005', '9420042', 'UPT ARSO I / SANGGARIA'),
@@ -88808,7 +88808,7 @@ INSERT INTO `villages` VALUES
   ('9426012011', '9426012', 'GHOYUI'),
   ('9426012012', '9426012', 'RORISI'),
   ('9426013001', '9426013', 'SOWIWA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9426013002', '9426013', 'RUAMBAK JAYA SP VII'),
   ('9426013003', '9426013', 'BAINO JAYA SP IV'),
   ('9426013004', '9426013', 'BOTAWA'),
@@ -88859,7 +88859,7 @@ INSERT INTO `villages` VALUES
   ('9426023007', '9426023', 'SEGHA'),
   ('9426023008', '9426023', 'SINABO'),
   ('9426023009', '9426023', 'DAWOA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9426023010', '9426023', 'WOINUI'),
   ('9426024001', '9426024', 'WONTI BOKHODARO'),
   ('9426024002', '9426024', 'ODASE'),
@@ -88910,7 +88910,7 @@ INSERT INTO `villages` VALUES
   ('9427011008', '9427011', 'MBRUWANDI'),
   ('9427011009', '9427011', 'MANGGONSWAN'),
   ('9427020005', '9427020', 'WARSA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9427020006', '9427020', 'WARBOR'),
   ('9427020007', '9427020', 'KOBARI JAYA'),
   ('9427020008', '9427020', 'FANJUR'),
@@ -88961,7 +88961,7 @@ INSERT INTO `villages` VALUES
   ('9428050006', '9428050', 'ANGGRESO'),
   ('9428050011', '9428050', 'MARINE VALEN'),
   ('9428050017', '9428050', 'KWERBA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9428050018', '9428050', 'MUARAMAREI'),
   ('9428051001', '9428051', 'METAWEJA'),
   ('9428051002', '9428051', 'BABIJA'),
@@ -89012,7 +89012,7 @@ INSERT INTO `villages` VALUES
   ('9429020009', '9429020', 'SRALALA'),
   ('9429020012', '9429020', 'YUNAT'),
   ('9429020025', '9429020', 'BOMBAN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9429021002', '9429021', 'RAPA'),
   ('9429021003', '9429021', 'TOBONGGOM'),
   ('9429021004', '9429021', 'SOKORE'),
@@ -89063,7 +89063,7 @@ INSERT INTO `villages` VALUES
   ('9429042002', '9429042', 'LOMBRIK'),
   ('9429042003', '9429042', 'ANIMAREM'),
   ('9429042004', '9429042', 'TAWELMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9429042005', '9429042', 'LOARABA'),
   ('9429043002', '9429043', 'BAMBI'),
   ('9429043003', '9429043', 'KAGAYEM'),
@@ -89114,7 +89114,7 @@ INSERT INTO `villages` VALUES
   ('9429052014', '9429052', 'DARAKMA'),
   ('9429060002', '9429060', 'EKILAPOK'),
   ('9429060011', '9429060', 'KARUNGGAME');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9429060013', '9429060', 'DISENDOBO'),
   ('9429060014', '9429060', 'SUMBO'),
   ('9429060015', '9429060', 'YEBADOLA'),
@@ -89165,7 +89165,7 @@ INSERT INTO `villages` VALUES
   ('9429081001', '9429081', 'MANDALA'),
   ('9429081002', '9429081', 'PASIR PUTIH'),
   ('9429082003', '9429082', 'PIJEMAE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9430010017', '9430010', 'MAMIRI'),
   ('9430010018', '9430010', 'JIWIKELANNY'),
   ('9430010019', '9430010', 'NISIMOK'),
@@ -89216,7 +89216,7 @@ INSERT INTO `villages` VALUES
   ('9430014009', '9430014', 'TINGGIRA'),
   ('9430020008', '9430020', 'WENAM'),
   ('9430020009', '9430020', 'EKANOM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9430020010', '9430020', 'UMBANUME'),
   ('9430020011', '9430020', 'YALIPAK'),
   ('9430020028', '9430020', 'AMBERINGIME'),
@@ -89267,7 +89267,7 @@ INSERT INTO `villages` VALUES
   ('9430031005', '9430031', 'WENEOGUN'),
   ('9430031006', '9430031', 'LIBUNGGA'),
   ('9430031007', '9430031', 'UMOM');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9430031008', '9430031', 'BERANGWI'),
   ('9430032001', '9430032', 'MOKONI'),
   ('9430032002', '9430032', 'GUNINGGAME'),
@@ -89318,7 +89318,7 @@ INSERT INTO `villages` VALUES
   ('9430040001', '9430040', 'BALINGGA'),
   ('9430040006', '9430040', 'TIMA'),
   ('9430040007', '9430040', 'BALIME');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9430040010', '9430040', 'BALIMNERI'),
   ('9430040013', '9430040', 'TIMONIKIME'),
   ('9430040014', '9430040', 'BINOLANGEN'),
@@ -89369,7 +89369,7 @@ INSERT INTO `villages` VALUES
   ('9430060005', '9430060', 'OKA'),
   ('9430060006', '9430060', 'NAMBU'),
   ('9430060007', '9430060', 'GANUME');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9430060008', '9430060', 'BINILANI'),
   ('9430060009', '9430060', 'GUMBAN'),
   ('9430060010', '9430060', 'LOWANOM'),
@@ -89420,7 +89420,7 @@ INSERT INTO `villages` VALUES
   ('9430090004', '9430090', 'PIRAWUN'),
   ('9430090005', '9430090', 'GAMELIA'),
   ('9430090007', '9430090', 'GAWIWARAK');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9430090008', '9430090', 'MEYAGALE'),
   ('9430090009', '9430090', 'WULAIPAS'),
   ('9430090010', '9430090', 'GUNAGEWAK'),
@@ -89471,7 +89471,7 @@ INSERT INTO `villages` VALUES
   ('9431010012', '9431010', 'SAMABEGULIK'),
   ('9431010013', '9431010', 'WIYUGOBAK'),
   ('9431010014', '9431010', 'MOGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9431010015', '9431010', 'DOKLE'),
   ('9431020001', '9431020', 'MELENGGAMA'),
   ('9431020002', '9431020', 'WIRIMA'),
@@ -89522,7 +89522,7 @@ INSERT INTO `villages` VALUES
   ('9432010009', '9432010', 'PAMI'),
   ('9432010010', '9432010', 'PIRANG'),
   ('9432010011', '9432010', 'POHOLANGGEN');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9432010012', '9432010', 'WANGKULAMSAFIANG'),
   ('9432010013', '9432010', 'IRAREK'),
   ('9432010014', '9432010', 'APOLONGSILI'),
@@ -89573,7 +89573,7 @@ INSERT INTO `villages` VALUES
   ('9432030012', '9432030', 'SOHOMBUNU'),
   ('9432030015', '9432030', 'MASANAHIKMA'),
   ('9432030016', '9432030', 'ABAGIMA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9432030017', '9432030', 'WAGHASILIMO'),
   ('9432030018', '9432030', 'WILEROMA'),
   ('9432030019', '9432030', 'OBABIN'),
@@ -89624,7 +89624,7 @@ INSERT INTO `villages` VALUES
   ('9432030072', '9432030', 'NILBO'),
   ('9432030073', '9432030', 'SAPIWAREK'),
   ('9432030076', '9432030', 'SALO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9432030077', '9432030', 'MOBAN'),
   ('9432030079', '9432030', 'HALISEK'),
   ('9432030080', '9432030', 'LOHOMABEL'),
@@ -89675,7 +89675,7 @@ INSERT INTO `villages` VALUES
   ('9432040029', '9432040', 'OHONIAM'),
   ('9432040030', '9432040', 'SUBUIRUINGGAMA'),
   ('9432040031', '9432040', 'DUWONG');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9432040035', '9432040', 'MOMONHUSI'),
   ('9432040036', '9432040', 'HELABU'),
   ('9432040037', '9432040', 'PUNGKAHIIK'),
@@ -89726,7 +89726,7 @@ INSERT INTO `villages` VALUES
   ('9433010003', '9433010', 'AGADUGUME'),
   ('9433010004', '9433010', 'GUTYENGGENAK'),
   ('9433010005', '9433010', 'DUGUNALE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9433010006', '9433010', 'OGOBAKPELENAK'),
   ('9433010007', '9433010', 'DOLINGGU'),
   ('9433010008', '9433010', 'AYUME'),
@@ -89777,7 +89777,7 @@ INSERT INTO `villages` VALUES
   ('9433030015', '9433030', 'WULONI'),
   ('9433030016', '9433030', 'NIPURALOME'),
   ('9433030017', '9433030', 'KIBOGOLOME');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9433030018', '9433030', 'TAGALOA'),
   ('9433030019', '9433030', 'JENGGERPAGA'),
   ('9433030020', '9433030', 'ILMABET'),
@@ -89828,7 +89828,7 @@ INSERT INTO `villages` VALUES
   ('9433041005', '9433041', 'TIMOBUT'),
   ('9433041006', '9433041', 'TIMOBUT EGEWAK'),
   ('9433041007', '9433041', 'KOMAPAGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9433042002', '9433042', 'NIGOLOME / NIKOAME'),
   ('9433042003', '9433042', 'AMULUME'),
   ('9433042005', '9433042', 'WOMBRU'),
@@ -89879,7 +89879,7 @@ INSERT INTO `villages` VALUES
   ('9433061002', '9433061', 'DAUNG / KOMBET'),
   ('9433061003', '9433061', 'KOMBET'),
   ('9433061004', '9433061', 'ONOP');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9433061005', '9433061', 'KULAMAGOM'),
   ('9433061006', '9433061', 'OGAMANIN'),
   ('9433070003', '9433070', 'YULOKOMA'),
@@ -89930,7 +89930,7 @@ INSERT INTO `villages` VALUES
   ('9434040001', '9434040', 'MEGAIKEBO'),
   ('9434040003', '9434040', 'TIMEPA'),
   ('9434040004', '9434040', 'MODIO');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9434040005', '9434040', 'PUTAPA'),
   ('9434040006', '9434040', 'TUAMANI / ATOU'),
   ('9434040007', '9434040', 'ADAUWO'),
@@ -89981,7 +89981,7 @@ INSERT INTO `villages` VALUES
   ('9434100001', '9434100', 'IDAKEBO'),
   ('9434100002', '9434100', 'PUGATADI II'),
   ('9434100003', '9434100', 'PUGATADI I');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9434100004', '9434100', 'IKRAR'),
   ('9434100005', '9434100', 'OBAYO'),
   ('9434100006', '9434100', 'KUYAKAGO'),
@@ -90032,7 +90032,7 @@ INSERT INTO `villages` VALUES
   ('9435040001', '9435040', 'AGISIGA'),
   ('9435040002', '9435040', 'TOUSIGA'),
   ('9435040005', '9435040', 'UNABUNDAGA');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9435040006', '9435040', 'MBAMOGO'),
   ('9435040007', '9435040', 'SOALI'),
   ('9435040008', '9435040', 'DANGGOA'),
@@ -90083,7 +90083,7 @@ INSERT INTO `villages` VALUES
   ('9436020011', '9436020', 'WAGOMANI'),
   ('9436020012', '9436020', 'DEMAGO'),
   ('9436020013', '9436020', 'YIPAI');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9436020014', '9436020', 'DIYAI II'),
   ('9436020015', '9436020', 'ONAGO II'),
   ('9436020016', '9436020', 'MEYEPA'),
@@ -90134,7 +90134,7 @@ INSERT INTO `villages` VALUES
   ('9471010001', '9471010', 'KOYA BARAT'),
   ('9471010002', '9471010', 'HOLTEKAM'),
   ('9471010003', '9471010', 'SKOW YAMBE');
-INSERT INTO `villages` VALUES
+INSERT INTO `m_villages` VALUES
   ('9471010004', '9471010', 'KOYA TIMUR'),
   ('9471010005', '9471010', 'SKOW MABO'),
   ('9471010006', '9471010', 'SKOW SAE'),
@@ -90169,7 +90169,7 @@ INSERT INTO `villages` VALUES
   ('9471040005', '9471040', 'ANGKASAPURA'),
   ('9471040007', '9471040', 'TANJUNG RIA'),
   ('9471040008', '9471040', 'KAMPUNG KAYOBATU');
-/*!40000 ALTER TABLE `villages` ENABLE KEYS */;
+/*!40000 ALTER TABLE `m_villages` ENABLE KEYS */;
 UNLOCK TABLES;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
