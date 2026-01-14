@@ -67,30 +67,30 @@ return new class extends Migration {
         // });
 
         // 3. Rehabilitasi Mangrove
-        Schema::create('mangrove', function (Blueprint $table) {
-            $table->id();
-            $table->year('year');
-            $table->tinyInteger('month');
+        // Schema::create('mangrove', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->year('year');
+        //     $table->tinyInteger('month');
 
-            $table->decimal('target_annual', 15, 2)->default(0);
-            $table->decimal('realization', 15, 2)->default(0);
-            $table->string('fund_source');
+        //     $table->decimal('target_annual', 15, 2)->default(0);
+        //     $table->decimal('realization', 15, 2)->default(0);
+        //     $table->string('fund_source');
 
-            // Specific
-            $table->string('mangrove_type')->nullable(); // Jenis Mangrove
-            $table->string('density')->nullable(); // Kerapatan Tanam
+        //     // Specific
+        //     $table->string('mangrove_type')->nullable(); // Jenis Mangrove
+        //     $table->string('density')->nullable(); // Kerapatan Tanam
 
-            $table->string('status')->default('draft');
-            $table->timestamp('approved_by_kasi_at')->nullable();
-            $table->timestamp('approved_by_cdk_at')->nullable();
-            $table->text('rejection_note')->nullable();
+        //     $table->string('status')->default('draft');
+        //     $table->timestamp('approved_by_kasi_at')->nullable();
+        //     $table->timestamp('approved_by_cdk_at')->nullable();
+        //     $table->text('rejection_note')->nullable();
 
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
-            $table->unsignedBigInteger('deleted_by')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        //     $table->unsignedBigInteger('created_by')->nullable();
+        //     $table->unsignedBigInteger('updated_by')->nullable();
+        //     $table->unsignedBigInteger('deleted_by')->nullable();
+        //     $table->timestamps();
+        //     $table->softDeletes();
+        // });
 
         // 4. Rehabilitasi Lahan Teknis (Bangunan KTA)
         Schema::create('lahan_teknis', function (Blueprint $table) {
