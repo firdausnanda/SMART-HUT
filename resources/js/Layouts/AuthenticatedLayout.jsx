@@ -10,8 +10,8 @@ export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [openMenus, setOpenMenus] = useState({
-        pembinaan: route().current('rehab-lahan.*'),
-        pembinaan_mobile: route().current('rehab-lahan.*')
+        pembinaan: route().current('rehab-lahan.*') || route().current('penghijauan-lingkungan.*'),
+        pembinaan_mobile: route().current('rehab-lahan.*') || route().current('penghijauan-lingkungan.*')
     });
 
     const toggleMenu = (menu) => {
@@ -64,7 +64,7 @@ export default function Authenticated({ user, header, children }) {
                         <button
                             onClick={() => toggleMenu('pembinaan')}
                             className={`w-full group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${isSidebarCollapsed ? 'justify-center px-0' : 'px-4'
-                                } ${openMenus['pembinaan'] || route().current('rehab-lahan.*')
+                                } ${openMenus['pembinaan'] || route().current('rehab-lahan.*') || route().current('penghijauan-lingkungan.*')
                                     ? 'bg-white/10 border-white/20 text-white shadow-sm'
                                     : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white'
                                 }`}
@@ -86,7 +86,7 @@ export default function Authenticated({ user, header, children }) {
                             <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                 {[
                                     { name: 'Rehabilitasi Lahan', route: 'rehab-lahan.index', pattern: 'rehab-lahan.*' },
-                                    { name: 'Penghijauan Lingkungan', route: '#', pattern: 'penghijauan.*' },
+                                    { name: 'Penghijauan Lingkungan', route: 'penghijauan-lingkungan.index', pattern: 'penghijauan-lingkungan.*' },
                                     { name: 'Rehabilitasi Manggrove', route: '#', pattern: 'mangrove.*' },
                                     { name: 'RHL Teknis', route: '#', pattern: 'rhl-teknis.*' },
                                     { name: 'Reboisasi Area PS', route: '#', pattern: 'reboisasi.*' }
@@ -223,7 +223,7 @@ export default function Authenticated({ user, header, children }) {
                     <div className="space-y-1">
                         <button
                             onClick={() => toggleMenu('pembinaan_mobile')}
-                            className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${openMenus['pembinaan_mobile'] || route().current('rehab-lahan.*')
+                            className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${openMenus['pembinaan_mobile'] || route().current('rehab-lahan.*') || route().current('penghijauan-lingkungan.*')
                                 ? 'bg-white/10 border-white/20 text-white'
                                 : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
                                 }`}
@@ -240,7 +240,7 @@ export default function Authenticated({ user, header, children }) {
                             <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                 {[
                                     { name: 'Rehabilitasi Lahan', route: 'rehab-lahan.index', pattern: 'rehab-lahan.*' },
-                                    { name: 'Penghijauan Lingkungan', route: '#', pattern: 'penghijauan.*' },
+                                    { name: 'Penghijauan Lingkungan', route: 'penghijauan-lingkungan.index', pattern: 'penghijauan-lingkungan.*' },
                                     { name: 'Rehabilitasi Manggrove', route: '#', pattern: 'mangrove.*' },
                                     { name: 'RHL Teknis', route: '#', pattern: 'rhl-teknis.*' },
                                     { name: 'Reboisasi Area PS', route: '#', pattern: 'reboisasi.*' }
