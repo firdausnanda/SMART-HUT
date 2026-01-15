@@ -195,7 +195,7 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
                             <svg className="h-4 w-4 mr-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                             </svg>
-                            <span>Stok Aman</span>
+                            <span>Meningkat</span>
                         </div>
                     </div>
 
@@ -284,52 +284,17 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 <tr className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xs shrink-0">
-                                            AD
-                                        </div>
-                                        <div className="min-w-0">
-                                            <p className="font-medium text-gray-900 truncate">Admin Staff</p>
-                                            <p className="sm:hidden text-xs text-gray-400">2 jam lalu</p>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">Input Data Rehabilitasi - Kec. Pule</td>
-                                    <td className="px-6 py-4 hidden sm:table-cell">2 jam lalu</td>
-                                    <td className="px-6 py-4">
-                                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Selesai</span>
-                                    </td>
-                                </tr>
-                                <tr className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-700 font-bold text-xs shrink-0">
-                                            KT
-                                        </div>
-                                        <div className="min-w-0">
-                                            <p className="font-medium text-gray-900 truncate">Ketua Tani Jaya</p>
-                                            <p className="sm:hidden text-xs text-gray-400">5 jam lalu</p>
+                                    <td colSpan="4" className="text-center py-12">
+                                        <div className="flex flex-col items-center">
+                                            <div className="p-4 bg-gray-50 rounded-full mb-3 text-gray-300">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                                </svg>
+                                            </div>
+                                            <p className="text-gray-400 font-medium tracking-tight whitespace-nowrap">Belum ada data aktivitas tersedia</p>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">Pengajuan Bibit Sengon</td>
-                                    <td className="px-6 py-4 hidden sm:table-cell">5 jam lalu</td>
-                                    <td className="px-6 py-4">
-                                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700">Menunggu</span>
-                                    </td>
-                                </tr>
-                                <tr className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs shrink-0">
-                                            SP
-                                        </div>
-                                        <div className="min-w-0">
-                                            <p className="font-medium text-gray-900 truncate">Supervisor</p>
-                                            <p className="sm:hidden text-xs text-gray-400">1 hari lalu</p>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">Verifikasi Laporan Bulanan</td>
-                                    <td className="px-6 py-4 hidden sm:table-cell">1 hari lalu</td>
-                                    <td className="px-6 py-4">
-                                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">Proses</span>
-                                    </td>
+
                                 </tr>
                             </tbody>
                         </table>

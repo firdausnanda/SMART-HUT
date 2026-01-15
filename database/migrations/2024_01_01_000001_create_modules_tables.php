@@ -119,30 +119,30 @@ return new class extends Migration {
         // });
 
         // 5. Reboisasi Area PS
-        Schema::create('reboisasi_ps', function (Blueprint $table) {
-            $table->id();
-            $table->year('year');
-            $table->tinyInteger('month');
+        // Schema::create('reboisasi_ps', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->year('year');
+        //     $table->tinyInteger('month');
 
-            $table->decimal('target_annual', 15, 2)->default(0);
-            $table->decimal('realization', 15, 2)->default(0);
-            $table->string('fund_source');
+        //     $table->decimal('target_annual', 15, 2)->default(0);
+        //     $table->decimal('realization', 15, 2)->default(0);
+        //     $table->string('fund_source');
 
-            // Specific
-            $table->string('group_name')->nullable(); // Nama KTH/LPHD
-            $table->string('sk_number')->nullable(); // Nomor SK Izin PS
+        //     // Specific
+        //     $table->string('group_name')->nullable(); // Nama KTH/LPHD
+        //     $table->string('sk_number')->nullable(); // Nomor SK Izin PS
 
-            $table->string('status')->default('draft');
-            $table->timestamp('approved_by_kasi_at')->nullable();
-            $table->timestamp('approved_by_cdk_at')->nullable();
-            $table->text('rejection_note')->nullable();
+        //     $table->string('status')->default('draft');
+        //     $table->timestamp('approved_by_kasi_at')->nullable();
+        //     $table->timestamp('approved_by_cdk_at')->nullable();
+        //     $table->text('rejection_note')->nullable();
 
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
-            $table->unsignedBigInteger('deleted_by')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        //     $table->unsignedBigInteger('created_by')->nullable();
+        //     $table->unsignedBigInteger('updated_by')->nullable();
+        //     $table->unsignedBigInteger('deleted_by')->nullable();
+        //     $table->timestamps();
+        //     $table->softDeletes();
+        // });
     }
 
     /**

@@ -35,17 +35,17 @@ export default function Login({ status, canResetPassword }) {
 
             <form onSubmit={submit} className="space-y-6">
                 <div>
-                    <InputLabel htmlFor="email" value="Email Address" className="text-gray-900 font-bold !text-gray-900" />
+                    <InputLabel htmlFor="email" value="Username" className="text-gray-900 font-bold !text-gray-900" />
 
                     <TextInput
                         id="email"
-                        type="email"
+                        type="text"
                         name="email"
                         value={data.email}
                         className="mt-2 block w-full rounded-xl border-gray-300 bg-white text-gray-900 focus:border-primary-500 focus:ring-primary-500 py-3 text-base shadow-sm"
                         autoComplete="username"
                         isFocused={true}
-                        placeholder="nama@email.com"
+                        placeholder="Masukkan Username"
                         onChange={(e) => setData('email', e.target.value)}
                     />
 
@@ -54,8 +54,8 @@ export default function Login({ status, canResetPassword }) {
 
                 <div className="mt-4">
                     <div className="flex items-center justify-between">
-                         <InputLabel htmlFor="password" value="Password" className="text-gray-900 font-bold !text-gray-900" />
-                         {canResetPassword && (
+                        <InputLabel htmlFor="password" value="Password" className="text-gray-900 font-bold !text-gray-900" />
+                        {canResetPassword && (
                             <Link
                                 href={route('password.request')}
                                 className="text-sm font-semibold text-primary-700 hover:text-primary-800 transition-colors"
@@ -110,13 +110,13 @@ export default function Login({ status, canResetPassword }) {
                 </div>
 
                 <div className="pt-2">
-                    <PrimaryButton 
-                        className="w-full justify-center py-4 bg-gradient-to-r from-emerald-700 to-green-800 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg shadow-emerald-900/20" 
+                    <PrimaryButton
+                        className="w-full justify-center py-4 bg-gradient-to-r from-emerald-700 to-green-800 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg shadow-emerald-900/20"
                         loading={processing}
                     >
                         Masuk Dashboard
                     </PrimaryButton>
-                </div>                
+                </div>
             </form>
         </GuestLayout>
     );
