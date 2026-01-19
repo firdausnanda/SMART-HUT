@@ -8,14 +8,14 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
 
-export default function Edit({ auth, kups, categories: initialCategories }) { // Fixed variable naming, though categories usually static
+export default function Edit({ auth, kups }) {
   const { data, setData, put, processing, errors } = useForm({
     province_id: kups.province_id || 35,
-    regency_id: kups.regency_id,
-    district_id: kups.district_id,
-    category: kups.category,
-    number_of_kups: kups.number_of_kups,
-    commodity: kups.commodity,
+    regency_id: kups.regency_id || '',
+    district_id: kups.district_id || '',
+    category: kups.category || '',
+    number_of_kups: kups.number_of_kups || '',
+    commodity: kups.commodity || '',
   });
 
   const [regencies, setRegencies] = useState([]);
@@ -23,7 +23,6 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
   const [loadingRegencies, setLoadingRegencies] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
 
-  // Static for now as agreed in Plan
   const categories = [
     { value: 'Blue', label: 'Blue' },
     { value: 'Silver', label: 'Silver' },
@@ -41,7 +40,7 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
       .join(' ');
   };
 
-  // Initial load: Regencies
+  // Initial load: Regencies for Jatim (35)
   useEffect(() => {
     setLoadingRegencies(true);
     axios.get(route('locations.regencies', 35))
@@ -55,7 +54,7 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
       .catch(() => setLoadingRegencies(false));
   }, []);
 
-  // Load Districts
+  // Load Districts when Regency changes
   useEffect(() => {
     if (data.regency_id) {
       setLoadingDistricts(true);
@@ -85,9 +84,9 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
       padding: '2px',
       backgroundColor: state.isDisabled ? '#f3f4f6' : '#f9fafb',
       borderColor: state.isDisabled ? '#f3f4f6' : '#e5e7eb',
-      boxShadow: state.isFocused ? '0 0 0 1px #16a34a' : 'none',
+      boxShadow: state.isFocused ? '0 0 0 1px #10b981' : 'none', // Emerald-500
       '&:hover': {
-        borderColor: state.isDisabled ? '#f3f4f6' : '#16a34a',
+        borderColor: state.isDisabled ? '#f3f4f6' : '#10b981',
       },
       cursor: state.isDisabled ? 'not-allowed' : 'default',
       transition: 'all 0.2s',
@@ -117,8 +116,8 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
       padding: '8px 12px',
       fontSize: '0.875rem',
       fontWeight: '500',
-      backgroundColor: state.isSelected ? '#16a34a' : state.isFocused ? '#f0fdf4' : 'transparent',
-      color: state.isSelected ? 'white' : state.isFocused ? '#16a34a' : '#374151',
+      backgroundColor: state.isSelected ? '#10b981' : state.isFocused ? '#ecfdf5' : 'transparent',
+      color: state.isSelected ? 'white' : state.isFocused ? '#059669' : '#374151',
       cursor: 'pointer',
     }),
   };
@@ -133,7 +132,7 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
       <div className="max-w-4xl mx-auto">
         <Link
           href={route('kups.index')}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-800 transition-colors mb-6 group"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-800 transition-colors mb-6 group"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -145,7 +144,7 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
           <div className="p-8 border-b border-gray-100 bg-gray-50/50">
             <h3 className="text-xl font-bold text-gray-900">Formulir Edit Data</h3>
             <p className="mt-1 text-sm text-gray-500">
-              Perbarui informasi di bawah ini untuk data Perkembangan KUPS.
+              Perbarui informasi di bawah ini untuk mengubah data Perkembangan KUPS.
             </p>
           </div>
 
@@ -153,7 +152,7 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
             <form onSubmit={submit} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div className="md:col-span-2">
-                  <h4 className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-4 border-b border-primary-100 pb-2">Informasi Lokasi</h4>
+                  <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4 border-b border-emerald-100 pb-2">Informasi Lokasi</h4>
                 </div>
 
                 {/* Location Selects */}
@@ -171,6 +170,7 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
                   <Select
                     options={regencies}
                     isLoading={loadingRegencies}
+                    value={regencies.find(r => r.value === data.regency_id) || null}
                     onChange={(opt) => {
                       setData((prev) => ({
                         ...prev,
@@ -181,7 +181,6 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
                     placeholder="Pilih Kabupaten..."
                     styles={selectStyles}
                     isClearable
-                    value={regencies.find(r => r.value === data.regency_id) || null}
                   />
                   <InputError message={errors.regency_id} className="mt-2" />
                 </div>
@@ -192,6 +191,7 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
                     options={districts}
                     isLoading={loadingDistricts}
                     isDisabled={!data.regency_id}
+                    value={districts.find(d => d.value === data.district_id) || null}
                     onChange={(opt) => {
                       setData((prev) => ({
                         ...prev,
@@ -201,24 +201,23 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
                     placeholder="Pilih Kecamatan..."
                     styles={selectStyles}
                     isClearable
-                    value={districts.find(d => d.value === data.district_id) || null}
                   />
                   <InputError message={errors.district_id} className="mt-2" />
                 </div>
 
                 <div className="md:col-span-2 mt-4">
-                  <h4 className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-4 border-b border-primary-100 pb-2">Detail KUPS</h4>
+                  <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4 border-b border-emerald-100 pb-2">Detail KUPS</h4>
                 </div>
 
                 <div>
                   <InputLabel htmlFor="category" value="Kategori KUPS" className="text-gray-700 font-bold mb-2" />
                   <Select
                     options={categories}
+                    value={categories.find(c => c.value === data.category) || null}
                     onChange={(opt) => setData('category', opt?.value || '')}
                     placeholder="Pilih Kategori..."
                     styles={selectStyles}
                     isClearable
-                    value={categories.find(c => c.value === data.category) || null}
                   />
                   <InputError message={errors.category} className="mt-2" />
                 </div>
@@ -229,7 +228,7 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
                     <TextInput
                       id="number_of_kups"
                       type="number"
-                      className="w-full pr-12"
+                      className="w-full pr-12 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
                       value={data.number_of_kups}
                       onChange={(e) => setData('number_of_kups', e.target.value)}
                       required
@@ -245,7 +244,7 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
                   <TextInput
                     id="commodity"
                     type="text"
-                    className="w-full"
+                    className="w-full focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
                     value={data.commodity}
                     onChange={(e) => setData('commodity', e.target.value)}
                     required
@@ -266,7 +265,7 @@ export default function Edit({ auth, kups, categories: initialCategories }) { //
                   className="px-8 py-3 bg-gradient-to-r from-emerald-700 to-green-800 hover:from-emerald-600 hover:to-green-700 text-white rounded-xl font-bold shadow-lg shadow-emerald-900/20 transition-all transform active:scale-95"
                   loading={processing}
                 >
-                  {processing ? 'Simpan Perubahan' : 'Update Laporan'}
+                  {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </PrimaryButton>
               </div>
             </form>

@@ -696,7 +696,7 @@ export default function Authenticated({ user, header, children }) {
                                 <Dropdown.Content align="right" width="56" contentClasses="py-0 bg-white">
                                     <div className="px-5 py-5 bg-gradient-to-br from-primary-50/50 to-white border-b border-gray-100">
                                         <div className="flex items-center gap-3">
-                                            <div className="h-12 w-12 rounded-xl bg-primary-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                                            <div className="h-10 w-10 shrink-0 rounded-xl bg-primary-600 flex items-center justify-center text-white font-bold text-base shadow-sm">
                                                 {user.name.charAt(0).toUpperCase()}
                                             </div>
                                             <div className="flex flex-col min-w-0">
@@ -707,7 +707,7 @@ export default function Authenticated({ user, header, children }) {
                                     </div>
 
                                     <div className="p-2">
-                                        <Dropdown.Link href={route('profile.edit')} className="rounded-xl !hover:bg-primary-50 transition-all duration-200 group/item py-2.5">
+                                        <Dropdown.Link href={route('profile.edit')} className="rounded-xl !hover:bg-primary-50 hover:text-primary-700 transition-all duration-200 group/item py-2.5">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center group-hover/item:bg-white transition-colors border border-transparent group-hover/item:border-primary-100">
                                                     <svg className="w-5 h-5 text-gray-500 group-hover/item:text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -723,7 +723,7 @@ export default function Authenticated({ user, header, children }) {
 
                                         <div className="my-1 border-t border-gray-50"></div>
 
-                                        <Dropdown.Link href={route('logout')} method="post" as="button" className="w-full rounded-xl !hover:bg-red-50 transition-all duration-200 group/logout py-2.5">
+                                        <Dropdown.Link href={route('logout')} method="post" as="button" className="w-full rounded-xl !hover:bg-red-50 hover:text-red-700 transition-all duration-200 group/logout py-2.5">
                                             <div className="flex items-center gap-3 text-red-600">
                                                 <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center group-hover/logout:bg-white transition-colors border border-transparent group-hover/logout:border-red-100">
                                                     <svg className="w-5 h-5 transition-transform group-hover/logout:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
