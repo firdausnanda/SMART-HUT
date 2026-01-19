@@ -100,6 +100,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/hasil-hutan-bukan-kayu/{hasil_hutan_bukan_kayu}/submit', [\App\Http\Controllers\HasilHutanBukanKayuController::class, 'submit'])->name('hasil-hutan-bukan-kayu.submit');
     Route::post('/hasil-hutan-bukan-kayu/{hasil_hutan_bukan_kayu}/approve', [\App\Http\Controllers\HasilHutanBukanKayuController::class, 'approve'])->name('hasil-hutan-bukan-kayu.approve');
     Route::post('/hasil-hutan-bukan-kayu/{hasil_hutan_bukan_kayu}/reject', [\App\Http\Controllers\HasilHutanBukanKayuController::class, 'reject'])->name('hasil-hutan-bukan-kayu.reject');
+
+    // Industri Berizin
+    Route::resource('industri-berizin', \App\Http\Controllers\IndustriBerizinController::class)->parameters(['industri-berizin' => 'industri_berizin']);
+    Route::post('/industri-berizin/{industri_berizin}/submit', [\App\Http\Controllers\IndustriBerizinController::class, 'submit'])->name('industri-berizin.submit');
+    Route::post('/industri-berizin/{industri_berizin}/approve', [\App\Http\Controllers\IndustriBerizinController::class, 'approve'])->name('industri-berizin.approve');
+    Route::post('/industri-berizin/{industri_berizin}/reject', [\App\Http\Controllers\IndustriBerizinController::class, 'reject'])->name('industri-berizin.reject');
 });
 
 require __DIR__ . '/auth.php';

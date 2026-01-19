@@ -14,8 +14,8 @@ export default function Authenticated({ user, header, children }) {
         pembinaan_mobile: route().current('rehab-lahan.*') || route().current('penghijauan-lingkungan.*') || route().current('rehab-manggrove.*') || route().current('rhl-teknis.*') || route().current('reboisasi-ps.*'),
         perlindungan: route().current('pengunjung-wisata.*') || route().current('kebakaran-hutan.*'),
         perlindungan_mobile: route().current('pengunjung-wisata.*') || route().current('kebakaran-hutan.*'),
-        bina_usaha: route().current('hasil-hutan-kayu.*') || route().current('hasil-hutan-bukan-kayu.*') || route().current('bina-usaha.*'),
-        bina_usaha_mobile: route().current('hasil-hutan-kayu.*') || route().current('hasil-hutan-bukan-kayu.*') || route().current('bina-usaha.*'),
+        bina_usaha: route().current('hasil-hutan-kayu.*') || route().current('hasil-hutan-bukan-kayu.*') || route().current('industri-berizin.*') || route().current('bina-usaha.*'),
+        bina_usaha_mobile: route().current('hasil-hutan-kayu.*') || route().current('hasil-hutan-bukan-kayu.*') || route().current('industri-berizin.*') || route().current('bina-usaha.*'),
         hutan_negara: route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Negara' }) || route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Hutan Negara' }) || window.location.search.includes('Hutan%20Negara'),
         hutan_negara_mobile: route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Negara' }) || route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Hutan Negara' }) || window.location.search.includes('Hutan%20Negara'),
         hutan_rakyat: route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Rakyat' }) || route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Hutan Rakyat' }) || window.location.search.includes('Hutan%20Rakyat') || window.location.search.includes('Hutan+Rakyat'),
@@ -214,7 +214,7 @@ export default function Authenticated({ user, header, children }) {
                                             { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Perhutanan Sosial' }) }
                                         ]
                                     },
-                                    { name: 'Industri Berizin', route: '#', pattern: 'bina-usaha.industri' },
+                                    { name: 'Industri Berizin', route: route('industri-berizin.index'), pattern: 'industri-berizin.*' },
                                     { name: 'Realisasi PNBP', route: '#', pattern: 'bina-usaha.pnbp' }
                                 ].map((item) => (
                                     <div key={item.name}>
@@ -252,7 +252,10 @@ export default function Authenticated({ user, header, children }) {
                                         ) : (
                                             <Link
                                                 href={item.route}
-                                                className="block py-2 text-xs font-medium text-primary-200 hover:text-white transition-colors"
+                                                className={`block py-2 text-xs transition-colors ${item.pattern && route().current(item.pattern)
+                                                    ? 'text-white font-bold'
+                                                    : 'text-primary-200 hover:text-white font-medium'
+                                                    }`}
                                             >
                                                 {item.name}
                                             </Link>
