@@ -75,6 +75,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/pengunjung-wisata/{pengunjung_wisata}/approve', [\App\Http\Controllers\PengunjungWisataController::class, 'approve'])->name('pengunjung-wisata.approve');
     Route::post('/pengunjung-wisata/{pengunjung_wisata}/reject', [\App\Http\Controllers\PengunjungWisataController::class, 'reject'])->name('pengunjung-wisata.reject');
 
+    // Kebakaran Hutan
+    Route::resource('kebakaran-hutan', \App\Http\Controllers\KebakaranHutanController::class)->parameters(['kebakaran-hutan' => 'kebakaran_hutan']);
+    Route::post('/kebakaran-hutan/{kebakaran_hutan}/submit', [\App\Http\Controllers\KebakaranHutanController::class, 'submit'])->name('kebakaran-hutan.submit');
+    Route::post('/kebakaran-hutan/{kebakaran_hutan}/approve', [\App\Http\Controllers\KebakaranHutanController::class, 'approve'])->name('kebakaran-hutan.approve');
+    Route::post('/kebakaran-hutan/{kebakaran_hutan}/reject', [\App\Http\Controllers\KebakaranHutanController::class, 'reject'])->name('kebakaran-hutan.reject');
+
     Route::resource('rehab-manggrove', RehabManggroveController::class);
 });
 
