@@ -27,6 +27,9 @@ class BukanKayuSeeder extends Seeder
             'Kopi',
             'Minyak Atsiri',
             'Umbi Lainnya',
+            'Cabai',
+            'Nanas',
+            'Lainnya',
         ];
 
         foreach ($data as $item) {

@@ -22,8 +22,8 @@ export default function Authenticated({ user, header, children }) {
         hutan_rakyat_mobile: route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Rakyat' }) || route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Hutan Rakyat' }) || window.location.search.includes('Hutan%20Rakyat') || window.location.search.includes('Hutan+Rakyat'),
         perhutanan_sosial: route().current('hasil-hutan-kayu.*', { forest_type: 'Perhutanan Sosial' }) || route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Perhutanan Sosial' }) || window.location.search.includes('Perhutanan%20Sosial') || window.location.search.includes('Perhutanan+Sosial'),
         perhutanan_sosial_mobile: route().current('hasil-hutan-kayu.*', { forest_type: 'Perhutanan Sosial' }) || route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Perhutanan Sosial' }) || window.location.search.includes('Perhutanan%20Sosial') || window.location.search.includes('Perhutanan+Sosial'),
-        pemberdayaan: route().current('skps.*'),
-        pemberdayaan_mobile: route().current('skps.*')
+        pemberdayaan: route().current('skps.*') || route().current('kups.*'),
+        pemberdayaan_mobile: route().current('skps.*') || route().current('kups.*')
     });
 
     const toggleMenu = (menu) => {
@@ -294,7 +294,7 @@ export default function Authenticated({ user, header, children }) {
                             <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                 {[
                                     { name: 'Perkembangan SK PS', route: route('skps.index'), pattern: 'skps.*' },
-                                    { name: 'Perkembangan KSP', route: '#', pattern: 'pemberdayaan.ksp' }
+                                    { name: 'Perkembangan KUPS', route: route('kups.index'), pattern: 'kups.*' }
                                 ].map((item) => (
                                     <Link
                                         key={item.name}
@@ -579,7 +579,7 @@ export default function Authenticated({ user, header, children }) {
                             <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                 {[
                                     { name: 'Perkembangan SK PS', route: route('skps.index'), pattern: 'skps.*' },
-                                    { name: 'Perkembangan KSP', route: '#', pattern: 'pemberdayaan.ksp' }
+                                    { name: 'Perkembangan KUPS', route: route('kups.index'), pattern: 'kups.*' }
                                 ].map((item) => (
                                     <Link
                                         key={item.name}

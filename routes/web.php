@@ -118,6 +118,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/skps/{skps}/submit', [\App\Http\Controllers\SkpsController::class, 'submit'])->name('skps.submit');
     Route::post('/skps/{skps}/approve', [\App\Http\Controllers\SkpsController::class, 'approve'])->name('skps.approve');
     Route::post('/skps/{skps}/reject', [\App\Http\Controllers\SkpsController::class, 'reject'])->name('skps.reject');
+
+    // Perkembangan KUPS
+    Route::resource('kups', \App\Http\Controllers\KupsController::class);
+    Route::post('/kups/{kups}/submit', [\App\Http\Controllers\KupsController::class, 'submit'])->name('kups.submit');
+    Route::post('/kups/{kups}/approve', [\App\Http\Controllers\KupsController::class, 'approve'])->name('kups.approve');
+    Route::post('/kups/{kups}/reject', [\App\Http\Controllers\KupsController::class, 'reject'])->name('kups.reject');
 });
 
 require __DIR__ . '/auth.php';
