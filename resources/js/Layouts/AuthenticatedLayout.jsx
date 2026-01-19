@@ -14,8 +14,14 @@ export default function Authenticated({ user, header, children }) {
         pembinaan_mobile: route().current('rehab-lahan.*') || route().current('penghijauan-lingkungan.*') || route().current('rehab-manggrove.*') || route().current('rhl-teknis.*') || route().current('reboisasi-ps.*'),
         perlindungan: route().current('pengunjung-wisata.*') || route().current('kebakaran-hutan.*'),
         perlindungan_mobile: route().current('pengunjung-wisata.*') || route().current('kebakaran-hutan.*'),
-        bina_usaha: false,
-        bina_usaha_mobile: false,
+        bina_usaha: route().current('hasil-hutan-kayu.*') || route().current('bina-usaha.*'),
+        bina_usaha_mobile: route().current('hasil-hutan-kayu.*') || route().current('bina-usaha.*'),
+        hutan_negara: route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Negara' }) || window.location.search.includes('Hutan%20Negara'),
+        hutan_negara_mobile: route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Negara' }) || window.location.search.includes('Hutan%20Negara'),
+        hutan_rakyat: route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Rakyat' }) || window.location.search.includes('Hutan%20Rakyat'),
+        hutan_rakyat_mobile: route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Rakyat' }) || window.location.search.includes('Hutan%20Rakyat'),
+        perhutanan_sosial: route().current('hasil-hutan-kayu.*', { forest_type: 'Perhutanan Sosial' }) || window.location.search.includes('Perhutanan%20Sosial'),
+        perhutanan_sosial_mobile: route().current('hasil-hutan-kayu.*', { forest_type: 'Perhutanan Sosial' }) || window.location.search.includes('Perhutanan%20Sosial'),
         pemberdayaan: false,
         pemberdayaan_mobile: false
     });
@@ -184,22 +190,74 @@ export default function Authenticated({ user, header, children }) {
                         {!isSidebarCollapsed && openMenus['bina_usaha'] && (
                             <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                 {[
-                                    { name: 'Hutan Negara', route: '#', pattern: 'bina-usaha.hutan-negara' },
-                                    { name: 'Hutan Rakyat', route: '#', pattern: 'bina-usaha.hutan-rakyat' },
-                                    { name: 'Perhutanan Sosial', route: '#', pattern: 'bina-usaha.perhutanan-sosial' },
+                                    {
+                                        name: 'Hutan Negara',
+                                        key: 'hutan_negara',
+                                        children: [
+                                            { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Negara' }) },
+                                            { name: 'Hasil Hutan Bukan Kayu', route: '#' }
+                                        ]
+                                    },
+                                    {
+                                        name: 'Hutan Rakyat',
+                                        key: 'hutan_rakyat',
+                                        children: [
+                                            { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Rakyat' }) },
+                                            { name: 'Hasil Hutan Bukan Kayu', route: '#' }
+                                        ]
+                                    },
+                                    {
+                                        name: 'Perhutanan Sosial',
+                                        key: 'perhutanan_sosial',
+                                        children: [
+                                            { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Perhutanan Sosial' }) },
+                                            { name: 'Hasil Hutan Bukan Kayu', route: '#' }
+                                        ]
+                                    },
                                     { name: 'Industri Berizin', route: '#', pattern: 'bina-usaha.industri' },
                                     { name: 'Realisasi PNBP', route: '#', pattern: 'bina-usaha.pnbp' }
                                 ].map((item) => (
-                                    <Link
-                                        key={item.name}
-                                        href={item.route}
-                                        className={`block py-2 text-xs font-medium transition-colors ${route().current(item.pattern)
-                                            ? 'text-white font-bold'
-                                            : 'text-primary-200 hover:text-white'
-                                            }`}
-                                    >
-                                        {item.name}
-                                    </Link>
+                                    <div key={item.name}>
+                                        {item.children ? (
+                                            <div>
+                                                <button
+                                                    onClick={() => toggleMenu(item.key)}
+                                                    className="flex w-full items-center justify-between py-2 text-xs font-medium text-primary-200 hover:text-white transition-colors"
+                                                >
+                                                    {item.name}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${openMenus[item.key] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </button>
+                                                {openMenus[item.key] && (
+                                                    <div className="ml-3 space-y-1 border-l border-white/10 pl-3">
+                                                        {item.children.map((child) => {
+                                                            const isActive = child.route !== '#' && window.location.href === child.route;
+                                                            return (
+                                                                <Link
+                                                                    key={child.name}
+                                                                    href={child.route}
+                                                                    className={`block py-1.5 text-xs transition-colors ${isActive
+                                                                        ? 'text-white font-bold'
+                                                                        : 'text-primary-300 hover:text-white'
+                                                                        }`}
+                                                                >
+                                                                    {child.name}
+                                                                </Link>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <Link
+                                                href={item.route}
+                                                className="block py-2 text-xs font-medium text-primary-200 hover:text-white transition-colors"
+                                            >
+                                                {item.name}
+                                            </Link>
+                                        )}
+                                    </div>
                                 ))}
                             </div>
                         )}
@@ -425,23 +483,73 @@ export default function Authenticated({ user, header, children }) {
                         {openMenus['bina_usaha_mobile'] && (
                             <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                 {[
-                                    { name: 'Hutan Negara', route: '#', pattern: 'bina-usaha.hutan-negara' },
-                                    { name: 'Hutan Rakyat', route: '#', pattern: 'bina-usaha.hutan-rakyat' },
-                                    { name: 'Perhutanan Sosial', route: '#', pattern: 'bina-usaha.perhutanan-sosial' },
+                                    {
+                                        name: 'Hutan Negara',
+                                        key: 'hutan_negara_mobile',
+                                        children: [
+                                            { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Negara' }) },
+                                            { name: 'Hasil Hutan Bukan Kayu', route: '#' }
+                                        ]
+                                    },
+                                    {
+                                        name: 'Hutan Rakyat',
+                                        key: 'hutan_rakyat_mobile',
+                                        children: [
+                                            { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Rakyat' }) },
+                                            { name: 'Hasil Hutan Bukan Kayu', route: '#' }
+                                        ]
+                                    },
+                                    {
+                                        name: 'Perhutanan Sosial',
+                                        key: 'perhutanan_sosial_mobile',
+                                        children: [
+                                            { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Perhutanan Sosial' }) },
+                                            { name: 'Hasil Hutan Bukan Kayu', route: '#' }
+                                        ]
+                                    },
                                     { name: 'Industri Berizin', route: '#', pattern: 'bina-usaha.industri' },
                                     { name: 'Realisasi PNBP', route: '#', pattern: 'bina-usaha.pnbp' }
                                 ].map((item) => (
-                                    <Link
-                                        key={item.name}
-                                        href={item.route}
-                                        onClick={() => setShowingNavigationDropdown(false)}
-                                        className={`block py-2 text-[13px] font-medium transition-colors ${route().current(item.pattern)
-                                            ? 'text-white font-bold'
-                                            : 'text-primary-300 hover:text-white'
-                                            }`}
-                                    >
-                                        {item.name}
-                                    </Link>
+                                    <div key={item.name}>
+                                        {item.children ? (
+                                            <div>
+                                                <button
+                                                    onClick={() => toggleMenu(item.key)}
+                                                    className="flex w-full items-center justify-between py-2 text-[13px] font-medium text-primary-300 hover:text-white transition-colors"
+                                                >
+                                                    {item.name}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform duration-200 ${openMenus[item.key] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </button>
+                                                {openMenus[item.key] && (
+                                                    <div className="ml-3 space-y-1 border-l border-white/10 pl-3">
+                                                        {item.children.map((child) => (
+                                                            <Link
+                                                                key={child.name}
+                                                                href={child.route}
+                                                                onClick={() => setShowingNavigationDropdown(false)}
+                                                                className="block py-1.5 text-xs text-primary-400 hover:text-white transition-colors"
+                                                            >
+                                                                {child.name}
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <Link
+                                                href={item.route}
+                                                onClick={() => setShowingNavigationDropdown(false)}
+                                                className={`block py-2 text-[13px] font-medium transition-colors ${route().current(item.pattern)
+                                                    ? 'text-white font-bold'
+                                                    : 'text-primary-300 hover:text-white'
+                                                    }`}
+                                            >
+                                                {item.name}
+                                            </Link>
+                                        )}
+                                    </div>
                                 ))}
                             </div>
                         )}

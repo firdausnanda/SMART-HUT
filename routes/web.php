@@ -82,6 +82,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/kebakaran-hutan/{kebakaran_hutan}/reject', [\App\Http\Controllers\KebakaranHutanController::class, 'reject'])->name('kebakaran-hutan.reject');
 
     Route::resource('rehab-manggrove', RehabManggroveController::class);
+
+    // Hasil Hutan Kayu
+    Route::get('hasil-hutan-kayu/export', [\App\Http\Controllers\HasilHutanKayuController::class, 'export'])->name('hasil-hutan-kayu.export');
+    Route::get('hasil-hutan-kayu/template', [\App\Http\Controllers\HasilHutanKayuController::class, 'template'])->name('hasil-hutan-kayu.template');
+    Route::post('hasil-hutan-kayu/import', [\App\Http\Controllers\HasilHutanKayuController::class, 'import'])->name('hasil-hutan-kayu.import');
+    Route::resource('hasil-hutan-kayu', \App\Http\Controllers\HasilHutanKayuController::class)->parameters(['hasil-hutan-kayu' => 'hasil_hutan_kayu']);
+    Route::post('/hasil-hutan-kayu/{hasil_hutan_kayu}/submit', [\App\Http\Controllers\HasilHutanKayuController::class, 'submit'])->name('hasil-hutan-kayu.submit');
+    Route::post('/hasil-hutan-kayu/{hasil_hutan_kayu}/approve', [\App\Http\Controllers\HasilHutanKayuController::class, 'approve'])->name('hasil-hutan-kayu.approve');
+    Route::post('/hasil-hutan-kayu/{hasil_hutan_kayu}/reject', [\App\Http\Controllers\HasilHutanKayuController::class, 'reject'])->name('hasil-hutan-kayu.reject');
 });
 
 require __DIR__ . '/auth.php';
