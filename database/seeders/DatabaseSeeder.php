@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             KayuSeeder::class,
             BukanKayuSeeder::class,
             JenisProduksiSeeder::class,
+            SkemaPerhutananSosialSeeder::class,
         ]);
     }
 }

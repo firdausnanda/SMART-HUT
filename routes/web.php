@@ -112,6 +112,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/realisasi-pnbp/{realisasi_pnbp}/submit', [\App\Http\Controllers\RealisasiPnbpController::class, 'submit'])->name('realisasi-pnbp.submit');
     Route::post('/realisasi-pnbp/{realisasi_pnbp}/approve', [\App\Http\Controllers\RealisasiPnbpController::class, 'approve'])->name('realisasi-pnbp.approve');
     Route::post('/realisasi-pnbp/{realisasi_pnbp}/reject', [\App\Http\Controllers\RealisasiPnbpController::class, 'reject'])->name('realisasi-pnbp.reject');
+
+    // Perkembangan SK PS
+    Route::resource('skps', \App\Http\Controllers\SkpsController::class);
+    Route::post('/skps/{skps}/submit', [\App\Http\Controllers\SkpsController::class, 'submit'])->name('skps.submit');
+    Route::post('/skps/{skps}/approve', [\App\Http\Controllers\SkpsController::class, 'approve'])->name('skps.approve');
+    Route::post('/skps/{skps}/reject', [\App\Http\Controllers\SkpsController::class, 'reject'])->name('skps.reject');
 });
 
 require __DIR__ . '/auth.php';
