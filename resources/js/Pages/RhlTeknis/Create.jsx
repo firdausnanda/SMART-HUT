@@ -141,6 +141,7 @@ export default function Create({ auth, sumberDana, bangunanKta }) {
                           placeholder="Pilih Jenis Bangunan..."
                           value={bangunanOptions.find(opt => opt.value === detail.bangunan_kta_id)}
                           onChange={opt => handleDetailChange(index, 'bangunan_kta_id', opt?.value || '')}
+                          menuPlacement="top"
                         />
                         <InputError message={errors[`details.${index}.bangunan_kta_id`]} />
                       </div>

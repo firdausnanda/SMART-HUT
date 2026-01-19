@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             WilayahSeeder::class,
             SumberDanaSeeder::class,
             BangunanKtaSeeder::class,
+            PengelolaWisataSeeder::class,
         ]);
     }
 }

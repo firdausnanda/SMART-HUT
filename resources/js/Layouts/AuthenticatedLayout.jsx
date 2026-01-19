@@ -12,8 +12,8 @@ export default function Authenticated({ user, header, children }) {
     const [openMenus, setOpenMenus] = useState({
         pembinaan: route().current('rehab-lahan.*') || route().current('penghijauan-lingkungan.*') || route().current('rehab-manggrove.*') || route().current('rhl-teknis.*') || route().current('reboisasi-ps.*'),
         pembinaan_mobile: route().current('rehab-lahan.*') || route().current('penghijauan-lingkungan.*') || route().current('rehab-manggrove.*') || route().current('rhl-teknis.*') || route().current('reboisasi-ps.*'),
-        perlindungan: false,
-        perlindungan_mobile: false,
+        perlindungan: route().current('pengunjung-wisata.*'),
+        perlindungan_mobile: route().current('pengunjung-wisata.*'),
         bina_usaha: false,
         bina_usaha_mobile: false,
         pemberdayaan: false,
@@ -118,7 +118,7 @@ export default function Authenticated({ user, header, children }) {
                         <button
                             onClick={() => toggleMenu('perlindungan')}
                             className={`w-full group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${isSidebarCollapsed ? 'justify-center px-0' : 'px-4'
-                                } ${openMenus['perlindungan']
+                                } ${openMenus['perlindungan'] || route().current('pengunjung-wisata.*')
                                     ? 'bg-white/10 border-white/20 text-white shadow-sm'
                                     : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white'
                                 }`}
@@ -139,7 +139,7 @@ export default function Authenticated({ user, header, children }) {
                         {!isSidebarCollapsed && openMenus['perlindungan'] && (
                             <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                 {[
-                                    { name: 'Pengunjung Objek Wisata', route: '#', pattern: 'perlindungan.wisata' },
+                                    { name: 'Pengunjung Objek Wisata', route: route('pengunjung-wisata.index'), pattern: 'pengunjung-wisata.*' },
                                     { name: 'Kebakaran Hutan', route: '#', pattern: 'perlindungan.kebakaran' }
                                 ].map((item) => (
                                     <Link
@@ -370,7 +370,7 @@ export default function Authenticated({ user, header, children }) {
                     <div className="space-y-1">
                         <button
                             onClick={() => toggleMenu('perlindungan_mobile')}
-                            className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${openMenus['perlindungan_mobile']
+                            className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${openMenus['perlindungan_mobile'] || route().current('pengunjung-wisata.*')
                                 ? 'bg-white/10 border-white/20 text-white'
                                 : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
                                 }`}
@@ -386,7 +386,7 @@ export default function Authenticated({ user, header, children }) {
                         {openMenus['perlindungan_mobile'] && (
                             <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                 {[
-                                    { name: 'Pengunjung Objek Wisata', route: '#', pattern: 'perlindungan.wisata' },
+                                    { name: 'Pengunjung Objek Wisata', route: route('pengunjung-wisata.index'), pattern: 'pengunjung-wisata.*' },
                                     { name: 'Kebakaran Hutan', route: '#', pattern: 'perlindungan.kebakaran' }
                                 ].map((item) => (
                                     <Link

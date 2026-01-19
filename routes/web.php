@@ -69,6 +69,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/reboisasi-ps/{reboisasi_ps}/approve', [\App\Http\Controllers\ReboisasiPsController::class, 'approve'])->name('reboisasi-ps.approve');
     Route::post('/reboisasi-ps/{reboisasi_ps}/reject', [\App\Http\Controllers\ReboisasiPsController::class, 'reject'])->name('reboisasi-ps.reject');
 
+    // Pengunjung Objek Wisata
+    Route::resource('pengunjung-wisata', \App\Http\Controllers\PengunjungWisataController::class)->parameters(['pengunjung-wisata' => 'pengunjung_wisata']);
+    Route::post('/pengunjung-wisata/{pengunjung_wisata}/submit', [\App\Http\Controllers\PengunjungWisataController::class, 'submit'])->name('pengunjung-wisata.submit');
+    Route::post('/pengunjung-wisata/{pengunjung_wisata}/approve', [\App\Http\Controllers\PengunjungWisataController::class, 'approve'])->name('pengunjung-wisata.approve');
+    Route::post('/pengunjung-wisata/{pengunjung_wisata}/reject', [\App\Http\Controllers\PengunjungWisataController::class, 'reject'])->name('pengunjung-wisata.reject');
+
     Route::resource('rehab-manggrove', RehabManggroveController::class);
 });
 
