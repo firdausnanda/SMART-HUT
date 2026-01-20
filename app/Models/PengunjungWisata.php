@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Wildside\Userstamps\Userstamps;
 
 class PengunjungWisata extends Model
 {
-    use HasFactory, SoftDeletes, Userstamps;
+    use HasFactory, SoftDeletes, Userstamps, LogsActivity;
 
     protected $fillable = [
         "year",
@@ -31,5 +33,12 @@ class PengunjungWisata extends Model
     public function pengelolaWisata()
     {
         return $this->belongsTo(PengelolaWisata::class, 'id_pengelola_wisata');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
     }
 }

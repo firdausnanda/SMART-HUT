@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Wildside\Userstamps\Userstamps;
 
 class Kups extends Model
 {
-    use HasFactory, Userstamps, SoftDeletes;
+    use HasFactory, Userstamps, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'province_id',
@@ -42,5 +44,12 @@ class Kups extends Model
     public function district()
     {
         return $this->belongsTo(Districts::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
     }
 }

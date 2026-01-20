@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Wildside\Userstamps\Userstamps;
 
 class HasilHutanBukanKayu extends Model
 {
-    use HasFactory, SoftDeletes, Userstamps;
+    use HasFactory, SoftDeletes, Userstamps, LogsActivity;
 
     protected $table = "hasil_hutan_bukan_kayu";
 
@@ -49,5 +51,12 @@ class HasilHutanBukanKayu extends Model
     public function kayu()
     {
         return $this->belongsTo(BukanKayu::class, 'id_bukan_kayu');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
     }
 }

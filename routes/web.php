@@ -130,6 +130,9 @@ Route::middleware('auth')->group(function () {
 
     // Impersonation Routes
     Route::impersonate();
+
+    // Activity Log
+    Route::resource('activity-log', \App\Http\Controllers\ActivityLogController::class)->only(['index']);
 });
 
 require __DIR__ . '/auth.php';

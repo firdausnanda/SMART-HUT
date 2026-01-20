@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Wildside\Userstamps\Userstamps;
 
 class RhlTeknis extends Model
 {
-  use HasFactory, SoftDeletes, Userstamps;
+  use HasFactory, SoftDeletes, Userstamps, LogsActivity;
 
   protected $table = 'rhl_teknis';
 
@@ -44,5 +46,12 @@ class RhlTeknis extends Model
       'rejected' => 'red',
       default => 'gray',
     };
+  }
+
+  public function getActivitylogOptions(): LogOptions
+  {
+    return LogOptions::defaults()
+      ->logAll()
+      ->logOnlyDirty();
   }
 }

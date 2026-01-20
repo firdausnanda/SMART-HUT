@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Wildside\Userstamps\Userstamps;
 
 class Skps extends Model
 {
-    use HasFactory, Userstamps, SoftDeletes;
+    use HasFactory, Userstamps, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         "province_id",
@@ -46,5 +48,12 @@ class Skps extends Model
     public function skema()
     {
         return $this->belongsTo(SkemaPerhutananSosial::class, 'id_skema_perhutanan_sosial');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
     }
 }
