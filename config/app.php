@@ -150,6 +150,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Lab404\Impersonate\ImpersonateServiceProvider::class,
+
     ])->toArray(),
 
     /*
