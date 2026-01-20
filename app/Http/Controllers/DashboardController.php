@@ -87,7 +87,7 @@ class DashboardController extends Controller
         // --- Recent Activity ---
         $activities = Activity::latest()
             ->take(5)
-            ->with('causer')
+            ->with(['causer', 'causer.roles'])
             ->get()
             ->map(function ($activity) {
                 $description = $activity->description;
@@ -114,6 +114,10 @@ class DashboardController extends Controller
                     'id' => $activity->id,
                     'description' => $description,
                     'causer' => $activity->causer ? $activity->causer->name : 'System',
+                    // Fetch the first role name (if any), capitalize it.
+                    'role' => $activity->causer && $activity->causer->roles->isNotEmpty()
+                        ? $activity->causer->roles->first()->description
+                        : '-',
                     'created_at' => $activity->created_at->diffForHumans(),
                     'subject_type' => class_basename($activity->subject_type),
                     'event' => $activity->event,

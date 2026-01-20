@@ -361,7 +361,7 @@ export default function Dashboard({ auth, stats, chartData, filters, availableYe
                                                         </div>
                                                         <div>
                                                             <div className="font-semibold text-gray-900">{activity.causer}</div>
-                                                            <div className="text-xs text-gray-400">Admin</div>
+                                                            <div className="text-xs text-gray-400 capitalize">{activity.role}</div>
                                                         </div>
                                                     </div>
                                                 </td>
