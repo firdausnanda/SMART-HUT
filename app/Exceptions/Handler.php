@@ -26,5 +26,14 @@ class Handler extends ExceptionHandler
         $this->renderable(function (\Spatie\Permission\Exceptions\UnauthorizedException $e, $request) {
             return redirect()->back()->with('error', 'Akses Ditolak: Anda tidak memiliki izin untuk melakukan aksi ini.');
         });
+
+        $this->renderable(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, $request) {
+            if ($request->wantsJson() && !$request->inertia()) {
+                return response()->json(['message' => 'Not Found'], 404);
+            }
+            return \Inertia\Inertia::render('Errors/NotFound')
+                ->toResponse($request)
+                ->setStatusCode(404);
+        });
     }
 }
