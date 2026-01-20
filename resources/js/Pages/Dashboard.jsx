@@ -27,7 +27,7 @@ ChartJS.register(
     ArcElement
 );
 
-export default function Dashboard({ auth, rehabStats, filters, availableYears }) {
+export default function Dashboard({ auth, stats, chartData, filters, availableYears, recentActivities, kupsChart }) {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleYearChange = (year) => {
@@ -39,6 +39,21 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
         });
     };
 
+    // Helper for formatting currency
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(value);
+    };
+
+    // Helper for formatting number
+    const formatNumber = (value) => {
+        return new Intl.NumberFormat('id-ID').format(value);
+    };
+
     // Chart Data using real monthly data
     const areaChartData = {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
@@ -46,7 +61,7 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
             {
                 fill: true,
                 label: 'Rehabilitasi Lahan (Ha)',
-                data: rehabStats.monthlyData || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                data: chartData || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 borderColor: 'rgb(22, 101, 52)', // primary-800
                 backgroundColor: 'rgba(22, 101, 52, 0.2)',
                 tension: 0.4,
@@ -54,28 +69,6 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
         ],
     };
 
-    const doughnutData = {
-        labels: ['Jati', 'Sengon', 'Mahoni', 'Lainnya'],
-        datasets: [
-            {
-                label: '# of Votes',
-                data: [122, 191, 33, 55],
-                backgroundColor: [
-                    'rgba(22, 101, 52, 0.8)',  // primary-800
-                    'rgba(21, 128, 61, 0.7)',  // primary-700
-                    'rgba(34, 197, 94, 0.6)',  // primary-500
-                    'rgba(134, 239, 172, 0.5)', // primary-300
-                ],
-                borderColor: [
-                    'rgba(22, 101, 52, 1)',
-                    'rgba(21, 128, 61, 1)',
-                    'rgba(34, 197, 94, 1)',
-                    'rgba(134, 239, 172, 1)',
-                ],
-                borderWidth: 1,
-            },
-        ],
-    };
 
     const chartOptions = {
         responsive: true,
@@ -123,12 +116,12 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                    {/* Stat Card 1 */}
+                    {/* Stat Card 1: Produksi Kayu */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Produksi Kayu</p>
-                                <p className="text-2xl font-bold text-gray-900 mt-1">0 <span className="text-sm font-normal text-gray-400">m3</span></p>
+                                <p className="text-2xl font-bold text-gray-900 mt-1">{formatNumber(stats.wood_production.total)} <span className="text-sm font-normal text-gray-400">m3</span></p>
                             </div>
                             <div className="p-3 bg-primary-50 rounded-lg text-primary-600 shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -137,19 +130,20 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
                             </div>
                         </div>
                         <div className="mt-4 flex items-center text-sm text-green-600">
+                            {/* Placeholder trend for now as we don't have prev year for wood */}
                             <svg className="h-4 w-4 mr-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                             </svg>
-                            <span>Tetap</span>
+                            <span>Data Tahun {filters.year}</span>
                         </div>
                     </div>
 
-                    {/* Stat Card 2 */}
+                    {/* Stat Card 2: Rehabilitasi Lahan */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Rehabilitasi Lahan</p>
-                                <p className="text-2xl font-bold text-gray-900 mt-1">{rehabStats.total} <span className="text-sm font-normal text-gray-400">Ha</span></p>
+                                <p className="text-2xl font-bold text-gray-900 mt-1">{formatNumber(stats.rehabilitation.total)} <span className="text-sm font-normal text-gray-400">Ha</span></p>
                             </div>
                             <div className="p-3 bg-primary-50 rounded-lg text-primary-600 shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -157,12 +151,12 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
                                 </svg>
                             </div>
                         </div>
-                        <div className={`mt-4 flex items-center text-sm ${rehabStats.growth > 0 ? 'text-green-600' : rehabStats.growth < 0 ? 'text-red-600' : 'text-gray-500'}`}>
-                            {rehabStats.growth > 0 ? (
+                        <div className={`mt-4 flex items-center text-sm ${stats.rehabilitation.growth > 0 ? 'text-green-600' : stats.rehabilitation.growth < 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                            {stats.rehabilitation.growth > 0 ? (
                                 <svg className="h-4 w-4 mr-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                 </svg>
-                            ) : rehabStats.growth < 0 ? (
+                            ) : stats.rehabilitation.growth < 0 ? (
                                 <svg className="h-4 w-4 mr-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" />
                                 </svg>
@@ -172,18 +166,18 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
                                 </svg>
                             )}
                             <span className="font-bold">
-                                {rehabStats.growth > 0 ? `+${rehabStats.growth}%` : `${rehabStats.growth}%`}
+                                {stats.rehabilitation.growth > 0 ? `+${stats.rehabilitation.growth}%` : `${stats.rehabilitation.growth}%`}
                             </span>
                             <span className="ml-1 opacity-70">dari tahun lalu</span>
                         </div>
                     </div>
 
-                    {/* Stat Card 3 */}
+                    {/* Stat Card 3: Transaksi Ekonomi */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-500">Transaksi Ekonomi</p>
-                                <p className="text-2xl font-bold text-gray-900 mt-1">0 <span className="text-sm font-normal text-gray-400">Rp</span></p>
+                                <p className="text-sm font-medium text-gray-500">Nilai Ekonomi</p>
+                                <p className="text-2xl font-bold text-gray-900 mt-1">{formatCurrency(stats.economy.total)}</p>
                             </div>
                             <div className="p-3 bg-primary-50 rounded-lg text-primary-600 shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -192,19 +186,20 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
                             </div>
                         </div>
                         <div className="mt-4 flex items-center text-sm text-green-600">
+                            {/* Placeholder trend for now */}
                             <svg className="h-4 w-4 mr-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                             </svg>
-                            <span>Meningkat</span>
+                            <span>Total Realisasi PNBP</span>
                         </div>
                     </div>
 
-                    {/* Stat Card 4 */}
+                    {/* Stat Card 4: KUPS */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Kelompok Tani Hutan</p>
-                                <p className="text-2xl font-bold text-gray-900 mt-1">0 <span className="text-sm font-normal text-gray-400">Kelompok</span></p>
+                                <p className="text-2xl font-bold text-gray-900 mt-1">{formatNumber(stats.kups.total)} <span className="text-sm font-normal text-gray-400">Unit</span></p>
                             </div>
                             <div className="p-3 bg-primary-50 rounded-lg text-primary-600 shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -213,7 +208,7 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
                             </div>
                         </div>
                         <div className="mt-4 flex items-center text-sm text-green-600">
-                            <span>Aktif & Terverifikasi</span>
+                            <span className="font-semibold text-green-700">Terdata & Aktif</span>
                         </div>
                     </div>
                 </div>
@@ -248,18 +243,49 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
 
                     {/* Secondary Chart */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 className="font-bold text-gray-800 mb-4">Komposisi Jenis Tanaman</h3>
+                        <h3 className="font-bold text-gray-800 mb-4">Klasifikasi KUPS</h3>
                         <div className="h-64 flex items-center justify-center">
-                            <Doughnut data={doughnutData} options={{ maintainAspectRatio: false }} />
+                            {kupsChart && kupsChart.labels && kupsChart.labels.length > 0 ? (
+                                <Doughnut
+                                    data={{
+                                        labels: kupsChart.labels,
+                                        datasets: [{
+                                            data: kupsChart.data,
+                                            backgroundColor: [
+                                                'rgba(59, 130, 246, 0.8)', // Blue
+                                                'rgba(168, 85, 247, 0.8)', // Purple
+                                                'rgba(234, 179, 8, 0.8)',  // Yellow/Gold
+                                                'rgba(239, 68, 68, 0.8)',  // Red
+                                                'rgba(34, 197, 94, 0.8)',  // Green
+                                            ],
+                                            borderColor: [
+                                                'rgba(59, 130, 246, 1)',
+                                                'rgba(168, 85, 247, 1)',
+                                                'rgba(234, 179, 8, 1)',
+                                                'rgba(239, 68, 68, 1)',
+                                                'rgba(34, 197, 94, 1)',
+                                            ],
+                                            borderWidth: 1,
+                                        }]
+                                    }}
+                                    options={{ maintainAspectRatio: false }}
+                                />
+                            ) : (
+                                <div className="text-center text-gray-400">
+                                    <p>Belum ada data klasifikasi</p>
+                                </div>
+                            )}
                         </div>
-                        <div className="mt-4 space-y-2">
-                            {doughnutData.labels.map((label, index) => (
+                        <div className="mt-4 space-y-2 max-h-40 overflow-y-auto">
+                            {kupsChart && kupsChart.labels && kupsChart.labels.map((label, index) => (
                                 <div key={label} className="flex justify-between items-center text-sm">
                                     <div className="flex items-center">
-                                        <span className="w-3 h-3 rounded-full mr-2 shrink-0" style={{ backgroundColor: doughnutData.datasets[0].backgroundColor[index] }}></span>
-                                        <span className="text-gray-600">{label}</span>
+                                        <span className="w-3 h-3 rounded-full mr-2 shrink-0" style={{
+                                            backgroundColor: ['rgba(59, 130, 246, 0.8)', 'rgba(168, 85, 247, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(34, 197, 94, 0.8)'][index % 5]
+                                        }}></span>
+                                        <span className="text-gray-600 capitalize">{label.replace(/_/g, ' ')}</span>
                                     </div>
-                                    <span className="font-medium text-gray-900">{doughnutData.datasets[0].data[index]}</span>
+                                    <span className="font-medium text-gray-900">{kupsChart.data[index]}</span>
                                 </div>
                             ))}
                         </div>
@@ -268,34 +294,116 @@ export default function Dashboard({ auth, rehabStats, filters, availableYears })
 
                 {/* Recent Activity Table */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                        <h3 className="font-bold text-gray-800">Aktivitas Terbaru</h3>
-                        <button className="text-sm text-primary-600 hover:text-primary-800 font-medium whitespace-nowrap ml-4">Lihat Semua</button>
+                    <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary-100 rounded-lg text-primary-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 className="font-bold text-gray-800 text-lg">Aktivitas Terbaru</h3>
+                        </div>
+                        <button className="text-sm text-primary-600 hover:text-primary-800 font-medium whitespace-nowrap px-4 py-2 hover:bg-primary-50 rounded-lg transition-colors">Lihat Semua</button>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm text-gray-500 min-w-[600px] sm:min-w-0">
-                            <thead className="bg-gray-50 text-gray-700 uppercase">
+                            <thead className="bg-gray-50 text-gray-600 border-b border-gray-200">
                                 <tr>
-                                    <th className="px-6 py-3 font-semibold">User</th>
-                                    <th className="px-6 py-3 font-semibold">Aktivitas</th>
-                                    <th className="px-6 py-3 font-semibold hidden sm:table-cell">Waktu</th>
-                                    <th className="px-6 py-3 font-semibold">Status</th>
+                                    <th className="px-6 py-4 font-semibold tracking-wider">User</th>
+                                    <th className="px-6 py-4 font-semibold tracking-wider">Aktivitas</th>
+                                    <th className="px-6 py-4 font-semibold tracking-wider hidden sm:table-cell">Waktu</th>
+                                    <th className="px-6 py-4 font-semibold tracking-wider">Modul</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                <tr className="hover:bg-gray-50">
-                                    <td colSpan="4" className="text-center py-12">
-                                        <div className="flex flex-col items-center">
-                                            <div className="p-4 bg-gray-50 rounded-full mb-3 text-gray-300">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                                </svg>
-                                            </div>
-                                            <p className="text-gray-400 font-medium tracking-tight whitespace-nowrap">Belum ada data aktivitas tersedia</p>
-                                        </div>
-                                    </td>
+                                {recentActivities && recentActivities.length > 0 ? (
+                                    recentActivities.map((activity) => {
+                                        // Helper for avatar initials
+                                        const initials = activity.causer.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase();
 
-                                </tr>
+                                        // Helper for activity icon/color
+                                        let icon;
+                                        let iconBg;
+                                        let iconColor;
+
+                                        if (activity.event === 'created') {
+                                            iconBg = 'bg-blue-100';
+                                            iconColor = 'text-blue-600';
+                                            icon = (
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                                            );
+                                        } else if (activity.event === 'updated') {
+                                            iconBg = 'bg-yellow-100';
+                                            iconColor = 'text-yellow-600';
+                                            icon = (
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            );
+                                        } else if (activity.event === 'deleted') {
+                                            iconBg = 'bg-red-100';
+                                            iconColor = 'text-red-600';
+                                            icon = (
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            );
+                                        } else {
+                                            iconBg = 'bg-gray-100';
+                                            iconColor = 'text-gray-600';
+                                            icon = (
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            );
+                                        }
+
+                                        return (
+                                            <tr key={activity.id} className="hover:bg-gray-50/80 transition-colors group">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center">
+                                                        <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-primary-600 to-primary-400 flex items-center justify-center text-white font-bold text-xs shadow-sm mr-3">
+                                                            {initials}
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-semibold text-gray-900">{activity.causer}</div>
+                                                            <div className="text-xs text-gray-400">Admin</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-start gap-3">
+                                                        <div className={`p-1.5 rounded-full ${iconBg} ${iconColor} shrink-0 mt-0.5`}>
+                                                            {icon}
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-medium text-gray-800">{activity.description}</div>
+                                                            <div className="text-xs text-gray-500 mt-0.5 max-w-[200px] truncate">{activity.subject_type}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 hidden sm:table-cell">
+                                                    <div className="flex items-center text-gray-500 text-sm">
+                                                        <svg className="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                        {activity.created_at}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${activity.subject_type === 'HasilHutanKayu' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-green-50 text-green-700 border-green-200'}`}>
+                                                        {activity.subject_type}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                ) : (
+                                    <tr className="hover:bg-gray-50">
+                                        <td colSpan="4" className="text-center py-12">
+                                            <div className="flex flex-col items-center">
+                                                <div className="p-4 bg-gray-50 rounded-full mb-3 text-gray-300">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                                    </svg>
+                                                </div>
+                                                <p className="text-gray-400 font-medium tracking-tight whitespace-nowrap">Belum ada data aktivitas tersedia</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
