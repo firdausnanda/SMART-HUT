@@ -26,3 +26,14 @@
         scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
     }
 }
+
+/* NProgress Customization */
+#nprogress .bar {
+    height: 4px !important; /* Increase height */
+    box-shadow: 0 0 10px #eab308, 0 0 5px #eab308; /* Glow effect */
+    background: #eab308 !important;
+}
+
+#nprogress .peg {
+    box-shadow: 0 0 10px #eab308, 0 0 5px #eab308; 
+}

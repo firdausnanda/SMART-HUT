@@ -9,6 +9,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 export default function PublicDashboard({ currentYear, availableYears, stats }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('Memuat Data...');
 
   const modules = [
     { id: 0, title: 'Pembinaan Hutan', color: 'bg-emerald-600', text: 'text-emerald-600' },
@@ -29,7 +30,10 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
   const handleYearChange = (selectedOption) => {
     router.get(route('public.dashboard'), { year: selectedOption.value }, {
       preserveScroll: true,
-      onStart: () => setIsLoading(true),
+      onStart: () => {
+        setLoadingText('Mengambil Data Tahun ' + selectedOption.value + '...');
+        setIsLoading(true);
+      },
       onFinish: () => setIsLoading(false),
     });
   };
@@ -178,12 +182,22 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans flex flex-col relative">
       <Head title="Dashboard Monitoring Program Kehutanan" />
 
-      {/* Loading Overlay */}
+      {/* Custom Loading Overlay */}
       {isLoading && (
-        <div className="absolute inset-0 z-[60] bg-white/50 backdrop-blur-sm flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-emerald-700 font-semibold text-sm">Memuat Data...</span>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary-950/20 backdrop-blur-[4px] transition-all duration-300">
+          <div className="bg-white/95 p-6 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] flex items-center gap-5 border border-white animate-in fade-in zoom-in duration-300 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-50/30 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+            <div className="relative">
+              <div className="absolute -inset-1 bg-primary-200 rounded-full animate-pulse blur-sm opacity-50"></div>
+              <svg className="animate-spin h-10 w-10 text-primary-600 relative z-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            <div className="flex flex-col relative z-10">
+              <span className="text-lg font-black text-gray-900 tracking-tight leading-tight">Mohon Tunggu</span>
+              <span className="text-xs text-primary-600 font-bold uppercase tracking-widest mt-0.5">{loadingText}</span>
+            </div>
           </div>
         </div>
       )}
@@ -200,7 +214,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                 <div className="flex flex-col">
                   <span className="font-display font-bold text-lg text-gray-900 leading-tight">Dashboard Monitoring</span>
                   <span className={`text-[10px] uppercase tracking-wider font-bold ${modules[currentSlide].text}`}>
-                    CDK Trenggalek
+                    CDK Wilayah Trenggalek
                   </span>
                 </div>
               </Link>

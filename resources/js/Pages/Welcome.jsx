@@ -3,7 +3,7 @@ import { Link, Head } from '@inertiajs/react';
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     return (
         <>
-            <Head title="Kehutanan Dalam Angka" />
+            <Head title="Monitoring Analysis Real Time – Kehutanan" />
             <div className="min-h-screen bg-white text-gray-800 font-sans selection:bg-primary-500 selection:text-white overflow-hidden">
                 {/* Navbar */}
                 <nav className="absolute top-0 w-full z-50">
@@ -48,16 +48,34 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                             {/* Left Column: Content */}
                             <div className="text-left space-y-6">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-100 text-primary-800 text-xs font-semibold tracking-wide">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-primary-600"></span>
-                                    Rehabilitasi Hutan & Lahan
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs font-bold tracking-wide shadow-sm mb-2">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    </span>
+                                    Official Platform CDK Wilayah Trenggalek
                                 </div>
 
-                                <h1 className="font-display font-bold text-4xl sm:text-5xl lg:text-5xl leading-[1.15] text-gray-900 tracking-tight">
-                                    Sistem Informasi <br />
-                                    <span className="text-primary-700">Kehutanan</span> <br />
-                                    Dalam Angka
-                                </h1>
+                                <div className="mb-10 relative">
+                                    <div className="absolute -left-10 -top-10 w-40 h-40 bg-emerald-100/50 rounded-full blur-3xl -z-10"></div>
+
+                                    <h1 className="font-display font-black sm:text-7xl lg:text-8xl leading-none tracking-tighter mb-6">
+                                        <span className="text-yellow-500 drop-shadow-sm font-semibold">
+                                            SMART
+                                        </span>
+                                        <span className='text-primary-900 drop-shadow-sm font-bold mx-1'>-</span>
+                                        <span className="text-primary-900 drop-shadow-sm font-medium">
+                                            HUT
+                                        </span>
+                                    </h1>
+
+                                    <div className="relative pl-6 border-l-4 border-emerald-500/30 py-1">
+                                        <h2 className="font-sans font-bold text-xl sm:text-2xl text-gray-700 leading-snug tracking-tight">
+                                            System for <span className="text-emerald-700">Monitoring Analysis</span> <br />
+                                            Real Time – Kehutanan
+                                        </h2>
+                                    </div>
+                                </div>
 
                                 <p className="font-sans text-base sm:text-lg text-gray-500 leading-relaxed max-w-md">
                                     Platform terintegrasi untuk monitoring, pengelolaan, dan pelaporan data statistik kehutanan secara akurat dan realtime.

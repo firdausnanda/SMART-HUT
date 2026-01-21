@@ -61,7 +61,7 @@ export default function NotFound() {
 
           <div className="mt-12 pt-8 border-t border-gray-100">
             <p className="text-xs text-gray-400 font-medium tracking-wide uppercase">
-              Sistem Informasi Kehutanan Dalam Angka
+              SMART-HUT (System for Monitoring Analysis Real Time – Kehutanan)
             </p>
           </div>
         </div>

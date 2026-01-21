@@ -108,7 +108,7 @@ export default function Dashboard({ auth, stats, chartData, filters, availableYe
                     <div className="relative z-10">
                         <h3 className="text-3xl font-bold font-display">Selamat Datang, {auth.user.name}!</h3>
                         <p className="mt-2 text-primary-100 max-w-xl">
-                            Sistem Informasi Kehutanan Dalam Angka (CDK Wilayah Trenggalek). <br />
+                            SMART-HUT (System for Monitoring Analysis Real Time – Kehutanan). <br />
                             Pantau data statistik kehutanan secara realtime dan akurat.
                         </p>
                     </div>

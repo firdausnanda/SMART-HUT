@@ -803,7 +803,7 @@ export default function Authenticated({ user, header, children }) {
 
                         <div className="flex-1 px-4 flex justify-between items-center">
                             <div className="flex-1 flex text-lg font-bold text-primary-900 items-center lg:hidden uppercase tracking-tight">
-                                Kehutanan Dalam Angka
+                                SMART-HUT
                             </div>
 
                             {/* Profile Dropdown */}
