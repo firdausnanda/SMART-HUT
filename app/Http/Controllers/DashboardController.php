@@ -6,6 +6,10 @@ use App\Models\HasilHutanKayu;
 use App\Models\Kups;
 use App\Models\RealisasiPnbp;
 use App\Models\RehabLahan;
+use App\Models\PenghijauanLingkungan;
+use App\Models\RehabManggrove;
+use App\Models\ReboisasiPS;
+use App\Models\RhlTeknis;
 use App\Models\Skps;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -181,6 +185,59 @@ class DashboardController extends Controller
             ->orderBy('month')
             ->pluck('total', 'month');
 
+        // --- 1.1 Penghijauan Lingkungan ---
+        $penghijauanTotal = PenghijauanLingkungan::where('year', $currentYear)
+            ->where('status', 'final')
+            ->sum('realization');
+
+        $penghijauanChart = PenghijauanLingkungan::where('year', $currentYear)
+            ->where('status', 'final')
+            ->selectRaw('month, sum(realization) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month');
+
+        // --- 1.2 Rehabilitasi Mangrove ---
+        $manggroveTotal = RehabManggrove::where('year', $currentYear)
+            ->where('status', 'final')
+            ->sum('realization');
+
+        $manggroveChart = RehabManggrove::where('year', $currentYear)
+            ->where('status', 'final')
+            ->selectRaw('month, sum(realization) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month');
+
+        // --- 1.3 Reboisasi PS ---
+        $reboisasiTotal = ReboisasiPS::where('year', $currentYear)
+            ->where('status', 'final')
+            ->sum('realization');
+
+        $reboisasiChart = ReboisasiPS::where('year', $currentYear)
+            ->where('status', 'final')
+            ->selectRaw('month, sum(realization) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month');
+
+        // --- 1.4 RHL Teknis (Sum of unit_amount from details) ---
+        $rhlTeknisData = RhlTeknis::where('year', $currentYear)
+            ->where('status', 'final')
+            ->with(['details'])
+            ->get();
+
+        $rhlTeknisTotal = $rhlTeknisData->sum(function ($item) {
+            return $item->details->sum('unit_amount');
+        });
+
+        $rhlTeknisChart = $rhlTeknisData->groupBy('month')->map(function ($items) {
+            return $items->sum(function ($item) {
+                return $item->details->sum('unit_amount');
+            });
+        });
+
         // --- 2. Perlindungan Hutan ---
         // Kebakaran
         $kebakaranStats = \App\Models\KebakaranHutan::where('year', $currentYear)
@@ -283,6 +340,16 @@ class DashboardController extends Controller
 
         $skpsStats = Skps::count();
 
+        $skpsByScheme = \App\Models\SkemaPerhutananSosial::leftJoin('skps', 'm_skema_perhutanan_sosial.id', '=', 'skps.id_skema_perhutanan_sosial')
+            ->selectRaw('m_skema_perhutanan_sosial.name as scheme, count(skps.id) as total')
+            ->groupBy('m_skema_perhutanan_sosial.id', 'm_skema_perhutanan_sosial.name')
+            ->get();
+
+        $skpsChart = [
+            'labels' => $skpsByScheme->pluck('scheme'),
+            'data' => $skpsByScheme->pluck('total'),
+        ];
+
         return Inertia::render('Public/PublicDashboard', [
             'currentYear' => $currentYear,
             'availableYears' => $availableYears,
@@ -290,6 +357,14 @@ class DashboardController extends Controller
                 'pembinaan' => [
                     'rehab_total' => (float) $rehabTotal,
                     'rehab_chart' => $rehabChart,
+                    'penghijauan_total' => (float) $penghijauanTotal,
+                    'penghijauan_chart' => $penghijauanChart,
+                    'manggrove_total' => (float) $manggroveTotal,
+                    'manggrove_chart' => $manggroveChart,
+                    'reboisasi_total' => (float) $reboisasiTotal,
+                    'reboisasi_chart' => $reboisasiChart,
+                    'rhl_teknis_total' => (float) $rhlTeknisTotal,
+                    'rhl_teknis_chart' => $rhlTeknisChart,
                 ],
                 'perlindungan' => [
                     'kebakaran_kejadian' => (int) ($kebakaranStats->total_kejadian ?? 0),
@@ -312,6 +387,7 @@ class DashboardController extends Controller
                 'pemberdayaan' => [
                     'kups' => $kupsStats,
                     'skps' => $skpsStats,
+                    'skps_chart' => $skpsChart,
                 ]
             ]
         ]);

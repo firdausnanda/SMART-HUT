@@ -305,38 +305,49 @@ export default function Index({ auth, datas, stats }) {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Data SKP</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{formatNumber(stats.total_count)} <span className="text-xs font-normal text-gray-400">SK</span></p>
-                </div>
-                <div className="p-3 bg-primary-50 rounded-lg text-primary-600 shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            {stats.map((stat, index) => {
+              // Helper to get styling based on scheme name
+              const getSchemeStyle = (name) => {
+                const lower = name.toLowerCase();
+                if (lower.includes('desa') || lower.includes('hd')) return { bg: 'bg-emerald-50', text: 'text-emerald-700', iconBg: 'bg-emerald-100', iconColor: 'text-emerald-600', border: 'border-emerald-100' };
+                if (lower.includes('kemasyarakatan') || lower.includes('hkm')) return { bg: 'bg-blue-50', text: 'text-blue-700', iconBg: 'bg-blue-100', iconColor: 'text-blue-600', border: 'border-blue-100' };
+                if (lower.includes('tanaman') || lower.includes('htr')) return { bg: 'bg-amber-50', text: 'text-amber-700', iconBg: 'bg-amber-100', iconColor: 'text-amber-600', border: 'border-amber-100' };
+                if (lower.includes('kemitraan') || lower.includes('kulin')) return { bg: 'bg-indigo-50', text: 'text-indigo-700', iconBg: 'bg-indigo-100', iconColor: 'text-indigo-600', border: 'border-indigo-100' };
+                if (lower.includes('iphps')) return { bg: 'bg-purple-50', text: 'text-purple-700', iconBg: 'bg-purple-100', iconColor: 'text-purple-600', border: 'border-purple-100' };
+                return { bg: 'bg-gray-50', text: 'text-gray-700', iconBg: 'bg-gray-100', iconColor: 'text-gray-600', border: 'border-gray-100' };
+              };
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Potensi</p>
-                  {/* Note: Potensi is string, so aggregation might be tricky if not numeric. Assuming numeric string here or just counting.
-                                    Actually the query used sum('potential'). If potential contains text it will result in 0 or error.
-                                    Assuming the user inputs numbers. The format might need cleaning if mixed.
-                                 */}
-                  <p className="text-2xl font-bold text-primary-600 mt-1">{formatNumber(stats.total_potential)} <span className="text-xs font-normal text-gray-400">Ha</span></p>
+              const style = getSchemeStyle(stat.name);
+
+              return (
+                <div key={index} className={`relative overflow-hidden rounded-xl p-4 border transition-all duration-300 hover:shadow-md group ${style.bg} ${style.border}`}>
+                  <div className="absolute top-0 right-0 -mr-3 -mt-3 w-16 h-16 rounded-full bg-white opacity-20 group-hover:scale-110 transition-transform duration-500"></div>
+
+                  <div className="relative z-10 flex flex-col h-full justify-between gap-3">
+                    <div className="flex items-center justify-between">
+                      <div className={`p-2 rounded-lg ${style.iconBg} ${style.iconColor} shadow-sm`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <div className="flex items-center gap-1 bg-white/60 backdrop-blur-sm px-1.5 py-0.5 rounded-md">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${style.text}`}>Total</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className={`text-2xl font-black ${style.text} tracking-tight leading-none mb-1`}>
+                        {formatNumber(stat.total)}
+                      </p>
+                      <p className={`text-[10px] font-bold ${style.iconColor} opacity-90 uppercase tracking-wide leading-tight`} title={stat.name}>
+                        {stat.name}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="p-3 bg-green-50 rounded-lg text-green-600 shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
 
           {/* Table Section */}

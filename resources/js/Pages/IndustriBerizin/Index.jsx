@@ -450,17 +450,14 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
                     datas.data.map((item, index) => (
                       <tr key={index} className="hover:bg-gray-50/50 transition-colors group">
                         {/* ... table rows ... */}
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex flex-col">
-                            <span className="font-bold text-gray-900">
-                              {new Date(0, item.month - 1).toLocaleString('id-ID', { month: 'long' })} {item.year}
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex flex-col gap-1.5">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 w-fit">
+                              {new Date(0, item.month - 1).toLocaleString('id-ID', { month: 'short' })} {item.year}
                             </span>
-                            <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500">
-                              {item.district?.name && <span className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600 font-medium">{item.district.name}</span>}
-                              {item.regency?.name && <>
-                                <span className="text-gray-300">•</span>
-                                <span>{item.regency.name}</span>
-                              </>}
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-gray-700 leading-tight">{item.district?.name || '-'}</span>
+                              <span className="text-[10px] text-gray-400 leading-tight">{item.regency?.name || '-'}</span>
                             </div>
                           </div>
                         </td>

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import Select from 'react-select';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement } from 'chart.js';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler } from 'chart.js';
 import { Doughnut, Bar, Line } from 'react-chartjs-2';
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler);
 
 export default function PublicDashboard({ currentYear, availableYears, stats }) {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -157,18 +157,33 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
     }]
   };
 
-  // 4. Pemberdayaan Charts (KUPS) -> Doughnut
+  // 4. Pemberdayaan Charts
+  // SKPS (Bar)
+  const skpsChartData = {
+    labels: stats.pemberdayaan.skps_chart.labels,
+    datasets: [{
+      label: 'Jumlah SK',
+      data: stats.pemberdayaan.skps_chart.data,
+      backgroundColor: 'rgba(5, 150, 105, 0.8)', // Emerald-600
+      borderRadius: 4,
+      barThickness: 20,
+    }]
+  };
+
+  // KUPS (Bar)
   const kupsChartData = {
     labels: Object.keys(stats.pemberdayaan.kups.classes),
     datasets: [{
+      label: 'Jumlah Unit',
       data: Object.values(stats.pemberdayaan.kups.classes),
       backgroundColor: [
-        'rgba(54, 162, 235, 0.8)',   // Blue
-        'rgba(201, 203, 207, 0.8)', // Silver
-        'rgba(255, 205, 86, 0.8)',  // Gold
-        'rgba(75, 192, 192, 0.8)',  // Platinum (Teal-ish)
+        'rgba(59, 130, 246, 0.8)',   // Blue
+        'rgba(156, 163, 175, 0.8)', // Platinum/Silver (Gray-400)
+        'rgba(234, 179, 8, 0.8)',   // Gold (Yellow-500)
+        'rgba(14, 165, 233, 0.8)',  // Platinum (Sky-500)
       ],
-      borderWidth: 0
+      borderRadius: 4,
+      barThickness: 20,
     }]
   };
 
@@ -298,30 +313,208 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
             >
 
               {/* Slide 0: Pembinaan Hutan */}
-              <div className="min-w-full px-1">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* Stats Cards */}
-                  <div className="col-span-1 space-y-6">
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-emerald-100">
-                      <p className="text-sm font-medium text-emerald-600/80 uppercase tracking-wider mb-2">Total Rehabilitasi Lahan</p>
-                      <h3 className="text-4xl font-extrabold text-emerald-900">{formatNumber(stats.pembinaan.rehab_total)} <span className="text-xl font-normal text-emerald-600">Ha</span></h3>
-                      <p className="text-sm text-gray-500 mt-2">Realisasi penanaman tahun {currentYear}</p>
+              <div className="min-w-full px-4 py-6">
+                <div className="max-w-7xl mx-auto space-y-6">
+                  {/* Row 1: 3 Columns */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    {/* 1. Rehabilitasi Lahan */}
+                    <div className="bg-white rounded-xl p-5 shadow-sm border border-emerald-100 hover:shadow-md transition-shadow duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                          </div>
+                          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">Rehabilitasi Lahan</span>
+                        </div>
+                      </div>
+                      <div className="mb-4">
+                        <h3 className="text-2xl font-black text-gray-800">{formatNumber(stats.pembinaan.rehab_total)} <span className="text-sm font-medium text-gray-400">Ha</span></h3>
+                        <p className="text-xs text-gray-400 mt-1">Total Realisasi Tahun {currentYear}</p>
+                      </div>
+                      <div className="h-[100px]">
+                        <Line
+                          data={{
+                            labels: Object.keys(stats.pembinaan.rehab_chart),
+                            datasets: [{
+                              data: Object.values(stats.pembinaan.rehab_chart),
+                              borderColor: '#10b981',
+                              backgroundColor: 'transparent',
+                              pointBackgroundColor: '#10b981',
+                              pointRadius: 2,
+                              borderWidth: 2,
+                              tension: 0.3
+                            }]
+                          }}
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                            scales: {
+                              y: { display: false },
+                              x: { display: false }
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
-                      <h4 className="font-bold text-emerald-900 mb-2">Program Unggulan</h4>
-                      <ul className="space-y-2 text-sm text-emerald-800">
-                        <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Rehabilitasi Hutan Lindung</li>
-                        <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Penghijauan Lingkungan</li>
-                        <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>RHL Teknis</li>
-                      </ul>
+
+                    {/* 2. Penghijauan Lingkungan */}
+                    <div className="bg-white rounded-xl p-5 shadow-sm border border-teal-100 hover:shadow-md transition-shadow duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-teal-50 rounded-lg text-teal-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                          </div>
+                          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">Penghijauan</span>
+                        </div>
+                      </div>
+                      <div className="mb-4">
+                        <h3 className="text-2xl font-black text-gray-800">{formatNumber(stats.pembinaan.penghijauan_total)} <span className="text-sm font-medium text-gray-400">Ha</span></h3>
+                        <p className="text-xs text-gray-400 mt-1">Total Realisasi Tahun {currentYear}</p>
+                      </div>
+                      <div className="h-[100px]">
+                        <Line
+                          data={{
+                            labels: Object.keys(stats.pembinaan.penghijauan_chart),
+                            datasets: [{
+                              data: Object.values(stats.pembinaan.penghijauan_chart),
+                              borderColor: '#14b8a6',
+                              backgroundColor: 'transparent',
+                              pointBackgroundColor: '#14b8a6',
+                              pointRadius: 2,
+                              borderWidth: 2,
+                              tension: 0.3
+                            }]
+                          }}
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { display: false }, x: { display: false } }
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* 3. Rehab Mangrove */}
+                    <div className="bg-white rounded-xl p-5 shadow-sm border border-cyan-100 hover:shadow-md transition-shadow duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-cyan-50 rounded-lg text-cyan-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
+                          </div>
+                          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">Mangrove</span>
+                        </div>
+                      </div>
+                      <div className="mb-4">
+                        <h3 className="text-2xl font-black text-gray-800">{formatNumber(stats.pembinaan.manggrove_total)} <span className="text-sm font-medium text-gray-400">Ha</span></h3>
+                        <p className="text-xs text-gray-400 mt-1">Total Realisasi Tahun {currentYear}</p>
+                      </div>
+                      <div className="h-[100px]">
+                        <Line
+                          data={{
+                            labels: Object.keys(stats.pembinaan.manggrove_chart),
+                            datasets: [{
+                              data: Object.values(stats.pembinaan.manggrove_chart),
+                              borderColor: '#06b6d4',
+                              backgroundColor: 'transparent',
+                              pointBackgroundColor: '#06b6d4',
+                              pointRadius: 2,
+                              borderWidth: 2,
+                              tension: 0.3
+                            }]
+                          }}
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { display: false }, x: { display: false } }
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
-                  {/* Chart */}
-                  <div className="col-span-1 lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                    <h3 className="font-bold text-gray-800 mb-6">Tren Rehabilitasi Lahan Bulanan</h3>
-                    <div className="h-[350px]">
-                      <Line data={rehabChartData} options={{ ...commonOptions, maintainAspectRatio: false }} />
+
+                  {/* Row 2: 2 Columns Centered */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto w-full">
+
+                    {/* 4. Reboisasi PS */}
+                    <div className="bg-white rounded-xl p-5 shadow-sm border border-pink-100 hover:shadow-md transition-shadow duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-pink-50 rounded-lg text-pink-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                          </div>
+                          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">Reboisasi Areal PS</span>
+                        </div>
+                      </div>
+                      <div className="mb-4">
+                        <h3 className="text-2xl font-black text-gray-800">{formatNumber(stats.pembinaan.reboisasi_total)} <span className="text-sm font-medium text-gray-400">Ha</span></h3>
+                        <p className="text-xs text-gray-400 mt-1">Total Realisasi Tahun {currentYear}</p>
+                      </div>
+                      <div className="h-[100px]">
+                        <Line
+                          data={{
+                            labels: Object.keys(stats.pembinaan.reboisasi_chart),
+                            datasets: [{
+                              data: Object.values(stats.pembinaan.reboisasi_chart),
+                              borderColor: '#ec4899',
+                              backgroundColor: 'transparent',
+                              pointBackgroundColor: '#ec4899',
+                              pointRadius: 2,
+                              borderWidth: 2,
+                              tension: 0.3
+                            }]
+                          }}
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { display: false }, x: { display: false } }
+                          }}
+                        />
+                      </div>
                     </div>
+
+                    {/* 5. RHL Teknis */}
+                    <div className="bg-white rounded-xl p-5 shadow-sm border border-orange-100 hover:shadow-md transition-shadow duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-orange-50 rounded-lg text-orange-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                          </div>
+                          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">RHL Teknis</span>
+                        </div>
+                      </div>
+                      <div className="mb-4">
+                        <h3 className="text-2xl font-black text-gray-800">{formatNumber(stats.pembinaan.rhl_teknis_total)} <span className="text-sm font-medium text-gray-400">Unit</span></h3>
+                        <p className="text-xs text-gray-400 mt-1">Total Realisasi Tahun {currentYear}</p>
+                      </div>
+                      <div className="h-[100px]">
+                        <Line
+                          data={{
+                            labels: Object.keys(stats.pembinaan.rhl_teknis_chart),
+                            datasets: [{
+                              data: Object.values(stats.pembinaan.rhl_teknis_chart),
+                              borderColor: '#f97316',
+                              backgroundColor: 'transparent',
+                              pointBackgroundColor: '#f97316',
+                              pointRadius: 2,
+                              borderWidth: 2,
+                              tension: 0.3
+                            }]
+                          }}
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { display: false }, x: { display: false } }
+                          }}
+                        />
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -457,39 +650,76 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
               </div>
 
               {/* Slide 3: Pemberdayaan */}
-              <div className="min-w-full px-1">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-                  <div className="col-span-1 space-y-6">
-                    <div className="bg-white p-6 rounded-3xl border border-indigo-100">
-                      <p className="text-sm font-bold text-indigo-500 uppercase mb-2">SK Perhutanan Sosial</p>
-                      <h3 className="text-4xl font-extrabold text-indigo-900">{stats.pemberdayaan.skps} <span className="text-xl font-normal text-gray-400">SK</span></h3>
-                      <p className="text-sm text-gray-500 mt-2">Akses Legal Masyarakat</p>
-                    </div>
-                    <div className="bg-white p-6 rounded-3xl border border-indigo-100">
-                      <p className="text-sm font-bold text-indigo-500 uppercase mb-2">Total KUPS</p>
-                      <h3 className="text-4xl font-extrabold text-indigo-900">{stats.pemberdayaan.kups.total} <span className="text-xl font-normal text-gray-400">Unit</span></h3>
-                      <p className="text-sm text-gray-500 mt-2">{stats.pemberdayaan.kups.active} Unit Aktif Beroperasi</p>
-                    </div>
-                  </div>
-                  <div className="col-span-1 lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-8 items-center">
-                    <div className="w-full md:w-1/2">
-                      <Doughnut data={kupsChartData} options={{ ...commonOptions, plugins: { ...commonOptions.plugins, legend: { position: 'right' } } }} />
-                    </div>
-                    <div className="w-full md:w-1/2 space-y-4">
-                      <h3 className="font-bold text-lg text-gray-900">Sebaran Kelas KUPS</h3>
-                      <p className="text-sm text-gray-600 leading-relaxed">
-                        Klasifikasi KUPS menggambarkan tingkat kemandirian kelompok usaha.
-                        Dari pemula (Blue) hingga mandiri (Platinum).
-                      </p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {Object.entries(stats.pemberdayaan.kups.classes).map(([key, val]) => (
-                          <div key={key} className="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-                            <span className="text-xs font-bold text-gray-500 uppercase">{key}</span>
-                            <span className="font-bold text-gray-900">{val}</span>
-                          </div>
-                        ))}
+              <div className="min-w-full px-4 py-6">
+                <div className="max-w-7xl mx-auto space-y-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                    {/* SKPS Section */}
+                    <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-100 flex flex-col h-full">
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900">Perhutanan Sosial</h3>
+                          <p className="text-sm text-gray-500">Akses Legal Masyarakat</p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-6 flex-1">
+                        <div className="flex flex-col items-center justify-center p-6 bg-emerald-50/50 rounded-2xl border border-emerald-50">
+                          <span className="text-sm font-bold text-emerald-600 uppercase tracking-widest mb-1">Total SK Terbit</span>
+                          <span className="text-5xl font-black text-gray-900">{formatNumber(stats.pemberdayaan.skps)}</span>
+                          <span className="text-sm font-medium text-gray-400 mt-2">Unit SK</span>
+                        </div>
+                        <div className="w-full h-[250px]">
+                          <Bar
+                            data={skpsChartData}
+                            options={{
+                              ...commonOptions,
+                              indexAxis: 'y',
+                              maintainAspectRatio: false,
+                              plugins: { ...commonOptions.plugins, legend: { display: false } },
+                              scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
+
+                    {/* KUPS Section */}
+                    <div className="bg-white rounded-3xl p-6 shadow-sm border border-blue-100 flex flex-col h-full">
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="p-3 bg-blue-50 rounded-2xl text-blue-600">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900">KUPS</h3>
+                          <p className="text-sm text-gray-500">Kelompok Usaha Perhutanan Sosial</p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-6 flex-1">
+                        <div className="flex flex-col items-center justify-center p-6 bg-blue-50/50 rounded-2xl border border-blue-50">
+                          <span className="text-sm font-bold text-blue-600 uppercase tracking-widest mb-1">Total KUPS</span>
+                          <span className="text-5xl font-black text-gray-900">{formatNumber(stats.pemberdayaan.kups.total)}</span>
+                          <span className="text-sm font-medium text-gray-400 mt-2">{stats.pemberdayaan.kups.active} Unit Aktif</span>
+                        </div>
+                        <div className="w-full h-[250px]">
+                          <Bar
+                            data={kupsChartData}
+                            options={{
+                              ...commonOptions,
+                              indexAxis: 'y',
+                              maintainAspectRatio: false,
+                              plugins: { ...commonOptions.plugins, legend: { display: false } },
+                              scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </div>

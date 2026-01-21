@@ -319,7 +319,12 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Luasan {filters.year}</p>
-                  <p className="text-2xl font-bold text-orange-600 mt-1">{stats.total_area} <span className="text-xs font-normal text-gray-400">Ha</span></p>
+                  <p className="text-2xl font-bold text-orange-600 mt-1">
+                    {typeof stats.total_area === 'number' || !isNaN(parseFloat(stats.total_area))
+                      ? parseFloat(stats.total_area).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+                      : stats.total_area}
+                    <span className="text-xs font-normal text-gray-400"> Ha</span>
+                  </p>
                 </div>
                 <div className="p-3 bg-orange-50 rounded-lg text-orange-600 shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

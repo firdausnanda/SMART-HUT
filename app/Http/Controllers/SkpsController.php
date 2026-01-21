@@ -45,10 +45,10 @@ class SkpsController extends Controller
       ->paginate(10)
       ->withQueryString();
 
-    $stats = [
-      'total_count' => Skps::count(),
-      'total_potential' => Skps::sum('potential'),
-    ];
+    $stats = SkemaPerhutananSosial::leftJoin('skps', 'm_skema_perhutanan_sosial.id', '=', 'skps.id_skema_perhutanan_sosial')
+      ->selectRaw('m_skema_perhutanan_sosial.name, count(skps.id) as total')
+      ->groupBy('m_skema_perhutanan_sosial.id', 'm_skema_perhutanan_sosial.name')
+      ->get();
 
     return Inertia::render('Skps/Index', [
       'datas' => $datas,
