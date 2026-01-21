@@ -165,4 +165,33 @@ class KupsController extends Controller
 
     return back()->with('success', 'Laporan ditolak.');
   }
+
+  public function export()
+  {
+    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\KupsExport, 'perkembangan-kups-' . date('Y-m-d') . '.xlsx');
+  }
+
+  public function template()
+  {
+    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\KupsTemplateExport, 'template_import_kups.xlsx');
+  }
+
+  public function import(Request $request)
+  {
+    $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+
+    $import = new \App\Imports\KupsImport();
+
+    try {
+      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
+    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      return redirect()->back()->with('import_errors', $e->failures());
+    }
+
+    if ($import->failures()->isNotEmpty()) {
+      return redirect()->back()->with('import_errors', $import->failures());
+    }
+
+    return redirect()->back()->with('success', 'Data berhasil diimport.');
+  }
 }

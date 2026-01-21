@@ -1,15 +1,17 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { debounce } from 'lodash';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
 import Pagination from '@/Components/Pagination';
 
 const MySwal = withReactContent(Swal);
 
 export default function Index({ auth, kups, stats, filters }) {
+  const { flash } = usePage().props;
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +19,34 @@ export default function Index({ auth, kups, stats, filters }) {
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [rejectionNote, setRejectionNote] = useState('');
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importFile, setImportFile] = useState(null);
+
+  useEffect(() => {
+    if (flash?.success) {
+      MySwal.fire({ title: 'Berhasil', text: flash.success, icon: 'success', timer: 2000, showConfirmButton: false });
+    }
+    if (flash?.error) {
+      MySwal.fire({ title: 'Gagal', text: flash.error, icon: 'error', confirmButtonColor: '#d33' });
+    }
+    if (flash?.import_errors) {
+      const errorList = flash.import_errors.map(f => `Baris ${f.row()}: ${f.errors().join(', ')}`).join('<br>');
+      MySwal.fire({ title: 'Import Gagal', html: `<div class="text-left text-sm">${errorList}</div>`, icon: 'error', confirmButtonColor: '#dc2626' });
+    }
+  }, [flash]);
+
+  const handleImportSubmit = (e) => {
+    e.preventDefault();
+    if (!importFile) return;
+    setLoadingText('Mengimport Data...');
+    setIsLoading(true);
+    setShowImportModal(false);
+    router.post(route('kups.import'), { file: importFile }, {
+      forceFormData: true,
+      onFinish: () => { setIsLoading(false); setImportFile(null); }
+    });
+  };
+
 
   const formatNumber = (num) => new Intl.NumberFormat('id-ID').format(num);
 
@@ -216,16 +246,36 @@ export default function Index({ auth, kups, stats, filters }) {
                   Kelola dan pantau data Kelompok Usaha Perhutanan Sosial di wilayah CDK Trenggalek.
                 </p>
               </div>
-              {canCreate && (
-                <Link href={route('kups.create')} className="shrink-0">
-                  <button className="flex items-center gap-2 px-5 py-2.5 bg-white text-emerald-700 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-50 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Input Data Baru
-                  </button>
-                </Link>
-              )}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => window.location.href = route('kups.export')}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Export
+                </button>
+                <button
+                  onClick={() => setShowImportModal(true)}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  Import
+                </button>
+                {canCreate && (
+                  <Link href={route('kups.create')} className="shrink-0">
+                    <button className="flex items-center gap-2 px-5 py-2.5 bg-white text-emerald-700 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-50 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Input Data Baru
+                    </button>
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
 
@@ -519,6 +569,64 @@ export default function Index({ auth, kups, stats, filters }) {
             </button>
           </div>
         </div>
+      </Modal>
+
+      {/* Import Modal */}
+      <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
+        <form onSubmit={handleImportSubmit} className="p-0 overflow-hidden">
+          <div className="p-6 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-900">Import Data Perkembangan KUPS</h2>
+            <button type="button" onClick={() => setShowImportModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="p-6 space-y-8">
+            <div className="flex gap-4 items-start">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">1</div>
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-gray-900 mb-1">Unduh Template</h3>
+                <p className="text-xs text-gray-500 mb-3 leading-relaxed">Gunakan template yang telah disediakan untuk memastikan format data sesuai.</p>
+                <button type="button" onClick={() => window.location.href = route('kups.template')} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download Template Excel
+                </button>
+              </div>
+            </div>
+            <div className="border-t border-gray-100"></div>
+            <div className="flex gap-4 items-start">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">2</div>
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-gray-900 mb-1">Upload Data</h3>
+                <p className="text-xs text-gray-500 mb-3 leading-relaxed">Pilih file yang telah diisi sesuai template (.xlsx, .xls, .csv).</p>
+                <div className={`relative border-2 border-dashed rounded-xl p-6 transition-all duration-200 text-center cursor-pointer ${importFile ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200 hover:border-emerald-300 hover:bg-gray-50'}`}>
+                  <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setImportFile(e.target.files[0])} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                  <div className="space-y-2 pointer-events-none">
+                    <div className={`mx-auto h-12 w-12 rounded-full flex items-center justify-center transition-colors ${importFile ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
+                      {importFile ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                      )}
+                    </div>
+                    {importFile ? (
+                      <div><p className="text-sm font-bold text-emerald-800">{importFile.name}</p><p className="text-xs text-emerald-600 mt-1">{(importFile.size / 1024).toFixed(1)} KB</p></div>
+                    ) : (
+                      <p className="text-sm font-medium text-gray-500">Klik untuk pilih file atau drag & drop</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 bg-gray-50 flex justify-end gap-3 border-t border-gray-100">
+            <SecondaryButton onClick={() => setShowImportModal(false)}>Batal</SecondaryButton>
+            <button type="submit" className="px-6 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all shadow-md shadow-emerald-200 disabled:opacity-50 disabled:shadow-none" disabled={!importFile}>Proses Import</button>
+          </div>
+        </form>
       </Modal>
 
     </AuthenticatedLayout>

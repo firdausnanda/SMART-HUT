@@ -130,24 +130,36 @@ Route::middleware('auth')->group(function () {
     Route::post('/hasil-hutan-bukan-kayu/{hasil_hutan_bukan_kayu}/reject', [\App\Http\Controllers\HasilHutanBukanKayuController::class, 'reject'])->name('hasil-hutan-bukan-kayu.reject');
 
     // Industri Berizin
+    Route::get('industri-berizin/export', [\App\Http\Controllers\IndustriBerizinController::class, 'export'])->name('industri-berizin.export');
+    Route::get('industri-berizin/template', [\App\Http\Controllers\IndustriBerizinController::class, 'template'])->name('industri-berizin.template');
+    Route::post('industri-berizin/import', [\App\Http\Controllers\IndustriBerizinController::class, 'import'])->name('industri-berizin.import');
     Route::resource('industri-berizin', \App\Http\Controllers\IndustriBerizinController::class)->parameters(['industri-berizin' => 'industri_berizin']);
     Route::post('/industri-berizin/{industri_berizin}/submit', [\App\Http\Controllers\IndustriBerizinController::class, 'submit'])->name('industri-berizin.submit');
     Route::post('/industri-berizin/{industri_berizin}/approve', [\App\Http\Controllers\IndustriBerizinController::class, 'approve'])->name('industri-berizin.approve');
     Route::post('/industri-berizin/{industri_berizin}/reject', [\App\Http\Controllers\IndustriBerizinController::class, 'reject'])->name('industri-berizin.reject');
 
     // Realisasi PNBP
+    Route::get('realisasi-pnbp/export', [\App\Http\Controllers\RealisasiPnbpController::class, 'export'])->name('realisasi-pnbp.export');
+    Route::get('realisasi-pnbp/template', [\App\Http\Controllers\RealisasiPnbpController::class, 'template'])->name('realisasi-pnbp.template');
+    Route::post('realisasi-pnbp/import', [\App\Http\Controllers\RealisasiPnbpController::class, 'import'])->name('realisasi-pnbp.import');
     Route::resource('realisasi-pnbp', \App\Http\Controllers\RealisasiPnbpController::class)->parameters(['realisasi-pnbp' => 'realisasi_pnbp']);
     Route::post('/realisasi-pnbp/{realisasi_pnbp}/submit', [\App\Http\Controllers\RealisasiPnbpController::class, 'submit'])->name('realisasi-pnbp.submit');
     Route::post('/realisasi-pnbp/{realisasi_pnbp}/approve', [\App\Http\Controllers\RealisasiPnbpController::class, 'approve'])->name('realisasi-pnbp.approve');
     Route::post('/realisasi-pnbp/{realisasi_pnbp}/reject', [\App\Http\Controllers\RealisasiPnbpController::class, 'reject'])->name('realisasi-pnbp.reject');
 
     // Perkembangan SK PS
+    Route::get('skps/export', [\App\Http\Controllers\SkpsController::class, 'export'])->name('skps.export');
+    Route::get('skps/template', [\App\Http\Controllers\SkpsController::class, 'template'])->name('skps.template');
+    Route::post('skps/import', [\App\Http\Controllers\SkpsController::class, 'import'])->name('skps.import');
     Route::resource('skps', \App\Http\Controllers\SkpsController::class);
     Route::post('/skps/{skps}/submit', [\App\Http\Controllers\SkpsController::class, 'submit'])->name('skps.submit');
     Route::post('/skps/{skps}/approve', [\App\Http\Controllers\SkpsController::class, 'approve'])->name('skps.approve');
     Route::post('/skps/{skps}/reject', [\App\Http\Controllers\SkpsController::class, 'reject'])->name('skps.reject');
 
     // Perkembangan KUPS
+    Route::get('kups/export', [\App\Http\Controllers\KupsController::class, 'export'])->name('kups.export');
+    Route::get('kups/template', [\App\Http\Controllers\KupsController::class, 'template'])->name('kups.template');
+    Route::post('kups/import', [\App\Http\Controllers\KupsController::class, 'import'])->name('kups.import');
     Route::resource('kups', \App\Http\Controllers\KupsController::class);
     Route::post('/kups/{kups}/submit', [\App\Http\Controllers\KupsController::class, 'submit'])->name('kups.submit');
     Route::post('/kups/{kups}/approve', [\App\Http\Controllers\KupsController::class, 'approve'])->name('kups.approve');

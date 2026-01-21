@@ -169,4 +169,33 @@ class SkpsController extends Controller
 
     return Redirect::back()->with('success', 'Laporan telah ditolak dengan catatan.');
   }
+
+  public function export()
+  {
+    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\SkpsExport, 'perkembangan-skps-' . date('Y-m-d') . '.xlsx');
+  }
+
+  public function template()
+  {
+    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\SkpsTemplateExport, 'template_import_skps.xlsx');
+  }
+
+  public function import(Request $request)
+  {
+    $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+
+    $import = new \App\Imports\SkpsImport();
+
+    try {
+      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
+    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      return redirect()->back()->with('import_errors', $e->failures());
+    }
+
+    if ($import->failures()->isNotEmpty()) {
+      return redirect()->back()->with('import_errors', $import->failures());
+    }
+
+    return redirect()->back()->with('success', 'Data berhasil diimport.');
+  }
 }
