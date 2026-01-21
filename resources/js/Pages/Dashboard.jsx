@@ -176,7 +176,7 @@ export default function Dashboard({ auth, stats, chartData, filters, availableYe
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-500">Nilai Ekonomi</p>
+                                <p className="text-sm font-medium text-gray-500">Realisasi PNBP</p>
                                 <p className="text-2xl font-bold text-gray-900 mt-1">{formatCurrency(stats.economy.total)}</p>
                             </div>
                             <div className="p-3 bg-primary-50 rounded-lg text-primary-600 shrink-0">
@@ -198,7 +198,7 @@ export default function Dashboard({ auth, stats, chartData, filters, availableYe
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-500">Kelompok Tani Hutan</p>
+                                <p className="text-sm font-medium text-gray-500">KUPS</p>
                                 <p className="text-2xl font-bold text-gray-900 mt-1">{formatNumber(stats.kups.total)} <span className="text-sm font-normal text-gray-400">Unit</span></p>
                             </div>
                             <div className="p-3 bg-primary-50 rounded-lg text-primary-600 shrink-0">
