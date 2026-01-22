@@ -14,20 +14,29 @@ class RhlTeknisImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
 {
   use SkipsFailures;
 
+  public function prepareForValidation($data, $index)
+  {
+    if (isset($data['sumber_dana'])) {
+      $data['sumber_dana'] = strtolower(trim($data['sumber_dana']));
+    }
+
+    return $data;
+  }
+
   public function rules(): array
   {
     return [
       'tahun' => 'required|numeric',
       'bulan_angka' => 'required|numeric|min:1|max:12',
       'target_tahunan_ha' => 'required|numeric',
-      'sumber_dana' => 'required|in:apbn,apbd,swasta,swadaya,other',
+      'sumber_dana' => ['required', \Illuminate\Validation\Rule::in(['apbn', 'apbd provinsi', 'apbd kabupaten/kota', 'bums', 'csr', 'bpdlh', 'lainnya'])],
     ];
   }
 
   public function customValidationMessages()
   {
     return [
-      'sumber_dana.in' => 'Sumber Dana harus: apbn, apbd, swasta, swadaya, atau other.',
+      'sumber_dana.in' => 'Sumber Dana harus: apbn, apbd provinsi, apbd kabupaten/kota, bums, csr, bpdlh, atau lainnya.',
     ];
   }
 

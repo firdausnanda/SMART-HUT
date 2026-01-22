@@ -15,6 +15,15 @@ class PenghijauanLingkunganImport implements ToModel, WithHeadingRow, WithValida
 {
   use SkipsFailures;
 
+  public function prepareForValidation($data, $index)
+  {
+    if (isset($data['sumber_dana'])) {
+      $data['sumber_dana'] = strtolower(trim($data['sumber_dana']));
+    }
+
+    return $data;
+  }
+
   public function rules(): array
   {
     return [
@@ -24,7 +33,7 @@ class PenghijauanLingkunganImport implements ToModel, WithHeadingRow, WithValida
       'nama_kecamatan' => 'required|exists:m_districts,name',
       'target_tahunan_ha' => 'required|numeric',
       'realisasi_ha' => 'required|numeric',
-      'sumber_dana' => 'required|in:apbn,apbd,swasta,swadaya,other',
+      'sumber_dana' => ['required', \Illuminate\Validation\Rule::in(['apbn', 'apbd provinsi', 'apbd kabupaten/kota', 'bums', 'csr', 'bpdlh', 'lainnya'])],
     ];
   }
 
@@ -35,7 +44,7 @@ class PenghijauanLingkunganImport implements ToModel, WithHeadingRow, WithValida
       'nama_kecamatan.exists' => 'Kecamatan tidak ditemukan.',
       'bulan_angka.min' => 'Bulan harus 1-12.',
       'bulan_angka.max' => 'Bulan harus 1-12.',
-      'sumber_dana.in' => 'Sumber Dana harus: apbn, apbd, swasta, swadaya, atau other.',
+      'sumber_dana.in' => 'Sumber Dana harus: apbn, apbd provinsi, apbd kabupaten/kota, bums, csr, bpdlh, atau lainnya.',
     ];
   }
 

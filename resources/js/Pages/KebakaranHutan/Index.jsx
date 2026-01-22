@@ -49,7 +49,7 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
       });
     }
     if (flash?.import_errors) {
-      const errorList = flash.import_errors.map(f => `Baris ${f.row}: ${f.errors.join(', ')}`).join('<br>');
+      const errorList = flash.import_errors.map(f => `Baris ${f.row}: ${Array.isArray(f.errors) ? f.errors.join(', ') : f.errors}`).join('<br>');
       MySwal.fire({
         title: 'Import Gagal',
         html: `<div class="text-left text-sm">${errorList}</div>`,

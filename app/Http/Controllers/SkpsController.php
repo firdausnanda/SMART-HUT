@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Redirect;
 
 class SkpsController extends Controller
 {
+  use \App\Traits\HandlesImportFailures;
   /**
    * Display a listing of the resource.
    */
@@ -189,11 +190,11 @@ class SkpsController extends Controller
     try {
       \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
     } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-      return redirect()->back()->with('import_errors', $e->failures());
+      return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
 
     if ($import->failures()->isNotEmpty()) {
-      return redirect()->back()->with('import_errors', $import->failures());
+      return redirect()->back()->with('import_errors', $this->mapImportFailures($import->failures()));
     }
 
     return redirect()->back()->with('success', 'Data berhasil diimport.');

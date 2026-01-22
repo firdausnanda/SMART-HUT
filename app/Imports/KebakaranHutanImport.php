@@ -26,7 +26,7 @@ class KebakaranHutanImport implements ToModel, WithHeadingRow, WithValidation, S
       'nama_pengelola_wisata' => 'required|string',
       'fungsi_kawasan' => 'required|string',
       'jumlah_kejadian' => 'required|numeric|min:0',
-      'luas_kebakaran_ha' => 'required|string',
+      'luas_kebakaran_ha' => 'required|numeric',
     ];
   }
 
