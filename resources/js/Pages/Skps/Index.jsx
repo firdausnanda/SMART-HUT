@@ -31,7 +31,7 @@ export default function Index({ auth, datas, stats }) {
       MySwal.fire({ title: 'Gagal', text: flash.error, icon: 'error', confirmButtonColor: '#d33' });
     }
     if (flash?.import_errors) {
-      const errorList = flash.import_errors.map(f => `Baris ${f.row()}: ${f.errors().join(', ')}`).join('<br>');
+      const errorList = flash.import_errors.map(f => `Baris ${f.row}: ${f.errors.join(', ')}`).join('<br>');
       MySwal.fire({ title: 'Import Gagal', html: `<div class="text-left text-sm">${errorList}</div>`, icon: 'error', confirmButtonColor: '#dc2626' });
     }
   }, [flash]);
