@@ -19,6 +19,7 @@ class NilaiEkonomiDetailFactory extends Factory
         return [
             'commodity_id' => \App\Models\Commodity::inRandomOrder()->first()->id ?? \App\Models\Commodity::factory(),
             'production_volume' => $this->faker->numberBetween(100, 5000),
+            'satuan' => $this->faker->randomElement(['Kg', 'Ton', 'M3', 'Liter', 'Batang']),
             'transaction_value' => $this->faker->numberBetween(1000000, 50000000),
             'created_at' => now(),
             'updated_at' => now(),

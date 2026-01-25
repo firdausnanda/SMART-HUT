@@ -70,6 +70,7 @@ class NilaiEkonomiController extends Controller
             'details' => 'required|array|min:1',
             'details.*.commodity_id' => 'required|exists:m_commodities,id',
             'details.*.production_volume' => 'required|numeric|min:0',
+            'details.*.satuan' => 'required|string',
             'details.*.transaction_value' => 'required|numeric|min:0',
         ]);
 
@@ -88,6 +89,7 @@ class NilaiEkonomiController extends Controller
             $nilaiEkonomi->details()->create([
                 'commodity_id' => $detail['commodity_id'],
                 'production_volume' => $detail['production_volume'],
+                'satuan' => $detail['satuan'],
                 'transaction_value' => $detail['transaction_value'],
             ]);
         }
@@ -119,6 +121,7 @@ class NilaiEkonomiController extends Controller
             'details' => 'required|array|min:1',
             'details.*.commodity_id' => 'required|exists:m_commodities,id',
             'details.*.production_volume' => 'required|numeric|min:0',
+            'details.*.satuan' => 'required|string',
             'details.*.transaction_value' => 'required|numeric|min:0',
         ]);
 
@@ -137,6 +140,7 @@ class NilaiEkonomiController extends Controller
             $nilaiEkonomi->details()->create([
                 'commodity_id' => $detail['commodity_id'],
                 'production_volume' => $detail['production_volume'],
+                'satuan' => $detail['satuan'],
                 'transaction_value' => $detail['transaction_value'],
             ]);
         }

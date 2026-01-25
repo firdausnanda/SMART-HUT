@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->foreignId('nilai_ekonomi_id')->constrained('nilai_ekonomi')->onDelete('cascade');
             $table->foreignId('commodity_id')->constrained('m_commodities');
             $table->decimal('production_volume', 15, 2);
+            $table->string('satuan')->default('Kg');
             $table->decimal('transaction_value', 19, 2);
             $table->timestamps();
         });

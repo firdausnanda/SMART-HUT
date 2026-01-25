@@ -21,8 +21,9 @@ export default function Edit({ auth, nilaiEkonomi, commodities }) {
     details: nilaiEkonomi.details?.map(d => ({
       commodity_id: d.commodity_id,
       production_volume: d.production_volume,
+      satuan: d.satuan || 'Kg',
       transaction_value: d.transaction_value
-    })) || [{ commodity_id: '', production_volume: '', transaction_value: '' }]
+    })) || [{ commodity_id: '', production_volume: '', satuan: 'Kg', transaction_value: '' }]
   });
 
   const [regencies, setRegencies] = useState([]);
@@ -69,6 +70,13 @@ export default function Edit({ auth, nilaiEkonomi, commodities }) {
   const commodityOptions = localCommodities.map(c => ({ value: c.id, label: c.name }));
   const monthOptions = Array.from({ length: 12 }, (_, i) => ({ value: i + 1, label: new Date(0, i).toLocaleString('id-ID', { month: 'long' }) }));
   const yearOptions = Array.from({ length: 5 }, (_, i) => ({ value: new Date().getFullYear() - i, label: (new Date().getFullYear() - i).toString() }));
+  const satuanOptions = [
+    { value: 'Kg', label: 'Kilogram (Kg)' },
+    { value: 'Ton', label: 'Ton' },
+    { value: 'M3', label: 'Meter Kubik (M³)' },
+    { value: 'Liter', label: 'Liter' },
+    { value: 'Batang', label: 'Batang' },
+  ];
 
   const submit = (e) => {
     e.preventDefault();
@@ -76,7 +84,7 @@ export default function Edit({ auth, nilaiEkonomi, commodities }) {
   };
 
   const addDetail = () => {
-    setData('details', [...data.details, { commodity_id: '', production_volume: '', transaction_value: '' }]);
+    setData('details', [...data.details, { commodity_id: '', production_volume: '', satuan: 'Kg', transaction_value: '' }]);
   };
 
   const removeDetail = (index) => {
@@ -287,8 +295,9 @@ export default function Edit({ auth, nilaiEkonomi, commodities }) {
               {data.details.length > 0 && (
                 <div className="hidden md:grid grid-cols-12 gap-4 mb-3 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
                   <div className="col-span-4">Komoditas</div>
-                  <div className="col-span-3">Volume Produksi</div>
-                  <div className="col-span-4">Nilai Transaksi</div>
+                  <div className="col-span-2 text-center">Volume</div>
+                  <div className="col-span-2">Satuan</div>
+                  <div className="col-span-3">Nilai Transaksi</div>
                   <div className="col-span-1 text-center">Aksi</div>
                 </div>
               )}
@@ -312,22 +321,32 @@ export default function Edit({ auth, nilaiEkonomi, commodities }) {
                       <InputError message={errors[`details.${index}.commodity_id`]} className="mt-1" />
                     </div>
 
-                    <div className="md:col-span-3 mb-4 md:mb-0">
+                    <div className="md:col-span-2 mb-4 md:mb-0">
                       <label className="block md:hidden text-xs font-bold text-gray-500 uppercase mb-1">Volume</label>
-                      <div className="relative">
-                        <TextInput
-                          type="number"
-                          className="w-full pr-12"
-                          value={detail.production_volume}
-                          onChange={(e) => updateDetail(index, 'production_volume', e.target.value)}
-                          placeholder="0"
-                        />
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400 text-xs font-bold">Kg/Ton</div>
-                      </div>
+                      <TextInput
+                        type="number"
+                        className="w-full"
+                        value={detail.production_volume}
+                        onChange={(e) => updateDetail(index, 'production_volume', e.target.value)}
+                        placeholder="0"
+                      />
                       <InputError message={errors[`details.${index}.production_volume`]} className="mt-1" />
                     </div>
 
-                    <div className="md:col-span-4 mb-4 md:mb-0">
+                    <div className="md:col-span-2 mb-4 md:mb-0">
+                      <label className="block md:hidden text-xs font-bold text-gray-500 uppercase mb-1">Satuan</label>
+                      <Select
+                        options={satuanOptions}
+                        value={satuanOptions.find(s => s.value === detail.satuan)}
+                        onChange={(opt) => updateDetail(index, 'satuan', opt?.value)}
+                        styles={selectStyles}
+                        menuPortalTarget={document.body}
+                        menuPosition="fixed"
+                      />
+                      <InputError message={errors[`details.${index}.satuan`]} className="mt-1" />
+                    </div>
+
+                    <div className="md:col-span-3 mb-4 md:mb-0">
                       <label className="block md:hidden text-xs font-bold text-gray-500 uppercase mb-1">Nilai Transaksi</label>
                       <CurrencyInput
                         className="w-full"

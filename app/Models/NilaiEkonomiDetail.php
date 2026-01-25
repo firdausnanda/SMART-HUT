@@ -13,6 +13,7 @@ class NilaiEkonomiDetail extends Model
         'nilai_ekonomi_id',
         'commodity_id',
         'production_volume',
+        'satuan',
         'transaction_value',
     ];
 
