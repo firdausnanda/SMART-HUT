@@ -17,6 +17,7 @@ class Kups extends Model
         'province_id',
         'regency_id',
         'district_id',
+        'nama_kups',
         'category',
         'number_of_kups',
         'commodity',

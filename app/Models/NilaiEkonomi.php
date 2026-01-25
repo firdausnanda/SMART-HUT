@@ -9,28 +9,33 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Wildside\Userstamps\Userstamps;
 
-class Skps extends Model
+class NilaiEkonomi extends Model
 {
-    use HasFactory, Userstamps, SoftDeletes, LogsActivity;
+    use HasFactory, SoftDeletes, LogsActivity, Userstamps;
+
+    protected $table = 'nilai_ekonomi';
 
     protected $fillable = [
-        "province_id",
-        "regency_id",
-        "district_id",
-        "district_id",
-        "id_skema_perhutanan_sosial",
-        "nama_kelompok",
-        "potential",
-        "ps_area",
-        "number_of_kk",
-        "status",
-        "approved_by_kasi_at",
-        "approved_by_cdk_at",
-        "rejection_note",
-        "created_by",
-        "updated_by",
-        "deleted_by",
+        'nama_kelompok',
+        'total_transaction_value',
+        'year',
+        'month',
+        'province_id',
+        'regency_id',
+        'district_id',
+        'status',
+        'approved_by_kasi_at',
+        'approved_by_cdk_at',
+        'rejection_note',
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
+
+    public function details()
+    {
+        return $this->hasMany(NilaiEkonomiDetail::class);
+    }
 
     public function province()
     {
@@ -47,9 +52,9 @@ class Skps extends Model
         return $this->belongsTo(Districts::class);
     }
 
-    public function skema()
+    public function creator()
     {
-        return $this->belongsTo(SkemaPerhutananSosial::class, 'id_skema_perhutanan_sosial');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function getActivitylogOptions(): LogOptions

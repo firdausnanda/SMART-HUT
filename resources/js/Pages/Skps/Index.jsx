@@ -357,6 +357,7 @@ export default function Index({ auth, datas, stats }) {
                 <thead className="bg-gray-50/50 text-gray-700 uppercase tracking-wider text-[11px] font-bold">
                   <tr>
                     <th className="px-6 py-4 w-[200px]">Lokasi</th>
+                    <th className="px-6 py-4">Nama Kelompok</th>
                     <th className="px-6 py-4">Skema & Luas</th>
                     <th className="px-6 py-4">Potensi & KK</th>
                     <th className="px-6 py-4">Input Oleh</th>
@@ -373,6 +374,9 @@ export default function Index({ auth, datas, stats }) {
                           <div className="text-xs text-primary-600 font-bold uppercase tracking-tighter">
                             {item.regency_name || 'Kabupaten N/A'}
                           </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="font-bold text-gray-900">{item.nama_kelompok || '-'}</div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="font-bold text-gray-900">{item.skema_name}</div>

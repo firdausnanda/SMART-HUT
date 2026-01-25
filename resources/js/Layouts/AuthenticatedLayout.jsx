@@ -23,8 +23,10 @@ export default function Authenticated({ user, header, children }) {
         hutan_rakyat_mobile: route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Rakyat' }) || route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Hutan Rakyat' }) || window.location.search.includes('Hutan%20Rakyat') || window.location.search.includes('Hutan+Rakyat'),
         perhutanan_sosial: route().current('hasil-hutan-kayu.*', { forest_type: 'Perhutanan Sosial' }) || route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Perhutanan Sosial' }) || window.location.search.includes('Perhutanan%20Sosial') || window.location.search.includes('Perhutanan+Sosial'),
         perhutanan_sosial_mobile: route().current('hasil-hutan-kayu.*', { forest_type: 'Perhutanan Sosial' }) || route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Perhutanan Sosial' }) || window.location.search.includes('Perhutanan%20Sosial') || window.location.search.includes('Perhutanan+Sosial'),
-        pemberdayaan: route().current('skps.*') || route().current('kups.*'),
-        pemberdayaan_mobile: route().current('skps.*') || route().current('kups.*')
+        pemberdayaan: route().current('skps.*') || route().current('kups.*') || route().current('nilai-ekonomi.*') || route().current('perkembangan-kth.*'),
+        pemberdayaan_mobile: route().current('skps.*') || route().current('kups.*') || route().current('nilai-ekonomi.*') || route().current('perkembangan-kth.*'),
+        kelembagaan_perhutanan_sosial: route().current('skps.*') || route().current('kups.*') || route().current('nilai-ekonomi.*'),
+        kelembagaan_hutan_rakyat: route().current('perkembangan-kth.*')
     });
 
     const { flash, auth } = usePage().props;
@@ -346,15 +348,14 @@ export default function Authenticated({ user, header, children }) {
                                                 children: [
                                                     { name: 'Perkembangan SK PS', route: route('skps.index'), pattern: 'skps.*' },
                                                     { name: 'Perkembangan KUPS', route: route('kups.index'), pattern: 'kups.*' },
-                                                    { name: 'Nilai Ekonomi (NEKON)', route: route('kups.index'), pattern: 'kups.*' }
+                                                    { name: 'Nilai Ekonomi (NEKON)', route: route('nilai-ekonomi.index'), pattern: 'nilai-ekonomi.*' }
                                                 ]
                                             },
                                             {
                                                 name: 'Kelembagaan Hutan Rakyat',
                                                 key: 'kelembagaan_hutan_rakyat',
                                                 children: [
-                                                    { name: 'Perkembangan KTH', route: route('skps.index'), pattern: 'skps.*' },
-                                                    { name: 'Nilai Transaksi Ekonomi', route: route('kups.index'), pattern: 'kups.*' }
+                                                    { name: 'Perkembangan KTH', route: route('perkembangan-kth.index'), pattern: 'perkembangan-kth.*' }
                                                 ]
                                             }
                                         ].map((item) => (

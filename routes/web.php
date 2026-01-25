@@ -164,6 +164,23 @@ Route::middleware('auth')->group(function () {
     Route::post('/kups/{kups}/submit', [\App\Http\Controllers\KupsController::class, 'submit'])->name('kups.submit');
     Route::post('/kups/{kups}/approve', [\App\Http\Controllers\KupsController::class, 'approve'])->name('kups.approve');
     Route::post('/kups/{kups}/reject', [\App\Http\Controllers\KupsController::class, 'reject'])->name('kups.reject');
+
+    // Nilai Ekonomi (NEKON)
+    Route::resource('nilai-ekonomi', \App\Http\Controllers\NilaiEkonomiController::class);
+    Route::post('/nilai-ekonomi/{nilai_ekonomi}/submit', [\App\Http\Controllers\NilaiEkonomiController::class, 'submit'])->name('nilai-ekonomi.submit');
+    Route::post('/nilai-ekonomi/{nilai_ekonomi}/approve', [\App\Http\Controllers\NilaiEkonomiController::class, 'approve'])->name('nilai-ekonomi.approve');
+    Route::post('/nilai-ekonomi/{nilai_ekonomi}/reject', [\App\Http\Controllers\NilaiEkonomiController::class, 'reject'])->name('nilai-ekonomi.reject');
+    Route::post('/commodities', [\App\Http\Controllers\CommodityController::class, 'store'])->name('commodities.store');
+
+    // Perkembangan KTH
+    Route::get('perkembangan-kth/export', [\App\Http\Controllers\PerkembanganKthController::class, 'export'])->name('perkembangan-kth.export');
+    Route::get('perkembangan-kth/template', [\App\Http\Controllers\PerkembanganKthController::class, 'template'])->name('perkembangan-kth.template');
+    Route::post('perkembangan-kth/import', [\App\Http\Controllers\PerkembanganKthController::class, 'import'])->name('perkembangan-kth.import');
+    Route::resource('perkembangan-kth', \App\Http\Controllers\PerkembanganKthController::class)->parameters(['perkembangan-kth' => 'perkembangan_kth']);
+    Route::post('/perkembangan-kth/{perkembangan_kth}/submit', [\App\Http\Controllers\PerkembanganKthController::class, 'submit'])->name('perkembangan-kth.submit');
+    Route::post('/perkembangan-kth/{perkembangan_kth}/approve', [\App\Http\Controllers\PerkembanganKthController::class, 'approve'])->name('perkembangan-kth.approve');
+    Route::post('/perkembangan-kth/{perkembangan_kth}/reject', [\App\Http\Controllers\PerkembanganKthController::class, 'reject'])->name('perkembangan-kth.reject');
+
     // User Management
     // User Management
     Route::resource('users', \App\Http\Controllers\UserController::class);

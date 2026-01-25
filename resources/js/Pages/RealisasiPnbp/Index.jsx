@@ -450,6 +450,7 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
                                 <span>{item.regency.name}</span>
                               </>}
                             </div>
+                          </div>
                         </td>
                         <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{item.pengelola_wisata?.name}</td>
                         <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{item.types_of_forest_products}</td>

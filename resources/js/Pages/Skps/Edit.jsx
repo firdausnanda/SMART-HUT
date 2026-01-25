@@ -13,6 +13,7 @@ export default function Edit({ auth, skemas, data: initialData }) {
     province_id: initialData.province_id || 35,
     regency_id: initialData.regency_id,
     district_id: initialData.district_id,
+    nama_kelompok: initialData.nama_kelompok,
     ps_area: initialData.ps_area,
     number_of_kk: initialData.number_of_kk,
     id_skema_perhutanan_sosial: initialData.id_skema_perhutanan_sosial,
@@ -201,6 +202,20 @@ export default function Edit({ auth, skemas, data: initialData }) {
 
                 <div className="md:col-span-2 mt-4">
                   <h4 className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-4 border-b border-primary-100 pb-2">Detail SK PS</h4>
+                </div>
+
+                <div className="md:col-span-2">
+                  <InputLabel htmlFor="nama_kelompok" value="Nama Kelompok" className="text-gray-700 font-bold mb-2" />
+                  <TextInput
+                    id="nama_kelompok"
+                    type="text"
+                    className="w-full"
+                    value={data.nama_kelompok}
+                    onChange={(e) => setData('nama_kelompok', e.target.value)}
+                    required
+                    placeholder="Masukkan Nama Kelompok"
+                  />
+                  <InputError message={errors.nama_kelompok} className="mt-2" />
                 </div>
 
                 <div>

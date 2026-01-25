@@ -17,6 +17,7 @@ class KupsTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle, Wit
     return [
       'Nama Kabupaten/Kota',
       'Nama Kecamatan',
+      'Nama KUPS',
       'Kategori',
       'Jumlah KUPS',
       'Komoditas'

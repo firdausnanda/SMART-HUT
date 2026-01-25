@@ -13,6 +13,7 @@ export default function Create({ auth }) {
     province_id: 35, // JAWA TIMUR
     regency_id: '',
     district_id: '',
+    nama_kups: '',
     category: '',
     number_of_kups: '',
     commodity: '',
@@ -206,6 +207,20 @@ export default function Create({ auth }) {
 
                 <div className="md:col-span-2 mt-4">
                   <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4 border-b border-emerald-100 pb-2">Detail KUPS</h4>
+                </div>
+
+                <div className="md:col-span-2">
+                  <InputLabel htmlFor="nama_kups" value="Nama KUPS" className="text-gray-700 font-bold mb-2" />
+                  <TextInput
+                    id="nama_kups"
+                    type="text"
+                    className="w-full focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
+                    value={data.nama_kups}
+                    onChange={(e) => setData('nama_kups', e.target.value)}
+                    required
+                    placeholder="Masukkan Nama KUPS"
+                  />
+                  <InputError message={errors.nama_kups} className="mt-2" />
                 </div>
 
                 <div>

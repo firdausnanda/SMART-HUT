@@ -3,7 +3,7 @@ import { Link, Head } from '@inertiajs/react';
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     return (
         <>
-            <Head title="Monitoring Analysis Real Time – Kehutanan" />
+            <Head title="Sistem Monitoring Analisis Real Time Data Kehutanan" />
             <div className="min-h-screen bg-white text-gray-800 font-sans selection:bg-primary-500 selection:text-white overflow-hidden">
                 {/* Navbar */}
                 <nav className="absolute top-0 w-full z-50">

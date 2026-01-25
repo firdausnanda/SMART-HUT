@@ -13,6 +13,7 @@ export default function Create({ auth, skemas }) {
     province_id: 35, // JAWA TIMUR
     regency_id: '',
     district_id: '',
+    nama_kelompok: '',
     ps_area: '',
     number_of_kk: '',
     id_skema_perhutanan_sosial: '',
@@ -200,6 +201,20 @@ export default function Create({ auth, skemas }) {
 
                 <div className="md:col-span-2 mt-4">
                   <h4 className="text-xs font-bold text-primary-600 uppercase tracking-widest mb-4 border-b border-primary-100 pb-2">Detail SK PS</h4>
+                </div>
+
+                <div className="md:col-span-2">
+                  <InputLabel htmlFor="nama_kelompok" value="Nama Kelompok" className="text-gray-700 font-bold mb-2" />
+                  <TextInput
+                    id="nama_kelompok"
+                    type="text"
+                    className="w-full"
+                    value={data.nama_kelompok}
+                    onChange={(e) => setData('nama_kelompok', e.target.value)}
+                    required
+                    placeholder="Masukkan Nama Kelompok"
+                  />
+                  <InputError message={errors.nama_kelompok} className="mt-2" />
                 </div>
 
                 <div>

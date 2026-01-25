@@ -17,6 +17,7 @@ class SkpsTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle, Wit
     return [
       'Nama Kabupaten/Kota',
       'Nama Kecamatan',
+      'Nama Kelompok',
       'Nama Skema Perhutanan Sosial',
       'Potensi (Ha)',
       'Luas PS (Ha)',

@@ -20,6 +20,7 @@ class KupsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFail
     return [
       'nama_kabupatenkota' => 'required|string',
       'nama_kecamatan' => 'required|string',
+      'nama_kups' => 'required|string',
       'kategori' => 'required|string',
       'jumlah_kups' => 'required|string',
       'komoditas' => 'required|string',
@@ -31,6 +32,7 @@ class KupsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFail
     return [
       'nama_kabupatenkota.required' => 'Nama Kabupaten/Kota harus diisi.',
       'nama_kecamatan.required' => 'Nama Kecamatan harus diisi.',
+      'nama_kups.required' => 'Nama KUPS harus diisi.',
     ];
   }
 
@@ -72,6 +74,7 @@ class KupsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFail
       'province_id' => $regency->province_id,
       'regency_id' => $regency->id,
       'district_id' => $district->id,
+      'nama_kups' => $row['nama_kups'],
       'category' => $row['kategori'],
       'number_of_kups' => $row['jumlah_kups'],
       'commodity' => $row['komoditas'],

@@ -20,6 +20,7 @@ class SkpsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFail
     return [
       'nama_kabupatenkota' => 'required|string',
       'nama_kecamatan' => 'required|string',
+      'nama_kelompok' => 'required|string',
       'nama_skema_perhutanan_sosial' => 'required|string',
       'potensi_ha' => 'required|string',
       'luas_ps_ha' => 'required|string',
@@ -32,6 +33,7 @@ class SkpsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFail
     return [
       'nama_kabupatenkota.required' => 'Nama Kabupaten/Kota harus diisi.',
       'nama_kecamatan.required' => 'Nama Kecamatan harus diisi.',
+      'nama_kelompok.required' => 'Nama Kelompok harus diisi.',
       'nama_skema_perhutanan_sosial.required' => 'Nama Skema Perhutanan Sosial harus diisi.',
     ];
   }
@@ -89,6 +91,7 @@ class SkpsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFail
       'regency_id' => $regency->id,
       'district_id' => $district->id,
       'id_skema_perhutanan_sosial' => $skema->id,
+      'nama_kelompok' => $row['nama_kelompok'],
       'potential' => $row['potensi_ha'],
       'ps_area' => $row['luas_ps_ha'],
       'number_of_kk' => $row['jumlah_kk'],

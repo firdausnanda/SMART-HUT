@@ -376,6 +376,7 @@ export default function Index({ auth, kups, stats, filters }) {
                 <thead className="bg-gray-50/50 text-gray-700 uppercase tracking-wider text-[11px] font-bold">
                   <tr>
                     <th scope="col" className="px-6 py-4">Lokasi</th>
+                    <th scope="col" className="px-6 py-4">Nama KUPS</th>
                     <th scope="col" className="px-6 py-4">Kategori</th>
                     <th scope="col" className="px-6 py-4 text-center">Jumlah KUPS</th>
                     <th scope="col" className="px-6 py-4">Komoditas</th>
@@ -390,6 +391,9 @@ export default function Index({ auth, kups, stats, filters }) {
                         <td className="px-6 py-4">
                           <div className="font-bold text-gray-900">{item.regency?.name}</div>
                           <div className="text-xs text-secondary-600 font-bold uppercase tracking-tight text-emerald-600">{item.district?.name}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="font-bold text-gray-900">{item.nama_kups || '-'}</div>
                         </td>
                         <td className="px-6 py-4">
                           <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg border ${item.category === 'Platinum' ? 'bg-slate-100 text-slate-700 border-slate-200' :

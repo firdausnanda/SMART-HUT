@@ -42,6 +42,8 @@ class DatabaseSeeder extends Seeder
             RealisasiPnbpSeeder::class,
             PerhutananSosialKayuSeeder::class,
             PerhutananSosialBukanKayuSeeder::class,
+            NilaiEkonomiSeeder::class,
+            PerkembanganKthSeeder::class,
         ]);
     }
 }
