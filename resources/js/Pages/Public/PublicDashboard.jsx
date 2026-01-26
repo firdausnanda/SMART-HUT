@@ -33,7 +33,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
 
   // Auto-slide effect
   useEffect(() => {
-    const interval = setInterval(nextSlide, 15000);
+    const interval = setInterval(nextSlide, 25000);
     return () => clearInterval(interval);
   }, []);
 
@@ -593,7 +593,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                                 {
                                   label: 'Luas Area (Ha)',
                                   data: stats?.perlindungan?.kebakaranMonthly ? Object.values(stats.perlindungan.kebakaranMonthly).map(d => d.area) : [],
-                                  borderColor: '#fb923c',
+                                  borderColor: '#1121f9ff',
                                   backgroundColor: '#fb923c20',
                                   fill: true,
                                   tension: 0.4,
@@ -632,7 +632,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                       {/* Pengelola Bar Chart */}
                       <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                         <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Distribusi Luas Kebakaran Berdasarkan Pengelola</h4>
+                          <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Luas Kebakaran Berdasarkan Pengelola</h4>
                           <span className="px-2 py-1 rounded-full bg-red-50 text-[8px] font-bold text-red-500 uppercase">Pengelola</span>
                         </div>
                         <div className="h-[400px]">
@@ -796,7 +796,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                       {/* Pengelola Bar Chart */}
                       <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                         <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Distribusi Pengunjung Berdasarkan Pengelola</h4>
+                          <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Jumlah Pengunjung Berdasarkan Pengelola</h4>
                           <span className="px-2 py-1 rounded-full bg-indigo-50 text-[8px] font-bold text-indigo-500 uppercase">Pengelola</span>
                         </div>
                         <div className="h-[400px]">

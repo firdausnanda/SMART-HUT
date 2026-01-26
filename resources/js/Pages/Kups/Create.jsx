@@ -15,7 +15,6 @@ export default function Create({ auth }) {
     district_id: '',
     nama_kups: '',
     category: '',
-    number_of_kups: '',
     commodity: '',
   });
 
@@ -223,7 +222,7 @@ export default function Create({ auth }) {
                   <InputError message={errors.nama_kups} className="mt-2" />
                 </div>
 
-                <div>
+                <div className="md:col-span-2">
                   <InputLabel htmlFor="category" value="Kategori KUPS" className="text-gray-700 font-bold mb-2" />
                   <Select
                     options={categories}
@@ -236,22 +235,6 @@ export default function Create({ auth }) {
                   <InputError message={errors.category} className="mt-2" />
                 </div>
 
-                <div>
-                  <InputLabel htmlFor="number_of_kups" value="Jumlah KUPS" className="text-gray-700 font-bold mb-2" />
-                  <div className="relative">
-                    <TextInput
-                      id="number_of_kups"
-                      type="number"
-                      className="w-full pr-12 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
-                      value={data.number_of_kups}
-                      onChange={(e) => setData('number_of_kups', e.target.value)}
-                      required
-                      placeholder="0"
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400 text-xs font-bold">Unit</div>
-                  </div>
-                  <InputError message={errors.number_of_kups} className="mt-2" />
-                </div>
 
                 <div className="md:col-span-2">
                   <InputLabel htmlFor="commodity" value="Komoditas" className="text-gray-700 font-bold mb-2" />

@@ -37,7 +37,6 @@ class KupsFactory extends Factory
       'district_id' => $district->id,
       'nama_kups' => 'KUPS ' . fake()->company(),
       'category' => fake()->randomElement(['Blue', 'Silver', 'Gold', 'Platinum']),
-      'number_of_kups' => fake()->numberBetween(1, 10),
       'commodity' => fake()->randomElement(['Kopi', 'Madu', 'Aren', 'Wisata', 'Bambu']),
       'status' => 'final',
       'approved_by_kasi_at' => now(),

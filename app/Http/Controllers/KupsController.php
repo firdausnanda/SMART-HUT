@@ -46,9 +46,6 @@ class KupsController extends Controller
 
     // Calculate Stats
     $stats = [
-      'total_kups' => Kups::get()->sum(function ($row) {
-        return (int) $row->number_of_kups;
-      }),
       'total_categories' => Kups::distinct('category')->count('category'),
       'total_commodities' => Kups::distinct('commodity')->count('commodity'),
       'total_count' => Kups::count(),
@@ -74,7 +71,6 @@ class KupsController extends Controller
       'district_id' => 'required|exists:m_districts,id',
       'nama_kups' => 'required|string',
       'category' => 'required|string',
-      'number_of_kups' => 'required|string',
       'commodity' => 'required|string',
     ]);
 
@@ -103,7 +99,6 @@ class KupsController extends Controller
       'district_id' => 'required|exists:m_districts,id',
       'nama_kups' => 'required|string',
       'category' => 'required|string',
-      'number_of_kups' => 'required|string',
       'commodity' => 'required|string',
     ]);
 

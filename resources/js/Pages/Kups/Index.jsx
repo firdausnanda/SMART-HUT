@@ -270,19 +270,6 @@ export default function Index({ auth, kups, stats, filters }) {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 md:gap-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total KUPS</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{formatNumber(stats.total_kups)} <span className="text-xs font-normal text-gray-400">Unit</span></p>
-                </div>
-                <div className="p-3 bg-emerald-50 rounded-lg text-emerald-600 shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                </div>
-              </div>
-            </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
@@ -367,7 +354,6 @@ export default function Index({ auth, kups, stats, filters }) {
                     <th scope="col" className="px-6 py-4">Lokasi</th>
                     <th scope="col" className="px-6 py-4">Nama KUPS</th>
                     <th scope="col" className="px-6 py-4">Kategori</th>
-                    <th scope="col" className="px-6 py-4 text-center">Jumlah KUPS</th>
                     <th scope="col" className="px-6 py-4">Komoditas</th>
                     <th scope="col" className="px-6 py-4 text-center">Status</th>
                     <th scope="col" className="px-6 py-4 text-center">Aksi</th>
@@ -392,14 +378,6 @@ export default function Index({ auth, kups, stats, filters }) {
                             }`}>
                             {item.category}
                           </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <div className="flex flex-col">
-                            <span className="text-gray-900 font-bold text-base leading-tight">
-                              {item.number_of_kups}
-                            </span>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase">Unit</span>
-                          </div>
                         </td>
                         <td className="px-6 py-4">
                           <span className="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg text-[10px] font-bold uppercase tracking-wider">

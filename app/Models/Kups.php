@@ -19,7 +19,6 @@ class Kups extends Model
         'district_id',
         'nama_kups',
         'category',
-        'number_of_kups',
         'commodity',
         'status',
         'approved_by_kasi_at',

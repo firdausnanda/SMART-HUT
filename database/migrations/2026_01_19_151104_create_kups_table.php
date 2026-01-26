@@ -19,7 +19,6 @@ return new class extends Migration {
             $table->unsignedBigInteger('district_id');
 
             $table->string('category');
-            $table->string('number_of_kups');
             $table->string('commodity');
 
             // Status & Approval

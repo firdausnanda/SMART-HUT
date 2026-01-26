@@ -22,7 +22,6 @@ class KupsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFail
       'nama_kecamatan' => 'required|string',
       'nama_kups' => 'required|string',
       'kategori' => 'required|string',
-      'jumlah_kups' => 'required|string',
       'komoditas' => 'required|string',
     ];
   }
@@ -76,7 +75,6 @@ class KupsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFail
       'district_id' => $district->id,
       'nama_kups' => $row['nama_kups'],
       'category' => $row['kategori'],
-      'number_of_kups' => $row['jumlah_kups'],
       'commodity' => $row['komoditas'],
       'status' => 'draft',
       'created_by' => Auth::id(),
