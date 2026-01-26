@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import Select from 'react-select';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState, useCallback, useEffect } from 'react';
 import { debounce } from 'lodash';
@@ -51,6 +52,14 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
     debouncedSearch(query, selectedYear);
   };
 
+  const handleYearChange = (option) => {
+    const year = option.value;
+    setSelectedYear(year);
+    router.get(route('nilai-transaksi-ekonomi.index'), { search: searchTerm, year: year }, { preserveState: true, preserveScroll: true });
+  };
+
+  const yearOptions = availableYears.map(year => ({ value: year, label: `Tahun ${year}` }));
+
   const handleImportSubmit = (e) => {
     e.preventDefault();
     if (!importFile) return;
@@ -91,11 +100,7 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
     });
   };
 
-  const handleYearChange = (e) => {
-    const year = e.target.value;
-    setSelectedYear(year);
-    router.get(route('nilai-transaksi-ekonomi.index'), { search: searchTerm, year: year }, { preserveState: true, preserveScroll: true });
-  };
+  // handleYearChange replaced above
 
   const handleDelete = (id) => {
     MySwal.fire({
@@ -139,7 +144,7 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
   const isKasi = user.roles.includes('kasi') || (Array.isArray(user.roles) && user.roles.some(r => r.name === 'kasi'));
   const isKaCdk = user.roles.includes('kacdk') || (Array.isArray(user.roles) && user.roles.some(r => r.name === 'kacdk'));
   const canCreate = user.permissions?.includes('pemberdayaan.create') || isAdmin;
-  const canEdit = user.permissions?.includes('pemberdayaan.edit') || isAdmin;
+  const canEdit = user.permissions?.includes('pemberdayaan.edit') || canCreate || isAdmin;
   const canDelete = user.permissions?.includes('pemberdayaan.delete') || isAdmin;
   const canApprove = user.permissions?.includes('pemberdayaan.approve') || isAdmin;
 
@@ -216,16 +221,54 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
               <div className="flex flex-wrap items-center gap-4 flex-1">
-                <select className="bg-gray-50 border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 p-2.5 font-bold" value={selectedYear} onChange={handleYearChange}>
-                  {availableYears.map(year => <option key={year} value={year}>Tahun {year}</option>)}
-                </select>
+                <h3 className="font-bold text-gray-800 hidden md:block">Daftar Data Nilai Transaksi</h3>
+                <div className="h-6 w-px bg-gray-200 hidden md:block"></div>
+                <div className="w-40">
+                  <Select
+                    options={yearOptions}
+                    value={yearOptions.find(opt => opt.value == selectedYear)}
+                    onChange={handleYearChange}
+                    className="text-sm font-bold"
+                    placeholder="Pilih Tahun"
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        borderRadius: '0.75rem',
+                        borderColor: '#e5e7eb',
+                        backgroundColor: '#f9fafb',
+                        minHeight: '42px',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#10b981'
+                        }
+                      }),
+                      singleValue: (base) => ({
+                        ...base,
+                        color: '#374151',
+                        fontWeight: 'bold'
+                      }),
+                      menu: (base) => ({
+                        ...base,
+                        borderRadius: '0.75rem',
+                        zIndex: 50
+                      })
+                    }}
+                  />
+                </div>
                 <div className="w-full md:w-64 relative">
-                  <TextInput className="w-full text-sm" placeholder="Cari KTH, Komoditas, Lokasi..." value={searchTerm} onChange={handleSearch} />
+                  <TextInput className="w-full text-sm pl-10 bg-gray-50 border-gray-200 focus:bg-white transition-colors rounded-xl" placeholder="Cari KTH, Komoditas..." value={searchTerm} onChange={handleSearch} />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                    </svg>
+                  </div>
                   {isSearching && <div className="absolute right-3 top-1/2 -translate-y-1/2"><svg className="animate-spin h-4 w-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>}
                 </div>
               </div>
               <div className="flex gap-2">
-                {/* Export button removed from here as it is moved to header */}
+                <div className="text-sm text-gray-400 font-bold bg-gray-50 px-3 py-1 rounded-full border border-gray-100 shrink-0 self-center">
+                  {datas.total} Data Teritem
+                </div>
               </div>
             </div>
 
@@ -233,11 +276,11 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
               <table className="w-full text-left text-sm text-gray-500">
                 <thead className="bg-gray-50/50 text-gray-700 uppercase tracking-wider text-[11px] font-bold">
                   <tr>
+                    <th className="px-6 py-4">Bulan / Tahun</th>
                     <th className="px-6 py-4">KTH / Lokasi</th>
-                    <th className="px-6 py-4">Komoditas</th>
-                    <th className="px-6 py-4 text-center">Volume Total</th>
-                    <th className="px-6 py-4 text-right">Nilai Transaksi (Total)</th>
-                    <th className="px-6 py-4 text-center">Periode</th>
+                    <th className="px-6 py-4">Komoditas & Volume</th>
+                    <th className="px-6 py-4 text-right">Nilai Transaksi</th>
+                    <th className="px-6 py-4">Input Oleh</th>
                     <th className="px-6 py-4 text-center">Status</th>
                     <th className="px-6 py-4 text-center">Aksi</th>
                   </tr>
@@ -246,55 +289,125 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                   {datas.data.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50/50 transition-colors group">
                       <td className="px-6 py-4">
-                        <div className="font-bold text-gray-900">{item.nama_kth}</div>
-                        <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{item.regency_name} • {item.district_name}</div>
+                        <div className="font-bold text-gray-900">{new Date(0, item.month - 1).toLocaleString('id-ID', { month: 'long' })}</div>
+                        <div className="text-xs text-gray-400 font-semibold">{item.year}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex flex-wrap gap-1">
+                        <div className="font-bold text-gray-900">{item.nama_kth}</div>
+                        <div className="text-xs text-emerald-600 font-bold uppercase tracking-tighter">
+                          {item.village_name || item.village_rel?.name}, {item.district_name || item.district_rel?.name}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1">
                           {item.details && item.details.map((d, idx) => (
-                            <span key={idx} className="px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 rounded text-[10px] font-bold">
-                              {d.commodity?.name || '-'}
-                            </span>
+                            <div key={idx} className="flex items-center justify-between text-xs border-b border-gray-50 pb-1 last:border-0 last:pb-0">
+                              <span className="font-bold text-gray-600">{d.commodity?.name}</span>
+                              <span className="text-gray-400 font-mono">{formatNumber(d.volume_produksi)} <span className="text-[10px]">{d.satuan}</span></span>
+                            </div>
                           ))}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-center font-bold text-gray-700">
-                        {formatNumber(item.details ? item.details.reduce((acc, curr) => acc + parseFloat(curr.volume_produksi), 0) : 0)}
+                      <td className="px-6 py-4 text-right">
+                        <span className="text-emerald-700 font-bold text-base leading-tight">
+                          {formatRupiah(item.total_nilai_transaksi)}
+                        </span>
                       </td>
-                      <td className="px-6 py-4 text-right font-bold text-emerald-700 text-base">{formatRupiah(item.total_nilai_transaksi)}</td>
-                      <td className="px-6 py-4 text-center">
-                        <div className="font-bold text-gray-900">{new Date(0, item.month - 1).toLocaleString('id-ID', { month: 'long' })}</div>
-                        <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{item.year}</div>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500 border border-slate-200 shrink-0">
+                            {item.creator?.name?.substring(0, 2).toUpperCase() || '??'}
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-bold text-gray-900 truncate leading-none">{item.creator?.name || 'Unknown'}</span>
+                            <span className="text-[10px] text-gray-400 font-medium mt-1 uppercase tracking-tight">{new Date(item.created_at).toLocaleDateString('id-ID')}</span>
+                          </div>
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-center"><StatusBadge status={item.status} /></td>
                       <td className="px-6 py-4">
                         <div className="flex justify-center gap-2">
                           {(canEdit && (item.status === 'draft' || item.status === 'rejected')) && (
-                            <button onClick={() => handleSubmit(item.id)} className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="Ajukan">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" /></svg>
+                            <button
+                              onClick={() => handleSubmit(item.id)}
+                              className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shadow-sm bg-blue-50"
+                              title="Kirim ke Pimpinan"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 9l3 3m0 0l-3 3m3-3H9" />
+                              </svg>
                             </button>
                           )}
-                          {((canEdit && (item.status === 'draft' || item.status === 'rejected')) || isAdmin) && (
-                            <Link href={route('nilai-transaksi-ekonomi.edit', item.id)} className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors" title="Edit">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                            </Link>
-                          )}
+
                           {(canApprove && (isKasi || isAdmin) && item.status === 'waiting_kasi') && (
-                            <div className="flex gap-1">
-                              <button onClick={() => handleVerify(item.id)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="Setujui"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg></button>
-                              <button onClick={() => handleReject(item.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Tolak"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-                            </div>
+                            <>
+                              <button
+                                onClick={() => handleVerify(item.id)}
+                                className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm bg-emerald-50"
+                                title="Setujui Laporan"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => handleReject(item.id)}
+                                className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-red-50"
+                                title="Tolak Laporan"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </>
                           )}
+
                           {(canApprove && (isKaCdk || isAdmin) && item.status === 'waiting_cdk') && (
-                            <div className="flex gap-1">
-                              <button onClick={() => handleVerify(item.id)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="Setujui"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
-                              <button onClick={() => handleReject(item.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Tolak"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
-                            </div>
+                            <>
+                              <button
+                                onClick={() => handleVerify(item.id)}
+                                className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm bg-emerald-50"
+                                title="Setujui Laporan"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => handleReject(item.id)}
+                                className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-red-50"
+                                title="Tolak Laporan"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </button>
+                            </>
                           )}
-                          {(canDelete || isAdmin) && (
-                            <button onClick={() => handleDelete(item.id)} className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="Hapus">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            </button>
+
+                          {((canEdit && (item.status === 'draft' || item.status === 'rejected')) || isAdmin) && (
+                            <>
+                              <Link
+                                href={route('nilai-transaksi-ekonomi.edit', item.id)}
+                                className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm bg-emerald-50"
+                                title="Edit Data"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                              </Link>
+                              {(canDelete || isAdmin) && (
+                                <button
+                                  onClick={() => handleDelete(item.id)}
+                                  className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-red-50"
+                                  title="Hapus Data"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                                </button>
+                              )}
+                            </>
                           )}
                         </div>
                       </td>
