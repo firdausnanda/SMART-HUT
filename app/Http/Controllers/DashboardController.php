@@ -494,8 +494,9 @@ class DashboardController extends Controller
                 ->selectRaw('m_regencies.name as regency, count(*) as count')
                 ->groupBy('m_regencies.name')
                 ->pluck('count', 'regency'),
-            'by_production_type' => \App\Models\Pbphh::join('m_jenis_produksi', 'pbphh.id_jenis_produksi', '=', 'm_jenis_produksi.id')
-                ->selectRaw('m_jenis_produksi.name as type, count(*) as count')
+            'by_production_type' => \App\Models\Pbphh::join('pbphh_jenis_produksi', 'pbphh.id', '=', 'pbphh_jenis_produksi.pbphh_id')
+                ->join('m_jenis_produksi', 'pbphh_jenis_produksi.jenis_produksi_id', '=', 'm_jenis_produksi.id')
+                ->selectRaw('m_jenis_produksi.name as type, count(distinct pbphh.id) as count')
                 ->groupBy('m_jenis_produksi.name')
                 ->get()
                 ->toArray(),

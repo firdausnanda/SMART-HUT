@@ -21,7 +21,156 @@ class NilaiTransaksiEkonomiController extends Controller
     $this->middleware('permission:pemberdayaan.approve')->only(['verify', 'approve', 'reject']);
   }
 
-  // ... (index through destroy unchanged)
+  public function index(Request $request)
+  {
+    $selectedYear = $request->query('year');
+    if (!$selectedYear) {
+      $selectedYear = NilaiTransaksiEkonomi::max('year') ?? date('Y');
+    }
+
+    $datas = NilaiTransaksiEkonomi::query()
+      ->leftJoin('m_regencies', 'nilai_transaksi_ekonomi.regency_id', '=', 'm_regencies.id')
+      ->leftJoin('m_districts', 'nilai_transaksi_ekonomi.district_id', '=', 'm_districts.id')
+      ->leftJoin('m_villages', 'nilai_transaksi_ekonomi.village_id', '=', 'm_villages.id')
+      ->select(
+        'nilai_transaksi_ekonomi.*',
+        'm_regencies.name as regency_name',
+        'm_districts.name as district_name',
+        'm_villages.name as village_name'
+      )
+      ->when($selectedYear, fn($q, $y) => $q->where('nilai_transaksi_ekonomi.year', $y))
+      ->when($request->search, function ($query, $search) {
+        $query->where(function ($q) use ($search) {
+          $q->where('nilai_transaksi_ekonomi.nama_kth', 'like', "%{$search}%")
+            ->orWhere('m_villages.name', 'like', "%{$search}%")
+            ->orWhere('m_districts.name', 'like', "%{$search}%")
+            ->orWhere('m_regencies.name', 'like', "%{$search}%")
+            ->orWhereHas('details.commodity', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
+        });
+      })
+      ->with(['creator', 'regency_rel', 'district_rel', 'village_rel', 'details.commodity'])
+      ->latest('nilai_transaksi_ekonomi.created_at')
+      ->paginate(10)
+      ->withQueryString();
+
+    $stats = [
+      'total_transaksi' => NilaiTransaksiEkonomi::where('year', $selectedYear)->where('status', 'final')->count(),
+      'total_nilai' => NilaiTransaksiEkonomi::where('year', $selectedYear)->where('status', 'final')->sum('total_nilai_transaksi'),
+      'total_volume' => \App\Models\NilaiTransaksiEkonomiDetail::whereHas('nilaiTransaksiEkonomi', fn($q) => $q->where('year', $selectedYear)->where('status', 'final'))->sum('volume_produksi'),
+      'total_kth' => NilaiTransaksiEkonomi::where('year', $selectedYear)->where('status', 'final')->distinct('nama_kth')->count('nama_kth'),
+    ];
+
+    $dbYears = NilaiTransaksiEkonomi::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
+    $fixedYears = range(2025, 2021);
+    $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
+    rsort($availableYears);
+
+    return Inertia::render('NilaiTransaksiEkonomi/Index', [
+      'datas' => $datas,
+      'stats' => $stats,
+      'filters' => ['year' => (int) $selectedYear, 'search' => $request->search],
+      'availableYears' => $availableYears,
+    ]);
+  }
+
+  public function create()
+  {
+    return Inertia::render('NilaiTransaksiEkonomi/Create', [
+      'commodities' => Commodity::orderBy('name')->get(),
+    ]);
+  }
+
+  public function store(Request $request)
+  {
+    $validated = $request->validate([
+      'year' => 'required|integer',
+      'month' => 'required|integer|min:1|max:12',
+      'province_id' => 'nullable|exists:m_provinces,id',
+      'regency_id' => 'nullable|exists:m_regencies,id',
+      'district_id' => 'nullable|exists:m_districts,id',
+      'village_id' => 'nullable|exists:m_villages,id',
+      'nama_kth' => 'required|string|max:255',
+      'details' => 'required|array|min:1',
+      'details.*.commodity_id' => 'required|exists:m_commodities,id',
+      'details.*.volume_produksi' => 'required|numeric|min:0',
+      'details.*.satuan' => 'required|string|max:50',
+      'details.*.nilai_transaksi' => 'required|numeric|min:0',
+    ]);
+
+    $validated['status'] = 'draft';
+    $validated['created_by'] = Auth::id();
+
+    $totalValue = collect($request->details)->sum('nilai_transaksi');
+    $validated['total_nilai_transaksi'] = $totalValue;
+
+    $record = NilaiTransaksiEkonomi::create($validated);
+
+    foreach ($request->details as $detail) {
+      $record->details()->create([
+        'commodity_id' => $detail['commodity_id'],
+        'volume_produksi' => $detail['volume_produksi'],
+        'satuan' => $detail['satuan'],
+        'nilai_transaksi' => $detail['nilai_transaksi'],
+      ]);
+    }
+
+    return redirect()->route('nilai-transaksi-ekonomi.index')->with('success', 'Data transaksi berhasil ditambahkan.');
+  }
+
+  public function show(NilaiTransaksiEkonomi $nilaiTransaksiEkonomi)
+  {
+    //
+  }
+
+  public function edit(NilaiTransaksiEkonomi $nilaiTransaksiEkonomi)
+  {
+    $nilaiTransaksiEkonomi->load(['regency_rel', 'district_rel', 'village_rel', 'details.commodity']);
+
+    return Inertia::render('NilaiTransaksiEkonomi/Edit', [
+      'data' => $nilaiTransaksiEkonomi,
+      'commodities' => Commodity::orderBy('name')->get(),
+    ]);
+  }
+
+  public function update(Request $request, NilaiTransaksiEkonomi $nilaiTransaksiEkonomi)
+  {
+    if (!in_array($nilaiTransaksiEkonomi->status, ['draft', 'rejected'])) {
+      return redirect()->back()->with('error', 'Data tidak dapat diedit karena sedang dalam proses verifikasi atau sudah final.');
+    }
+
+    $validated = $request->validate([
+      'year' => 'required|integer',
+      'month' => 'required|integer|min:1|max:12',
+      'province_id' => 'nullable|exists:m_provinces,id',
+      'regency_id' => 'nullable|exists:m_regencies,id',
+      'district_id' => 'nullable|exists:m_districts,id',
+      'village_id' => 'nullable|exists:m_villages,id',
+      'nama_kth' => 'required|string|max:255',
+      'details' => 'required|array|min:1',
+      'details.*.commodity_id' => 'required|exists:m_commodities,id',
+      'details.*.volume_produksi' => 'required|numeric|min:0',
+      'details.*.satuan' => 'required|string|max:50',
+      'details.*.nilai_transaksi' => 'required|numeric|min:0',
+    ]);
+
+    $validated['updated_by'] = Auth::id();
+    $totalValue = collect($request->details)->sum('nilai_transaksi');
+    $validated['total_nilai_transaksi'] = $totalValue;
+
+    $nilaiTransaksiEkonomi->update($validated);
+    $nilaiTransaksiEkonomi->details()->delete();
+
+    foreach ($request->details as $detail) {
+      $nilaiTransaksiEkonomi->details()->create([
+        'commodity_id' => $detail['commodity_id'],
+        'volume_produksi' => $detail['volume_produksi'],
+        'satuan' => $detail['satuan'],
+        'nilai_transaksi' => $detail['nilai_transaksi'],
+      ]);
+    }
+
+    return redirect()->route('nilai-transaksi-ekonomi.index')->with('success', 'Data transaksi berhasil diperbarui.');
+  }
 
   public function destroy(NilaiTransaksiEkonomi $nilaiTransaksiEkonomi)
   {
