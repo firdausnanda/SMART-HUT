@@ -23,6 +23,7 @@ return new class extends Migration {
             // Data
             $table->enum('forest_type', ['Hutan Negara', 'Hutan Rakyat', 'Perhutanan Sosial']);
             $table->string('annual_volume_target');
+            $table->string('annual_volume_realization');
             $table->string('id_kayu');
 
             // Status & Approval

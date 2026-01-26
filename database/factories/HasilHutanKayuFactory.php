@@ -41,6 +41,7 @@ class HasilHutanKayuFactory extends Factory
       'district_id' => $district->id,
       'forest_type' => fake()->randomElement(['Hutan Rakyat', 'Hutan Negara']),
       'annual_volume_target' => fake()->randomFloat(2, 50, 5000),
+      'annual_volume_realization' => fake()->randomFloat(2, 50, 5000),
       'id_kayu' => $kayu->id ?? 1,
       'status' => 'final',
       'approved_by_kasi_at' => now(),

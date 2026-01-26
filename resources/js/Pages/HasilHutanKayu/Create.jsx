@@ -17,6 +17,7 @@ export default function Create({ auth, kayu_list, forest_type }) {
     district_id: '',
     forest_type: forest_type || 'Hutan Negara',
     annual_volume_target: '',
+    annual_volume_realization: '',
     id_kayu: '',
   });
 
@@ -29,7 +30,6 @@ export default function Create({ auth, kayu_list, forest_type }) {
   const formatLabel = (name) => {
     if (!name) return '';
     return name.toLowerCase()
-      .replace('kabupaten', 'Kab.')
       .replace('kota', 'Kota')
       .split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -301,6 +301,22 @@ export default function Create({ auth, kayu_list, forest_type }) {
                     <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400 text-xs font-bold">m³</div>
                   </div>
                   <InputError message={errors.annual_volume_target} className="mt-2" />
+                </div>
+
+                <div>
+                  <InputLabel htmlFor="annual_volume_realization" value="Realisasi Volume Tahunan" className="text-gray-700 font-bold mb-2" />
+                  <div className="relative">
+                    <TextInput
+                      id="annual_volume_realization"
+                      type="text"
+                      className="w-full pr-12"
+                      value={data.annual_volume_realization}
+                      onChange={(e) => setData('annual_volume_realization', e.target.value)}
+                      required
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400 text-xs font-bold">m³</div>
+                  </div>
+                  <InputError message={errors.annual_volume_realization} className="mt-2" />
                 </div>
 
               </div>

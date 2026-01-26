@@ -29,14 +29,14 @@ class RhlTeknisImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
       'tahun' => 'required|numeric',
       'bulan_angka' => 'required|numeric|min:1|max:12',
       'target_tahunan_ha' => 'required|numeric',
-      'sumber_dana' => ['required', \Illuminate\Validation\Rule::in(['apbn', 'apbd provinsi', 'apbd kabupaten/kota', 'bums', 'csr', 'bpdlh', 'lainnya'])],
+      'sumber_dana' => ['required', 'exists:m_sumber_dana,name'],
     ];
   }
 
   public function customValidationMessages()
   {
     return [
-      'sumber_dana.in' => 'Sumber Dana harus: apbn, apbd provinsi, apbd kabupaten/kota, bums, csr, bpdlh, atau lainnya.',
+      'sumber_dana.exists' => 'Sumber Dana tidak ditemukan di data referensi (Master Sumber Dana).',
     ];
   }
 

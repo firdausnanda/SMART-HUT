@@ -44,7 +44,7 @@ export default function Edit({ auth, data: transactionData, commodities }) {
 
   const formatLabel = (name) => {
     if (!name) return '';
-    return name.toLowerCase().replace('kabupaten', 'Kab.').replace('kota', 'Kota').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    return name.toLowerCase().replace('kota', 'Kota').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
   useEffect(() => {

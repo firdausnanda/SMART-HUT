@@ -29,7 +29,6 @@ export default function Create({ auth, provinces, regencies, pengelola_wisata })
   const formatLabel = (name) => {
     if (!name) return '';
     return name.toLowerCase()
-      .replace('kabupaten', 'Kab.')
       .replace('kota', 'Kota')
       .split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))

@@ -434,6 +434,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                   <th className="px-6 py-4">Lokasi (Kec/Desa)</th>
                   <th className="px-6 py-4">Jenis Kayu</th>
                   <th className="px-6 py-4">Target Volume</th>
+                  <th className="px-6 py-4">Realisasi Volume</th>
                   <th className="px-6 py-4 text-center">Status</th>
                   <th className="px-6 py-4 text-center">Aksi</th>
                 </tr>
@@ -462,6 +463,9 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                     </td>
                     <td className="px-6 py-4">
                       <span className="font-bold text-gray-900">{item.annual_volume_target}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="font-bold text-emerald-700">{item.annual_volume_realization}</span>
                     </td>
                     <td className="px-6 py-4 text-center">
                       <StatusBadge status={item.status} />

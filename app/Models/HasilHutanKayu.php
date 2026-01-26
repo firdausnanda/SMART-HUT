@@ -21,6 +21,7 @@ class HasilHutanKayu extends Model
         "district_id",
         "forest_type",
         "annual_volume_target",
+        "annual_volume_realization",
         "id_kayu",
         "status",
         "approved_by_kasi_at",

@@ -33,7 +33,7 @@ class RehabManggroveImport implements ToModel, WithHeadingRow, WithValidation, S
       'nama_kecamatan' => 'required|exists:m_districts,name',
       'target_tahunan_ha' => 'required|numeric',
       'realisasi_ha' => 'required|numeric',
-      'sumber_dana' => ['required', \Illuminate\Validation\Rule::in(['apbn', 'apbd provinsi', 'apbd kabupaten/kota', 'bums', 'csr', 'bpdlh', 'lainnya'])],
+      'sumber_dana' => ['required', 'exists:m_sumber_dana,name'],
     ];
   }
 
@@ -42,7 +42,7 @@ class RehabManggroveImport implements ToModel, WithHeadingRow, WithValidation, S
     return [
       'nama_kabupaten.exists' => 'Kabupaten tidak ditemukan.',
       'nama_kecamatan.exists' => 'Kecamatan tidak ditemukan.',
-      'sumber_dana.in' => 'Sumber Dana harus: apbn, apbd provinsi, apbd kabupaten/kota, bums, csr, bpdlh, atau lainnya.',
+      'sumber_dana.exists' => 'Sumber Dana tidak ditemukan di data referensi (Master Sumber Dana).',
     ];
   }
 

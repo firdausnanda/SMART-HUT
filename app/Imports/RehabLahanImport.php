@@ -33,7 +33,7 @@ class RehabLahanImport implements ToModel, WithHeadingRow, WithValidation, Skips
       'nama_kecamatan' => 'required|exists:m_districts,name',
       'target_tahunan_ha' => 'required|numeric',
       'realisasi_ha' => 'required|numeric',
-      'sumber_dana' => ['required', \Illuminate\Validation\Rule::in(['apbn', 'apbd provinsi', 'apbd kabupaten/kota', 'bums', 'csr', 'bpdlh', 'lainnya'])],
+      'sumber_dana' => ['required', 'exists:m_sumber_dana,name'],
     ];
   }
 
@@ -44,7 +44,7 @@ class RehabLahanImport implements ToModel, WithHeadingRow, WithValidation, Skips
       'nama_kecamatan.exists' => 'Kecamatan tidak ditemukan.',
       'bulan_angka.min' => 'Bulan harus 1-12.',
       'bulan_angka.max' => 'Bulan harus 1-12.',
-      'sumber_dana.in' => 'Sumber Dana harus: apbn, apbd provinsi, apbd kabupaten/kota, bums, csr, bpdlh, atau lainnya.',
+      'sumber_dana.exists' => 'Sumber Dana tidak ditemukan di data referensi (Master Sumber Dana).',
     ];
   }
 
