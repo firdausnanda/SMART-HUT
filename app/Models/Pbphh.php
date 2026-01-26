@@ -49,7 +49,7 @@ class Pbphh extends Model
         return $this->belongsTo(Districts::class);
     }
 
-    public function jenis_produksi()
+    public function jenisProduksi()
     {
         return $this->belongsToMany(JenisProduksi::class, 'pbphh_jenis_produksi', 'pbphh_id', 'jenis_produksi_id')
             ->withPivot('kapasitas_ijin')

@@ -12,6 +12,11 @@ class PbphhSeeder extends Seeder
    */
   public function run(): void
   {
-    Pbphh::factory(100)->create();
+    Pbphh::factory(100)->create()->each(function ($pbphh) {
+      $jenis = \App\Models\JenisProduksi::inRandomOrder()->first();
+      if ($jenis) {
+        $pbphh->jenisProduksi()->attach($jenis->id, ['kapasitas_ijin' => fake()->numberBetween(100, 1000)]);
+      }
+    });
   }
 }

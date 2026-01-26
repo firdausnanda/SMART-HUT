@@ -43,7 +43,6 @@ class PbphhFactory extends Factory
       'investment_value' => fake()->numberBetween(1000000, 1000000000),
       'number_of_workers' => fake()->numberBetween(10, 500),
       'present_condition' => fake()->boolean(),
-      'id_jenis_produksi' => $jenisProduksi->id ?? 1,
       'status' => 'final',
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
