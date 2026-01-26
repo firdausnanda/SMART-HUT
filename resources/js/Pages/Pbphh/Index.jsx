@@ -430,9 +430,15 @@ export default function Index({ auth, datas, stats }) {
                           )}
                         </td>
                         <td className="px-6 py-4">
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-700 border border-amber-100">
-                            {item.jenis_produksi?.name || '-'}
-                          </span>
+                          <div className="flex flex-col gap-1">
+                            {item.jenis_produksi && item.jenis_produksi.length > 0 ? (
+                              item.jenis_produksi.map((jp, idx) => (
+                                <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-700 border border-amber-100">
+                                  {jp.name} ({jp.pivot?.kapasitas_ijin || '-'})
+                                </span>
+                              ))
+                            ) : '-'}
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           {getStatusBadge(item.status)}

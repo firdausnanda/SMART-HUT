@@ -14,4 +14,11 @@ class JenisProduksi extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function pbphh()
+    {
+        return $this->belongsToMany(Pbphh::class, 'pbphh_jenis_produksi', 'jenis_produksi_id', 'pbphh_id')
+            ->withPivot('kapasitas_ijin')
+            ->withTimestamps();
+    }
 }

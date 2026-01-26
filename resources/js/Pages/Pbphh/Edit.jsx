@@ -18,7 +18,10 @@ export default function Edit({ auth, data: item, jenis_produksi_list }) {
     investment_value: item.investment_value || '',
     number_of_workers: item.number_of_workers || '',
     present_condition: item.present_condition ?? true,
-    id_jenis_produksi: item.id_jenis_produksi || '',
+    jenis_produksi: (item.jenis_produksi && item.jenis_produksi.length > 0) ? item.jenis_produksi.map(p => ({
+      jenis_produksi_id: p.id,
+      kapasitas_ijin: p.pivot?.kapasitas_ijin || ''
+    })) : [{ jenis_produksi_id: '', kapasitas_ijin: '' }],
   });
 
   const [regencies, setRegencies] = useState([]);
@@ -221,17 +224,69 @@ export default function Edit({ auth, data: item, jenis_produksi_list }) {
                   <InputError message={errors.number} className="mt-2" />
                 </div>
 
-                <div>
-                  <InputLabel htmlFor="id_jenis_produksi" value="Jenis Produksi" className="text-gray-700 font-bold mb-2" />
-                  <Select
-                    options={jenis_produksi_list.map(k => ({ value: k.id, label: k.name }))}
-                    onChange={(opt) => setData('id_jenis_produksi', opt?.value || '')}
-                    value={jenis_produksi_list.find(k => k.id === data.id_jenis_produksi) ? { value: data.id_jenis_produksi, label: jenis_produksi_list.find(k => k.id === data.id_jenis_produksi).name } : null}
-                    placeholder="Pilih Jenis Produksi..."
-                    styles={selectStyles}
-                    isClearable
-                  />
-                  <InputError message={errors.id_jenis_produksi} className="mt-2" />
+                <div className="md:col-span-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <InputLabel value="Jenis Produksi & Kapasitas" className="text-gray-700 font-bold" />
+                    <button
+                      type="button"
+                      onClick={() => setData('jenis_produksi', [...data.jenis_produksi, { jenis_produksi_id: '', kapasitas_ijin: '' }])}
+                      className="text-xs font-bold text-emerald-600 hover:text-emerald-800"
+                    >
+                      + Tambah Jenis Produksi
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {data.jenis_produksi.map((item, index) => (
+                      <div key={index} className="flex flex-col md:flex-row gap-4 items-start p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <div className="flex-1 w-full">
+                          <InputLabel value="Jenis Produksi" className="mb-1 text-xs" />
+                          <Select
+                            options={jenis_produksi_list.map(k => ({ value: k.id, label: k.name }))}
+                            onChange={(opt) => {
+                              const newData = [...data.jenis_produksi];
+                              newData[index].jenis_produksi_id = opt?.value || '';
+                              setData('jenis_produksi', newData);
+                            }}
+                            placeholder="Pilih Jenis..."
+                            styles={selectStyles}
+                            value={jenis_produksi_list.find(k => k.id === item.jenis_produksi_id) ? { value: item.jenis_produksi_id, label: jenis_produksi_list.find(k => k.id === item.jenis_produksi_id).name } : null}
+                          />
+                          <InputError message={errors[`jenis_produksi.${index}.jenis_produksi_id`]} className="mt-1" />
+                        </div>
+                        <div className="flex-1 w-full">
+                          <InputLabel value="Kapasitas Ijin" className="mb-1 text-xs" />
+                          <TextInput
+                            type="text"
+                            className="w-full"
+                            value={item.kapasitas_ijin}
+                            onChange={(e) => {
+                              const newData = [...data.jenis_produksi];
+                              newData[index].kapasitas_ijin = e.target.value;
+                              setData('jenis_produksi', newData);
+                            }}
+                            placeholder="Contoh: 1000 m3/tahun"
+                          />
+                          <InputError message={errors[`jenis_produksi.${index}.kapasitas_ijin`]} className="mt-1" />
+                        </div>
+                        {data.jenis_produksi.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newData = [...data.jenis_produksi];
+                              newData.splice(index, 1);
+                              setData('jenis_produksi', newData);
+                            }}
+                            className="mt-6 text-red-500 hover:text-red-700"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="md:col-span-2 mt-4">

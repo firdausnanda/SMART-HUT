@@ -22,7 +22,7 @@ class Pbphh extends Model
         'investment_value',
         'number_of_workers',
         'present_condition',
-        'id_jenis_produksi',
+        // 'id_jenis_produksi', // Removed: Moved to pivot table
         'status',
         'approved_by_kasi_at',
         'approved_by_cdk_at',
@@ -51,7 +51,9 @@ class Pbphh extends Model
 
     public function jenis_produksi()
     {
-        return $this->belongsTo(JenisProduksi::class, 'id_jenis_produksi');
+        return $this->belongsToMany(JenisProduksi::class, 'pbphh_jenis_produksi', 'pbphh_id', 'jenis_produksi_id')
+            ->withPivot('kapasitas_ijin')
+            ->withTimestamps();
     }
 
     public function getActivitylogOptions(): LogOptions

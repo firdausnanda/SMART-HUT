@@ -24,18 +24,18 @@ class PbphhController extends Controller
     $datas = Pbphh::query()
       ->leftJoin('m_regencies', 'pbphh.regency_id', '=', 'm_regencies.id')
       ->leftJoin('m_districts', 'pbphh.district_id', '=', 'm_districts.id')
-      ->leftJoin('m_jenis_produksi', 'pbphh.id_jenis_produksi', '=', 'm_jenis_produksi.id')
       ->select(
         'pbphh.*',
         'm_regencies.name as regency_name',
-        'm_districts.name as district_name',
-        'm_jenis_produksi.name as jenis_produksi_name'
+        'm_districts.name as district_name'
       )
       ->when($request->search, function ($query, $search) {
         $query->where(function ($q) use ($search) {
           $q->where('pbphh.name', 'like', "%{$search}%")
             ->orWhere('pbphh.number', 'like', "%{$search}%")
-            ->orWhere('m_jenis_produksi.name', 'like', "%{$search}%")
+            ->orWhereHas('jenis_produksi', function ($q2) use ($search) {
+              $q2->where('name', 'like', "%{$search}%");
+            })
             ->orWhere('m_regencies.name', 'like', "%{$search}%")
             ->orWhere('m_districts.name', 'like', "%{$search}%");
         });
@@ -77,10 +77,19 @@ class PbphhController extends Controller
       'investment_value' => 'required|integer|min:0',
       'number_of_workers' => 'required|integer|min:0',
       'present_condition' => 'required|boolean',
-      'id_jenis_produksi' => 'required|exists:m_jenis_produksi,id',
+      'jenis_produksi' => 'required|array|min:1',
+      'jenis_produksi.*.jenis_produksi_id' => 'required|exists:m_jenis_produksi,id',
+      'jenis_produksi.*.kapasitas_ijin' => 'required|string',
     ]);
 
-    Pbphh::create($validated);
+    $data = collect($validated)->except('jenis_produksi')->toArray();
+    $pbphh = Pbphh::create($data);
+
+    $pivotData = [];
+    foreach ($request->jenis_produksi as $item) {
+      $pivotData[$item['jenis_produksi_id']] = ['kapasitas_ijin' => $item['kapasitas_ijin']];
+    }
+    $pbphh->jenis_produksi()->sync($pivotData);
 
     return redirect()->route('pbphh.index')
       ->with('success', 'Data berhasil ditambahkan');
@@ -108,10 +117,19 @@ class PbphhController extends Controller
       'investment_value' => 'required|integer|min:0',
       'number_of_workers' => 'required|integer|min:0',
       'present_condition' => 'required|boolean',
-      'id_jenis_produksi' => 'required|exists:m_jenis_produksi,id',
+      'jenis_produksi' => 'required|array|min:1',
+      'jenis_produksi.*.jenis_produksi_id' => 'required|exists:m_jenis_produksi,id',
+      'jenis_produksi.*.kapasitas_ijin' => 'required|string',
     ]);
 
-    $pbphh->update($validated);
+    $data = collect($validated)->except('jenis_produksi')->toArray();
+    $pbphh->update($data);
+
+    $pivotData = [];
+    foreach ($request->jenis_produksi as $item) {
+      $pivotData[$item['jenis_produksi_id']] = ['kapasitas_ijin' => $item['kapasitas_ijin']];
+    }
+    $pbphh->jenis_produksi()->sync($pivotData);
 
     return redirect()->route('pbphh.index')
       ->with('success', 'Data berhasil diperbarui');
