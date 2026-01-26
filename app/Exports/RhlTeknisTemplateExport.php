@@ -15,7 +15,7 @@ class RhlTeknisTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle
 {
   public function headings(): array
   {
-    return ['Tahun', 'Bulan (Angka)', 'Target Tahunan (Ha)', 'Sumber Dana'];
+    return ['Tahun', 'Bulan (Angka)', 'Target Tahunan (Unit)', 'Sumber Dana', 'Jenis Bangunan', 'Jumlah Unit'];
   }
 
   public function title(): string
@@ -33,12 +33,16 @@ class RhlTeknisTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle
     return [
       AfterSheet::class => function (AfterSheet $event) {
         $sheet = $event->sheet->getDelegate();
+
         $validation = $sheet->getCell('B2')->getDataValidation();
         $validation->setType(DataValidation::TYPE_WHOLE)->setErrorStyle(DataValidation::STYLE_STOP)->setAllowBlank(false)->setShowInputMessage(true)->setShowErrorMessage(true)->setFormula1(1)->setFormula2(12)->setErrorTitle('Input Error')->setError('Bulan harus angka 1-12');
         for ($i = 2; $i <= 1000; $i++) {
           $sheet->getCell("B$i")->setDataValidation(clone $validation);
         }
+
         $sheet->getComment('D1')->getText()->createTextRun('Isi dengan: apbn, apbd, swasta, swadaya, other');
+        $sheet->getComment('E1')->getText()->createTextRun("Pisahkan dengan koma (,) untuk lebih dari satu.\nContoh: Dam Penahan, Embung Air\nPilihan: Dam Penahan, Dam Pengendali, Gully Plug, Rehabilitasi Teras, Sumur Resapan");
+        $sheet->getComment('F1')->getText()->createTextRun("Pisahkan dengan koma (,) sesuai urutan jenis bangunan.\nContoh: 5, 2\n(Artinya 5 unit Dam Penahan dan 2 unit Embung Air)");
       },
     ];
   }
