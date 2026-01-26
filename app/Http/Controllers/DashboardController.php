@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\HasilHutanKayu;
 use App\Models\Kups;
+use App\Models\NilaiEkonomi;
 use App\Models\RealisasiPnbp;
 use App\Models\RehabLahan;
 use App\Models\PenghijauanLingkungan;
 use App\Models\RehabManggrove;
 use App\Models\ReboisasiPS;
 use App\Models\RhlTeknis;
+use App\Models\SkemaPerhutananSosial;
 use App\Models\Skps;
 use App\Models\SumberDana;
 use App\Models\KebakaranHutan;
@@ -515,15 +517,15 @@ class DashboardController extends Controller
 
         // --- 4. Kelembagaan Perhutanan Sosial ---
         $kelembagaanPsStats = [
-            'kelompok_count' => \App\Models\Skps::count(),
-            'area_total' => (float) \App\Models\Skps::sum('ps_area'),
-            'kk_total' => (int) \App\Models\Skps::sum('number_of_kk'),
-            'nekon_total' => (float) \App\Models\NilaiEkonomi::where('year', $currentYear)->where('status', 'final')->sum('total_transaction_value'),
-            'scheme_distribution' => \App\Models\SkemaPerhutananSosial::leftJoin('skps', 'm_skema_perhutanan_sosial.id', '=', 'skps.id_skema_perhutanan_sosial')
+            'kelompok_count' => Skps::count(),
+            'area_total' => (float) Skps::sum('ps_area'),
+            'kk_total' => (int) Skps::sum('number_of_kk'),
+            'nekon_total' => (float) NilaiEkonomi::where('year', $currentYear)->where('status', 'final')->sum('total_transaction_value'),
+            'scheme_distribution' => SkemaPerhutananSosial::leftJoin('skps', 'm_skema_perhutanan_sosial.id', '=', 'skps.id_skema_perhutanan_sosial')
                 ->selectRaw('m_skema_perhutanan_sosial.name as scheme, count(skps.id) as count')
                 ->groupBy('m_skema_perhutanan_sosial.id', 'm_skema_perhutanan_sosial.name')
                 ->get(),
-            'economic_by_regency' => \App\Models\NilaiEkonomi::join('m_regencies', 'nilai_ekonomi.regency_id', '=', 'm_regencies.id')
+            'economic_by_regency' => NilaiEkonomi::join('m_regencies', 'nilai_ekonomi.regency_id', '=', 'm_regencies.id')
                 ->where('nilai_ekonomi.year', $currentYear)
                 ->where('nilai_ekonomi.status', 'final')
                 ->selectRaw('m_regencies.name as regency, sum(total_transaction_value) as total')

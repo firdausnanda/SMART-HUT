@@ -148,7 +148,7 @@ class KupsController extends Controller
 
     if (($user->hasRole('cdk') || $user->hasRole('admin')) && $kup->status === 'waiting_cdk') {
       $kup->update([
-        'status' => 'finalized',
+        'status' => 'final',
         'approved_by_cdk_at' => now(),
       ]);
       return back()->with('success', 'Laporan disetujui oleh Kepala CDK.');

@@ -7,6 +7,7 @@ import withReactContent from 'sweetalert2-react-content';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import Pagination from '@/Components/Pagination';
+import StatusBadge from '@/Components/StatusBadge';
 
 const MySwal = withReactContent(Swal);
 
@@ -176,18 +177,6 @@ export default function Index({ auth, kups, stats, filters }) {
       },
       onFinish: () => setIsLoading(false)
     });
-  };
-
-  const getStatusBadge = (status) => {
-    const classes = "px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm border";
-    switch (status) {
-      case 'draft': return <span className={`${classes} bg-gray-100 text-gray-600 border-gray-200`}>Draft</span>;
-      case 'waiting_kasi': return <span className={`${classes} bg-yellow-50 text-yellow-700 border-yellow-200`}>Menunggu Verifikasi</span>;
-      case 'waiting_cdk': return <span className={`${classes} bg-blue-50 text-blue-700 border-blue-200`}>Menunggu Persetujuan</span>;
-      case 'finalized': return <span className={`${classes} bg-green-50 text-green-700 border-green-200`}>Disetujui</span>;
-      case 'rejected': return <span className={`${classes} bg-red-50 text-red-700 border-red-200`}>Ditolak</span>;
-      default: return null;
-    }
   };
 
   // Helper roles
@@ -418,7 +407,7 @@ export default function Index({ auth, kups, stats, filters }) {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          {getStatusBadge(item.status)}
+                          <StatusBadge status={item.status} />
                           {item.status === 'rejected' && item.rejection_note && (
                             <div className="text-[10px] text-red-500 mt-1 font-medium italic max-w-[150px] mx-auto truncate" title={item.rejection_note}>
                               "{item.rejection_note}"

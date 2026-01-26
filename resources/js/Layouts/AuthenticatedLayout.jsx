@@ -241,24 +241,24 @@ export default function Authenticated({ user, header, children }) {
                                                 name: 'Produksi dari Hutan Negara',
                                                 key: 'hutan_negara',
                                                 children: [
-                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Negara' }) },
-                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Negara' }) }
+                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Negara' }), pattern: 'hasil-hutan-kayu.*' },
+                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Negara' }), pattern: 'hasil-hutan-bukan-kayu.*' }
                                                 ]
                                             },
                                             {
                                                 name: 'Produksi dari Perhutanan Sosial',
                                                 key: 'perhutanan_sosial',
                                                 children: [
-                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Perhutanan Sosial' }) },
-                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Perhutanan Sosial' }) }
+                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Perhutanan Sosial' }), pattern: 'hasil-hutan-kayu.*' },
+                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Perhutanan Sosial' }), pattern: 'hasil-hutan-bukan-kayu.*' }
                                                 ]
                                             },
                                             {
                                                 name: 'Produksi dari Hutan Rakyat',
                                                 key: 'hutan_rakyat',
                                                 children: [
-                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Rakyat' }) },
-                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Rakyat' }) }
+                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Rakyat' }), pattern: 'hasil-hutan-kayu.*' },
+                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Rakyat' }), pattern: 'hasil-hutan-bukan-kayu.*' }
                                                 ]
                                             },
                                             { name: 'PBPHH', route: route('pbphh.index'), pattern: 'pbphh.*' },
@@ -279,7 +279,7 @@ export default function Authenticated({ user, header, children }) {
                                                         {openMenus[item.key] && (
                                                             <div className="ml-3 space-y-1 border-l border-white/10 pl-3">
                                                                 {item.children.map((child) => {
-                                                                    const isActive = child.route !== '#' && window.location.href === child.route;
+                                                                    const isActive = child.pattern ? route().current(child.pattern) : (child.route !== '#' && window.location.href === child.route);
                                                                     return (
                                                                         <Link
                                                                             key={child.name}
@@ -375,7 +375,7 @@ export default function Authenticated({ user, header, children }) {
                                                         {openMenus[item.key] && (
                                                             <div className="ml-3 space-y-1 border-l border-white/10 pl-3">
                                                                 {item.children.map((child) => {
-                                                                    const isActive = child.route !== '#' && window.location.href === child.route;
+                                                                    const isActive = child.pattern ? route().current(child.pattern) : (child.route !== '#' && window.location.href === child.route);
                                                                     return (
                                                                         <Link
                                                                             key={child.name}
@@ -636,24 +636,24 @@ export default function Authenticated({ user, header, children }) {
                                                 name: 'Produksi dari Hutan Negara',
                                                 key: 'hutan_negara_mobile',
                                                 children: [
-                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Negara' }) },
-                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Negara' }) }
+                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Negara' }), pattern: 'hasil-hutan-kayu.*' },
+                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Negara' }), pattern: 'hasil-hutan-bukan-kayu.*' }
                                                 ]
                                             },
                                             {
                                                 name: 'Produksi dari Perhutanan Sosial',
                                                 key: 'perhutanan_sosial_mobile',
                                                 children: [
-                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Perhutanan Sosial' }) },
-                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Perhutanan Sosial' }) }
+                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Perhutanan Sosial' }), pattern: 'hasil-hutan-kayu.*' },
+                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Perhutanan Sosial' }), pattern: 'hasil-hutan-bukan-kayu.*' }
                                                 ]
                                             },
                                             {
                                                 name: 'Produksi dari Hutan Rakyat',
                                                 key: 'hutan_rakyat_mobile',
                                                 children: [
-                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Rakyat' }) },
-                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Rakyat' }) }
+                                                    { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Rakyat' }), pattern: 'hasil-hutan-kayu.*' },
+                                                    { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Rakyat' }), pattern: 'hasil-hutan-bukan-kayu.*' }
                                                 ]
                                             },
                                             { name: 'PBPHH', route: route('pbphh.index'), pattern: 'pbphh.*' },
@@ -673,16 +673,22 @@ export default function Authenticated({ user, header, children }) {
                                                         </button>
                                                         {openMenus[item.key] && (
                                                             <div className="ml-3 space-y-1 border-l border-white/10 pl-3">
-                                                                {item.children.map((child) => (
-                                                                    <Link
-                                                                        key={child.name}
-                                                                        href={child.route}
-                                                                        onClick={() => setShowingNavigationDropdown(false)}
-                                                                        className="block py-1.5 text-xs text-primary-400 hover:text-white transition-colors"
-                                                                    >
-                                                                        {child.name}
-                                                                    </Link>
-                                                                ))}
+                                                                {item.children.map((child) => {
+                                                                    const isActive = child.pattern ? route().current(child.pattern) : (child.route !== '#' && window.location.href === child.route);
+                                                                    return (
+                                                                        <Link
+                                                                            key={child.name}
+                                                                            href={child.route}
+                                                                            onClick={() => setShowingNavigationDropdown(false)}
+                                                                            className={`block py-1.5 text-xs transition-colors ${isActive
+                                                                                ? 'text-white font-bold'
+                                                                                : 'text-primary-400 hover:text-white'
+                                                                                }`}
+                                                                        >
+                                                                            {child.name}
+                                                                        </Link>
+                                                                    );
+                                                                })}
                                                             </div>
                                                         )}
                                                     </div>
@@ -727,7 +733,8 @@ export default function Authenticated({ user, header, children }) {
                                     <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                         {[
                                             { name: 'Perkembangan SK PS', route: route('skps.index'), pattern: 'skps.*' },
-                                            { name: 'Perkembangan KUPS', route: route('kups.index'), pattern: 'kups.*' }
+                                            { name: 'Perkembangan KUPS', route: route('kups.index'), pattern: 'kups.*' },
+                                            { name: 'Nilai Ekonomi (NEKON)', route: route('nilai-ekonomi.index'), pattern: 'nilai-ekonomi.*' }
                                         ].map((item) => (
                                             <Link
                                                 key={item.name}
