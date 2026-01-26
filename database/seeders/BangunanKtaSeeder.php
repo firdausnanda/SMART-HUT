@@ -17,7 +17,6 @@ class BangunanKtaSeeder extends Seeder
             ['name' => 'Dam Pengendali'],
             ['name' => 'Gully Plug'],
             ['name' => 'Rehabilitasi Teras'],
-            ['name' => 'Embung Air'],
             ['name' => 'Sumur Resapan'],
         ];
 

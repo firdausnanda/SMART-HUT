@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SumberDana;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,31 +13,39 @@ class SumberDanaSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\SumberDana::create([
+        SumberDana::create([
             'name' => 'APBN'
         ]);
 
-        \App\Models\SumberDana::create([
+        SumberDana::create([
             'name' => 'APBD Provinsi'
         ]);
 
-        \App\Models\SumberDana::create([
+        SumberDana::create([
             'name' => 'APBD Kabupaten/Kota'
         ]);
 
-        \App\Models\SumberDana::create([
+        SumberDana::create([
             'name' => 'BUMS'
         ]);
 
-        \App\Models\SumberDana::create([
+        SumberDana::create([
             'name' => 'CSR'
         ]);
 
-        \App\Models\SumberDana::create([
+        SumberDana::create([
             'name' => 'BPDLH'
         ]);
 
-        \App\Models\SumberDana::create([
+        SumberDana::create([
+            'name' => 'BUMN - PJT'
+        ]);
+
+        SumberDana::create([
+            'name' => 'Swadaya'
+        ]);
+
+        SumberDana::create([
             'name' => 'Lainnya'
         ]);
 
