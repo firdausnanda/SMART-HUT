@@ -19,11 +19,10 @@ class RealisasiPnbpTemplateExport implements WithHeadings, ShouldAutoSize, WithT
       'Tahun',
       'Bulan (Angka 1-12)',
       'Nama Kabupaten/Kota',
-      'Nama Kecamatan',
+      'Nama Pengelola Wisata',
       'Jenis Hasil Hutan',
       'Target PNBP',
-      'Jumlah PSDH',
-      'Jumlah DBHDR'
+      'Realisasi PNBP'
     ];
   }
 
@@ -66,11 +65,10 @@ class RealisasiPnbpTemplateExport implements WithHeadings, ShouldAutoSize, WithT
 
         // Add helpful comments
         $sheet->getComment('C1')->getText()->createTextRun('Contoh: TRENGGALEK, TULUNGAGUNG');
-        $sheet->getComment('D1')->getText()->createTextRun('Contoh: WATULIMO, MUNJUNGAN');
+        $sheet->getComment('D1')->getText()->createTextRun('Nama Pengelola Wisata dari master data');
         $sheet->getComment('E1')->getText()->createTextRun('Contoh: Kayu Jati, Kayu Mahoni, Rotan');
         $sheet->getComment('F1')->getText()->createTextRun('Target PNBP dalam Rupiah');
-        $sheet->getComment('G1')->getText()->createTextRun('PSDH = Provisi Sumber Daya Hutan');
-        $sheet->getComment('H1')->getText()->createTextRun('DBHDR = Diana Bagi Hasil Dana Reboisasi');
+        $sheet->getComment('G1')->getText()->createTextRun('Realisasi PNBP dalam Rupiah');
       },
     ];
   }

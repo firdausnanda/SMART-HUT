@@ -21,11 +21,10 @@ class RealisasiPnbpImport implements ToModel, WithHeadingRow, WithValidation, Sk
       'tahun' => 'required|numeric',
       'bulan_angka_1_12' => 'required|numeric|min:1|max:12',
       'nama_kabupatenkota' => 'required|string',
-      'nama_kecamatan' => 'required|string',
+      'nama_pengelola_wisata' => 'required|string',
       'jenis_hasil_hutan' => 'required|string',
       'target_pnbp' => 'required|string',
-      'jumlah_psdh' => 'required|string',
-      'jumlah_dbhdr' => 'required|string',
+      'realisasi_pnbp' => 'required|string',
     ];
   }
 
@@ -33,7 +32,7 @@ class RealisasiPnbpImport implements ToModel, WithHeadingRow, WithValidation, Sk
   {
     return [
       'nama_kabupatenkota.required' => 'Nama Kabupaten/Kota harus diisi.',
-      'nama_kecamatan.required' => 'Nama Kecamatan harus diisi.',
+      'nama_pengelola_wisata.required' => 'Nama Pengelola Wisata harus diisi.',
     ];
   }
 
@@ -56,17 +55,16 @@ class RealisasiPnbpImport implements ToModel, WithHeadingRow, WithValidation, Sk
       return null;
     }
 
-    // Look up district by name within regency
-    $district = DB::table('m_districts')
-      ->where('regency_id', $regency->id)
-      ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+    // Look up pengelola wisata by name
+    $pengelolaWisata = DB::table('m_pengelola_wisata')
+      ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_pengelola_wisata'])) . '%'])
       ->first();
 
-    if (!$district) {
+    if (!$pengelolaWisata) {
       $this->onFailure(new \Maatwebsite\Excel\Validators\Failure(
         $this->getRowNumber(),
-        'nama_kecamatan',
-        ["Kecamatan '{$row['nama_kecamatan']}' tidak ditemukan di {$regency->name}."]
+        'nama_pengelola_wisata',
+        ["Pengelola Wisata '{$row['nama_pengelola_wisata']}' tidak ditemukan."]
       ));
       return null;
     }
@@ -76,11 +74,10 @@ class RealisasiPnbpImport implements ToModel, WithHeadingRow, WithValidation, Sk
       'month' => $row['bulan_angka_1_12'],
       'province_id' => $regency->province_id,
       'regency_id' => $regency->id,
-      'district_id' => $district->id,
+      'id_pengelola_wisata' => $pengelolaWisata->id,
       'types_of_forest_products' => $row['jenis_hasil_hutan'],
       'pnbp_target' => $row['target_pnbp'],
-      'number_of_psdh' => $row['jumlah_psdh'],
-      'number_of_dbhdr' => $row['jumlah_dbhdr'],
+      'pnbp_realization' => $row['realisasi_pnbp'],
       'status' => 'draft',
       'created_by' => Auth::id(),
     ]);

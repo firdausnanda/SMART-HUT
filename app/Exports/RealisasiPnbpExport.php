@@ -21,7 +21,7 @@ class RealisasiPnbpExport implements FromQuery, WithHeadings, WithMapping, Shoul
   public function query()
   {
     return RealisasiPnbp::query()
-      ->with(['creator', 'regency', 'district'])
+      ->with(['creator', 'regency', 'pengelola_wisata'])
       ->where('status', 'final')
       ->when($this->year, fn($q) => $q->where('year', $this->year))
       ->orderBy('year', 'desc')
@@ -35,11 +35,10 @@ class RealisasiPnbpExport implements FromQuery, WithHeadings, WithMapping, Shoul
       'Tahun',
       'Bulan',
       'Kabupaten/Kota',
-      'Kecamatan',
+      'Pengelola Wisata',
       'Jenis Hasil Hutan',
       'Target PNBP',
-      'Jumlah PSDH',
-      'Jumlah DBHDR',
+      'Realisasi PNBP',
       'Status',
       'Diinput Oleh',
       'Tanggal Input'
@@ -70,11 +69,10 @@ class RealisasiPnbpExport implements FromQuery, WithHeadings, WithMapping, Shoul
       $row->year,
       $monthNames[$row->month] ?? $row->month,
       $row->regency->name ?? '-',
-      $row->district->name ?? '-',
+      $row->pengelola_wisata->name ?? '-',
       $row->types_of_forest_products,
       $row->pnbp_target,
-      $row->number_of_psdh,
-      $row->number_of_dbhdr,
+      $row->pnbp_realization,
       ucfirst($row->status),
       $row->creator->name ?? 'Unknown',
       $row->created_at->format('d-m-Y H:i'),
