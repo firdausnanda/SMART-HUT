@@ -34,6 +34,7 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
       'nama_kecamatan' => 'required|exists:m_districts,name',
       'jenis_kayu' => 'required|exists:m_kayu,name',
       'target_volume' => 'required|numeric',
+      'realisasi_volume' => 'nullable|numeric',
     ];
   }
 
@@ -104,6 +105,7 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
       'district_id' => $district->id,
       'forest_type' => $this->forestType,
       'annual_volume_target' => $row['target_volume'] ?? 0,
+      'annual_volume_realization' => $row['realisasi_volume'] ?? 0,
       'id_kayu' => $kayu->id,
       'status' => 'draft',
       'created_by' => Auth::id(),

@@ -24,6 +24,7 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
       'Nama Kecamatan',
       'Jenis Kayu',
       'Target Volume',
+      'Realisasi Volume',
     ];
   }
 
@@ -81,6 +82,8 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
         $sheet->getComment('C1')->getText()->createTextRun('Isi dengan Nama Kabupaten/Kota (KABUPATEN TRENGGALEK,KABUPATEN TULUNGAGUNG,KABUPATEN KEDIRI,KOTA KEDIRI)');
         $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan (e.g. KECAMATAN TRENGGALEK)');
         $sheet->getComment('E1')->getText()->createTextRun('Isi dengan Nama Jenis Kayu (e.g. JATI)');
+        $sheet->getComment('F1')->getText()->createTextRun('Isi dengan Target Volume (Angka)');
+        $sheet->getComment('G1')->getText()->createTextRun('Isi dengan Realisasi Volume (Angka)');
       },
     ];
   }
