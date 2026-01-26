@@ -884,38 +884,58 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
 
                       {/* Right: Charts Grid */}
                       <div className="md:col-span-3 space-y-6">
-                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                          <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">Tren Produksi Bulanan</h4>
-                          <div className="h-[200px]">
-                            <Line
-                              data={{
-                                labels: stats?.bina_usaha[source.key]?.kayu_monthly ? Object.keys(stats.bina_usaha[source.key].kayu_monthly).map(m => {
-                                  const date = new Date();
-                                  date.setMonth(m - 1);
-                                  return date.toLocaleString('id-ID', { month: 'short' });
-                                }) : [],
-                                datasets: [
-                                  {
-                                    label: 'Kayu (M³)',
-                                    data: stats?.bina_usaha[source.key]?.kayu_monthly ? Object.values(stats.bina_usaha[source.key].kayu_monthly) : [],
-                                    borderColor: source.color,
-                                    backgroundColor: `${source.color}20`,
-                                    fill: true,
-                                    tension: 0.4,
-                                  },
-                                  {
-                                    label: 'Bukan Kayu (Ton/Ltr)',
-                                    data: stats?.bina_usaha[source.key]?.bukan_kayu_monthly ? Object.values(stats.bina_usaha[source.key].bukan_kayu_monthly) : [],
-                                    borderColor: '#f59e0b',
-                                    backgroundColor: '#f59e0b20',
-                                    fill: true,
-                                    tension: 0.4,
-                                    borderDash: [5, 5]
-                                  }
-                                ]
-                              }}
-                              options={{ ...commonOptions, maintainAspectRatio: false }}
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                            <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">Tren Produksi Kayu Bulanan</h4>
+                            <div className="h-[200px]">
+                              <Line
+                                data={{
+                                  labels: stats?.bina_usaha[source.key]?.kayu_monthly ? Object.keys(stats.bina_usaha[source.key].kayu_monthly).map(m => {
+                                    const date = new Date();
+                                    date.setMonth(m - 1);
+                                    return date.toLocaleString('id-ID', { month: 'short' });
+                                  }) : [],
+                                  datasets: [
+                                    {
+                                      label: 'Kayu (M³)',
+                                      data: stats?.bina_usaha[source.key]?.kayu_monthly ? Object.values(stats.bina_usaha[source.key].kayu_monthly) : [],
+                                      borderColor: source.color,
+                                      backgroundColor: `${source.color}20`,
+                                      fill: true,
+                                      tension: 0.4,
+                                    }
+                                  ]
+                                }}
+                                options={{ ...commonOptions, maintainAspectRatio: false }}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                            <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">Tren Produksi Bukan Kayu Bulanan</h4>
+                            <div className="h-[200px]">
+                              <Line
+                                data={{
+                                  labels: stats?.bina_usaha[source.key]?.bukan_kayu_monthly ? Object.keys(stats.bina_usaha[source.key].bukan_kayu_monthly).map(m => {
+                                    const date = new Date();
+                                    date.setMonth(m - 1);
+                                    return date.toLocaleString('id-ID', { month: 'short' });
+                                  }) : [],
+                                  datasets: [
+                                    {
+                                      label: 'Bukan Kayu (Ton/Ltr)',
+                                      data: stats?.bina_usaha[source.key]?.bukan_kayu_monthly ? Object.values(stats.bina_usaha[source.key].bukan_kayu_monthly) : [],
+                                      borderColor: '#f59e0b',
+                                      backgroundColor: '#f59e0b20',
+                                      fill: true,
+                                      tension: 0.4,
+                                      borderDash: [5, 5]
+                                    }
+                                  ]
+                                }}
+                                options={{ ...commonOptions, maintainAspectRatio: false }}
+                              />
+                            </div>
                           </div>
                         </div>
 
