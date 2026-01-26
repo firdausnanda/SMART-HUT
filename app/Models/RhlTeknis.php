@@ -20,6 +20,11 @@ class RhlTeknis extends Model
     'month',
     'target_annual',
     'fund_source',
+    'province_id',
+    'regency_id',
+    'district_id',
+    'village_id',
+    'coordinates',
     'status',
     'approved_by_kasi_at',
     'approved_by_cdk_at',
@@ -34,6 +39,21 @@ class RhlTeknis extends Model
   public function creator()
   {
     return $this->belongsTo(User::class, 'created_by');
+  }
+
+  public function regency()
+  {
+    return $this->belongsTo(Regencies::class, 'regency_id');
+  }
+
+  public function district()
+  {
+    return $this->belongsTo(Districts::class, 'district_id');
+  }
+
+  public function village()
+  {
+    return $this->belongsTo(Villages::class, 'village_id');
   }
 
   public function getStatusColorAttribute()

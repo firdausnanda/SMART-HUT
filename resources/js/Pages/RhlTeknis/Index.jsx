@@ -305,6 +305,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                 <thead className="bg-gray-50/50 text-gray-700 uppercase tracking-wider text-[11px] font-bold">
                   <tr>
                     <th className="px-6 py-4">Periode</th>
+                    <th className="px-6 py-4">Lokasi</th>
                     <th className="px-6 py-4">Detail Bangunan</th>
                     <th className="px-6 py-4 text-center">Capaian & Target</th>
                     <th className="px-6 py-4">Sumber Dana</th>
@@ -323,6 +324,26 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                         <td className="px-6 py-4">
                           <div className="font-bold text-gray-900">{new Date(0, item.month - 1).toLocaleString('id-ID', { month: 'long' })}</div>
                           <div className="text-[10px] text-gray-400 font-semibold">{item.year}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-bold text-gray-900 text-xs">{item.regency_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
+                            <span className="text-[10px] text-gray-500">Kec. {item.district_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
+                            <span className="text-[10px] text-gray-500">Desa {item.village_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
+                            {item.coordinates && (
+                              <a
+                                href={`https://www.google.com/maps/search/?api=1&query=${item.coordinates}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[9px] text-blue-500 hover:underline flex items-center gap-1 mt-1"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                                </svg>
+                                {item.coordinates}
+                              </a>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="space-y-1">

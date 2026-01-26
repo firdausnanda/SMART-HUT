@@ -20,12 +20,18 @@ class RhlTeknisFactory extends Factory
   {
     $fund_source = SumberDana::inRandomOrder()->first();
     $user = User::inRandomOrder()->first();
+    $village = \App\Models\Villages::with('district.regency')->inRandomOrder()->first();
 
     return [
       'year' => 2026,
-      'month' => fake()->month(),
+      'month' => fake()->numberBetween(1, 12),
       'target_annual' => fake()->numberBetween(1, 50),
       'fund_source' => $fund_source->name ?? 'APBD',
+      'province_id' => 35,
+      'regency_id' => $village?->district?->regency_id,
+      'district_id' => $village?->district_id,
+      'village_id' => $village?->id,
+      'coordinates' => fake()->latitude() . ', ' . fake()->longitude(),
       'status' => 'final',
       'created_by' => $user->id,
       'updated_by' => $user->id,

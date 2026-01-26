@@ -15,7 +15,7 @@ class RhlTeknisTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle
 {
   public function headings(): array
   {
-    return ['Tahun', 'Bulan (Angka)', 'Target Tahunan (Unit)', 'Sumber Dana', 'Jenis Bangunan', 'Jumlah Unit'];
+    return ['Tahun', 'Bulan (Angka)', 'Kabupaten', 'Kecamatan', 'Desa', 'Koordinat', 'Target Tahunan (Unit)', 'Sumber Dana', 'Jenis Bangunan', 'Jumlah Unit'];
   }
 
   public function title(): string
@@ -40,9 +40,14 @@ class RhlTeknisTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle
           $sheet->getCell("B$i")->setDataValidation(clone $validation);
         }
 
-        $sheet->getComment('D1')->getText()->createTextRun('Isi dengan: apbn, apbd, swasta, swadaya, other');
-        $sheet->getComment('E1')->getText()->createTextRun("Pisahkan dengan koma (,) untuk lebih dari satu.\nContoh: Dam Penahan, Embung Air\nPilihan: Dam Penahan, Dam Pengendali, Gully Plug, Rehabilitasi Teras, Sumur Resapan");
-        $sheet->getComment('F1')->getText()->createTextRun("Pisahkan dengan koma (,) sesuai urutan jenis bangunan.\nContoh: 5, 2\n(Artinya 5 unit Dam Penahan dan 2 unit Embung Air)");
+        $sheet->getComment('C1')->getText()->createTextRun('Isi dengan nama Kabupaten sesuai data valid (Contoh: Malang).');
+        $sheet->getComment('D1')->getText()->createTextRun('Isi dengan nama Kecamatan sesuai data valid (Contoh: Kepanjen).');
+        $sheet->getComment('E1')->getText()->createTextRun('Isi dengan nama Desa sesuai data valid.');
+        $sheet->getComment('F1')->getText()->createTextRun("Format: Lat, Long\nContoh: -7.12345, 112.54321");
+
+        $sheet->getComment('H1')->getText()->createTextRun('Isi dengan: apbn, apbd, swasta, swadaya, other');
+        $sheet->getComment('I1')->getText()->createTextRun("Pisahkan dengan koma (,) untuk lebih dari satu.\nContoh: Dam Penahan, Embung Air\nPilihan: Dam Penahan, Dam Pengendali, Gully Plug, Rehabilitasi Teras, Sumur Resapan");
+        $sheet->getComment('J1')->getText()->createTextRun("Pisahkan dengan koma (,) sesuai urutan jenis bangunan.\nContoh: 5, 2\n(Artinya 5 unit Dam Penahan dan 2 unit Embung Air)");
       },
     ];
   }

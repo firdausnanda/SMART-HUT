@@ -22,6 +22,13 @@ return new class extends Migration {
       $table->year('year');
       $table->tinyInteger('month'); // 1-12
 
+      // Specific
+      $table->unsignedBigInteger('province_id')->nullable();
+      $table->char('regency_id', 4)->nullable();
+      $table->char('district_id', 7)->nullable();
+      $table->char('village_id', 10)->nullable();
+      $table->string('coordinates')->nullable(); // Lat,Long
+
       // Standard Mandatory
       $table->decimal('target_annual', 15, 2)->default(0);
       $table->string('fund_source');

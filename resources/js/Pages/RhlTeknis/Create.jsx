@@ -5,17 +5,91 @@ import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import Select from 'react-select';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function Create({ auth, sumberDana, bangunanKta }) {
   const { data, setData, post, processing, errors } = useForm({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
+    province_id: 35, // JAWA TIMUR
+    regency_id: '',
+    district_id: '',
+    village_id: '',
+    coordinates: '',
     target_annual: '',
     fund_source: '',
     details: [
       { bangunan_kta_id: '', unit_amount: 0 }
     ],
   });
+
+  const [regencies, setRegencies] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [villages, setVillages] = useState([]);
+
+  const [loadingRegencies, setLoadingRegencies] = useState(false);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
+  const [loadingVillages, setLoadingVillages] = useState(false);
+
+  const formatLabel = (name) => {
+    if (!name) return '';
+    return name.toLowerCase()
+      .replace('kota', 'Kota')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Initial load: Regencies for Jatim (35)
+  useEffect(() => {
+    setLoadingRegencies(true);
+    axios.get(route('locations.regencies', 35))
+      .then(res => {
+        setRegencies(res.data.map(item => ({
+          value: item.id,
+          label: formatLabel(item.name)
+        })));
+        setLoadingRegencies(false);
+      })
+      .catch(() => setLoadingRegencies(false));
+  }, []);
+
+  // Load Districts when Regency changes
+  useEffect(() => {
+    if (data.regency_id) {
+      setLoadingDistricts(true);
+      axios.get(route('locations.districts', data.regency_id))
+        .then(res => {
+          setDistricts(res.data.map(item => ({
+            value: item.id,
+            label: formatLabel(item.name)
+          })));
+          setLoadingDistricts(false);
+        })
+        .catch(() => setLoadingDistricts(false));
+    } else {
+      setDistricts([]);
+    }
+  }, [data.regency_id]);
+
+  // Load Villages when District changes
+  useEffect(() => {
+    if (data.district_id) {
+      setLoadingVillages(true);
+      axios.get(route('locations.villages', data.district_id))
+        .then(res => {
+          setVillages(res.data.map(item => ({
+            value: item.id,
+            label: formatLabel(item.name)
+          })));
+          setLoadingVillages(false);
+        })
+        .catch(() => setLoadingVillages(false));
+    } else {
+      setVillages([]);
+    }
+  }, [data.district_id]);
 
   const addDetailRow = () => {
     setData('details', [...data.details, { bangunan_kta_id: '', unit_amount: 0 }]);
@@ -97,6 +171,84 @@ export default function Create({ auth, sumberDana, bangunanKta }) {
                       <option key={i + 1} value={i + 1}>{new Date(0, i).toLocaleString('id-ID', { month: 'long' })}</option>
                     ))}
                   </select>
+                </div>
+
+                {/* Location Selects */}
+                <div>
+                  <InputLabel value="Provinsi" className="mb-2" />
+                  <Select
+                    isDisabled
+                    value={{ value: 35, label: 'JAWA TIMUR' }}
+                    styles={selectStyles}
+                  />
+                </div>
+
+                <div>
+                  <InputLabel value="Kabupaten" className="mb-2" />
+                  <Select
+                    options={regencies}
+                    isLoading={loadingRegencies}
+                    onChange={(opt) => {
+                      setData((prev) => ({
+                        ...prev,
+                        regency_id: opt?.value || '',
+                        district_id: '',
+                        village_id: ''
+                      }));
+                    }}
+                    placeholder="Pilih Kabupaten..."
+                    styles={selectStyles}
+                    isClearable
+                  />
+                  <InputError message={errors.regency_id} className="mt-2" />
+                </div>
+
+                <div>
+                  <InputLabel value="Kecamatan" className="mb-2" />
+                  <Select
+                    options={districts}
+                    isLoading={loadingDistricts}
+                    isDisabled={!data.regency_id}
+                    onChange={(opt) => {
+                      setData((prev) => ({
+                        ...prev,
+                        district_id: opt?.value || '',
+                        village_id: ''
+                      }));
+                    }}
+                    placeholder="Pilih Kecamatan..."
+                    styles={selectStyles}
+                    isClearable
+                    value={districts.find(d => d.value === data.district_id) || null}
+                  />
+                  <InputError message={errors.district_id} className="mt-2" />
+                </div>
+
+                <div>
+                  <InputLabel value="Desa" className="mb-2" />
+                  <Select
+                    options={villages}
+                    isLoading={loadingVillages}
+                    isDisabled={!data.district_id}
+                    onChange={(opt) => setData('village_id', opt?.value || '')}
+                    placeholder="Pilih Desa..."
+                    styles={selectStyles}
+                    isClearable
+                    value={villages.find(v => v.value === data.village_id) || null}
+                  />
+                  <InputError message={errors.village_id} className="mt-2" />
+                </div>
+
+                <div>
+                  <InputLabel htmlFor="coordinates" value="Koordinat Lokasi (Opsional)" className="mb-2" />
+                  <TextInput
+                    id="coordinates"
+                    className="w-full"
+                    value={data.coordinates}
+                    onChange={(e) => setData('coordinates', e.target.value)}
+                    placeholder="Lat, Long"
+                  />
+                  <InputError message={errors.coordinates} className="mt-2" />
                 </div>
 
                 <div>

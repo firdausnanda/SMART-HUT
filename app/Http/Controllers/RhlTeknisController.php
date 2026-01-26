@@ -30,6 +30,15 @@ class RhlTeknisController extends Controller
     }
 
     $datas = RhlTeknis::query()
+      ->leftJoin('m_regencies', 'rhl_teknis.regency_id', '=', 'm_regencies.id')
+      ->leftJoin('m_districts', 'rhl_teknis.district_id', '=', 'm_districts.id')
+      ->leftJoin('m_villages', 'rhl_teknis.village_id', '=', 'm_villages.id')
+      ->select(
+        'rhl_teknis.*',
+        'm_regencies.name as regency_name',
+        'm_districts.name as district_name',
+        'm_villages.name as village_name'
+      )
       ->when($selectedYear, function ($query, $year) {
         return $query->where('year', $year);
       })
@@ -38,7 +47,10 @@ class RhlTeknisController extends Controller
           $q->where('fund_source', 'like', "%{$search}%")
             ->orWhereHas('details.bangunan_kta', function ($q2) use ($search) {
               $q2->where('name', 'like', "%{$search}%");
-            });
+            })
+            ->orWhere('m_villages.name', 'like', "%{$search}%")
+            ->orWhere('m_districts.name', 'like', "%{$search}%")
+            ->orWhere('m_regencies.name', 'like', "%{$search}%");
         });
       })
       ->with(['creator', 'details.bangunan_kta'])
@@ -86,6 +98,11 @@ class RhlTeknisController extends Controller
     $validated = $request->validate([
       'year' => 'required|integer',
       'month' => 'required|integer|min:1|max:12',
+      'province_id' => 'nullable|exists:m_provinces,id',
+      'regency_id' => 'nullable|exists:m_regencies,id',
+      'district_id' => 'nullable|exists:m_districts,id',
+      'village_id' => 'nullable|exists:m_villages,id',
+      'coordinates' => 'nullable|string',
       'target_annual' => 'required|numeric',
       'fund_source' => 'required|string',
       'details' => 'required|array|min:1',
@@ -97,6 +114,11 @@ class RhlTeknisController extends Controller
       $report = RhlTeknis::create([
         'year' => $validated['year'],
         'month' => $validated['month'],
+        'province_id' => $validated['province_id'] ?? null,
+        'regency_id' => $validated['regency_id'] ?? null,
+        'district_id' => $validated['district_id'] ?? null,
+        'village_id' => $validated['village_id'] ?? null,
+        'coordinates' => $validated['coordinates'] ?? null,
         'target_annual' => $validated['target_annual'],
         'fund_source' => $validated['fund_source'],
       ]);
@@ -123,6 +145,11 @@ class RhlTeknisController extends Controller
     $validated = $request->validate([
       'year' => 'required|integer',
       'month' => 'required|integer|min:1|max:12',
+      'province_id' => 'nullable|exists:m_provinces,id',
+      'regency_id' => 'nullable|exists:m_regencies,id',
+      'district_id' => 'nullable|exists:m_districts,id',
+      'village_id' => 'nullable|exists:m_villages,id',
+      'coordinates' => 'nullable|string',
       'target_annual' => 'required|numeric',
       'fund_source' => 'required|string',
       'details' => 'required|array|min:1',
@@ -134,6 +161,11 @@ class RhlTeknisController extends Controller
       $rhl_teknis->update([
         'year' => $validated['year'],
         'month' => $validated['month'],
+        'province_id' => $validated['province_id'] ?? null,
+        'regency_id' => $validated['regency_id'] ?? null,
+        'district_id' => $validated['district_id'] ?? null,
+        'village_id' => $validated['village_id'] ?? null,
+        'coordinates' => $validated['coordinates'] ?? null,
         'target_annual' => $validated['target_annual'],
         'fund_source' => $validated['fund_source'],
       ]);

@@ -32,6 +32,10 @@ class RhlTeknisImport implements OnEachRow, WithHeadingRow, WithValidation, Skip
       'bulan_angka' => 'required|numeric|min:1|max:12',
       'target_tahunan_unit' => 'required|numeric',
       'sumber_dana' => ['required', 'exists:m_sumber_dana,name'],
+      'kabupaten' => 'required|string|exists:m_regencies,name',
+      'kecamatan' => 'required|string|exists:m_districts,name',
+      'desa' => 'required|string|exists:m_villages,name',
+      'koordinat' => 'nullable|string',
       'jenis_bangunan' => 'required|string',
       'jumlah_unit' => 'required|string',
     ];
@@ -41,6 +45,9 @@ class RhlTeknisImport implements OnEachRow, WithHeadingRow, WithValidation, Skip
   {
     return [
       'sumber_dana.exists' => 'Sumber Dana tidak ditemukan di data referensi (Master Sumber Dana).',
+      'kabupaten.exists' => 'Kabupaten tidak valid.',
+      'kecamatan.exists' => 'Kecamatan tidak valid.',
+      'desa.exists' => 'Desa tidak valid.',
     ];
   }
 
@@ -49,11 +56,26 @@ class RhlTeknisImport implements OnEachRow, WithHeadingRow, WithValidation, Skip
     $rowData = $row->toArray();
 
     // 1. Create Parent Record
+
+    // Find Location IDs
+    $regency = \App\Models\Regencies::where('name', 'like', '%' . trim($rowData['kabupaten']) . '%')->first();
+    $district = \App\Models\Districts::where('name', 'like', '%' . trim($rowData['kecamatan']) . '%')
+      ->where('regency_id', $regency?->id)
+      ->first();
+    $village = \App\Models\Villages::where('name', 'like', '%' . trim($rowData['desa']) . '%')
+      ->where('district_id', $district?->id)
+      ->first();
+
     $rhlTeknis = RhlTeknis::create([
       'year' => $rowData['tahun'],
       'month' => $rowData['bulan_angka'],
       'target_annual' => $rowData['target_tahunan_unit'],
       'fund_source' => $rowData['sumber_dana'] ?? 'other',
+      'province_id' => 35, // JAWA TIMUR Default
+      'regency_id' => $regency?->id,
+      'district_id' => $district?->id,
+      'village_id' => $village?->id,
+      'coordinates' => $rowData['koordinat'] ?? null,
       'status' => 'draft',
       'created_by' => Auth::id(),
     ]);
