@@ -197,6 +197,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
 
   return (
     <>
+      <Head title="Reboisasi Area PS" />
       <AuthenticatedLayout
         user={auth.user}
         header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Reboisasi Area PS</h2>}
