@@ -75,6 +75,8 @@ class UserSeeder extends Seeder
                 $user->syncPermissions($permission);
             } else if ($row[2] == 'pk') {
                 $user->syncPermissions($permission_pk);
+            } else if ($row[2] == 'peh') {
+                $user->syncPermissions($permission_pk); // Assign same permissions as PK
             } else if ($row[2] == 'kasi') {
                 $user->syncPermissions($permission_kasi);
             } else if ($row[2] == 'kacdk') {
