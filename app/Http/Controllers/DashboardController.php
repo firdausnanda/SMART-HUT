@@ -11,6 +11,9 @@ use App\Models\RehabManggrove;
 use App\Models\ReboisasiPS;
 use App\Models\RhlTeknis;
 use App\Models\Skps;
+use App\Models\SumberDana;
+use App\Models\KebakaranHutan;
+use App\Models\PengunjungWisata;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -177,18 +180,52 @@ class DashboardController extends Controller
 
         // --- 1. Pembinaan Hutan (Rehab Lahan) ---
         $rehabTotal = RehabLahan::where('year', $currentYear)
+            ->where('status', 'final')
             ->sum('realization');
 
+        $rehabTargetTotal = RehabLahan::where('year', $currentYear)
+            ->where('status', 'final')
+            ->sum('target_annual');
+
         $rehabChart = RehabLahan::where('year', $currentYear)
+            ->where('status', 'final')
             ->selectRaw('month, sum(realization) as total')
             ->groupBy('month')
             ->orderBy('month')
             ->pluck('total', 'month');
 
+        $rehabTargetChart = RehabLahan::where('year', $currentYear)
+            ->where('status', 'final')
+            ->selectRaw('month, sum(target_annual) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month');
+
+        $rehabFund = SumberDana::leftJoin('rehab_lahan', function ($join) use ($currentYear) {
+            $join->on('m_sumber_dana.name', '=', 'rehab_lahan.fund_source')
+                ->where('rehab_lahan.year', '=', $currentYear)
+                ->where('rehab_lahan.status', '=', 'final')
+                ->whereNull('rehab_lahan.deleted_at');
+        })
+            ->selectRaw('m_sumber_dana.name as fund, count(rehab_lahan.id) as total')
+            ->groupBy('m_sumber_dana.name')
+            ->pluck('total', 'fund');
+
+        $rehabRegency = RehabLahan::where('year', $currentYear)
+            ->where('status', 'final')
+            ->join('m_regencies', 'rehab_lahan.regency_id', '=', 'm_regencies.id')
+            ->selectRaw('m_regencies.name as regency, count(*) as total')
+            ->groupBy('m_regencies.name')
+            ->pluck('total', 'regency');
+
         // --- 1.1 Penghijauan Lingkungan ---
         $penghijauanTotal = PenghijauanLingkungan::where('year', $currentYear)
             ->where('status', 'final')
             ->sum('realization');
+
+        $penghijauanTargetTotal = PenghijauanLingkungan::where('year', $currentYear)
+            ->where('status', 'final')
+            ->sum('target_annual');
 
         $penghijauanChart = PenghijauanLingkungan::where('year', $currentYear)
             ->where('status', 'final')
@@ -197,23 +234,78 @@ class DashboardController extends Controller
             ->orderBy('month')
             ->pluck('total', 'month');
 
+        $penghijauanTargetChart = PenghijauanLingkungan::where('year', $currentYear)
+            ->where('status', 'final')
+            ->selectRaw('month, sum(target_annual) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month');
+
+        $penghijauanFund = SumberDana::leftJoin('penghijauan_lingkungan', function ($join) use ($currentYear) {
+            $join->on('m_sumber_dana.name', '=', 'penghijauan_lingkungan.fund_source')
+                ->where('penghijauan_lingkungan.year', '=', $currentYear)
+                ->where('penghijauan_lingkungan.status', '=', 'final')
+                ->whereNull('penghijauan_lingkungan.deleted_at');
+        })
+            ->selectRaw('m_sumber_dana.name as fund, count(penghijauan_lingkungan.id) as total')
+            ->groupBy('m_sumber_dana.name')
+            ->pluck('total', 'fund');
+
+        $penghijauanRegency = PenghijauanLingkungan::where('year', $currentYear)
+            ->where('status', 'final')
+            ->join('m_regencies', 'penghijauan_lingkungan.regency_id', '=', 'm_regencies.id')
+            ->selectRaw('m_regencies.name as regency, count(*) as total')
+            ->groupBy('m_regencies.name')
+            ->pluck('total', 'regency');
+
         // --- 1.2 Rehabilitasi Mangrove ---
         $manggroveTotal = RehabManggrove::where('year', $currentYear)
             ->where('status', 'final')
             ->sum('realization');
+
+        $manggroveTargetTotal = RehabManggrove::where('year', $currentYear)
+            ->where('status', 'final')
+            ->sum('target_annual');
 
         $manggroveChart = RehabManggrove::where('year', $currentYear)
             ->where('status', 'final')
             ->selectRaw('month, sum(realization) as total')
             ->groupBy('month')
             ->orderBy('month')
+            ->pluck('total', 'month');
+
+        $manggroveTargetChart = RehabManggrove::where('year', $currentYear)
+            ->where('status', 'final')
+            ->selectRaw('month, sum(target_annual) as total')
+            ->groupBy('month')
             ->orderBy('month')
             ->pluck('total', 'month');
+
+        $manggroveFund = SumberDana::leftJoin('rehab_manggrove', function ($join) use ($currentYear) {
+            $join->on('m_sumber_dana.name', '=', 'rehab_manggrove.fund_source')
+                ->where('rehab_manggrove.year', '=', $currentYear)
+                ->where('rehab_manggrove.status', '=', 'final')
+                ->whereNull('rehab_manggrove.deleted_at');
+        })
+            ->selectRaw('m_sumber_dana.name as fund, count(rehab_manggrove.id) as total')
+            ->groupBy('m_sumber_dana.name')
+            ->pluck('total', 'fund');
+
+        $manggroveRegency = RehabManggrove::where('year', $currentYear)
+            ->where('status', 'final')
+            ->join('m_regencies', 'rehab_manggrove.regency_id', '=', 'm_regencies.id')
+            ->selectRaw('m_regencies.name as regency, count(*) as total')
+            ->groupBy('m_regencies.name')
+            ->pluck('total', 'regency');
 
         // --- 1.3 Reboisasi PS ---
         $reboisasiTotal = ReboisasiPS::where('year', $currentYear)
             ->where('status', 'final')
             ->sum('realization');
+
+        $reboisasiTargetTotal = ReboisasiPS::where('year', $currentYear)
+            ->where('status', 'final')
+            ->sum('target_annual');
 
         $reboisasiChart = ReboisasiPS::where('year', $currentYear)
             ->where('status', 'final')
@@ -221,6 +313,30 @@ class DashboardController extends Controller
             ->groupBy('month')
             ->orderBy('month')
             ->pluck('total', 'month');
+
+        $reboisasiTargetChart = ReboisasiPS::where('year', $currentYear)
+            ->where('status', 'final')
+            ->selectRaw('month, sum(target_annual) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month');
+
+        $reboisasiFund = SumberDana::leftJoin('reboisasi_ps', function ($join) use ($currentYear) {
+            $join->on('m_sumber_dana.name', '=', 'reboisasi_ps.fund_source')
+                ->where('reboisasi_ps.year', '=', $currentYear)
+                ->where('reboisasi_ps.status', '=', 'final')
+                ->whereNull('reboisasi_ps.deleted_at');
+        })
+            ->selectRaw('m_sumber_dana.name as fund, count(reboisasi_ps.id) as total')
+            ->groupBy('m_sumber_dana.name')
+            ->pluck('total', 'fund');
+
+        $reboisasiRegency = ReboisasiPS::where('year', $currentYear)
+            ->where('status', 'final')
+            ->join('m_regencies', 'reboisasi_ps.regency_id', '=', 'm_regencies.id')
+            ->selectRaw('m_regencies.name as regency, count(*) as total')
+            ->groupBy('m_regencies.name')
+            ->pluck('total', 'regency');
 
         // --- 1.4 RHL Teknis (Sum of unit_amount from details) ---
         $rhlTeknisData = RhlTeknis::where('year', $currentYear)
@@ -232,11 +348,27 @@ class DashboardController extends Controller
             return $item->details->sum('unit_amount');
         });
 
+        $rhlTeknisTargetTotal = $rhlTeknisData->sum('target_annual');
+
         $rhlTeknisChart = $rhlTeknisData->groupBy('month')->map(function ($items) {
             return $items->sum(function ($item) {
                 return $item->details->sum('unit_amount');
             });
         });
+
+        $rhlTeknisTargetChart = $rhlTeknisData->groupBy('month')->map(function ($items) {
+            return $items->sum('target_annual');
+        });
+
+        $rhlTeknisFund = SumberDana::leftJoin('rhl_teknis', function ($join) use ($currentYear) {
+            $join->on('m_sumber_dana.name', '=', 'rhl_teknis.fund_source')
+                ->where('rhl_teknis.year', '=', $currentYear)
+                ->where('rhl_teknis.status', '=', 'final')
+                ->whereNull('rhl_teknis.deleted_at');
+        })
+            ->selectRaw('m_sumber_dana.name as fund, count(rhl_teknis.id) as total')
+            ->groupBy('m_sumber_dana.name')
+            ->pluck('total', 'fund');
 
         // --- 2. Perlindungan Hutan ---
         // Kebakaran
@@ -245,109 +377,186 @@ class DashboardController extends Controller
             ->selectRaw('SUM(number_of_fires) as total_kejadian, SUM(fire_area) as total_area')
             ->first();
 
-        $kebakaranMonthlyStats = \App\Models\KebakaranHutan::where('year', $currentYear)
+        $kebakaranChart = KebakaranHutan::where('year', $currentYear)
             ->where('status', 'final')
-            ->selectRaw('month, SUM(number_of_fires) as total')
+            ->selectRaw('month, sum(number_of_fires) as incidents, sum(fire_area) as area')
             ->groupBy('month')
-            ->orderBy('month')
-            ->pluck('total', 'month');
+            ->get()
+            ->pluck('incidents', 'month')
+            ->all();
+
+        $kebakaranMonthlyData = KebakaranHutan::where('year', $currentYear)
+            ->where('status', 'final')
+            ->selectRaw('month, sum(number_of_fires) as incidents, sum(fire_area) as area')
+            ->groupBy('month')
+            ->get()
+            ->keyBy('month');
+
+        $kebakaranByPengelola = KebakaranHutan::where('kebakaran_hutan.year', $currentYear)
+            ->where('kebakaran_hutan.status', 'final')
+            ->join('m_pengelola_wisata', 'kebakaran_hutan.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
+            ->selectRaw('m_pengelola_wisata.name as pengelola, sum(number_of_fires) as incidents, sum(fire_area) as area')
+            ->groupBy('m_pengelola_wisata.name')
+            ->get()
+            ->keyBy('pengelola');
 
         // Wisata
-        $wisataStats = \App\Models\PengunjungWisata::where('year', $currentYear)
+        $wisataStats = PengunjungWisata::where('year', $currentYear)
             ->where('status', 'final')
             ->selectRaw('SUM(number_of_visitors) as total_visitors, SUM(gross_income) as total_income')
             ->first();
 
-        $wisataMonthlyStats = \App\Models\PengunjungWisata::where('year', $currentYear)
+        $wisataMonthlyStats = PengunjungWisata::where('year', $currentYear)
             ->where('status', 'final')
-            ->selectRaw('month, SUM(number_of_visitors) as total')
+            ->selectRaw('month, sum(number_of_visitors) as visitors, sum(gross_income) as income')
             ->groupBy('month')
-            ->orderBy('month')
-            ->pluck('total', 'month');
-
-        // --- 3. Bina Usaha (Expanded) ---
-        // Kayu Stats
-        $kayuStats = HasilHutanKayu::where('year', $currentYear)
-            ->where('status', 'final')
-            ->selectRaw('forest_type, SUM(annual_volume_target) as total_volume')
-            ->groupBy('forest_type')
-            ->pluck('total_volume', 'forest_type');
-
-        $kayuMonthlyStats = HasilHutanKayu::where('year', $currentYear)
-            ->where('status', 'final')
-            ->selectRaw('month, SUM(annual_volume_target) as total')
-            ->groupBy('month')
-            ->orderBy('month')
-            ->pluck('total', 'month');
-
-        $kayuCommodityStats = HasilHutanKayu::join('m_kayu', 'hasil_hutan_kayu.id_kayu', '=', 'm_kayu.id')
-            ->where('hasil_hutan_kayu.year', $currentYear)
-            ->where('hasil_hutan_kayu.status', 'final')
-            ->selectRaw('m_kayu.name as commodity, SUM(hasil_hutan_kayu.annual_volume_target) as total')
-            ->groupBy('m_kayu.name')
-            ->orderByDesc('total')
-            ->limit(5)
-            ->pluck('total', 'commodity');
-
-        // Bukan Kayu Stats
-        $bukanKayuStats = \App\Models\HasilHutanBukanKayu::where('year', $currentYear)
-            ->where('status', 'final')
-            ->selectRaw('forest_type, SUM(annual_volume_target) as total_production')
-            ->groupBy('forest_type')
-            ->pluck('total_production', 'forest_type');
-
-        $bukanKayuMonthlyStats = \App\Models\HasilHutanBukanKayu::where('year', $currentYear)
-            ->where('status', 'final')
-            ->selectRaw('month, SUM(annual_volume_target) as total')
-            ->groupBy('month')
-            ->orderBy('month')
-            ->pluck('total', 'month');
-
-        $bukanKayuCommodityStats = \App\Models\HasilHutanBukanKayu::join('m_bukan_kayu', 'hasil_hutan_bukan_kayu.id_bukan_kayu', '=', 'm_bukan_kayu.id')
-            ->where('hasil_hutan_bukan_kayu.year', $currentYear)
-            ->where('hasil_hutan_bukan_kayu.status', 'final')
-            ->selectRaw('m_bukan_kayu.name as commodity, SUM(hasil_hutan_bukan_kayu.annual_volume_target) as total')
-            ->groupBy('m_bukan_kayu.name')
-            ->orderByDesc('total')
-            ->limit(5)
-            ->pluck('total', 'commodity');
-
-        $industriCount = \App\Models\Pbphh::count();
-
-        $pnbpTotal = RealisasiPnbp::where('year', $currentYear)
-            ->where('status', 'final')
             ->get()
-            ->sum(function ($row) {
-                return (float) str_replace(['Rp', '.', ' '], '', $row->number_of_psdh) +
-                    (float) str_replace(['Rp', '.', ' '], '', $row->number_of_dbhdr);
-            });
+            ->keyBy('month');
 
-        // --- 4. Pemberdayaan Masyarakat (KUPS & SKPS) ---
-        $kupsStats = [
-            'total' => Kups::count(),
-            'active' => Kups::where('status', '!=', 'inactive')->count(),
-            'bg_colors' => [
-                'Blue' => 'rgba(54, 162, 235, 0.7)',
-                'Silver' => 'rgba(201, 203, 207, 0.7)',
-                'Gold' => 'rgba(255, 205, 86, 0.7)',
-                'Platinum' => 'rgba(75, 192, 192, 0.7)',
-            ], // Defining colors for frontend usage/consistency if needed, or just send data
-            'classes' => Kups::select('category', DB::raw('count(*) as total'))
-                ->groupBy('category')
+        $wisataByPengelola = PengunjungWisata::where('pengunjung_wisata.year', $currentYear)
+            ->where('pengunjung_wisata.status', 'final')
+            ->join('m_pengelola_wisata', 'pengunjung_wisata.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
+            ->selectRaw('m_pengelola_wisata.name as pengelola, sum(number_of_visitors) as visitors, sum(gross_income) as income')
+            ->groupBy('m_pengelola_wisata.name')
+            ->get()
+            ->keyBy('pengelola');
+
+        // --- 3. Bina Usaha (Split into 5 categories) ---
+        $forestTypes = ['Hutan Negara', 'Perhutanan Sosial', 'Hutan Rakyat'];
+        $binaUsahaData = [];
+
+        foreach ($forestTypes as $type) {
+            $key = strtolower(str_replace(' ', '_', $type));
+
+            // Kayu for this type
+            $binaUsahaData[$key]['kayu_total'] = (float) HasilHutanKayu::where('year', $currentYear)
+                ->where('status', 'final')
+                ->where('forest_type', $type)
+                ->sum('annual_volume_target');
+
+            $binaUsahaData[$key]['kayu_monthly'] = HasilHutanKayu::where('year', $currentYear)
+                ->where('status', 'final')
+                ->where('forest_type', $type)
+                ->selectRaw('month, sum(annual_volume_target) as total')
+                ->groupBy('month')
+                ->pluck('total', 'month');
+
+            $binaUsahaData[$key]['kayu_commodity'] = HasilHutanKayu::join('m_kayu', 'hasil_hutan_kayu.id_kayu', '=', 'm_kayu.id')
+                ->where('hasil_hutan_kayu.year', $currentYear)
+                ->where('hasil_hutan_kayu.status', 'final')
+                ->where('forest_type', $type)
+                ->selectRaw('m_kayu.name as commodity, sum(hasil_hutan_kayu.annual_volume_target) as total')
+                ->groupBy('m_kayu.name')
+                ->orderByDesc('total')
+                ->limit(5)
+                ->pluck('total', 'commodity');
+
+            // Bukan Kayu for this type
+            $binaUsahaData[$key]['bukan_kayu_total'] = (float) \App\Models\HasilHutanBukanKayu::where('year', $currentYear)
+                ->where('status', 'final')
+                ->where('forest_type', $type)
+                ->sum('annual_volume_target');
+
+            $binaUsahaData[$key]['bukan_kayu_monthly'] = \App\Models\HasilHutanBukanKayu::where('year', $currentYear)
+                ->where('status', 'final')
+                ->where('forest_type', $type)
+                ->selectRaw('month, sum(annual_volume_target) as total')
+                ->groupBy('month')
+                ->pluck('total', 'month');
+
+            $binaUsahaData[$key]['bukan_kayu_commodity'] = \App\Models\HasilHutanBukanKayu::join('m_bukan_kayu', 'hasil_hutan_bukan_kayu.id_bukan_kayu', '=', 'm_bukan_kayu.id')
+                ->where('hasil_hutan_bukan_kayu.year', $currentYear)
+                ->where('hasil_hutan_bukan_kayu.status', 'final')
+                ->where('forest_type', $type)
+                ->selectRaw('m_bukan_kayu.name as commodity, sum(hasil_hutan_bukan_kayu.annual_volume_target) as total')
+                ->groupBy('m_bukan_kayu.name')
+                ->orderByDesc('total')
+                ->limit(5)
+                ->pluck('total', 'commodity');
+        }
+
+        // PBPHH
+        $pbphhStats = [
+            'total_units' => \App\Models\Pbphh::count(),
+            'total_workers' => \App\Models\Pbphh::sum('number_of_workers'),
+            'total_investment' => \App\Models\Pbphh::sum('investment_value'),
+            'by_regency' => \App\Models\Pbphh::join('m_regencies', 'pbphh.regency_id', '=', 'm_regencies.id')
+                ->selectRaw('m_regencies.name as regency, count(*) as count')
+                ->groupBy('m_regencies.name')
+                ->pluck('count', 'regency'),
+            'by_production_type' => \App\Models\Pbphh::join('m_jenis_produksi', 'pbphh.id_jenis_produksi', '=', 'm_jenis_produksi.id')
+                ->selectRaw('m_jenis_produksi.name as type, count(*) as count')
+                ->groupBy('m_jenis_produksi.name')
                 ->get()
-                ->pluck('total', 'category')
+                ->toArray(),
+            'by_condition' => \App\Models\Pbphh::selectRaw('present_condition as condition_name, count(*) as count')
+                ->groupBy('present_condition')
+                ->get()
+                ->toArray()
         ];
 
-        $skpsStats = Skps::count();
+        // PNBP
+        $pnbpStats = [
+            'total_realization' => (float) RealisasiPnbp::where('year', $currentYear)->where('status', 'final')->sum('pnbp_realization'),
+            'total_target' => (float) RealisasiPnbp::where('year', $currentYear)->where('status', 'final')->sum('pnbp_target'),
+            'monthly' => RealisasiPnbp::where('year', $currentYear)
+                ->where('status', 'final')
+                ->selectRaw('month, sum(pnbp_realization) as realization, sum(pnbp_target) as target')
+                ->groupBy('month')
+                ->get()
+                ->keyBy('month'),
+            'by_regency' => RealisasiPnbp::join('m_regencies', 'realisasi_pnbp.regency_id', '=', 'm_regencies.id')
+                ->where('realisasi_pnbp.year', $currentYear)
+                ->where('realisasi_pnbp.status', 'final')
+                ->selectRaw('m_regencies.name as regency, sum(pnbp_realization) as total')
+                ->groupBy('m_regencies.name')
+                ->pluck('total', 'regency')
+        ];
 
-        $skpsByScheme = \App\Models\SkemaPerhutananSosial::leftJoin('skps', 'm_skema_perhutanan_sosial.id', '=', 'skps.id_skema_perhutanan_sosial')
-            ->selectRaw('m_skema_perhutanan_sosial.name as scheme, count(skps.id) as total')
-            ->groupBy('m_skema_perhutanan_sosial.id', 'm_skema_perhutanan_sosial.name')
-            ->get();
+        // --- 4. Kelembagaan Perhutanan Sosial ---
+        $kelembagaanPsStats = [
+            'kelompok_count' => \App\Models\Skps::count(),
+            'area_total' => (float) \App\Models\Skps::sum('ps_area'),
+            'kk_total' => (int) \App\Models\Skps::sum('number_of_kk'),
+            'nekon_total' => (float) \App\Models\NilaiEkonomi::where('year', $currentYear)->where('status', 'final')->sum('total_transaction_value'),
+            'scheme_distribution' => \App\Models\SkemaPerhutananSosial::leftJoin('skps', 'm_skema_perhutanan_sosial.id', '=', 'skps.id_skema_perhutanan_sosial')
+                ->selectRaw('m_skema_perhutanan_sosial.name as scheme, count(skps.id) as count')
+                ->groupBy('m_skema_perhutanan_sosial.id', 'm_skema_perhutanan_sosial.name')
+                ->get(),
+            'economic_by_regency' => \App\Models\NilaiEkonomi::join('m_regencies', 'nilai_ekonomi.regency_id', '=', 'm_regencies.id')
+                ->where('nilai_ekonomi.year', $currentYear)
+                ->where('nilai_ekonomi.status', 'final')
+                ->selectRaw('m_regencies.name as regency, sum(total_transaction_value) as total')
+                ->groupBy('m_regencies.name')
+                ->pluck('total', 'regency')
+        ];
 
-        $skpsChart = [
-            'labels' => $skpsByScheme->pluck('scheme'),
-            'data' => $skpsByScheme->pluck('total'),
+        // --- 5. Kelembagaan Hutan Rakyat ---
+        $kelembagaanHrStats = [
+            'kelompok_count' => \App\Models\PerkembanganKth::where('year', $currentYear)->where('status', 'final')->count(),
+            'area_total' => (float) \App\Models\PerkembanganKth::where('year', $currentYear)->where('status', 'final')->sum('luas_kelola'),
+            'anggota_total' => (int) \App\Models\PerkembanganKth::where('year', $currentYear)->where('status', 'final')->sum('jumlah_anggota'),
+            'nte_total' => (float) \App\Models\NilaiTransaksiEkonomi::where('year', $currentYear)->where('status', 'final')->sum('total_nilai_transaksi'),
+            'class_distribution' => \App\Models\PerkembanganKth::where('year', $currentYear)
+                ->where('status', 'final')
+                ->selectRaw('kelas_kelembagaan as class_name, count(*) as count')
+                ->groupBy('kelas_kelembagaan')
+                ->get(),
+            'economic_by_regency' => \App\Models\NilaiTransaksiEkonomi::join('m_regencies', 'nilai_transaksi_ekonomi.regency_id', '=', 'm_regencies.id')
+                ->where('nilai_transaksi_ekonomi.year', $currentYear)
+                ->where('nilai_transaksi_ekonomi.status', 'final')
+                ->selectRaw('m_regencies.name as regency, sum(total_nilai_transaksi) as total')
+                ->groupBy('m_regencies.name')
+                ->pluck('total', 'regency'),
+            'top_commodities' => \App\Models\NilaiTransaksiEkonomiDetail::join('m_commodities', 'nilai_transaksi_ekonomi_details.commodity_id', '=', 'm_commodities.id')
+                ->join('nilai_transaksi_ekonomi', 'nilai_transaksi_ekonomi_details.nilai_transaksi_ekonomi_id', '=', 'nilai_transaksi_ekonomi.id')
+                ->where('nilai_transaksi_ekonomi.year', $currentYear)
+                ->where('nilai_transaksi_ekonomi.status', 'final')
+                ->selectRaw('m_commodities.name as commodity, sum(nilai_transaksi_ekonomi_details.nilai_transaksi) as total')
+                ->groupBy('m_commodities.name')
+                ->orderByDesc('total')
+                ->limit(5)
+                ->pluck('total', 'commodity')
         ];
 
         return Inertia::render('Public/PublicDashboard', [
@@ -356,39 +565,55 @@ class DashboardController extends Controller
             'stats' => [
                 'pembinaan' => [
                     'rehab_total' => (float) $rehabTotal,
+                    'rehab_target_total' => (float) $rehabTargetTotal,
                     'rehab_chart' => $rehabChart,
+                    'rehab_target_chart' => $rehabTargetChart,
+                    'rehab_fund' => $rehabFund,
+                    'rehab_regency' => $rehabRegency,
                     'penghijauan_total' => (float) $penghijauanTotal,
+                    'penghijauan_target_total' => (float) $penghijauanTargetTotal,
                     'penghijauan_chart' => $penghijauanChart,
+                    'penghijauan_target_chart' => $penghijauanTargetChart,
+                    'penghijauan_fund' => $penghijauanFund,
+                    'penghijauan_regency' => $penghijauanRegency,
                     'manggrove_total' => (float) $manggroveTotal,
+                    'manggrove_target_total' => (float) $manggroveTargetTotal,
                     'manggrove_chart' => $manggroveChart,
+                    'manggrove_target_chart' => $manggroveTargetChart,
+                    'manggrove_fund' => $manggroveFund,
+                    'manggrove_regency' => $manggroveRegency,
                     'reboisasi_total' => (float) $reboisasiTotal,
+                    'reboisasi_target_total' => (float) $reboisasiTargetTotal,
                     'reboisasi_chart' => $reboisasiChart,
+                    'reboisasi_target_chart' => $reboisasiTargetChart,
+                    'reboisasi_fund' => $reboisasiFund,
+                    'reboisasi_regency' => $reboisasiRegency,
                     'rhl_teknis_total' => (float) $rhlTeknisTotal,
+                    'rhl_teknis_target_total' => (float) $rhlTeknisTargetTotal,
                     'rhl_teknis_chart' => $rhlTeknisChart,
+                    'rhl_teknis_target_chart' => $rhlTeknisTargetChart,
+                    'rhl_teknis_fund' => $rhlTeknisFund,
                 ],
                 'perlindungan' => [
                     'kebakaran_kejadian' => (int) ($kebakaranStats->total_kejadian ?? 0),
                     'kebakaran_area' => (float) ($kebakaranStats->total_area ?? 0),
-                    'kebakaranMonthly' => $kebakaranMonthlyStats,
+                    'kebakaranChart' => $kebakaranChart,
+                    'kebakaranMonthly' => $kebakaranMonthlyData,
+                    'kebakaranByPengelola' => $kebakaranByPengelola,
                     'wisata_visitors' => (int) ($wisataStats->total_visitors ?? 0),
                     'wisata_income' => (float) ($wisataStats->total_income ?? 0),
                     'wisataMonthly' => $wisataMonthlyStats,
+                    'wisataByPengelola' => $wisataByPengelola,
                 ],
                 'bina_usaha' => [
-                    'kayu' => $kayuStats,
-                    'kayuMonthly' => $kayuMonthlyStats,
-                    'kayuCommodity' => $kayuCommodityStats,
-                    'bukanKayu' => $bukanKayuStats,
-                    'bukanKayuMonthly' => $bukanKayuMonthlyStats,
-                    'bukanKayuCommodity' => $bukanKayuCommodityStats,
-                    'industri' => $industriCount,
-                    'pnbp' => $pnbpTotal,
+                    'hutan_negara' => $binaUsahaData['hutan_negara'],
+                    'perhutanan_sosial' => $binaUsahaData['perhutanan_sosial'],
+                    'hutan_rakyat' => $binaUsahaData['hutan_rakyat'],
+                    'pbphh' => $pbphhStats,
+                    'pnbp' => $pnbpStats,
                 ],
-                'pemberdayaan' => [
-                    'kups' => $kupsStats,
-                    'skps' => $skpsStats,
-                    'skps_chart' => $skpsChart,
-                ]
+                'kelembagaan_ps' => $kelembagaanPsStats,
+                'kelembagaan_hr' => $kelembagaanHrStats,
             ]
         ]);
     }

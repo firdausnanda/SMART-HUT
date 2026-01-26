@@ -12,10 +12,20 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
   const [loadingText, setLoadingText] = useState('Memuat Data...');
 
   const modules = [
-    { id: 0, title: 'Pembinaan Hutan', color: 'bg-emerald-600', text: 'text-emerald-600' },
-    { id: 1, title: 'Perlindungan Hutan', color: 'bg-red-600', text: 'text-red-600' },
-    { id: 2, title: 'Bina Usaha', color: 'bg-blue-600', text: 'text-blue-600' },
-    { id: 3, title: 'Pemberdayaan', color: 'bg-indigo-600', text: 'text-indigo-600' },
+    { id: 0, title: 'Rehabilitasi Lahan', color: 'bg-emerald-600', text: 'text-emerald-600' },
+    { id: 1, title: 'Penghijauan Lingkungan', color: 'bg-teal-600', text: 'text-teal-600' },
+    { id: 2, title: 'Rehabilitasi Manggrove', color: 'bg-cyan-600', text: 'text-cyan-600' },
+    { id: 3, title: 'Bangunan Konservasi Tanah dan Air', color: 'bg-orange-600', text: 'text-orange-600' },
+    { id: 4, title: 'Reboisasi Area Perhutanan Sosial', color: 'bg-pink-600', text: 'text-pink-600' },
+    { id: 5, title: 'Kebakaran Hutan', color: 'bg-red-600', text: 'text-red-600' },
+    { id: 6, title: 'Jasa Lingkungan', color: 'bg-indigo-600', text: 'text-indigo-600' },
+    { id: 7, title: 'Produksi Hutan Negara', color: 'bg-blue-600', text: 'text-blue-600' },
+    { id: 8, title: 'Produksi Perhutanan Sosial', color: 'bg-sky-600', text: 'text-sky-600' },
+    { id: 9, title: 'Produksi Hutan Rakyat', color: 'bg-cyan-600', text: 'text-cyan-600' },
+    { id: 10, title: 'PBPHH', color: 'bg-slate-600', text: 'text-slate-600' },
+    { id: 11, title: 'Penerimaan Negara (PNBP)', color: 'bg-amber-600', text: 'text-amber-600' },
+    { id: 12, title: 'Kelembagaan Perhutanan Sosial', color: 'bg-emerald-600', text: 'text-emerald-600' },
+    { id: 13, title: 'Kelembagaan Hutan Rakyat', color: 'bg-lime-600', text: 'text-lime-600' },
   ];
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % modules.length);
@@ -71,92 +81,10 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
   };
 
   // --- 2. Perlindungan Charts ---
-  // Kebakaran Monthly (Line)
-  const kebakaranMonthlyData = {
-    labels: stats?.perlindungan?.kebakaranMonthly ? Object.keys(stats.perlindungan.kebakaranMonthly).map(m => {
-      const date = new Date();
-      date.setMonth(m - 1);
-      return date.toLocaleString('id-ID', { month: 'short' });
-    }) : [],
-    datasets: [{
-      label: 'Kejadian Kebakaran',
-      data: stats?.perlindungan?.kebakaranMonthly ? Object.values(stats.perlindungan.kebakaranMonthly) : [],
-      borderColor: 'rgb(220, 38, 38)', // Red-600
-      backgroundColor: 'rgba(220, 38, 38, 0.5)',
-      tension: 0.3
-    }]
-  };
-
-  // Wisata Monthly (Line)
-  const wisataMonthlyData = {
-    labels: stats?.perlindungan?.wisataMonthly ? Object.keys(stats.perlindungan.wisataMonthly).map(m => {
-      const date = new Date();
-      date.setMonth(m - 1);
-      return date.toLocaleString('id-ID', { month: 'short' });
-    }) : [],
-    datasets: [{
-      label: 'Pengunjung',
-      data: stats?.perlindungan?.wisataMonthly ? Object.values(stats.perlindungan.wisataMonthly) : [],
-      borderColor: 'rgb(79, 70, 229)', // Indigo-600
-      backgroundColor: 'rgba(79, 70, 229, 0.5)',
-      tension: 0.3
-    }]
-  };
-
   // --- 3. Bina Usaha Charts ---
-  // Kayu Monthly (Line)
-  const kayuMonthlyData = {
-    labels: stats?.bina_usaha?.kayuMonthly ? Object.keys(stats.bina_usaha.kayuMonthly).map(m => {
-      const date = new Date();
-      date.setMonth(m - 1);
-      return date.toLocaleString('id-ID', { month: 'short' });
-    }) : [],
-    datasets: [{
-      label: 'Volume Produksi (M3)',
-      data: stats?.bina_usaha?.kayuMonthly ? Object.values(stats.bina_usaha.kayuMonthly) : [],
-      borderColor: 'rgb(59, 130, 246)', // Blue-500
-      backgroundColor: 'rgba(59, 130, 246, 0.5)',
-      tension: 0.3
-    }]
-  };
+  // (No longer needed, charts are built inline for each source)
 
-  // Kayu Commodity (Bar)
-  const kayuCommodityData = {
-    labels: stats?.bina_usaha?.kayuCommodity ? Object.keys(stats.bina_usaha.kayuCommodity) : [],
-    datasets: [{
-      label: 'Volume (M3)',
-      data: stats?.bina_usaha?.kayuCommodity ? Object.values(stats.bina_usaha.kayuCommodity).map(v => parseFloat(v)) : [],
-      backgroundColor: 'rgba(37, 99, 235, 0.8)', // Blue-600
-      borderRadius: 4,
-    }]
-  };
-
-  // Bukan Kayu Monthly (Line)
-  const bukanKayuMonthlyData = {
-    labels: stats?.bina_usaha?.bukanKayuMonthly ? Object.keys(stats.bina_usaha.bukanKayuMonthly).map(m => {
-      const date = new Date();
-      date.setMonth(m - 1);
-      return date.toLocaleString('id-ID', { month: 'short' });
-    }) : [],
-    datasets: [{
-      label: 'Produksi (Ton/Ltr)',
-      data: stats?.bina_usaha?.bukanKayuMonthly ? Object.values(stats.bina_usaha.bukanKayuMonthly) : [],
-      borderColor: 'rgb(245, 158, 11)', // Amber-500
-      backgroundColor: 'rgba(245, 158, 11, 0.5)',
-      tension: 0.3
-    }]
-  };
-
-  // Bukan Kayu Commodity (Bar)
-  const bukanKayuCommodityData = {
-    labels: stats?.bina_usaha?.bukanKayuCommodity ? Object.keys(stats.bina_usaha.bukanKayuCommodity) : [],
-    datasets: [{
-      label: 'Produksi (Ton/Ltr)',
-      data: stats?.bina_usaha?.bukanKayuCommodity ? Object.values(stats.bina_usaha.bukanKayuCommodity).map(v => parseFloat(v)) : [],
-      backgroundColor: 'rgba(217, 119, 6, 0.8)', // Amber-600
-      borderRadius: 4,
-    }]
-  };
+  // 4. Pemberdayaan Charts ---
 
   // 4. Pemberdayaan Charts
   // SKPS (Bar)
@@ -313,418 +241,1232 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
 
-              {/* Slide 0: Pembinaan Hutan */}
-              <div className="min-w-full px-4 py-6">
-                <div className="max-w-7xl mx-auto space-y-6">
-                  {/* Row 1: 3 Columns */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Slides 0-5: Specific Pembinaan Sections */}
+              {[
+                { label: 'Rehabilitasi Lahan', total: stats?.pembinaan?.rehab_total, targetTotal: stats?.pembinaan?.rehab_target_total, chart: stats?.pembinaan?.rehab_chart, targetChart: stats?.pembinaan?.rehab_target_chart, fund: stats?.pembinaan?.rehab_fund, regency: stats?.pembinaan?.rehab_regency, color: '#10b981', unit: 'Ha' },
+                { label: 'Penghijauan Lingkungan', total: stats?.pembinaan?.penghijauan_total, targetTotal: stats?.pembinaan?.penghijauan_target_total, chart: stats?.pembinaan?.penghijauan_chart, targetChart: stats?.pembinaan?.penghijauan_target_chart, fund: stats?.pembinaan?.penghijauan_fund, regency: stats?.pembinaan?.penghijauan_regency, color: '#14b8a6', unit: 'Ha' },
+                { label: 'Rehabilitasi Manggrove', total: stats?.pembinaan?.manggrove_total, targetTotal: stats?.pembinaan?.manggrove_target_total, chart: stats?.pembinaan?.manggrove_chart, targetChart: stats?.pembinaan?.manggrove_target_chart, fund: stats?.pembinaan?.manggrove_fund, regency: stats?.pembinaan?.manggrove_regency, color: '#06b6d4', unit: 'Ha' },
+                { label: 'Bangunan Konservasi Tanah dan Air', total: stats?.pembinaan?.rhl_teknis_total, targetTotal: stats?.pembinaan?.rhl_teknis_target_total, chart: stats?.pembinaan?.rhl_teknis_chart, targetChart: stats?.pembinaan?.rhl_teknis_target_chart, fund: stats?.pembinaan?.rhl_teknis_fund, regency: null, color: '#f97316', unit: 'Unit' },
+                { label: 'Reboisasi Area PS', total: stats?.pembinaan?.reboisasi_total, targetTotal: stats?.pembinaan?.reboisasi_target_total, chart: stats?.pembinaan?.reboisasi_chart, targetChart: stats?.pembinaan?.reboisasi_target_chart, fund: stats?.pembinaan?.reboisasi_fund, regency: stats?.pembinaan?.reboisasi_regency, color: '#ec4899', unit: 'Ha' },
+              ].map((section, idx) => {
+                const percentage = section.targetTotal > 0 ? (section.total / section.targetTotal) * 100 : 0;
 
-                    {/* 1. Rehabilitasi Lahan */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm border border-emerald-100 hover:shadow-md transition-shadow duration-300">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                return (
+                  <div key={idx} className="min-w-full px-4">
+                    <div className="max-w-7xl mx-auto space-y-8">
+                      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        {/* Left: Professional Stats Card */}
+                        <div className="lg:col-span-1 flex flex-col gap-6">
+                          <div className="relative group">
+                            <div className="absolute -inset-1 bg-gradient-to-b from-white to-gray-50 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                            <div className="relative bg-white p-8 rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col overflow-hidden">
+                              {/* Decorative Circle */}
+                              <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full opacity-[0.03] pointer-events-none" style={{ backgroundColor: section.color }}></div>
+
+                              <div className="flex flex-col items-center justify-between h-full relative z-10">
+                                <div className="text-center w-full">
+                                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-500`} style={{ background: `linear-gradient(135deg, ${section.color}, ${section.color}DD)`, color: 'white' }}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                    </svg>
+                                  </div>
+                                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-2">Total Realisasi</span>
+                                  <div className="flex flex-col gap-1 items-center justify-center">
+                                    <h3 className="text-6xl font-black text-gray-900 leading-none tabular-nums tracking-tighter">
+                                      {formatNumber(section.total || 0)}
+                                    </h3>
+                                    <span className="text-xl font-bold text-gray-400" style={{ letterSpacing: '-0.02em' }}>{section.unit}</span>
+                                  </div>
+                                </div>
+
+                                <div className="w-full mt-8 pt-8 border-t border-gray-50">
+                                  <div className="flex justify-between items-end mb-3">
+                                    <div className="flex flex-col">
+                                      <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Progress</span>
+                                      <span className="text-2xl font-black text-gray-900">{percentage.toFixed(1)}%</span>
+                                    </div>
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">Target: {formatNumber(section.targetTotal || 0)}</span>
+                                  </div>
+                                  <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner p-0.5">
+                                    <div
+                                      className="h-full rounded-full transition-all duration-1000 ease-out shadow-sm relative overflow-hidden"
+                                      style={{ width: `${Math.min(percentage, 100)}%`, backgroundColor: section.color }}
+                                    >
+                                      <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-[shimmer_2s_linear_infinite]"></div>
+                                    </div>
+                                  </div>
+                                  <p className="text-[9px] text-gray-400 mt-4 uppercase font-black text-center tracking-[0.2em]">Data Terverifikasi {currentYear}</p>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">Rehabilitasi Lahan</span>
+                        </div>
+
+                        {/* Right: Charts Grid */}
+                        <div className="md:col-span-3 space-y-6">
+                          {/* Monthly Trend Charts Group */}
+                          <div className="grid grid-cols-1 gap-6">
+                            {/* Realization Trend Chart */}
+                            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                              <div className="flex items-center justify-between mb-4">
+                                <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Tren Realisasi Bulanan</h4>
+                                <span className="px-2 py-1 rounded-full bg-blue-50 text-[8px] font-bold text-blue-500 uppercase">Realization</span>
+                              </div>
+                              <div className="h-[180px]">
+                                <Line
+                                  data={{
+                                    labels: section.chart ? Object.keys(section.chart).map(m => {
+                                      const date = new Date();
+                                      date.setMonth(m - 1);
+                                      return date.toLocaleString('id-ID', { month: 'short' });
+                                    }) : [],
+                                    datasets: [{
+                                      label: section.label,
+                                      data: section.chart ? Object.values(section.chart) : [],
+                                      borderColor: section.color,
+                                      backgroundColor: section.color + '20',
+                                      fill: true,
+                                      tension: 0.4,
+                                      pointRadius: 2
+                                    }]
+                                  }}
+                                  options={{
+                                    ...commonOptions,
+                                    maintainAspectRatio: false,
+                                    plugins: { ...commonOptions.plugins, legend: { display: false } },
+                                    scales: { y: { ...commonOptions.scales.y, display: true }, x: { grid: { display: false } } }
+                                  }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Target Trend Chart */}
+                            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                              <div className="flex items-center justify-between mb-4">
+                                <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Tren Target Bulanan</h4>
+                                <span className="px-2 py-1 rounded-full bg-gray-50 text-[8px] font-bold text-gray-400 uppercase">Target</span>
+                              </div>
+                              <div className="h-[180px]">
+                                <Line
+                                  data={{
+                                    labels: section.targetChart ? Object.keys(section.targetChart).map(m => {
+                                      const date = new Date();
+                                      date.setMonth(m - 1);
+                                      return date.toLocaleString('id-ID', { month: 'short' });
+                                    }) : [],
+                                    datasets: [{
+                                      label: 'Target ' + section.label,
+                                      data: section.targetChart ? Object.values(section.targetChart) : [],
+                                      borderColor: '#94a3b8',
+                                      backgroundColor: '#94a3b820',
+                                      fill: true,
+                                      tension: 0.4,
+                                      pointRadius: 2,
+                                      borderDash: [5, 5]
+                                    }]
+                                  }}
+                                  options={{
+                                    ...commonOptions,
+                                    maintainAspectRatio: false,
+                                    plugins: { ...commonOptions.plugins, legend: { display: false } },
+                                    scales: { y: { ...commonOptions.scales.y, display: true }, x: { grid: { display: false } } }
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Bottom Charts: Fund & Regency (Pemberdayaan Style) */}
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                            {/* Fund Source Card */}
+                            <div className={`bg-white rounded-3xl p-6 shadow-sm border flex flex-col h-full`} style={{ borderColor: section.color + '30' }}>
+                              <div className="flex items-center gap-4 mb-6">
+                                <div className={`p-3 rounded-2xl`} style={{ backgroundColor: section.color + '15', color: section.color }}>
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m.5-1c.5 0 .996-.067 1.474-.194M12 15.5c-.478 0-.974-.067-1.474-.194" /></svg>
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-bold text-gray-900">Sumber Dana</h3>
+                                  <p className="text-xs text-gray-500">Distribusi Pendanaan</p>
+                                </div>
+                              </div>
+                              <div className="flex flex-col gap-6 flex-1">
+                                <div className={`flex flex-col items-center justify-center p-4 rounded-2xl border`} style={{ backgroundColor: section.color + '05', borderColor: section.color + '20' }}>
+                                  <span className={`text-[10px] font-bold uppercase tracking-widest mb-1`} style={{ color: section.color }}>Total Laporan</span>
+                                  <span className="text-4xl font-black text-gray-900">
+                                    {formatNumber(Object.values(section.fund || {}).reduce((a, b) => a + (parseInt(b) || 0), 0))}
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-400 mt-1">Laporan Terdaftar</span>
+                                </div>
+                                <div className="w-full h-[180px]">
+                                  <Bar
+                                    data={{
+                                      labels: section.fund ? Object.keys(section.fund) : [],
+                                      datasets: [{
+                                        data: section.fund ? Object.values(section.fund) : [],
+                                        backgroundColor: section.color + 'CC',
+                                        borderRadius: 6
+                                      }]
+                                    }}
+                                    options={{
+                                      ...commonOptions,
+                                      indexAxis: 'y',
+                                      maintainAspectRatio: false,
+                                      plugins: {
+                                        ...commonOptions.plugins,
+                                        legend: { display: false },
+                                        tooltip: {
+                                          callbacks: {
+                                            label: (context) => ` Jumlah: ${context.raw} Laporan`
+                                          }
+                                        }
+                                      },
+                                      scales: {
+                                        x: { grid: { display: false }, ticks: { display: false } },
+                                        y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }
+                                      }
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Regency Card */}
+                            <div className={`bg-white rounded-3xl p-6 shadow-sm border flex flex-col h-full`} style={{ borderColor: section.color + '30' }}>
+                              <div className="flex items-center gap-4 mb-6">
+                                <div className={`p-3 rounded-2xl`} style={{ backgroundColor: section.color + '15', color: section.color }}>
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-bold text-gray-900">Wilayah</h3>
+                                  <p className="text-xs text-gray-500">Distribusi Kabupaten/Kota</p>
+                                </div>
+                              </div>
+                              <div className="flex flex-col gap-6 flex-1">
+                                {section.regency ? (
+                                  <>
+                                    <div className={`flex flex-col items-center justify-center p-4 rounded-2xl border`} style={{ backgroundColor: section.color + '05', borderColor: section.color + '20' }}>
+                                      <span className={`text-[10px] font-bold uppercase tracking-widest mb-1`} style={{ color: section.color }}>Total Wilayah</span>
+                                      <span className="text-4xl font-black text-gray-900">
+                                        {formatNumber(Object.keys(section.regency || {}).length)}
+                                      </span>
+                                      <span className="text-xs font-medium text-gray-400 mt-1">Kabupaten/Kota Terjangkau</span>
+                                    </div>
+                                    <div className="w-full h-[180px]">
+                                      <Bar
+                                        data={{
+                                          labels: Object.keys(section.regency),
+                                          datasets: [{
+                                            data: Object.values(section.regency),
+                                            backgroundColor: section.color + 'AA',
+                                            borderRadius: 6
+                                          }]
+                                        }}
+                                        options={{
+                                          ...commonOptions,
+                                          indexAxis: 'y',
+                                          maintainAspectRatio: false,
+                                          plugins: {
+                                            ...commonOptions.plugins,
+                                            legend: { display: false },
+                                            tooltip: {
+                                              callbacks: {
+                                                label: (context) => ` Jumlah: ${context.raw} Laporan`
+                                              }
+                                            }
+                                          },
+                                          scales: {
+                                            x: { grid: { display: false }, ticks: { display: false } },
+                                            y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }
+                                          }
+                                        }}
+                                      />
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2 py-12">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                    </svg>
+                                    <p className="text-xs italic font-medium">Data Lokasi Belum Tersedia</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="mb-4">
-                        <h3 className="text-2xl font-black text-gray-800">{formatNumber(stats?.pembinaan?.rehab_total || 0)} <span className="text-sm font-medium text-gray-400">Ha</span></h3>
-                        <p className="text-xs text-gray-400 mt-1">Total Realisasi Tahun {currentYear}</p>
+                    </div>
+                  </div>
+                );
+              })}
+              {/* Slide 5: Kebakaran Hutan (Premium Redesign) */}
+              <div className="min-w-full px-4">
+                <div className="max-w-7xl mx-auto space-y-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    {/* Left: Professional Stats Card */}
+                    <div className="lg:col-span-1 flex flex-col gap-6">
+                      <div className="relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-b from-white to-gray-50 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                        <div className="relative bg-white p-8 rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col overflow-hidden">
+                          {/* Decorative Circle */}
+                          <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full opacity-[0.03] pointer-events-none bg-red-600"></div>
+
+                          <div className="flex flex-col items-center justify-between relative z-10">
+                            <div className="text-center w-full">
+                              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-500`} style={{ background: `linear-gradient(135deg, #dc2626, #dc2626DD)`, color: 'white' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.99 7.99 0 0120 13a7.99 7.99 0 01-2.343 5.657z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14l.879 2.121z" />
+                                </svg>
+                              </div>
+                              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-2">Total Kejadian</span>
+                              <div className="flex flex-col gap-1 items-center justify-center">
+                                <h3 className="text-6xl font-black text-gray-900 leading-none tabular-nums tracking-tighter">
+                                  {formatNumber(stats?.perlindungan?.kebakaran_kejadian || 0)}
+                                </h3>
+                                <span className="text-xl font-bold text-gray-400" style={{ letterSpacing: '-0.02em' }}>Kejadian</span>
+                              </div>
+                            </div>
+
+                            <div className="w-full mt-8 pt-8 border-t border-gray-50">
+                              <div className="flex justify-between items-end mb-3">
+                                <div className="flex flex-col">
+                                  <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Luas Area</span>
+                                  <span className="text-2xl font-black text-gray-900">{formatNumber(stats?.perlindungan?.kebakaran_area || 0)}</span>
+                                </div>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">Hektar (Ha)</span>
+                              </div>
+                              <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner p-0.5">
+                                <div
+                                  className="h-full rounded-full transition-all duration-1000 ease-out shadow-sm relative overflow-hidden bg-red-500"
+                                  style={{ width: `100%` }}
+                                >
+                                  <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-[shimmer_2s_linear_infinite]"></div>
+                                </div>
+                              </div>
+                              <p className="text-[9px] text-gray-400 mt-4 uppercase font-black text-center tracking-[0.2em]">Monitoring Karhutla {currentYear}</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="h-[100px]">
-                        <Line
+                    </div>
+
+                    {/* Right: Charts Grid */}
+                    <div className="md:col-span-3 space-y-6">
+                      {/* Trend Chart: Luas vs Kejadian */}
+                      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Tren Luas Area & Jumlah Kejadian</h4>
+                          <div className="flex gap-4">
+                            <span className="flex items-center gap-1.5 text-[8px] font-bold text-red-500 uppercase">
+                              <span className="w-2 h-2 rounded-full bg-red-500"></span> Kejadian
+                            </span>
+                            <span className="flex items-center gap-1.5 text-[8px] font-bold text-orange-400 uppercase">
+                              <span className="w-2 h-2 rounded-full bg-orange-400"></span> Luas Area
+                            </span>
+                          </div>
+                        </div>
+                        <div className="h-[200px]">
+                          <Line
+                            data={{
+                              labels: stats?.perlindungan?.kebakaranMonthly ? Object.keys(stats.perlindungan.kebakaranMonthly).map(m => {
+                                const date = new Date();
+                                date.setMonth(m - 1);
+                                return date.toLocaleString('id-ID', { month: 'short' });
+                              }) : [],
+                              datasets: [
+                                {
+                                  label: 'Jumlah Kejadian',
+                                  data: stats?.perlindungan?.kebakaranMonthly ? Object.values(stats.perlindungan.kebakaranMonthly).map(d => d.incidents) : [],
+                                  borderColor: '#dc2626',
+                                  backgroundColor: '#dc262620',
+                                  fill: true,
+                                  tension: 0.4,
+                                  pointRadius: 3,
+                                  yAxisID: 'y',
+                                },
+                                {
+                                  label: 'Luas Area (Ha)',
+                                  data: stats?.perlindungan?.kebakaranMonthly ? Object.values(stats.perlindungan.kebakaranMonthly).map(d => d.area) : [],
+                                  borderColor: '#fb923c',
+                                  backgroundColor: '#fb923c20',
+                                  fill: true,
+                                  tension: 0.4,
+                                  pointRadius: 3,
+                                  borderDash: [5, 5],
+                                  yAxisID: 'y1',
+                                }
+                              ]
+                            }}
+                            options={{
+                              ...commonOptions,
+                              maintainAspectRatio: false,
+                              plugins: { ...commonOptions.plugins, legend: { display: false } },
+                              scales: {
+                                y: {
+                                  type: 'linear',
+                                  display: true,
+                                  position: 'left',
+                                  title: { display: true, text: 'Kejadian', font: { size: 10, weight: 'bold' } },
+                                  grid: { display: false }
+                                },
+                                y1: {
+                                  type: 'linear',
+                                  display: true,
+                                  position: 'right',
+                                  title: { display: true, text: 'Luas (Ha)', font: { size: 10, weight: 'bold' } },
+                                  grid: { drawOnChartArea: false }
+                                },
+                                x: { grid: { display: false } }
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Pengelola Bar Chart */}
+                      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Distribusi Luas Kebakaran Berdasarkan Pengelola</h4>
+                          <span className="px-2 py-1 rounded-full bg-red-50 text-[8px] font-bold text-red-500 uppercase">Pengelola</span>
+                        </div>
+                        <div className="h-[400px]">
+                          <Bar
+                            data={{
+                              labels: stats?.perlindungan?.kebakaranByPengelola ? Object.keys(stats.perlindungan.kebakaranByPengelola) : [],
+                              datasets: [{
+                                label: 'Luas Area (Ha)',
+                                data: stats?.perlindungan?.kebakaranByPengelola ? Object.values(stats.perlindungan.kebakaranByPengelola).map(d => d.area) : [],
+                                backgroundColor: '#dc2626CC',
+                                borderRadius: 6
+                              }]
+                            }}
+                            options={{
+                              ...commonOptions,
+                              indexAxis: 'y',
+                              maintainAspectRatio: false,
+                              plugins: { ...commonOptions.plugins, legend: { display: false } },
+                              scales: {
+                                x: { grid: { display: false }, ticks: { display: true } },
+                                y: {
+                                  grid: { display: false },
+                                  ticks: {
+                                    autoSkip: false,
+                                    font: { size: 9, weight: 'bold' }
+                                  }
+                                }
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Slide 6: Jasa Lingkungan (Premium Redesign) */}
+              <div className="min-w-full px-4">
+                <div className="max-w-7xl mx-auto space-y-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    {/* Left: Professional Stats Card */}
+                    <div className="lg:col-span-1 flex flex-col gap-6">
+                      <div className="relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-b from-white to-gray-50 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                        <div className="relative bg-white p-8 rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col overflow-hidden">
+                          {/* Decorative Circle */}
+                          <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full opacity-[0.03] pointer-events-none bg-indigo-600"></div>
+
+                          <div className="flex flex-col items-center justify-between relative z-10">
+                            <div className="text-center w-full">
+                              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-500`} style={{ background: `linear-gradient(135deg, #4f46e5, #4f46e5DD)`, color: 'white' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                              </div>
+                              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-2">Total Pengunjung</span>
+                              <div className="flex flex-col gap-1 items-center justify-center">
+                                <h3 className="text-6xl font-black text-gray-900 leading-none tabular-nums tracking-tighter">
+                                  {formatNumber(stats?.perlindungan?.wisata_visitors || 0)}
+                                </h3>
+                                <span className="text-xl font-bold text-gray-400" style={{ letterSpacing: '-0.02em' }}>Orang</span>
+                              </div>
+                            </div>
+
+                            <div className="w-full mt-8 pt-8 border-t border-gray-50">
+                              <div className="flex justify-between items-end mb-3">
+                                <div className="flex flex-col">
+                                  <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Pendapatan</span>
+                                  <span className="text-2xl font-black text-gray-900">{formatCurrency(stats?.perlindungan?.wisata_income || 0)}</span>
+                                </div>
+                              </div>
+                              <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner p-0.5">
+                                <div
+                                  className="h-full rounded-full transition-all duration-1000 ease-out shadow-sm relative overflow-hidden bg-indigo-500"
+                                  style={{ width: `100%` }}
+                                >
+                                  <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-[shimmer_2s_linear_infinite]"></div>
+                                </div>
+                              </div>
+                              <p className="text-[9px] text-gray-400 mt-4 uppercase font-black text-center tracking-[0.2em]">Jasa Lingkungan {currentYear}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: Charts Grid */}
+                    <div className="md:col-span-3 space-y-6">
+                      {/* Trend Chart: Pengunjung vs Pendapatan */}
+                      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Tren Pengunjung & Pendapatan</h4>
+                          <div className="flex gap-4">
+                            <span className="flex items-center gap-1.5 text-[8px] font-bold text-indigo-500 uppercase">
+                              <span className="w-2 h-2 rounded-full bg-indigo-500"></span> Pengunjung
+                            </span>
+                            <span className="flex items-center gap-1.5 text-[8px] font-bold text-emerald-400 uppercase">
+                              <span className="w-2 h-2 rounded-full bg-emerald-400"></span> Pendapatan
+                            </span>
+                          </div>
+                        </div>
+                        <div className="h-[200px]">
+                          <Line
+                            data={{
+                              labels: stats?.perlindungan?.wisataMonthly ? Object.keys(stats.perlindungan.wisataMonthly).map(m => {
+                                const date = new Date();
+                                date.setMonth(m - 1);
+                                return date.toLocaleString('id-ID', { month: 'short' });
+                              }) : [],
+                              datasets: [
+                                {
+                                  label: 'Jumlah Pengunjung',
+                                  data: stats?.perlindungan?.wisataMonthly ? Object.values(stats.perlindungan.wisataMonthly).map(d => d.visitors) : [],
+                                  borderColor: '#4f46e5',
+                                  backgroundColor: '#4f46e520',
+                                  fill: true,
+                                  tension: 0.4,
+                                  pointRadius: 3,
+                                  yAxisID: 'y',
+                                },
+                                {
+                                  label: 'Pendapatan (Rp)',
+                                  data: stats?.perlindungan?.wisataMonthly ? Object.values(stats.perlindungan.wisataMonthly).map(d => d.income) : [],
+                                  borderColor: '#10b981',
+                                  backgroundColor: '#10b98120',
+                                  fill: true,
+                                  tension: 0.4,
+                                  pointRadius: 3,
+                                  borderDash: [5, 5],
+                                  yAxisID: 'y1',
+                                }
+                              ]
+                            }}
+                            options={{
+                              ...commonOptions,
+                              maintainAspectRatio: false,
+                              plugins: { ...commonOptions.plugins, legend: { display: false } },
+                              scales: {
+                                y: {
+                                  type: 'linear',
+                                  display: true,
+                                  position: 'left',
+                                  title: { display: true, text: 'Pengunjung', font: { size: 10, weight: 'bold' } },
+                                  grid: { display: false }
+                                },
+                                y1: {
+                                  type: 'linear',
+                                  display: true,
+                                  position: 'right',
+                                  title: { display: true, text: 'Pendapatan', font: { size: 10, weight: 'bold' } },
+                                  grid: { drawOnChartArea: false }
+                                },
+                                x: { grid: { display: false } }
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Pengelola Bar Chart */}
+                      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Distribusi Pengunjung Berdasarkan Pengelola</h4>
+                          <span className="px-2 py-1 rounded-full bg-indigo-50 text-[8px] font-bold text-indigo-500 uppercase">Pengelola</span>
+                        </div>
+                        <div className="h-[400px]">
+                          <Bar
+                            data={{
+                              labels: stats?.perlindungan?.wisataByPengelola ? Object.keys(stats.perlindungan.wisataByPengelola) : [],
+                              datasets: [{
+                                label: 'Jumlah Pengunjung',
+                                data: stats?.perlindungan?.wisataByPengelola ? Object.values(stats.perlindungan.wisataByPengelola).map(d => d.visitors) : [],
+                                backgroundColor: '#4f46e5CC',
+                                borderRadius: 6
+                              }]
+                            }}
+                            options={{
+                              ...commonOptions,
+                              indexAxis: 'y',
+                              maintainAspectRatio: false,
+                              plugins: { ...commonOptions.plugins, legend: { display: false } },
+                              scales: {
+                                x: { grid: { display: false }, ticks: { display: true } },
+                                y: {
+                                  grid: { display: false },
+                                  ticks: {
+                                    autoSkip: false,
+                                    font: { size: 9, weight: 'bold' }
+                                  }
+                                }
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Slides 7-9: Production Source Breakdown (Negara, PS, Rakyat) */}
+              {[
+                { key: 'hutan_negara', id: 7, title: 'Hutan Negara', color: '#2563eb', bg: 'bg-blue-600' },
+                { key: 'perhutanan_sosial', id: 8, title: 'Perhutanan Sosial', color: '#0ea5e9', bg: 'bg-sky-600' },
+                { key: 'hutan_rakyat', id: 9, title: 'Hutan Rakyat', color: '#0891b2', bg: 'bg-cyan-600' }
+              ].map((source) => (
+                <div key={source.key} className="min-w-full px-4">
+                  <div className="max-w-7xl mx-auto space-y-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                      {/* Left: Professional Stats Card */}
+                      <div className="lg:col-span-1 flex flex-col gap-6">
+                        <div className="relative group">
+                          <div className="absolute -inset-1 bg-gradient-to-b from-white to-gray-50 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                          <div className="relative bg-white p-8 rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col overflow-hidden">
+                            {/* Decorative Circle */}
+                            <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full opacity-[0.03] pointer-events-none" style={{ backgroundColor: source.color }}></div>
+
+                            <div className="flex flex-col items-center justify-between relative z-10">
+                              <div className="text-center w-full">
+                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-500`} style={{ background: `linear-gradient(135deg, ${source.color}, ${source.color}DD)`, color: 'white' }}>
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                  </svg>
+                                </div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-2">Total Produksi Kayu</span>
+                                <div className="flex flex-col gap-1 items-center justify-center">
+                                  <h3 className="text-5xl font-black text-gray-900 leading-none tabular-nums tracking-tighter">
+                                    {formatNumber(stats?.bina_usaha[source.key]?.kayu_total || 0)}
+                                  </h3>
+                                  <span className="text-lg font-bold text-gray-400" style={{ letterSpacing: '-0.02em' }}>M³</span>
+                                </div>
+                              </div>
+
+                              <div className="w-full mt-8 pt-8 border-t border-gray-50">
+                                <div className="flex justify-between items-end mb-3">
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Bukan Kayu</span>
+                                    <span className="text-2xl font-black text-gray-900">{formatNumber(stats?.bina_usaha[source.key]?.bukan_kayu_total || 0)}</span>
+                                  </div>
+                                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">Ton/Ltr</span>
+                                </div>
+                                <p className="text-[9px] text-gray-400 mt-4 uppercase font-black text-center tracking-[0.2em]">Produksi {source.title} {currentYear}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: Charts Grid */}
+                      <div className="md:col-span-3 space-y-6">
+                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                          <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">Tren Produksi Bulanan</h4>
+                          <div className="h-[200px]">
+                            <Line
+                              data={{
+                                labels: stats?.bina_usaha[source.key]?.kayu_monthly ? Object.keys(stats.bina_usaha[source.key].kayu_monthly).map(m => {
+                                  const date = new Date();
+                                  date.setMonth(m - 1);
+                                  return date.toLocaleString('id-ID', { month: 'short' });
+                                }) : [],
+                                datasets: [
+                                  {
+                                    label: 'Kayu (M³)',
+                                    data: stats?.bina_usaha[source.key]?.kayu_monthly ? Object.values(stats.bina_usaha[source.key].kayu_monthly) : [],
+                                    borderColor: source.color,
+                                    backgroundColor: `${source.color}20`,
+                                    fill: true,
+                                    tension: 0.4,
+                                  },
+                                  {
+                                    label: 'Bukan Kayu (Ton/Ltr)',
+                                    data: stats?.bina_usaha[source.key]?.bukan_kayu_monthly ? Object.values(stats.bina_usaha[source.key].bukan_kayu_monthly) : [],
+                                    borderColor: '#f59e0b',
+                                    backgroundColor: '#f59e0b20',
+                                    fill: true,
+                                    tension: 0.4,
+                                    borderDash: [5, 5]
+                                  }
+                                ]
+                              }}
+                              options={{ ...commonOptions, maintainAspectRatio: false }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                            <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">5 Komoditas Terbesar (Kayu)</h4>
+                            <div className="h-[200px]">
+                              <Bar
+                                data={{
+                                  labels: stats?.bina_usaha[source.key]?.kayu_commodity ? Object.keys(stats.bina_usaha[source.key].kayu_commodity) : [],
+                                  datasets: [{
+                                    label: 'Volume (M³)',
+                                    data: stats?.bina_usaha[source.key]?.kayu_commodity ? Object.values(stats.bina_usaha[source.key].kayu_commodity) : [],
+                                    backgroundColor: source.color,
+                                    borderRadius: 6
+                                  }]
+                                }}
+                                options={{
+                                  ...commonOptions,
+                                  indexAxis: 'y',
+                                  maintainAspectRatio: false,
+                                  plugins: { ...commonOptions.plugins, legend: { display: false } },
+                                  scales: { y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }, x: { grid: { display: false } } }
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                            <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">5 Komoditas Terbesar (Bukan Kayu)</h4>
+                            <div className="h-[200px]">
+                              <Bar
+                                data={{
+                                  labels: stats?.bina_usaha[source.key]?.bukan_kayu_commodity ? Object.keys(stats.bina_usaha[source.key].bukan_kayu_commodity) : [],
+                                  datasets: [{
+                                    label: 'Produksi',
+                                    data: stats?.bina_usaha[source.key]?.bukan_kayu_commodity ? Object.values(stats.bina_usaha[source.key].bukan_kayu_commodity) : [],
+                                    backgroundColor: '#f59e0bCC',
+                                    borderRadius: 6
+                                  }]
+                                }}
+                                options={{
+                                  ...commonOptions,
+                                  indexAxis: 'y',
+                                  maintainAspectRatio: false,
+                                  plugins: { ...commonOptions.plugins, legend: { display: false } },
+                                  scales: { y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }, x: { grid: { display: false } } }
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Slide 10: PBPHH (Enhanced Redesign) */}
+              <div className="min-w-full px-4">
+                <div className="max-w-7xl mx-auto space-y-8">
+                  {/* Top: Metric Cards Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Card 1: Total PBPHH */}
+                    <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-6">
+                      <div className="w-16 h-16 rounded-2xl bg-slate-600 flex items-center justify-center text-white shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Total PBPHH</p>
+                        <h3 className="text-3xl font-black text-gray-900 leading-tight">
+                          {formatNumber(stats?.bina_usaha?.pbphh?.total_units || 0)} <span className="text-sm font-bold text-gray-400">Unit</span>
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* Card 2: Total Investasi */}
+                    <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-6">
+                      <div className="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Investasi</p>
+                        <h3 className="text-xl font-black text-gray-900 leading-tight">
+                          {formatCurrency(stats?.bina_usaha?.pbphh?.total_investment || 0)}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* Card 3: Total Tenaga Kerja */}
+                    <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-6">
+                      <div className="w-16 h-16 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Tenaga Kerja</p>
+                        <h3 className="text-3xl font-black text-gray-900 leading-tight">
+                          {formatNumber(stats?.bina_usaha?.pbphh?.total_workers || 0)} <span className="text-sm font-bold text-gray-400">Orang</span>
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Charts Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Sebaran per Kabupaten */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col h-full">
+                      <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Sebaran Unit per Kabupaten</h4>
+                      <div className="h-[250px] mt-auto">
+                        <Bar
                           data={{
-                            labels: Object.keys(stats.pembinaan.rehab_chart),
+                            labels: stats?.bina_usaha?.pbphh?.by_regency ? Object.keys(stats.bina_usaha.pbphh.by_regency) : [],
                             datasets: [{
-                              data: Object.values(stats.pembinaan.rehab_chart),
-                              borderColor: '#10b981',
-                              backgroundColor: 'transparent',
-                              pointBackgroundColor: '#10b981',
-                              pointRadius: 2,
-                              borderWidth: 2,
-                              tension: 0.3
+                              label: 'Unit',
+                              data: stats?.bina_usaha?.pbphh?.by_regency ? Object.values(stats.bina_usaha.pbphh.by_regency) : [],
+                              backgroundColor: '#475569CC',
+                              borderRadius: 4
+                            }]
+                          }}
+                          options={{ ...commonOptions, indexAxis: 'y', maintainAspectRatio: false, plugins: { ...commonOptions.plugins, legend: { display: false } } }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Jenis Produksi (%) */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col h-full">
+                      <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Jenis Produksi (%)</h4>
+                      <div className="h-[250px] mt-auto">
+                        <Bar
+                          data={{
+                            labels: stats?.bina_usaha?.pbphh?.by_production_type ? stats.bina_usaha.pbphh.by_production_type.map(d => d.type) : [],
+                            datasets: [{
+                              label: 'Persentase (%)',
+                              data: stats?.bina_usaha?.pbphh?.by_production_type ? stats.bina_usaha.pbphh.by_production_type.map(d => (d.count / (stats.bina_usaha.pbphh.total_units || 1)) * 100) : [],
+                              backgroundColor: '#4f46e5CC',
+                              borderRadius: 4
                             }]
                           }}
                           options={{
-                            responsive: true,
+                            ...commonOptions,
                             maintainAspectRatio: false,
-                            plugins: { legend: { display: false }, tooltip: { enabled: true } },
-                            scales: {
-                              y: { display: false },
-                              x: { display: false }
+                            plugins: {
+                              ...commonOptions.plugins,
+                              legend: { display: false },
+                              tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)}%` } }
+                            },
+                            scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, ticks: { callback: (val) => `${val}%` } } }
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Kondisi Saat Ini */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col h-full">
+                      <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Kondisi Operasional (Total & %)</h4>
+                      <div className="h-[250px] mt-auto relative">
+                        <Doughnut
+                          data={{
+                            labels: stats?.bina_usaha?.pbphh?.by_condition ? stats.bina_usaha.pbphh.by_condition.map(d => d.condition_name === '1' ? 'Aktif' : 'Tidak Aktif') : [],
+                            datasets: [{
+                              data: stats?.bina_usaha?.pbphh?.by_condition ? stats.bina_usaha.pbphh.by_condition.map(d => d.count) : [],
+                              backgroundColor: ['#10b981', '#f59e0b'],
+                              borderWidth: 0
+                            }]
+                          }}
+                          plugins={[{
+                            id: 'centerText',
+                            afterDraw: (chart) => {
+                              const { ctx, chartArea: { top, bottom, left, right, width, height } } = chart;
+                              ctx.save();
+                              const text = stats?.bina_usaha?.pbphh?.total_units || 0;
+                              const label = 'UNIT';
+
+                              ctx.textAlign = 'center';
+                              ctx.textBaseline = 'middle';
+
+                              // Main Number
+                              ctx.font = 'black 24px Inter, sans-serif';
+                              ctx.fillStyle = '#111827';
+                              ctx.fillText(text, left + width / 2, top + height / 2 - 10);
+
+                              // Label
+                              ctx.font = 'bold 10px Inter, sans-serif';
+                              ctx.fillStyle = '#9ca3af';
+                              ctx.fillText(label, left + width / 2, top + height / 2 + 10);
+                              ctx.restore();
+                            }
+                          }]}
+                          options={{
+                            maintainAspectRatio: false,
+                            cutout: '70%',
+                            plugins: {
+                              legend: { position: 'bottom', labels: { usePointStyle: true, font: { weight: 'bold', size: 10 } } },
+                              tooltip: {
+                                enabled: true,
+                                callbacks: {
+                                  label: (ctx) => {
+                                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((ctx.raw / total) * 100).toFixed(1);
+                                    return ` ${ctx.label}: ${ctx.raw} Unit (${percentage}%)`;
+                                  }
+                                }
+                              }
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Slide 11: PNBP (Premium Redesign) */}
+              <div className="min-w-full px-4">
+                <div className="max-w-7xl mx-auto space-y-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    {/* Left: Professional Stats Card */}
+                    <div className="lg:col-span-1 flex flex-col gap-6">
+                      <div className="relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-b from-white to-gray-50 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                        <div className="relative bg-white p-8 rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col overflow-hidden">
+                          {/* Decorative Circle */}
+                          <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full opacity-[0.03] pointer-events-none bg-amber-600"></div>
+
+                          <div className="flex flex-col items-center justify-between relative z-10">
+                            <div className="text-center w-full">
+                              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-500`} style={{ background: `linear-gradient(135deg, #d33c06, #d33c06DD)`, color: 'white' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </div>
+                              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-2">Total PNBP</span>
+                              <div className="flex flex-col gap-1 items-center justify-center">
+                                <h3 className="text-4xl font-black text-gray-900 leading-none tabular-nums tracking-tighter">
+                                  {formatCurrency(stats?.bina_usaha?.pnbp?.total_realization || 0)}
+                                </h3>
+                              </div>
+                            </div>
+
+                            <div className="w-full mt-8 pt-8 border-t border-gray-50">
+                              <div className="flex justify-between items-end mb-3">
+                                <div className="flex flex-col">
+                                  <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Target Tahunan</span>
+                                  <span className="text-xl font-black text-gray-500">{formatCurrency(stats?.bina_usaha?.pnbp?.total_target || 0)}</span>
+                                </div>
+                              </div>
+                              <p className="text-[9px] text-gray-400 mt-4 uppercase font-black text-center tracking-[0.2em]">Penerimaan Negara {currentYear}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: Charts Grid */}
+                    <div className="md:col-span-3 space-y-6">
+                      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                        <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">Tren Penerimaan Bulanan</h4>
+                        <div className="h-[250px]">
+                          <Line
+                            data={{
+                              labels: stats?.bina_usaha?.pnbp?.monthly ? Object.keys(stats.bina_usaha.pnbp.monthly).map(m => {
+                                const date = new Date();
+                                date.setMonth(m - 1);
+                                return date.toLocaleString('id-ID', { month: 'short' });
+                              }) : [],
+                              datasets: [
+                                {
+                                  label: 'Realisasi',
+                                  data: stats?.bina_usaha?.pnbp?.monthly ? Object.values(stats.bina_usaha.pnbp.monthly).map(d => d.realization) : [],
+                                  borderColor: '#d97706',
+                                  backgroundColor: '#d9770620',
+                                  fill: true,
+                                  tension: 0.4,
+                                },
+                                {
+                                  label: 'Target',
+                                  data: stats?.bina_usaha?.pnbp?.monthly ? Object.values(stats.bina_usaha.pnbp.monthly).map(d => d.target) : [],
+                                  borderColor: '#cbd5e1',
+                                  borderDash: [5, 5],
+                                  tension: 0.4,
+                                }
+                              ]
+                            }}
+                            options={{ ...commonOptions, maintainAspectRatio: false }}
+                          />
+                        </div>
+                      </div>
+                      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                        <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">Realisasi per Kabupaten</h4>
+                        <div className="h-[150px]">
+                          <Bar
+                            data={{
+                              labels: stats?.bina_usaha?.pnbp?.by_regency ? Object.keys(stats.bina_usaha.pnbp.by_regency) : [],
+                              datasets: [{
+                                label: 'Realisasi (Rp)',
+                                data: stats?.bina_usaha?.pnbp?.by_regency ? Object.values(stats.bina_usaha.pnbp.by_regency) : [],
+                                backgroundColor: '#d97706CC',
+                                borderRadius: 6
+                              }]
+                            }}
+                            options={{
+                              ...commonOptions,
+                              indexAxis: 'y',
+                              maintainAspectRatio: false,
+                              plugins: { ...commonOptions.plugins, legend: { display: false } },
+                              scales: { y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }, x: { grid: { display: false } } }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Slide 12: Kelembagaan Perhutanan Sosial */}
+              <div className="min-w-full px-4">
+                <div className="max-w-7xl mx-auto space-y-8">
+                  {/* Top: Metric Cards Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {/* Card: Total Kelompok */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-2">Total Kelompok</p>
+                      <h3 className="text-3xl font-black text-gray-900">{formatNumber(stats?.kelembagaan_ps?.kelompok_count || 0)}</h3>
+                      <p className="text-[9px] text-gray-400 mt-1 uppercase font-bold">Unit Kelompok</p>
+                    </div>
+                    {/* Card: Total Luas */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-2">Total Luas</p>
+                      <h3 className="text-3xl font-black text-gray-900">{formatNumber(stats?.kelembagaan_ps?.area_total || 0)}</h3>
+                      <p className="text-[9px] text-gray-400 mt-1 uppercase font-bold">Hektar (Ha)</p>
+                    </div>
+                    {/* Card: Total KK */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-2">Total KK</p>
+                      <h3 className="text-3xl font-black text-gray-900">{formatNumber(stats?.kelembagaan_ps?.kk_total || 0)}</h3>
+                      <p className="text-[9px] text-gray-400 mt-1 uppercase font-bold">Kepala Keluarga</p>
+                    </div>
+                    {/* Card: Total NEKON */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-2">Total NEKON</p>
+                      <h3 className="text-xl font-black text-gray-900">{formatCurrency(stats?.kelembagaan_ps?.nekon_total || 0)}</h3>
+                      <p className="text-[9px] text-gray-400 mt-1 uppercase font-bold">Nilai Ekonomi</p>
+                    </div>
+                  </div>
+
+                  {/* Charts Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Chart 1: Skema Perhutanan Sosial (Pie) */}
+                    <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col h-full">
+                      <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-8">Skema Perhutanan Sosial (Persentase & Jumlah)</h4>
+                      <div className="h-[300px] mt-auto relative">
+                        <Doughnut
+                          data={{
+                            labels: stats?.kelembagaan_ps?.scheme_distribution ? stats.kelembagaan_ps.scheme_distribution.map(d => d.scheme) : [],
+                            datasets: [{
+                              data: stats?.kelembagaan_ps?.scheme_distribution ? stats.kelembagaan_ps.scheme_distribution.map(d => d.count) : [],
+                              backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'],
+                              borderWidth: 0
+                            }]
+                          }}
+                          plugins={[{
+                            id: 'centerTextPs',
+                            afterDraw: (chart) => {
+                              const { ctx, chartArea: { top, bottom, left, right, width, height } } = chart;
+                              ctx.save();
+                              const text = stats?.kelembagaan_ps?.kelompok_count || 0;
+                              ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                              ctx.font = 'black 24px Inter, sans-serif'; ctx.fillStyle = '#111827';
+                              ctx.fillText(text, left + width / 2, top + height / 2 - 10);
+                              ctx.font = 'bold 10px Inter, sans-serif'; ctx.fillStyle = '#9ca3af';
+                              ctx.fillText('KELOMPOK', left + width / 2, top + height / 2 + 10); ctx.restore();
+                            }
+                          }]}
+                          options={{
+                            maintainAspectRatio: false, cutout: '70%',
+                            plugins: {
+                              legend: { position: 'right', labels: { usePointStyle: true, font: { weight: 'bold', size: 10 } } },
+                              tooltip: {
+                                callbacks: {
+                                  label: (ctx) => {
+                                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((ctx.raw / total) * 100).toFixed(1);
+                                    return ` ${ctx.label}: ${ctx.raw} Kelompok (${percentage}%)`;
+                                  }
+                                }
+                              }
                             }
                           }}
                         />
                       </div>
                     </div>
 
-                    {/* 2. Penghijauan Lingkungan */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm border border-teal-100 hover:shadow-md transition-shadow duration-300">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="p-2 bg-teal-50 rounded-lg text-teal-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                          </div>
-                          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">Penghijauan</span>
-                        </div>
-                      </div>
-                      <div className="mb-4">
-                        <h3 className="text-2xl font-black text-gray-800">{formatNumber(stats?.pembinaan?.penghijauan_total || 0)} <span className="text-sm font-medium text-gray-400">Ha</span></h3>
-                        <p className="text-xs text-gray-400 mt-1">Total Realisasi Tahun {currentYear}</p>
-                      </div>
-                      <div className="h-[100px]">
-                        <Line
+                    {/* Chart 2: Nilai Ekonomi (NEKON) per Pengelola */}
+                    <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col h-full">
+                      <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-8">Nilai Ekonomi (NEKON) Per Kabupaten</h4>
+                      <div className="h-[300px] mt-auto">
+                        <Bar
                           data={{
-                            labels: Object.keys(stats.pembinaan.penghijauan_chart),
+                            labels: stats?.kelembagaan_ps?.economic_by_regency ? Object.keys(stats.kelembagaan_ps.economic_by_regency) : [],
                             datasets: [{
-                              data: Object.values(stats.pembinaan.penghijauan_chart),
-                              borderColor: '#14b8a6',
-                              backgroundColor: 'transparent',
-                              pointBackgroundColor: '#14b8a6',
-                              pointRadius: 2,
-                              borderWidth: 2,
-                              tension: 0.3
+                              label: 'NEKON (Rp)',
+                              data: stats?.kelembagaan_ps?.economic_by_regency ? Object.values(stats.kelembagaan_ps.economic_by_regency) : [],
+                              backgroundColor: '#10b981CC',
+                              borderRadius: 6
                             }]
                           }}
                           options={{
-                            responsive: true,
+                            ...commonOptions,
                             maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: { y: { display: false }, x: { display: false } }
+                            plugins: { ...commonOptions.plugins, legend: { display: false } },
+                            scales: {
+                              y: { grid: { display: false }, ticks: { callback: (val) => 'Rp ' + formatNumber(val) } },
+                              x: { grid: { display: false } }
+                            }
                           }}
                         />
                       </div>
-                    </div>
-
-                    {/* 3. Rehab Mangrove */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm border border-cyan-100 hover:shadow-md transition-shadow duration-300">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="p-2 bg-cyan-50 rounded-lg text-cyan-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
-                          </div>
-                          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">Mangrove</span>
-                        </div>
-                      </div>
-                      <div className="mb-4">
-                        <h3 className="text-2xl font-black text-gray-800">{formatNumber(stats?.pembinaan?.manggrove_total || 0)} <span className="text-sm font-medium text-gray-400">Ha</span></h3>
-                        <p className="text-xs text-gray-400 mt-1">Total Realisasi Tahun {currentYear}</p>
-                      </div>
-                      <div className="h-[100px]">
-                        <Line
-                          data={{
-                            labels: Object.keys(stats.pembinaan.manggrove_chart),
-                            datasets: [{
-                              data: Object.values(stats.pembinaan.manggrove_chart),
-                              borderColor: '#06b6d4',
-                              backgroundColor: 'transparent',
-                              pointBackgroundColor: '#06b6d4',
-                              pointRadius: 2,
-                              borderWidth: 2,
-                              tension: 0.3
-                            }]
-                          }}
-                          options={{
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: { y: { display: false }, x: { display: false } }
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Row 2: 2 Columns Centered */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto w-full">
-
-                    {/* 4. Reboisasi PS */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm border border-pink-100 hover:shadow-md transition-shadow duration-300">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="p-2 bg-pink-50 rounded-lg text-pink-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                          </div>
-                          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">Reboisasi Areal PS</span>
-                        </div>
-                      </div>
-                      <div className="mb-4">
-                        <h3 className="text-2xl font-black text-gray-800">{formatNumber(stats?.pembinaan?.reboisasi_total || 0)} <span className="text-sm font-medium text-gray-400">Ha</span></h3>
-                        <p className="text-xs text-gray-400 mt-1">Total Realisasi Tahun {currentYear}</p>
-                      </div>
-                      <div className="h-[100px]">
-                        <Line
-                          data={{
-                            labels: Object.keys(stats.pembinaan.reboisasi_chart),
-                            datasets: [{
-                              data: Object.values(stats.pembinaan.reboisasi_chart),
-                              borderColor: '#ec4899',
-                              backgroundColor: 'transparent',
-                              pointBackgroundColor: '#ec4899',
-                              pointRadius: 2,
-                              borderWidth: 2,
-                              tension: 0.3
-                            }]
-                          }}
-                          options={{
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: { y: { display: false }, x: { display: false } }
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* 5. RHL Teknis */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm border border-orange-100 hover:shadow-md transition-shadow duration-300">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="p-2 bg-orange-50 rounded-lg text-orange-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                          </div>
-                          <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">RHL Teknis</span>
-                        </div>
-                      </div>
-                      <div className="mb-4">
-                        <h3 className="text-2xl font-black text-gray-800">{formatNumber(stats?.pembinaan?.rhl_teknis_total || 0)} <span className="text-sm font-medium text-gray-400">Unit</span></h3>
-                        <p className="text-xs text-gray-400 mt-1">Total Realisasi Tahun {currentYear}</p>
-                      </div>
-                      <div className="h-[100px]">
-                        <Line
-                          data={{
-                            labels: Object.keys(stats.pembinaan.rhl_teknis_chart),
-                            datasets: [{
-                              data: Object.values(stats.pembinaan.rhl_teknis_chart),
-                              borderColor: '#f97316',
-                              backgroundColor: 'transparent',
-                              pointBackgroundColor: '#f97316',
-                              pointRadius: 2,
-                              borderWidth: 2,
-                              tension: 0.3
-                            }]
-                          }}
-                          options={{
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: { y: { display: false }, x: { display: false } }
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-
-              {/* Slide 1: Perlindungan Hutan */}
-              <div className="min-w-full px-1">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-100 relative overflow-hidden">
-                    <div className="absolute right-0 top-0 p-3 opacity-10"><svg className="w-20 h-20 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" /></svg></div>
-                    <p className="text-sm font-bold text-red-500 uppercase">Kebakaran Hutan</p>
-                    <h3 className="text-3xl font-bold text-gray-900 mt-2">{formatNumber(stats?.perlindungan?.kebakaran_kejadian || 0)}</h3>
-                    <p className="text-gray-500 text-sm">Kejadian Tahun Ini</p>
-                  </div>
-
-                  <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-100 relative overflow-hidden">
-                    <div className="absolute right-0 top-0 p-3 opacity-10"><svg className="w-20 h-20 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" /></svg></div>
-                    <p className="text-sm font-bold text-red-500 uppercase">Area Terbakar</p>
-                    <h3 className="text-3xl font-bold text-gray-900 mt-2">{formatNumber(stats?.perlindungan?.kebakaran_area || 0)}</h3>
-                    <p className="text-gray-500 text-sm">Hektar</p>
-                  </div>
-
-                  <div className="bg-white p-6 rounded-3xl shadow-sm border border-indigo-100 relative overflow-hidden">
-                    <div className="absolute right-0 top-0 p-3 opacity-10"><svg className="w-20 h-20 text-indigo-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" /></svg></div>
-                    <p className="text-sm font-bold text-indigo-500 uppercase">Pengunjung Wisata Alam</p>
-                    <h3 className="text-3xl font-bold text-gray-900 mt-2">{formatNumber(stats?.perlindungan?.wisata_visitors || 0)}</h3>
-                    <p className="text-gray-500 text-sm">Orang</p>
-                  </div>
-
-                  <div className="bg-white p-6 rounded-3xl shadow-sm border border-emerald-100 relative overflow-hidden">
-                    <div className="absolute right-0 top-0 p-3 opacity-10"><svg className="w-20 h-20 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                    <p className="text-sm font-bold text-emerald-500 uppercase">Pendapatan Wisata</p>
-                    <h3 className="text-2xl font-bold text-gray-900 mt-2">{formatCurrency(stats?.perlindungan?.wisata_income || 0)}</h3>
-                    <p className="text-gray-500 text-sm">Rupiah</p>
-                  </div>
-                </div>
-
-                {/* Monthly Charts Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-                  {/* Kebakaran Chart */}
-                  <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-50">
-                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                      <span className="w-2 h-8 rounded-full bg-red-500"></span>
-                      Tren Kebakaran Hutan
-                    </h3>
-                    <div className="h-[250px]">
-                      <Line data={kebakaranMonthlyData} options={{ ...commonOptions, maintainAspectRatio: false }} />
-                    </div>
-                  </div>
-
-                  {/* Wisata Chart */}
-                  <div className="bg-white p-6 rounded-3xl shadow-sm border border-indigo-50">
-                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                      <span className="w-2 h-8 rounded-full bg-indigo-500"></span>
-                      Tren Kunjungan Wisata
-                    </h3>
-                    <div className="h-[250px]">
-                      <Line data={wisataMonthlyData} options={{ ...commonOptions, maintainAspectRatio: false }} />
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Slide 2: Bina Usaha */}
-              <div className="min-w-full px-1">
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                  <div className="bg-white p-6 rounded-3xl border border-blue-100">
-                    <p className="text-xs font-bold text-blue-500 uppercase mb-2">Penerimaan Negara (PNBP)</p>
-                    <h3 className="text-2xl font-bold">{formatCurrency(stats?.bina_usaha?.pnbp || 0)}</h3>
-                  </div>
-                  <div className="bg-white p-6 rounded-3xl border border-blue-100">
-                    <p className="text-xs font-bold text-blue-500 uppercase mb-2">PBPHH</p>
-                    <h3 className="text-3xl font-bold">{stats?.bina_usaha?.industri || 0} <span className="text-base font-normal text-gray-400">Unit</span></h3>
-                  </div>
-                </div>
-
-                {/* Main Charts Area */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-                  {/* Column 1: Hasil Hutan Kayu */}
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-900">Hasil Hutan Kayu</h3>
-                    </div>
-
-                    {/* Monthly Trend */}
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                      <p className="text-sm font-bold text-gray-400 mb-4">Tren Produksi Bulanan</p>
-                      <div className="h-[250px]">
-                        <Line data={kayuMonthlyData} options={{ ...commonOptions, maintainAspectRatio: false }} />
-                      </div>
-                    </div>
-
-                    {/* Top Commodities */}
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                      <p className="text-sm font-bold text-gray-400 mb-4">5 Komoditas Terbesar</p>
-                      <div className="h-[250px]">
-                        <Bar data={kayuCommodityData} options={{ ...commonOptions, indexAxis: 'y', maintainAspectRatio: false }} />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Column 2: Hasil Hutan Bukan Kayu */}
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-900">Hasil Hutan Bukan Kayu</h3>
-                    </div>
-
-                    {/* Monthly Trend */}
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                      <p className="text-sm font-bold text-gray-400 mb-4">Tren Produksi Bulanan</p>
-                      <div className="h-[250px]">
-                        <Line data={bukanKayuMonthlyData} options={{ ...commonOptions, maintainAspectRatio: false }} />
-                      </div>
-                    </div>
-
-                    {/* Top Commodities */}
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                      <p className="text-sm font-bold text-gray-400 mb-4">5 Komoditas Terbesar</p>
-                      <div className="h-[250px]">
-                        <Bar data={bukanKayuCommodityData} options={{ ...commonOptions, indexAxis: 'y', maintainAspectRatio: false }} />
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              {/* Slide 3: Pemberdayaan */}
-              <div className="min-w-full px-4 py-6">
+              {/* Slide 13: Kelembagaan Hutan Rakyat */}
+              <div className="min-w-full px-4">
                 <div className="max-w-7xl mx-auto space-y-8">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Top: Metric Cards Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-lime-600 mb-2">Total Kelompok</p>
+                      <h3 className="text-3xl font-black text-gray-900">{formatNumber(stats?.kelembagaan_hr?.kelompok_count || 0)}</h3>
+                      <p className="text-[9px] text-gray-400 mt-1 uppercase font-bold">Unit Kelompok</p>
+                    </div>
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-lime-600 mb-2">Total Luas</p>
+                      <h3 className="text-3xl font-black text-gray-900">{formatNumber(stats?.kelembagaan_hr?.area_total || 0)}</h3>
+                      <p className="text-[9px] text-gray-400 mt-1 uppercase font-bold">Hektar (Ha)</p>
+                    </div>
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-lime-600 mb-2">Jumlah Anggota</p>
+                      <h3 className="text-3xl font-black text-gray-900">{formatNumber(stats?.kelembagaan_hr?.anggota_total || 0)}</h3>
+                      <p className="text-[9px] text-gray-400 mt-1 uppercase font-bold">Orang Anggota</p>
+                    </div>
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-lime-600 mb-2">Total NTE</p>
+                      <h3 className="text-xl font-black text-gray-900">{formatCurrency(stats?.kelembagaan_hr?.nte_total || 0)}</h3>
+                      <p className="text-[9px] text-gray-400 mt-1 uppercase font-bold">Nilai Transaksi Ekonomi</p>
+                    </div>
+                  </div>
 
-                    {/* SKPS Section */}
-                    <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-100 flex flex-col h-full">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900">Perhutanan Sosial</h3>
-                          <p className="text-sm text-gray-500">Akses Legal Masyarakat</p>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-6 flex-1">
-                        <div className="flex flex-col items-center justify-center p-6 bg-emerald-50/50 rounded-2xl border border-emerald-50">
-                          <span className="text-sm font-bold text-emerald-600 uppercase tracking-widest mb-1">Total SK Terbit</span>
-                          <span className="text-5xl font-black text-gray-900">{formatNumber(stats.pemberdayaan.skps)}</span>
-                          <span className="text-sm font-medium text-gray-400 mt-2">Unit SK</span>
-                        </div>
-                        <div className="w-full h-[250px]">
-                          <Bar
-                            data={skpsChartData}
-                            options={{
-                              ...commonOptions,
-                              indexAxis: 'y',
-                              maintainAspectRatio: false,
-                              plugins: { ...commonOptions.plugins, legend: { display: false } },
-                              scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
-                            }}
-                          />
-                        </div>
+                  {/* Charts Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Kelas Kelembagaan (Pie) */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col h-full">
+                      <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Kelas Kelembagaan (Persentase & Jumlah)</h4>
+                      <div className="h-[250px] mt-auto relative">
+                        <Doughnut
+                          data={{
+                            labels: stats?.kelembagaan_hr?.class_distribution ? stats.kelembagaan_hr.class_distribution.map(d => d.class_name) : [],
+                            datasets: [{
+                              data: stats?.kelembagaan_hr?.class_distribution ? stats.kelembagaan_hr.class_distribution.map(d => d.count) : [],
+                              backgroundColor: ['#84cc16', '#a3e635', '#bef264', '#d9f99d'],
+                              borderWidth: 0
+                            }]
+                          }}
+                          plugins={[{
+                            id: 'centerTextHr',
+                            afterDraw: (chart) => {
+                              const { ctx, chartArea: { top, bottom, left, right, width, height } } = chart;
+                              ctx.save();
+                              const text = stats?.kelembagaan_hr?.kelompok_count || 0;
+                              ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                              ctx.font = 'black 24px Inter, sans-serif'; ctx.fillStyle = '#111827';
+                              ctx.fillText(text, left + width / 2, top + height / 2 - 10);
+                              ctx.font = 'bold 10px Inter, sans-serif'; ctx.fillStyle = '#9ca3af';
+                              ctx.fillText('KELOMPOK', left + width / 2, top + height / 2 + 10); ctx.restore();
+                            }
+                          }]}
+                          options={{
+                            maintainAspectRatio: false, cutout: '70%',
+                            plugins: {
+                              legend: { position: 'bottom', labels: { usePointStyle: true, font: { weight: 'bold', size: 9 } } },
+                              tooltip: {
+                                callbacks: {
+                                  label: (ctx) => {
+                                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((ctx.raw / total) * 100).toFixed(1);
+                                    return ` ${ctx.label}: ${ctx.raw} Kelompok (${percentage}%)`;
+                                  }
+                                }
+                              }
+                            }
+                          }}
+                        />
                       </div>
                     </div>
 
-                    {/* KUPS Section */}
-                    <div className="bg-white rounded-3xl p-6 shadow-sm border border-blue-100 flex flex-col h-full">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 bg-blue-50 rounded-2xl text-blue-600">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900">KUPS</h3>
-                          <p className="text-sm text-gray-500">Kelompok Usaha Perhutanan Sosial</p>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-6 flex-1">
-                        <div className="flex flex-col items-center justify-center p-6 bg-blue-50/50 rounded-2xl border border-blue-50">
-                          <span className="text-sm font-bold text-blue-600 uppercase tracking-widest mb-1">Total KUPS</span>
-                          <span className="text-5xl font-black text-gray-900">{formatNumber(stats?.pemberdayaan?.kups?.total || 0)}</span>
-                          <span className="text-sm font-medium text-gray-400 mt-2">{stats?.pemberdayaan?.kups?.active || 0} Unit Aktif</span>
-                        </div>
-                        <div className="w-full h-[250px]">
-                          <Bar
-                            data={kupsChartData}
-                            options={{
-                              ...commonOptions,
-                              indexAxis: 'y',
-                              maintainAspectRatio: false,
-                              plugins: { ...commonOptions.plugins, legend: { display: false } },
-                              scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
-                            }}
-                          />
-                        </div>
+                    {/* Nilai Ekonomi Per Kabupaten (Bar) */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col h-full">
+                      <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Nilai Transaksi Ekonomi (NTE) Per Kabupaten</h4>
+                      <div className="h-[250px] mt-auto">
+                        <Bar
+                          data={{
+                            labels: stats?.kelembagaan_hr?.economic_by_regency ? Object.keys(stats.kelembagaan_hr.economic_by_regency) : [],
+                            datasets: [{
+                              label: 'NTE (Rp)',
+                              data: stats?.kelembagaan_hr?.economic_by_regency ? Object.values(stats.kelembagaan_hr.economic_by_regency) : [],
+                              backgroundColor: '#84cc16CC',
+                              borderRadius: 4
+                            }]
+                          }}
+                          options={{
+                            ...commonOptions,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            plugins: { ...commonOptions.plugins, legend: { display: false } }
+                          }}
+                        />
                       </div>
                     </div>
 
+                    {/* Komoditas Terbesar (Bar) */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col h-full">
+                      <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">5 Komoditas Terbesar (NTE)</h4>
+                      <div className="h-[250px] mt-auto">
+                        <Bar
+                          data={{
+                            labels: stats?.kelembagaan_hr?.top_commodities ? Object.keys(stats.kelembagaan_hr.top_commodities) : [],
+                            datasets: [{
+                              label: 'Nilai Transaksi',
+                              data: stats?.kelembagaan_hr?.top_commodities ? Object.values(stats.kelembagaan_hr.top_commodities) : [],
+                              backgroundColor: '#65a30dCC',
+                              borderRadius: 4
+                            }]
+                          }}
+                          options={{
+                            ...commonOptions,
+                            maintainAspectRatio: false,
+                            plugins: { ...commonOptions.plugins, legend: { display: false } }
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
