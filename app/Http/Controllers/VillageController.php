@@ -31,8 +31,8 @@ class VillageController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'id' => 'required|numeric|unique:villages,id',
-      'district_id' => 'required|exists:districts,id',
+      'id' => 'required|numeric|unique:m_villages,id',
+      'district_id' => 'required|exists:m_districts,id',
       'name' => 'required|string|max:255',
     ]);
 
@@ -44,7 +44,7 @@ class VillageController extends Controller
   public function update(Request $request, Villages $village)
   {
     $request->validate([
-      'district_id' => 'required|exists:districts,id',
+      'district_id' => 'required|exists:m_districts,id',
       'name' => 'required|string|max:255',
     ]);
 

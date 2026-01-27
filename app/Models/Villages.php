@@ -10,11 +10,16 @@ class Villages extends Model
     use HasFactory;
 
     protected $fillable = [
+        "id",
         "district_id",
         "name"
     ];
 
+    public $incrementing = false;
+
     protected $table = "m_villages";
+
+    public $timestamps = false;
 
     public function district()
     {

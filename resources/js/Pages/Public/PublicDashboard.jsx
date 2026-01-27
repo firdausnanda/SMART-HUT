@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import Select from 'react-select';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler } from 'chart.js';
-import { Doughnut, Bar, Line } from 'react-chartjs-2';
+import { Doughnut, Bar, Line, Pie } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler);
 
@@ -1115,50 +1115,56 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                     <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col h-full">
                       <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Kondisi Operasional (Total & %)</h4>
                       <div className="h-[250px] mt-auto relative">
-                        <Doughnut
+                        <Pie
                           data={{
-                            labels: stats?.bina_usaha?.pbphh?.by_condition ? stats.bina_usaha.pbphh.by_condition.map(d => d.condition_name === '1' ? 'Aktif' : 'Tidak Aktif') : [],
+                            labels: stats?.bina_usaha?.pbphh?.by_condition ? stats.bina_usaha.pbphh.by_condition.map(d => String(d.condition_name) === '1' ? 'Aktif' : 'Tidak Aktif') : [],
                             datasets: [{
                               data: stats?.bina_usaha?.pbphh?.by_condition ? stats.bina_usaha.pbphh.by_condition.map(d => d.count) : [],
-                              backgroundColor: ['#10b981', '#f59e0b'],
-                              borderWidth: 0
+                              backgroundColor: stats?.bina_usaha?.pbphh?.by_condition ? stats.bina_usaha.pbphh.by_condition.map(d => String(d.condition_name) === '1' ? '#16a34a' : '#dc2626') : [],
+                              borderWidth: 2,
+                              borderColor: '#ffffff',
+                              hoverOffset: 10,
+                              borderRadius: 4,
                             }]
                           }}
-                          plugins={[{
-                            id: 'centerText',
-                            afterDraw: (chart) => {
-                              const { ctx, chartArea: { top, bottom, left, right, width, height } } = chart;
-                              ctx.save();
-                              const text = stats?.bina_usaha?.pbphh?.total_units || 0;
-                              const label = 'UNIT';
-
-                              ctx.textAlign = 'center';
-                              ctx.textBaseline = 'middle';
-
-                              // Main Number
-                              ctx.font = 'black 24px Inter, sans-serif';
-                              ctx.fillStyle = '#111827';
-                              ctx.fillText(text, left + width / 2, top + height / 2 - 10);
-
-                              // Label
-                              ctx.font = 'bold 10px Inter, sans-serif';
-                              ctx.fillStyle = '#9ca3af';
-                              ctx.fillText(label, left + width / 2, top + height / 2 + 10);
-                              ctx.restore();
-                            }
-                          }]}
                           options={{
+                            layout: {
+                              padding: 20
+                            },
                             maintainAspectRatio: false,
-                            cutout: '70%',
                             plugins: {
-                              legend: { position: 'bottom', labels: { usePointStyle: true, font: { weight: 'bold', size: 10 } } },
+                              legend: {
+                                position: 'bottom',
+                                labels: {
+                                  usePointStyle: true,
+                                  padding: 20,
+                                  font: { weight: 'bold', size: 10, family: "'Inter', sans-serif" },
+                                  color: '#64748b'
+                                }
+                              },
                               tooltip: {
                                 enabled: true,
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1e293b',
+                                bodyColor: '#475569',
+                                borderColor: '#e2e8f0',
+                                borderWidth: 1,
+                                padding: 12,
+                                cornerRadius: 12,
+                                displayColors: true,
+                                boxPadding: 6,
                                 callbacks: {
                                   label: (ctx) => {
                                     const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
                                     const percentage = ((ctx.raw / total) * 100).toFixed(1);
                                     return ` ${ctx.label}: ${ctx.raw} Unit (${percentage}%)`;
+                                  },
+                                  labelColor: (ctx) => {
+                                    const isAktif = ctx.raw.label === 'Aktif' || String(stats?.bina_usaha?.pbphh?.by_condition[ctx.dataIndex]?.condition_name) === '1';
+                                    return {
+                                      borderColor: isAktif ? '#16a34a' : '#dc2626',
+                                      backgroundColor: isAktif ? '#16a34a' : '#dc2626',
+                                    };
                                   }
                                 }
                               }
@@ -1327,7 +1333,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                               ctx.save();
                               const text = stats?.kelembagaan_ps?.kelompok_count || 0;
                               ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                              ctx.font = 'black 24px Inter, sans-serif'; ctx.fillStyle = '#111827';
+                              ctx.font = '900 72px Inter, sans-serif'; ctx.fillStyle = '#111827';
                               ctx.fillText(text, left + width / 2, top + height / 2 - 10);
                               ctx.font = 'bold 10px Inter, sans-serif'; ctx.fillStyle = '#9ca3af';
                               ctx.fillText('KELOMPOK', left + width / 2, top + height / 2 + 10); ctx.restore();

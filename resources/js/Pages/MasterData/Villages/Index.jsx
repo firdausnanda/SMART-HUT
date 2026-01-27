@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
+import Select from 'react-select';
 import Modal from '@/Components/Modal';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
@@ -252,19 +253,27 @@ export default function VillagesIndex({ auth, villages, districts, filters }) {
 
             <div>
               <InputLabel htmlFor="district_id" value="Kecamatan" />
-              <select
-                id="district_id"
-                className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm"
-                value={data.district_id}
-                onChange={(e) => setData('district_id', e.target.value)}
-              >
-                <option value="">Pilih Kecamatan</option>
-                {districts.map((district) => (
-                  <option key={district.id} value={district.id}>
-                    {district.name}
-                  </option>
-                ))}
-              </select>
+              <div className="mt-1">
+                <Select
+                  id="district_id"
+                  options={districts.map(d => ({ value: d.id, label: d.name }))}
+                  value={districts.map(d => ({ value: d.id, label: d.name })).find(opt => opt.value === data.district_id) || null}
+                  onChange={(option) => setData('district_id', option ? option.value : '')}
+                  placeholder="Pilih Kecamatan"
+                  classNamePrefix="react-select"
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: '0.5rem',
+                      borderColor: state.isFocused ? '#6366f1' : '#d1d5db',
+                      boxShadow: state.isFocused ? '0 0 0 1px #6366f1' : 'none',
+                      '&:hover': {
+                        borderColor: '#9ca3af'
+                      }
+                    })
+                  }}
+                />
+              </div>
               <InputError message={errors.district_id} className="mt-2" />
             </div>
 
@@ -286,7 +295,7 @@ export default function VillagesIndex({ auth, villages, districts, filters }) {
                 Batal
               </SecondaryButton>
               <PrimaryButton disabled={processing} className="bg-primary-600 hover:bg-primary-700 text-white shadow-primary-200 h-[48px]">
-                {modalMode === 'create' ? 'Simpan Data' : 'Perbarui Data'}
+                {processing ? 'Menyimpan...' : (modalMode === 'create' ? 'Simpan Data' : 'Perbarui Data')}
               </PrimaryButton>
             </div>
           </form>
