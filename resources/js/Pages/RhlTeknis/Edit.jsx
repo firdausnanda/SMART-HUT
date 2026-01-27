@@ -16,7 +16,6 @@ export default function Edit({ auth, data: item, sumberDana, bangunanKta }) {
     regency_id: item?.regency_id || '',
     district_id: item?.district_id || '',
     village_id: item?.village_id || '',
-    coordinates: item?.coordinates || '',
     target_annual: item?.target_annual ?? '',
     fund_source: item?.fund_source || '',
     details: (item?.details && item.details.length > 0) ? item.details.map(d => ({
@@ -241,17 +240,7 @@ export default function Edit({ auth, data: item, sumberDana, bangunanKta }) {
                   <InputError message={errors.village_id} className="mt-2" />
                 </div>
 
-                <div>
-                  <InputLabel htmlFor="coordinates" value="Koordinat Lokasi (Opsional)" className="mb-2" />
-                  <TextInput
-                    id="coordinates"
-                    className="w-full"
-                    value={data.coordinates}
-                    onChange={(e) => setData('coordinates', e.target.value)}
-                    placeholder="Lat, Long"
-                  />
-                  <InputError message={errors.coordinates} className="mt-2" />
-                </div>
+
 
                 <div>
                   <InputLabel value="Target Tahunan (Unit)" className="mb-2" />

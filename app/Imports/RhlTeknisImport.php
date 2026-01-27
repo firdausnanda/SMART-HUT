@@ -35,7 +35,6 @@ class RhlTeknisImport implements OnEachRow, WithHeadingRow, WithValidation, Skip
       'kabupaten' => 'required|string|exists:m_regencies,name',
       'kecamatan' => 'required|string|exists:m_districts,name',
       'desa' => 'required|string|exists:m_villages,name',
-      'koordinat' => 'nullable|string',
       'jenis_bangunan' => 'required|string',
       'jumlah_unit' => 'required|string',
     ];
@@ -75,7 +74,6 @@ class RhlTeknisImport implements OnEachRow, WithHeadingRow, WithValidation, Skip
       'regency_id' => $regency?->id,
       'district_id' => $district?->id,
       'village_id' => $village?->id,
-      'coordinates' => $rowData['koordinat'] ?? null,
       'status' => 'draft',
       'created_by' => Auth::id(),
     ]);

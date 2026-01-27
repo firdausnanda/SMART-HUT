@@ -30,7 +30,7 @@ class RhlTeknisExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
 
   public function headings(): array
   {
-    return ['No', 'Tahun', 'Bulan', 'Kabupaten', 'Kecamatan', 'Desa', 'Koordinat', 'Target Tahunan (Ha)', 'Sumber Dana', 'Status', 'Diinput Oleh', 'Tanggal Input'];
+    return ['No', 'Tahun', 'Bulan', 'Kabupaten', 'Kecamatan', 'Desa', 'Target Tahunan (Ha)', 'Sumber Dana', 'Status', 'Diinput Oleh', 'Tanggal Input'];
   }
 
   public function map($row): array
@@ -47,7 +47,6 @@ class RhlTeknisExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
       $row->regency->name ?? '-',
       $row->district->name ?? '-',
       $row->village->name ?? '-',
-      $row->coordinates ?? '-',
       number_format($row->target_annual, 2, ',', '.'),
       $fundSourceLabels[$row->fund_source] ?? $row->fund_source,
       ucfirst($row->status),

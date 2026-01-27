@@ -16,7 +16,6 @@ export default function Create({ auth, sumberDana, bangunanKta }) {
     regency_id: '',
     district_id: '',
     village_id: '',
-    coordinates: '',
     target_annual: '',
     fund_source: '',
     details: [
@@ -239,17 +238,7 @@ export default function Create({ auth, sumberDana, bangunanKta }) {
                   <InputError message={errors.village_id} className="mt-2" />
                 </div>
 
-                <div>
-                  <InputLabel htmlFor="coordinates" value="Koordinat Lokasi (Opsional)" className="mb-2" />
-                  <TextInput
-                    id="coordinates"
-                    className="w-full"
-                    value={data.coordinates}
-                    onChange={(e) => setData('coordinates', e.target.value)}
-                    placeholder="Lat, Long"
-                  />
-                  <InputError message={errors.coordinates} className="mt-2" />
-                </div>
+
 
                 <div>
                   <InputLabel value="Target Tahunan (Unit)" className="mb-2" />

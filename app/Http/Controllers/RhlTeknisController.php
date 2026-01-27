@@ -120,7 +120,6 @@ class RhlTeknisController extends Controller
       'regency_id' => 'nullable|exists:m_regencies,id',
       'district_id' => 'nullable|exists:m_districts,id',
       'village_id' => 'nullable|exists:m_villages,id',
-      'coordinates' => 'nullable|string',
       'target_annual' => 'required|numeric',
       'fund_source' => 'required|string',
       'details' => 'required|array|min:1',
@@ -136,7 +135,6 @@ class RhlTeknisController extends Controller
         'regency_id' => $validated['regency_id'] ?? null,
         'district_id' => $validated['district_id'] ?? null,
         'village_id' => $validated['village_id'] ?? null,
-        'coordinates' => $validated['coordinates'] ?? null,
         'target_annual' => $validated['target_annual'],
         'fund_source' => $validated['fund_source'],
       ]);
@@ -167,7 +165,6 @@ class RhlTeknisController extends Controller
       'regency_id' => 'nullable|exists:m_regencies,id',
       'district_id' => 'nullable|exists:m_districts,id',
       'village_id' => 'nullable|exists:m_villages,id',
-      'coordinates' => 'nullable|string',
       'target_annual' => 'required|numeric',
       'fund_source' => 'required|string',
       'details' => 'required|array|min:1',
@@ -183,7 +180,6 @@ class RhlTeknisController extends Controller
         'regency_id' => $validated['regency_id'] ?? null,
         'district_id' => $validated['district_id'] ?? null,
         'village_id' => $validated['village_id'] ?? null,
-        'coordinates' => $validated['coordinates'] ?? null,
         'target_annual' => $validated['target_annual'],
         'fund_source' => $validated['fund_source'],
       ]);

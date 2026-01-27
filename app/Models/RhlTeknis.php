@@ -24,7 +24,6 @@ class RhlTeknis extends Model
     'regency_id',
     'district_id',
     'village_id',
-    'coordinates',
     'status',
     'approved_by_kasi_at',
     'approved_by_cdk_at',
