@@ -34,12 +34,10 @@ class HasilHutanKayuController extends Controller
     $datas = HasilHutanKayu::query()
       ->leftJoin('m_regencies', 'hasil_hutan_kayu.regency_id', '=', 'm_regencies.id')
       ->leftJoin('m_districts', 'hasil_hutan_kayu.district_id', '=', 'm_districts.id')
-      ->leftJoin('m_kayu', 'hasil_hutan_kayu.id_kayu', '=', 'm_kayu.id')
       ->select(
         'hasil_hutan_kayu.*',
         'm_regencies.name as regency_name',
-        'm_districts.name as district_name',
-        'm_kayu.name as kayu_name'
+        'm_districts.name as district_name'
       )
       ->where('forest_type', $forestType)
       ->when($selectedYear, function ($query, $year) {
@@ -47,24 +45,26 @@ class HasilHutanKayuController extends Controller
       })
       ->when($request->search, function ($query, $search) {
         $query->where(function ($q) use ($search) {
-          $q->where('m_kayu.name', 'like', "%{$search}%")
+          $q->whereHas('details.kayu', function ($q2) use ($search) {
+            $q2->where('name', 'like', "%{$search}%");
+          })
             ->orWhere('m_regencies.name', 'like', "%{$search}%")
             ->orWhere('m_districts.name', 'like', "%{$search}%");
         });
       })
-
-      ->with(['creator', 'regency', 'district', 'kayu'])
+      ->with(['creator', 'regency', 'district', 'details.kayu'])
       ->when($sortField, function ($query) use ($sortField, $sortDirection) {
         $sortMap = [
-          'month' => 'hasil_hutan_kayu.month', // Or combined with year if needed
-          'location' => 'm_districts.name', // Approximate, allows sorting by district name
-          'kayu' => 'm_kayu.name',
+          'month' => 'hasil_hutan_kayu.month',
+          'location' => 'm_districts.name',
           'target' => 'hasil_hutan_kayu.annual_volume_target',
           'realization' => 'hasil_hutan_kayu.annual_volume_realization',
           'status' => 'hasil_hutan_kayu.status',
           'created_at' => 'hasil_hutan_kayu.created_at',
         ];
 
+        // Kayu sort is complex with many-to-many, ignoring for now or could sort by count/first
+  
         $dbColumn = $sortMap[$sortField] ?? 'hasil_hutan_kayu.created_at';
         return $query->orderBy($dbColumn, $sortDirection);
       })
@@ -135,11 +135,31 @@ class HasilHutanKayuController extends Controller
       'regency_id' => 'required|exists:m_regencies,id',
       'district_id' => 'required|exists:m_districts,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
-      'annual_volume_target' => 'required|string', // Using string as per migration/model
-      'id_kayu' => 'required|exists:m_kayu,id',
+      'annual_volume_target' => 'required|numeric',
+      'annual_volume_realization' => 'required|numeric',
+      'kayu_ids' => 'required|array|min:1',
+      'kayu_ids.*' => 'exists:m_kayu,id',
     ]);
 
-    HasilHutanKayu::create($validated);
+    DB::transaction(function () use ($validated) {
+      $parent = HasilHutanKayu::create([
+        'year' => $validated['year'],
+        'month' => $validated['month'],
+        'province_id' => $validated['province_id'],
+        'regency_id' => $validated['regency_id'],
+        'district_id' => $validated['district_id'],
+        'forest_type' => $validated['forest_type'],
+        'annual_volume_target' => $validated['annual_volume_target'],
+        'annual_volume_realization' => $validated['annual_volume_realization'],
+        'status' => 'draft'
+      ]);
+
+      foreach ($validated['kayu_ids'] as $kayuId) {
+        $parent->details()->create([
+          'kayu_id' => $kayuId,
+        ]);
+      }
+    });
 
     return redirect()->route('hasil-hutan-kayu.index', ['forest_type' => $validated['forest_type']])
       ->with('success', 'Data berhasil ditambahkan');
@@ -148,7 +168,7 @@ class HasilHutanKayuController extends Controller
   public function edit(HasilHutanKayu $hasilHutanKayu)
   {
     return Inertia::render('HasilHutanKayu/Edit', [
-      'data' => $hasilHutanKayu->load(['kayu', 'regency', 'district']),
+      'data' => $hasilHutanKayu->load(['details.kayu', 'regency', 'district']),
       'kayu_list' => Kayu::all(),
       'provinces' => DB::table('m_provinces')->where('id', '35')->get(),
       'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
@@ -165,11 +185,31 @@ class HasilHutanKayuController extends Controller
       'regency_id' => 'required|exists:m_regencies,id',
       'district_id' => 'required|exists:m_districts,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
-      'annual_volume_target' => 'required|string',
-      'id_kayu' => 'required|exists:m_kayu,id',
+      'annual_volume_target' => 'required|numeric',
+      'annual_volume_realization' => 'required|numeric',
+      'kayu_ids' => 'required|array|min:1',
+      'kayu_ids.*' => 'exists:m_kayu,id',
     ]);
 
-    $hasilHutanKayu->update($validated);
+    DB::transaction(function () use ($validated, $hasilHutanKayu) {
+      $hasilHutanKayu->update([
+        'year' => $validated['year'],
+        'month' => $validated['month'],
+        'province_id' => $validated['province_id'],
+        'regency_id' => $validated['regency_id'],
+        'district_id' => $validated['district_id'],
+        'forest_type' => $validated['forest_type'],
+        'annual_volume_target' => $validated['annual_volume_target'],
+        'annual_volume_realization' => $validated['annual_volume_realization'],
+      ]);
+
+      $hasilHutanKayu->details()->delete();
+      foreach ($validated['kayu_ids'] as $kayuId) {
+        $hasilHutanKayu->details()->create([
+          'kayu_id' => $kayuId,
+        ]);
+      }
+    });
 
     return redirect()->route('hasil-hutan-kayu.index', ['forest_type' => $hasilHutanKayu->forest_type])
       ->with('success', 'Data berhasil diperbarui');

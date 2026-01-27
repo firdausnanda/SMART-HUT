@@ -659,7 +659,17 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                       <div className="text-xs text-gray-500">{item.regency_name || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-medium text-gray-800">{item.kayu_name || '-'}</div>
+                      <div className="font-medium text-gray-800">
+                        {item.details && item.details.length > 0 ? (
+                          <div className="flex flex-col gap-1">
+                            {item.details.map((detail, idx) => (
+                              <span key={idx} className="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-100 w-fit">
+                                {detail.kayu?.name}
+                              </span>
+                            ))}
+                          </div>
+                        ) : '-'}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className="font-bold text-gray-900">{item.annual_volume_target}</span>

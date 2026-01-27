@@ -452,10 +452,11 @@ class DashboardController extends Controller
                 ->groupBy('month')
                 ->pluck('total', 'month');
 
-            $binaUsahaData[$key]['kayu_commodity'] = HasilHutanKayu::join('m_kayu', 'hasil_hutan_kayu.id_kayu', '=', 'm_kayu.id')
+            $binaUsahaData[$key]['kayu_commodity'] = HasilHutanKayu::join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
+                ->join('m_kayu', 'hasil_hutan_kayu_details.kayu_id', '=', 'm_kayu.id')
                 ->where('hasil_hutan_kayu.year', $currentYear)
                 ->where('hasil_hutan_kayu.status', 'final')
-                ->where('forest_type', $type)
+                ->where('hasil_hutan_kayu.forest_type', $type)
                 ->selectRaw('m_kayu.name as commodity, sum(hasil_hutan_kayu.annual_volume_target) as total')
                 ->groupBy('m_kayu.name')
                 ->orderByDesc('total')

@@ -97,18 +97,25 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     if (!$district)
       return null;
 
-    return new HasilHutanKayu([
-      'year' => $row['tahun'],
-      'month' => $row['bulan_angka'],
-      'province_id' => 35, // Default JAWA TIMUR
-      'regency_id' => $regency->id,
-      'district_id' => $district->id,
-      'forest_type' => $this->forestType,
-      'annual_volume_target' => $row['target_volume'] ?? 0,
-      'annual_volume_realization' => $row['realisasi_volume'] ?? 0,
-      'id_kayu' => $kayu->id,
-      'status' => 'draft',
-      'created_by' => Auth::id(),
-    ]);
+    return DB::transaction(function () use ($row, $district, $regency, $kayu) {
+      $parent = HasilHutanKayu::create([
+        'year' => $row['tahun'],
+        'month' => $row['bulan_angka'],
+        'province_id' => 35, // Default JAWA TIMUR
+        'regency_id' => $regency->id,
+        'district_id' => $district->id,
+        'forest_type' => $this->forestType,
+        'annual_volume_target' => $row['target_volume'] ?? 0,
+        'annual_volume_realization' => $row['realisasi_volume'] ?? 0,
+        'status' => 'draft',
+        'created_by' => Auth::id(),
+      ]);
+
+      $parent->details()->create([
+        'kayu_id' => $kayu->id,
+      ]);
+
+      return $parent;
+    });
   }
 }

@@ -18,7 +18,7 @@ export default function Create({ auth, kayu_list, forest_type }) {
     forest_type: forest_type || 'Hutan Negara',
     annual_volume_target: '',
     annual_volume_realization: '',
-    id_kayu: '',
+    kayu_ids: [],
   });
 
   const [regencies, setRegencies] = useState([]);
@@ -266,29 +266,29 @@ export default function Create({ auth, kayu_list, forest_type }) {
                   <InputError message={errors.district_id} className="mt-2" />
                 </div>
 
-                <div className="md:col-span-2 mt-4">
-                  <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4 border-b border-emerald-100 pb-2">Detail Hasil Hutan</h4>
+                <div className="md:col-span-2 space-y-4">
+                  <div>
+                    <InputLabel value="Jenis Kayu (Bisa Pilih Lebih dari Satu)" className="mb-2 text-gray-700 font-bold" />
+                    <Select
+                      options={kayu_list.map(k => ({ value: k.id, label: k.name }))}
+                      isMulti
+                      onChange={(opts) => {
+                        setData('kayu_ids', opts.map(o => o.value));
+                      }}
+                      placeholder="Pilih Jenis Kayu..."
+                      styles={selectStyles}
+                      menuPlacement="top"
+                      isClearable
+                      value={kayu_list
+                        .filter(k => data.kayu_ids.includes(k.id))
+                        .map(k => ({ value: k.id, label: k.name }))}
+                    />
+                    <InputError message={errors.kayu_ids} className="mt-2" />
+                  </div>
                 </div>
 
-                {/* Forest Type Hidden Input */}
-                <input type="hidden" value={data.forest_type} />
-
                 <div>
-                  <InputLabel htmlFor="id_kayu" value="Jenis Kayu" className="text-gray-700 font-bold mb-2" />
-                  <Select
-                    options={kayu_list.map(k => ({ value: k.id, label: k.name }))}
-                    onChange={(opt) => setData('id_kayu', opt?.value || '')}
-                    placeholder="Pilih Jenis Kayu..."
-                    styles={selectStyles}
-                    menuPlacement="top"
-                    isClearable
-                    value={kayu_list.find(k => k.id === data.id_kayu) ? { value: data.id_kayu, label: kayu_list.find(k => k.id === data.id_kayu).name } : null}
-                  />
-                  <InputError message={errors.id_kayu} className="mt-2" />
-                </div>
-
-                <div>
-                  <InputLabel htmlFor="annual_volume_target" value="Target Volume Tahunan" className="text-gray-700 font-bold mb-2" />
+                  <InputLabel htmlFor="annual_volume_target" value="Target Volume Total" className="text-gray-700 font-bold mb-2" />
                   <div className="relative">
                     <TextInput
                       id="annual_volume_target"
@@ -304,7 +304,7 @@ export default function Create({ auth, kayu_list, forest_type }) {
                 </div>
 
                 <div>
-                  <InputLabel htmlFor="annual_volume_realization" value="Realisasi Volume Tahunan" className="text-gray-700 font-bold mb-2" />
+                  <InputLabel htmlFor="annual_volume_realization" value="Realisasi Volume Total" className="text-gray-700 font-bold mb-2" />
                   <div className="relative">
                     <TextInput
                       id="annual_volume_realization"
