@@ -62,7 +62,7 @@ class DashboardController extends Controller
 
         // --- KUPS Stats (New) ---
         // Total accumulated KUPS
-        $kupsTotal = Kups::count();
+        $kupsTotal = Kups::where('status', 'final')->count();
         $kupsActive = Kups::where('status', 'active')->count(); // Assuming there's a status 'active', otherwise just use total.
         // Actually Kups model has 'status' but values might be 'final', 'verified' etc. Let's just use total count for now or based on implementation plan.
         // Plan said: "Count of Kups records".
@@ -135,6 +135,7 @@ class DashboardController extends Controller
 
         // --- KUPS Chart Data ---
         $kupsByClass = Kups::select('category', DB::raw('count(*) as total'))
+            ->where('status', 'final')
             ->groupBy('category')
             ->get();
 
@@ -382,7 +383,7 @@ class DashboardController extends Controller
 
         // --- 2. Perlindungan Hutan ---
         // Kebakaran
-        $kebakaranStats = \App\Models\KebakaranHutan::where('year', $currentYear)
+        $kebakaranStats = KebakaranHutan::where('year', $currentYear)
             ->where('status', 'final')
             ->selectRaw('SUM(number_of_fires) as total_kejadian, SUM(fire_area) as total_area')
             ->first();
