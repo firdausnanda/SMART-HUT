@@ -593,7 +593,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                                 {
                                   label: 'Luas Area (Ha)',
                                   data: stats?.perlindungan?.kebakaranMonthly ? Object.values(stats.perlindungan.kebakaranMonthly).map(d => d.area) : [],
-                                  borderColor: '#1121f9ff',
+                                  borderColor: '#f9f111ff',
                                   backgroundColor: '#fb923c20',
                                   fill: true,
                                   tension: 0.4,
@@ -851,31 +851,46 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                             {/* Decorative Circle */}
                             <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full opacity-[0.03] pointer-events-none" style={{ backgroundColor: source.color }}></div>
 
-                            <div className="flex flex-col items-center justify-between relative z-10">
-                              <div className="text-center w-full">
-                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-500`} style={{ background: `linear-gradient(135deg, ${source.color}, ${source.color}DD)`, color: 'white' }}>
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                            <div className="flex flex-col h-full relative z-10 gap-6">
+                              {/* Title Section */}
+                              <div className="text-center">
+                                <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gray-50 text-gray-500 border border-gray-100">
+                                  Ringkasan Produksi
+                                </span>
+                              </div>
+
+                              {/* Wood Production Section */}
+                              <div className="flex-1 bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-100 flex flex-col items-center justify-center text-center group/card transition-all hover:shadow-md">
+                                <div className="mb-4 p-3 rounded-xl bg-white shadow-sm border border-gray-100 text-gray-700 group-hover/card:scale-110 transition-transform duration-300">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3c-4.418 0-8 2.686-8 6h3c0 1.657 2.239 3 5 3s5-1.343 5-3h3c0-3.314-3.582-6-8-6z m0 12c-1.105 0-2 .895-2 2v4h4v-4c0-1.105-.895-2-2-2z" />
                                   </svg>
                                 </div>
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 block mb-2">Total Produksi Kayu</span>
-                                <div className="flex flex-col gap-1 items-center justify-center">
-                                  <h3 className="text-5xl font-black text-gray-900 leading-none tabular-nums tracking-tighter">
-                                    {formatNumber(stats?.bina_usaha[source.key]?.kayu_total || 0)}
+                                <span className="text-[9px] uppercase font-bold text-gray-400 tracking-widest mb-1">Total Produksi Kayu</span>
+                                <h3 className="text-4xl font-black text-gray-900 leading-none mb-1 tabular-nums tracking-tight">
+                                  {formatNumber(stats?.bina_usaha[source.key]?.kayu_total || 0)}
+                                </h3>
+                                <span className={`text-xs font-bold px-2 py-0.5 rounded-md bg-opacity-10`} style={{ backgroundColor: source.color + '20', color: source.color }}>Meter Kubik (M³)</span>
+                              </div>
+
+                              {/* Non-Wood Production Section */}
+                              <div className="flex-1 bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-100 flex flex-col items-center justify-center text-center group/card transition-all hover:shadow-md">
+                                <div className="mb-4 p-3 rounded-xl bg-white shadow-sm border border-gray-100 text-amber-500 group-hover/card:scale-110 transition-transform duration-300">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                  </svg>
+                                </div>
+                                <div className="flex flex-col items-center">
+                                  <span className="text-[9px] uppercase font-bold text-gray-400 tracking-widest mb-1">Total Bukan Kayu</span>
+                                  <h3 className="text-3xl font-black text-gray-900 leading-none mb-1 tabular-nums tracking-tight">
+                                    {formatNumber(stats?.bina_usaha[source.key]?.bukan_kayu_total || 0)}
                                   </h3>
-                                  <span className="text-lg font-bold text-gray-400" style={{ letterSpacing: '-0.02em' }}>M³</span>
+                                  <span className="text-xs font-bold text-amber-600 px-2 py-0.5 rounded-md bg-amber-50">Kg/Liter</span>
                                 </div>
                               </div>
 
-                              <div className="w-full mt-8 pt-8 border-t border-gray-50">
-                                <div className="flex justify-between items-end mb-3">
-                                  <div className="flex flex-col">
-                                    <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Bukan Kayu</span>
-                                    <span className="text-2xl font-black text-gray-900">{formatNumber(stats?.bina_usaha[source.key]?.bukan_kayu_total || 0)}</span>
-                                  </div>
-                                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">Ton/Ltr</span>
-                                </div>
-                                <p className="text-[9px] text-gray-400 mt-4 uppercase font-black text-center tracking-[0.2em]">Produksi {source.title} {currentYear}</p>
+                              <div className="text-center mt-2">
+                                <p className="text-[9px] text-gray-400 uppercase font-black tracking-[0.2em] opacity-60">Data Terupdate {currentYear}</p>
                               </div>
                             </div>
                           </div>
@@ -884,7 +899,8 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
 
                       {/* Right: Charts Grid */}
                       <div className="md:col-span-3 space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Monthly Trends (Stacked) */}
+                        <div className="grid grid-cols-1 gap-6">
                           <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                             <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">Tren Produksi Kayu Bulanan</h4>
                             <div className="h-[200px]">
@@ -923,7 +939,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                                   }) : [],
                                   datasets: [
                                     {
-                                      label: 'Bukan Kayu (Ton/Ltr)',
+                                      label: 'Bukan Kayu (Kg/Liter)',
                                       data: stats?.bina_usaha[source.key]?.bukan_kayu_monthly ? Object.values(stats.bina_usaha[source.key].bukan_kayu_monthly) : [],
                                       borderColor: '#f59e0b',
                                       backgroundColor: '#f59e0b20',
@@ -939,6 +955,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                           </div>
                         </div>
 
+                        {/* Top Commodities (Side by Side) */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                             <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">5 Komoditas Terbesar (Kayu)</h4>
