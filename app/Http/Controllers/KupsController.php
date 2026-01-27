@@ -191,7 +191,7 @@ class KupsController extends Controller
       return back()->with('success', 'Laporan disetujui oleh Kasi.');
     }
 
-    if (($user->hasRole('cdk') || $user->hasRole('admin')) && $kup->status === 'waiting_cdk') {
+    if (($user->hasRole('kacdk') || $user->hasRole('admin')) && $kup->status === 'waiting_cdk') {
       $kup->update([
         'status' => 'final',
         'approved_by_cdk_at' => now(),
@@ -219,7 +219,7 @@ class KupsController extends Controller
           'status' => 'waiting_cdk',
           'approved_by_kasi_at' => now(),
         ]);
-    } elseif ($user->hasRole('cdk') || $user->hasRole('admin')) { // Admin can finalize waiting_cdk items too? Assuming logic similar to approve
+    } elseif ($user->hasRole('kacdk') || $user->hasRole('admin')) { // Admin can finalize waiting_cdk items too? Assuming logic similar to approve
       // Note: In approve(), admin works on waiting_cdk to final.
       // Admin usually can approve anything or step in.
       // Based on approve() logic:

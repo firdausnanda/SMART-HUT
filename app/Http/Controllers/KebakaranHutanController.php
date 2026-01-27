@@ -265,7 +265,30 @@ class KebakaranHutanController extends Controller
       'ids.*' => 'exists:kebakaran_hutan,id',
     ]);
 
-    KebakaranHutan::whereIn('id', $request->ids)->delete();
+    $user = auth()->user();
+    $count = 0;
+
+    if ($user->hasAnyRole(['kasi', 'kacdk'])) {
+      return redirect()->back()->with('error', 'Aksi tidak diijinkan.');
+    }
+
+    if ($user->hasAnyRole(['pk', 'peh', 'pelaksana'])) {
+      $count = KebakaranHutan::whereIn('id', $request->ids)
+        ->where('status', 'draft')
+        ->delete();
+
+      if ($count === 0) {
+        return redirect()->back()->with('error', 'Hanya data dengan status draft yang dapat dihapus.');
+      }
+
+      return redirect()->back()->with('success', $count . ' data berhasil dihapus.');
+    }
+
+    if ($user->hasRole('admin')) {
+      $count = KebakaranHutan::whereIn('id', $request->ids)->delete();
+
+      return redirect()->back()->with('success', $count . ' data berhasil dihapus.');
+    }
 
     return redirect()->back()->with('success', count($request->ids) . ' data berhasil dihapus.');
   }
