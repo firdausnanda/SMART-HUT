@@ -56,6 +56,11 @@ class Pbphh extends Model
             ->withTimestamps();
     }
 
+    public function jenis_produksi()
+    {
+        return $this->jenisProduksi();
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
