@@ -597,7 +597,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                     onClick={() => handleSort('volume')}
                   >
                     <div className="flex items-center gap-1">
-                      Volume
+                      Vol (Tgt / Real)
                       <SortIcon field="volume" />
                     </div>
                   </th>
@@ -641,10 +641,27 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                       <div className="text-xs text-gray-500">{item.regency_name || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-medium text-gray-800">{item.kayu_name || '-'}</div>
+                      {item.details && item.details.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {item.details.map((detail, idx) => (
+                            <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                              {detail.commodity?.name || '-'}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="font-bold text-gray-900">{item.annual_volume_target}</span>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-emerald-600 text-xs">
+                          T: {formatNumber(item.details ? item.details.reduce((acc, curr) => acc + parseFloat(curr.volume || 0), 0) : 0)}
+                        </span>
+                        <span className="font-bold text-blue-600 text-xs mt-0.5">
+                          R: {formatNumber(item.details ? item.details.reduce((acc, curr) => acc + parseFloat(curr.annual_volume_realization || 0), 0) : 0)}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-center">
                       <StatusBadge status={item.status} />

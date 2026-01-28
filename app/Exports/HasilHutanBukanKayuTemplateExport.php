@@ -15,16 +15,28 @@ use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 
 class HasilHutanBukanKayuTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle, WithStyles, WithEvents
 {
+  protected $commodities;
+
+  public function __construct()
+  {
+    $this->commodities = \App\Models\Commodity::all();
+  }
+
   public function headings(): array
   {
-    return [
+    $headers = [
       'Tahun',
       'Bulan (Angka)',
       'Nama Kabupaten',
       'Nama Kecamatan',
-      'Jenis Komoditas',
-      'Volume',
     ];
+
+    foreach ($this->commodities as $commodity) {
+      $headers[] = $commodity->name . ' - Target';
+      $headers[] = $commodity->name . ' - Realisasi';
+    }
+
+    return $headers;
   }
 
   public function title(): string
@@ -63,9 +75,11 @@ class HasilHutanBukanKayuTemplateExport implements WithHeadings, ShouldAutoSize,
           $sheet->getCell("B$i")->setDataValidation(clone $validation);
         }
 
+        // Freeze the first row (headers) and first 4 columns (Location info)
+        $sheet->freezePane('E2');
+
         $sheet->getComment('C1')->getText()->createTextRun('Isi dengan Nama Kabupaten (e.g. KABUPATEN TRENGGALEK)');
         $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan (e.g. KECAMATAN PANGGUL)');
-        $sheet->getComment('E1')->getText()->createTextRun('Isi dengan Jenis Komoditas (e.g. GETAH PINUS)');
       },
     ];
   }

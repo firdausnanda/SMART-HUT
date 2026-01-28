@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
 
-export default function Create({ auth, kayu_list, forest_type }) {
+export default function Create({ auth, commodity_list = [], forest_type }) { // Renamed kayu_list to commodity_list with default empty array
   const { data, setData, post, processing, errors } = useForm({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
@@ -16,8 +16,9 @@ export default function Create({ auth, kayu_list, forest_type }) {
     regency_id: '',
     district_id: '',
     forest_type: forest_type || 'Hutan Negara',
-    annual_volume_target: '',
-    id_bukan_kayu: '',
+    details: [
+      { commodity_id: '', volume: '', annual_volume_realization: '', unit: 'Kg' }
+    ]
   });
 
   const [regencies, setRegencies] = useState([]);
@@ -70,6 +71,25 @@ export default function Create({ auth, kayu_list, forest_type }) {
   const submit = (e) => {
     e.preventDefault();
     post(route('hasil-hutan-bukan-kayu.store'));
+  };
+
+  const addDetail = () => {
+    setData('details', [
+      ...data.details,
+      { commodity_id: '', volume: '', annual_volume_realization: '', unit: 'Kg' }
+    ]);
+  };
+
+  const removeDetail = (index) => {
+    const newDetails = [...data.details];
+    newDetails.splice(index, 1);
+    setData('details', newDetails);
+  };
+
+  const updateDetail = (index, field, value) => {
+    const newDetails = [...data.details];
+    newDetails[index][field] = value;
+    setData('details', newDetails);
   };
 
   const selectStyles = {
@@ -266,40 +286,83 @@ export default function Create({ auth, kayu_list, forest_type }) {
                 </div>
 
                 <div className="md:col-span-2 mt-4">
-                  <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4 border-b border-emerald-100 pb-2">Detail Hasil Hutan</h4>
-                </div>
-
-                {/* Forest Type Hidden Input */}
-                <input type="hidden" value={data.forest_type} />
-
-                <div>
-                  <InputLabel htmlFor="id_bukan_kayu" value="Jenis Komoditas" className="text-gray-700 font-bold mb-2" />
-                  <Select
-                    options={kayu_list.map(k => ({ value: k.id, label: k.name }))}
-                    onChange={(opt) => setData('id_bukan_kayu', opt?.value || '')}
-                    placeholder="Pilih Jenis Komoditas..."
-                    styles={selectStyles}
-                    menuPlacement="top"
-                    isClearable
-                    value={kayu_list.find(k => k.id === data.id_bukan_kayu) ? { value: data.id_bukan_kayu, label: kayu_list.find(k => k.id === data.id_bukan_kayu).name } : null}
-                  />
-                  <InputError message={errors.id_bukan_kayu} className="mt-2" />
-                </div>
-
-                <div>
-                  <InputLabel htmlFor="annual_volume_target" value="Target Volume Tahunan" className="text-gray-700 font-bold mb-2" />
-                  <div className="relative">
-                    <TextInput
-                      id="annual_volume_target"
-                      type="text"
-                      className="w-full pr-12"
-                      value={data.annual_volume_target}
-                      onChange={(e) => setData('annual_volume_target', e.target.value)}
-                      required
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400 text-xs font-bold">Kg/Ltr</div>
+                  <div className="flex items-center justify-between mb-4 border-b border-emerald-100 pb-2">
+                    <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Detail Hasil Hutan</h4>
+                    <button
+                      type="button"
+                      onClick={addDetail}
+                      className="text-xs font-bold text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                      </svg>
+                      Tambah Komoditas
+                    </button>
                   </div>
-                  <InputError message={errors.annual_volume_target} className="mt-2" />
+
+                  <div className="space-y-4">
+                    {data.details.map((detail, index) => (
+                      <div key={index} className="p-4 bg-gray-50 rounded-xl border border-gray-200 relative group">
+                        {data.details.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeDetail(index)}
+                            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                        )}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <InputLabel value={`Komoditas #${index + 1}`} className="text-gray-700 font-bold mb-2 text-xs" />
+                            <Select
+                              options={commodity_list?.map(k => ({ value: k.id, label: k.name })) || []}
+                              onChange={(opt) => updateDetail(index, 'commodity_id', opt?.value || '')}
+                              placeholder="Pilih Jenis..."
+                              styles={selectStyles}
+                              menuPlacement="auto"
+                              isClearable
+                              value={commodity_list?.find(k => k.id === detail.commodity_id) ? { value: detail.commodity_id, label: commodity_list.find(k => k.id === detail.commodity_id).name } : null}
+                            />
+                            {errors[`details.${index}.commodity_id`] && <InputError message="Wajib diisi." className="mt-1" />}
+                          </div>
+                          <div>
+                            <InputLabel value="Target Volume" className="text-gray-700 font-bold mb-2 text-xs" />
+                            <div className="relative">
+                              <TextInput
+                                type="number"
+                                step="any"
+                                className="w-full pr-12"
+                                value={detail.volume}
+                                onChange={(e) => updateDetail(index, 'volume', e.target.value)}
+                                placeholder="0.00"
+                              />
+                              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400 text-xs font-bold">Kg/Ltr</div>
+                            </div>
+                            {errors[`details.${index}.volume`] && <InputError message="Wajib diisi." className="mt-1" />}
+                          </div>
+                          <div>
+                            <InputLabel value="Realisasi Volume" className="text-gray-700 font-bold mb-2 text-xs" />
+                            <div className="relative">
+                              <TextInput
+                                type="number"
+                                step="any"
+                                className="w-full pr-12"
+                                value={detail.annual_volume_realization}
+                                onChange={(e) => updateDetail(index, 'annual_volume_realization', e.target.value)}
+                                placeholder="0.00"
+                              />
+                              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400 text-xs font-bold">Kg/Ltr</div>
+                            </div>
+                            {errors[`details.${index}.annual_volume_realization`] && <InputError message="Wajib diisi." className="mt-1" />}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {errors.details && <InputError message={errors.details} className="mt-2" />}
                 </div>
 
               </div>

@@ -22,8 +22,6 @@ class HasilHutanBukanKayu extends Model
         "regency_id",
         "district_id",
         "forest_type",
-        "annual_volume_target",
-        "id_bukan_kayu",
         "status",
         "approved_by_kasi_at",
         "approved_by_cdk_at",
@@ -48,9 +46,9 @@ class HasilHutanBukanKayu extends Model
         return $this->belongsTo(Districts::class, 'district_id');
     }
 
-    public function kayu()
+    public function details()
     {
-        return $this->belongsTo(BukanKayu::class, 'id_bukan_kayu');
+        return $this->hasMany(HasilHutanBukanKayuDetail::class, 'hasil_hutan_bukan_kayu_id');
     }
 
     public function getActivitylogOptions(): LogOptions
