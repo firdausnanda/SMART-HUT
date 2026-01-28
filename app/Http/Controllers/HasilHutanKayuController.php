@@ -57,8 +57,8 @@ class HasilHutanKayuController extends Controller
         $sortMap = [
           'month' => 'hasil_hutan_kayu.month',
           'location' => 'm_districts.name',
-          'target' => 'hasil_hutan_kayu.annual_volume_target',
-          'realization' => 'hasil_hutan_kayu.annual_volume_realization',
+          'target' => 'hasil_hutan_kayu_details.volume_target',
+          'realization' => 'hasil_hutan_kayu_details.volume_realization',
           'status' => 'hasil_hutan_kayu.status',
           'created_at' => 'hasil_hutan_kayu.created_at',
         ];
@@ -70,7 +70,7 @@ class HasilHutanKayuController extends Controller
       })
       ->paginate(10)
 
-      ->withQueryString();
+      ->appends(request()->query());
 
     // Calculate Stats
     $stats = [
@@ -80,10 +80,8 @@ class HasilHutanKayuController extends Controller
       'total_volume' => HasilHutanKayu::where('forest_type', $forestType)
         ->when($selectedYear, fn($q) => $q->where('year', $selectedYear))
         ->where('status', 'final')
-        ->get()
-        ->sum(function ($row) {
-          return (float) $row->annual_volume_target;
-        }),
+        ->join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
+        ->sum('hasil_hutan_kayu_details.volume_target'),
       'verified_count' => HasilHutanKayu::where('forest_type', $forestType)
         ->when($selectedYear, fn($q) => $q->where('year', $selectedYear))
         ->where('status', 'final')
@@ -135,10 +133,10 @@ class HasilHutanKayuController extends Controller
       'regency_id' => 'required|exists:m_regencies,id',
       'district_id' => 'required|exists:m_districts,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
-      'annual_volume_target' => 'required|numeric',
-      'annual_volume_realization' => 'required|numeric',
-      'kayu_ids' => 'required|array|min:1',
-      'kayu_ids.*' => 'exists:m_kayu,id',
+      'details' => 'required|array|min:1',
+      'details.*.kayu_id' => 'required|exists:m_kayu,id',
+      'details.*.volume_target' => 'required|numeric|min:0',
+      'details.*.volume_realization' => 'required|numeric|min:0',
     ]);
 
     DB::transaction(function () use ($validated) {
@@ -149,14 +147,14 @@ class HasilHutanKayuController extends Controller
         'regency_id' => $validated['regency_id'],
         'district_id' => $validated['district_id'],
         'forest_type' => $validated['forest_type'],
-        'annual_volume_target' => $validated['annual_volume_target'],
-        'annual_volume_realization' => $validated['annual_volume_realization'],
         'status' => 'draft'
       ]);
 
-      foreach ($validated['kayu_ids'] as $kayuId) {
+      foreach ($validated['details'] as $detail) {
         $parent->details()->create([
-          'kayu_id' => $kayuId,
+          'kayu_id' => $detail['kayu_id'],
+          'volume_target' => $detail['volume_target'],
+          'volume_realization' => $detail['volume_realization'],
         ]);
       }
     });
@@ -185,10 +183,10 @@ class HasilHutanKayuController extends Controller
       'regency_id' => 'required|exists:m_regencies,id',
       'district_id' => 'required|exists:m_districts,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
-      'annual_volume_target' => 'required|numeric',
-      'annual_volume_realization' => 'required|numeric',
-      'kayu_ids' => 'required|array|min:1',
-      'kayu_ids.*' => 'exists:m_kayu,id',
+      'details' => 'required|array|min:1',
+      'details.*.kayu_id' => 'required|exists:m_kayu,id',
+      'details.*.volume_target' => 'required|numeric|min:0',
+      'details.*.volume_realization' => 'required|numeric|min:0',
     ]);
 
     DB::transaction(function () use ($validated, $hasilHutanKayu) {
@@ -199,14 +197,14 @@ class HasilHutanKayuController extends Controller
         'regency_id' => $validated['regency_id'],
         'district_id' => $validated['district_id'],
         'forest_type' => $validated['forest_type'],
-        'annual_volume_target' => $validated['annual_volume_target'],
-        'annual_volume_realization' => $validated['annual_volume_realization'],
       ]);
 
       $hasilHutanKayu->details()->delete();
-      foreach ($validated['kayu_ids'] as $kayuId) {
+      foreach ($validated['details'] as $detail) {
         $hasilHutanKayu->details()->create([
-          'kayu_id' => $kayuId,
+          'kayu_id' => $detail['kayu_id'],
+          'volume_target' => $detail['volume_target'],
+          'volume_realization' => $detail['volume_realization'],
         ]);
       }
     });

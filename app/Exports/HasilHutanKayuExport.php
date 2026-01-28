@@ -50,7 +50,7 @@ class HasilHutanKayuExport implements FromQuery, WithHeadings, WithMapping, Shou
   public function map($row): array
   {
     $detailsString = $row->details->map(function ($detail) {
-      return $detail->kayu->name ?? '-';
+      return ($detail->kayu->name ?? '-') . ' (T:' . floatval($detail->volume_target) . ', R:' . floatval($detail->volume_realization) . ')';
     })->implode(', ');
 
     return [
@@ -61,8 +61,8 @@ class HasilHutanKayuExport implements FromQuery, WithHeadings, WithMapping, Shou
       $row->regency->name ?? '-',
       $row->district->name ?? '-',
       $detailsString,
-      $row->annual_volume_target,
-      $row->annual_volume_realization,
+      $row->details->sum('volume_target'),
+      $row->details->sum('volume_realization'),
       $row->status,
       $row->creator->name ?? 'Unknown',
       $row->created_at->format('d-m-Y H:i'),

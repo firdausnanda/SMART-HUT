@@ -12,6 +12,8 @@ class HasilHutanKayuDetail extends Model
   protected $fillable = [
     'hasil_hutan_kayu_id',
     'kayu_id',
+    'volume_target',
+    'volume_realization',
   ];
 
   public function hasilHutanKayu()

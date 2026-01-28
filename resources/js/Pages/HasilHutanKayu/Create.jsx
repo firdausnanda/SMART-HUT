@@ -18,7 +18,7 @@ export default function Create({ auth, kayu_list, forest_type }) {
     forest_type: forest_type || 'Hutan Negara',
     annual_volume_target: '',
     annual_volume_realization: '',
-    kayu_ids: [],
+    details: [{ kayu_id: '', volume_target: '', volume_realization: '' }],
   });
 
   const [regencies, setRegencies] = useState([]);
@@ -67,6 +67,22 @@ export default function Create({ auth, kayu_list, forest_type }) {
       setDistricts([]);
     }
   }, [data.regency_id]);
+
+  const addDetail = () => {
+    setData('details', [...data.details, { kayu_id: '', volume_target: '', volume_realization: '' }]);
+  };
+
+  const removeDetail = (index) => {
+    const newDetails = [...data.details];
+    newDetails.splice(index, 1);
+    setData('details', newDetails);
+  };
+
+  const updateDetail = (index, field, value) => {
+    const newDetails = [...data.details];
+    newDetails[index][field] = value;
+    setData('details', newDetails);
+  };
 
   const submit = (e) => {
     e.preventDefault();
@@ -155,6 +171,8 @@ export default function Create({ auth, kayu_list, forest_type }) {
       cursor: 'pointer',
     }),
   };
+
+  const kayuOptions = kayu_list.map(k => ({ value: k.id, label: k.name }));
 
   return (
     <AuthenticatedLayout
@@ -267,56 +285,74 @@ export default function Create({ auth, kayu_list, forest_type }) {
                 </div>
 
                 <div className="md:col-span-2 space-y-4">
-                  <div>
-                    <InputLabel value="Jenis Kayu (Bisa Pilih Lebih dari Satu)" className="mb-2 text-gray-700 font-bold" />
-                    <Select
-                      options={kayu_list.map(k => ({ value: k.id, label: k.name }))}
-                      isMulti
-                      onChange={(opts) => {
-                        setData('kayu_ids', opts.map(o => o.value));
-                      }}
-                      placeholder="Pilih Jenis Kayu..."
-                      styles={selectStyles}
-                      menuPlacement="top"
-                      isClearable
-                      value={kayu_list
-                        .filter(k => data.kayu_ids.includes(k.id))
-                        .map(k => ({ value: k.id, label: k.name }))}
-                    />
-                    <InputError message={errors.kayu_ids} className="mt-2" />
+                  <div className="flex items-center justify-between">
+                    <InputLabel value="Detail Kayu & Volume" className="text-gray-700 font-bold" />
+                    <button
+                      type="button"
+                      onClick={addDetail}
+                      className="px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-bold rounded-lg hover:bg-emerald-200 transition-colors"
+                    >
+                      + Tambah Kayu
+                    </button>
                   </div>
-                </div>
 
-                <div>
-                  <InputLabel htmlFor="annual_volume_target" value="Target Volume Total" className="text-gray-700 font-bold mb-2" />
-                  <div className="relative">
-                    <TextInput
-                      id="annual_volume_target"
-                      type="text"
-                      className="w-full pr-12"
-                      value={data.annual_volume_target}
-                      onChange={(e) => setData('annual_volume_target', e.target.value)}
-                      required
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400 text-xs font-bold">m³</div>
-                  </div>
-                  <InputError message={errors.annual_volume_target} className="mt-2" />
-                </div>
+                  {data.details.map((detail, index) => (
+                    <div key={index} className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 relative group">
+                      {data.details.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeDetail(index)}
+                          className="absolute top-2 right-2 text-red-400 hover:text-red-600 p-1"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      )}
 
-                <div>
-                  <InputLabel htmlFor="annual_volume_realization" value="Realisasi Volume Total" className="text-gray-700 font-bold mb-2" />
-                  <div className="relative">
-                    <TextInput
-                      id="annual_volume_realization"
-                      type="text"
-                      className="w-full pr-12"
-                      value={data.annual_volume_realization}
-                      onChange={(e) => setData('annual_volume_realization', e.target.value)}
-                      required
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400 text-xs font-bold">m³</div>
-                  </div>
-                  <InputError message={errors.annual_volume_realization} className="mt-2" />
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="md:col-span-1">
+                          <InputLabel value="Jenis Kayu" className="text-xs text-gray-500 mb-1" />
+                          <Select
+                            options={kayuOptions}
+                            value={kayuOptions.find(opt => opt.value === detail.kayu_id) || null}
+                            onChange={(opt) => updateDetail(index, 'kayu_id', opt?.value)}
+                            placeholder="Pilih Kayu..."
+                            styles={selectStyles}
+                            menuPlacement="auto"
+                          />
+                          <InputError message={errors[`details.${index}.kayu_id`]} className="mt-1" />
+                        </div>
+
+                        <div>
+                          <InputLabel value="Target (m³)" className="text-xs text-gray-500 mb-1" />
+                          <TextInput
+                            type="number"
+                            step="0.01"
+                            className="w-full text-sm"
+                            value={detail.volume_target}
+                            onChange={(e) => updateDetail(index, 'volume_target', e.target.value)}
+                            placeholder="0.00"
+                          />
+                          <InputError message={errors[`details.${index}.volume_target`]} className="mt-1" />
+                        </div>
+
+                        <div>
+                          <InputLabel value="Realisasi (m³)" className="text-xs text-gray-500 mb-1" />
+                          <TextInput
+                            type="number"
+                            step="0.01"
+                            className="w-full text-sm"
+                            value={detail.volume_realization}
+                            onChange={(e) => updateDetail(index, 'volume_realization', e.target.value)}
+                            placeholder="0.00"
+                          />
+                          <InputError message={errors[`details.${index}.volume_realization`]} className="mt-1" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <InputError message={errors.details} className="mt-2" />
                 </div>
 
               </div>

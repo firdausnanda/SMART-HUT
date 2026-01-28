@@ -40,14 +40,25 @@ class HasilHutanKayuFactory extends Factory
       'regency_id' => $regency->id,
       'district_id' => $district->id,
       'forest_type' => fake()->randomElement(['Hutan Rakyat', 'Hutan Negara']),
-      'annual_volume_target' => fake()->randomFloat(2, 50, 5000),
-      'annual_volume_realization' => fake()->randomFloat(2, 50, 5000),
-      'id_kayu' => $kayu->id ?? 1,
       'status' => 'final',
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
       'created_by' => $user->id,
       'updated_by' => $user->id,
     ];
+  }
+
+  public function configure()
+  {
+    return $this->afterCreating(function (\App\Models\HasilHutanKayu $hasilHutanKayu) {
+      $kayus = Kayu::inRandomOrder()->limit(rand(1, 3))->get();
+      foreach ($kayus as $kayu) {
+        $hasilHutanKayu->details()->create([
+          'kayu_id' => $kayu->id,
+          'volume_target' => fake()->randomFloat(2, 10, 1000),
+          'volume_realization' => fake()->randomFloat(2, 10, 1000),
+        ]);
+      }
+    });
   }
 }

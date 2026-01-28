@@ -15,17 +15,28 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle, WithStyles, WithEvents
 {
+  protected $kayus;
+
+  public function __construct()
+  {
+    $this->kayus = Kayu::all();
+  }
+
   public function headings(): array
   {
-    return [
+    $headers = [
       'Tahun',
       'Bulan (Angka)',
       'Nama Kabupaten',
       'Nama Kecamatan',
-      'Jenis Kayu',
-      'Target Volume',
-      'Realisasi Volume',
     ];
+
+    foreach ($this->kayus as $kayu) {
+      $headers[] = $kayu->name . ' - Target';
+      $headers[] = $kayu->name . ' - Realisasi';
+    }
+
+    return $headers;
   }
 
   public function title(): string
@@ -44,19 +55,6 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
   {
     return [
       AfterSheet::class => function (AfterSheet $event) {
-        // Get Data for Dropdowns
-        $kayus = Kayu::pluck('name')->toArray();
-        $regencies = DB::table('m_regencies')->where('province_id', 35)->pluck('name')->toArray();
-
-        // Dropdowns need to be comma separated string (max 255 chars usually, or ref to other sheet)
-        // Since lists might be long, putting them directly in validation might fail if > 255 chars.
-        // Best practice is to create a Reference sheet, but for simplicity here I'll try partial or just let user type if list is long.
-        // But Kayu might be short.
-        // Regencies (38 items) * ~10 chars = ~400 chars > 255. So we need a hidden sheet or just allow typing.
-  
-        // Let's add comments to help user instead of complex validation for now to avoid Excel breakage,
-        // OR add validation for Month (1-12).
-  
         $sheet = $event->sheet->getDelegate();
 
         // Month Validation (1-12)
@@ -78,12 +76,22 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
           $sheet->getCell("B$i")->setDataValidation(clone $validation);
         }
 
-        // Add comments for other columns
+        // Add comments
         $sheet->getComment('C1')->getText()->createTextRun('Isi dengan Nama Kabupaten/Kota (KABUPATEN TRENGGALEK,KABUPATEN TULUNGAGUNG,KABUPATEN KEDIRI,KOTA KEDIRI)');
         $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan (e.g. KECAMATAN TRENGGALEK)');
-        $sheet->getComment('E1')->getText()->createTextRun('Isi dengan Nama Jenis Kayu (e.g. JATI)');
-        $sheet->getComment('F1')->getText()->createTextRun('Isi dengan Target Volume (Angka)');
-        $sheet->getComment('G1')->getText()->createTextRun('Isi dengan Realisasi Volume (Angka)');
+
+        $colIndex = 4; // Start at Column E (0-indexed: A=0, B=1, C=2, D=3, E=4)
+        foreach ($this->kayus as $kayu) {
+          // Target Column
+          $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+          $sheet->getComment($colLetter . '1')->getText()->createTextRun('Target Volume (Angka) untuk ' . $kayu->name);
+          $colIndex++;
+
+          // Realization Column
+          $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+          $sheet->getComment($colLetter . '1')->getText()->createTextRun('Realisasi Volume (Angka) untuk ' . $kayu->name);
+          $colIndex++;
+        }
       },
     ];
   }

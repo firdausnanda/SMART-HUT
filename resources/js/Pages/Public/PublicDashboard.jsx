@@ -1379,33 +1379,60 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                             labels: stats?.kelembagaan_ps?.scheme_distribution ? stats.kelembagaan_ps.scheme_distribution.map(d => d.scheme) : [],
                             datasets: [{
                               data: stats?.kelembagaan_ps?.scheme_distribution ? stats.kelembagaan_ps.scheme_distribution.map(d => d.count) : [],
-                              backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'],
-                              borderWidth: 0
+                              backgroundColor: ['#059669', '#0284c7', '#f59e0b', '#f43f5e', '#6366f1'],
+                              borderWidth: 2,
+                              borderColor: '#ffffff',
+                              hoverOffset: 10,
                             }]
                           }}
                           plugins={[{
                             id: 'centerTextPs',
-                            afterDraw: (chart) => {
+                            beforeDraw: (chart) => {
                               const { ctx, chartArea: { top, bottom, left, right, width, height } } = chart;
                               ctx.save();
                               const text = stats?.kelembagaan_ps?.kelompok_count || 0;
                               ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                              ctx.font = '900 72px Inter, sans-serif'; ctx.fillStyle = '#111827';
-                              ctx.fillText(text, left + width / 2, top + height / 2 - 10);
-                              ctx.font = 'bold 10px Inter, sans-serif'; ctx.fillStyle = '#9ca3af';
-                              ctx.fillText('KELOMPOK', left + width / 2, top + height / 2 + 10); ctx.restore();
+                              ctx.font = '900 64px Inter, sans-serif'; ctx.fillStyle = '#1e293b';
+                              ctx.fillText(text, left + width / 2, top + height / 2 - 12);
+                              ctx.font = 'bold 11px Inter, sans-serif'; ctx.fillStyle = '#64748b';
+                              ctx.letterSpacing = '1px';
+                              ctx.fillText('TOTAL KELOMPOK', left + width / 2, top + height / 2 + 20); ctx.restore();
                             }
                           }]}
                           options={{
-                            maintainAspectRatio: false, cutout: '70%',
+                            maintainAspectRatio: false,
+                            cutout: '75%',
+                            layout: { padding: 20 },
                             plugins: {
-                              legend: { position: 'right', labels: { usePointStyle: true, font: { weight: 'bold', size: 10 } } },
+                              legend: {
+                                position: 'bottom',
+                                labels: {
+                                  usePointStyle: true,
+                                  pointStyle: 'circle',
+                                  padding: 20,
+                                  font: { weight: '600', size: 10, family: "'Inter', sans-serif" },
+                                  color: '#475569'
+                                }
+                              },
                               tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1e293b',
+                                bodyColor: '#475569',
+                                borderColor: '#e2e8f0',
+                                borderWidth: 1,
+                                padding: 12,
+                                boxPadding: 6,
                                 callbacks: {
                                   label: (ctx) => {
                                     const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
                                     const percentage = ((ctx.raw / total) * 100).toFixed(1);
                                     return ` ${ctx.label}: ${ctx.raw} Kelompok (${percentage}%)`;
+                                  },
+                                  labelColor: function (context) {
+                                    return {
+                                      borderColor: context.dataset.backgroundColor[context.dataIndex],
+                                      backgroundColor: context.dataset.backgroundColor[context.dataIndex]
+                                    };
                                   }
                                 }
                               }
@@ -1483,33 +1510,60 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                             labels: stats?.kelembagaan_hr?.class_distribution ? stats.kelembagaan_hr.class_distribution.map(d => d.class_name) : [],
                             datasets: [{
                               data: stats?.kelembagaan_hr?.class_distribution ? stats.kelembagaan_hr.class_distribution.map(d => d.count) : [],
-                              backgroundColor: ['#84cc16', '#a3e635', '#bef264', '#d9f99d'],
-                              borderWidth: 0
+                              backgroundColor: ['#4d7c0f', '#65a30d', '#84cc16', '#a3e635'],
+                              borderWidth: 2,
+                              borderColor: '#ffffff',
+                              hoverOffset: 10,
                             }]
                           }}
                           plugins={[{
                             id: 'centerTextHr',
-                            afterDraw: (chart) => {
+                            beforeDraw: (chart) => {
                               const { ctx, chartArea: { top, bottom, left, right, width, height } } = chart;
                               ctx.save();
                               const text = stats?.kelembagaan_hr?.kelompok_count || 0;
                               ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                              ctx.font = 'black 24px Inter, sans-serif'; ctx.fillStyle = '#111827';
-                              ctx.fillText(text, left + width / 2, top + height / 2 - 10);
-                              ctx.font = 'bold 10px Inter, sans-serif'; ctx.fillStyle = '#9ca3af';
-                              ctx.fillText('KELOMPOK', left + width / 2, top + height / 2 + 10); ctx.restore();
+                              ctx.font = '900 64px Inter, sans-serif'; ctx.fillStyle = '#1e293b';
+                              ctx.fillText(text, left + width / 2, top + height / 2 - 12);
+                              ctx.font = 'bold 11px Inter, sans-serif'; ctx.fillStyle = '#64748b';
+                              ctx.letterSpacing = '1px';
+                              ctx.fillText('TOTAL KELOMPOK', left + width / 2, top + height / 2 + 20); ctx.restore();
                             }
                           }]}
                           options={{
-                            maintainAspectRatio: false, cutout: '70%',
+                            maintainAspectRatio: false,
+                            cutout: '75%',
+                            layout: { padding: 20 },
                             plugins: {
-                              legend: { position: 'bottom', labels: { usePointStyle: true, font: { weight: 'bold', size: 9 } } },
+                              legend: {
+                                position: 'bottom',
+                                labels: {
+                                  usePointStyle: true,
+                                  pointStyle: 'circle',
+                                  padding: 20,
+                                  font: { weight: '600', size: 10, family: "'Inter', sans-serif" },
+                                  color: '#475569'
+                                }
+                              },
                               tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1e293b',
+                                bodyColor: '#475569',
+                                borderColor: '#e2e8f0',
+                                borderWidth: 1,
+                                padding: 12,
+                                boxPadding: 6,
                                 callbacks: {
                                   label: (ctx) => {
                                     const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
                                     const percentage = ((ctx.raw / total) * 100).toFixed(1);
                                     return ` ${ctx.label}: ${ctx.raw} Kelompok (${percentage}%)`;
+                                  },
+                                  labelColor: function (context) {
+                                    return {
+                                      borderColor: context.dataset.backgroundColor[context.dataIndex],
+                                      backgroundColor: context.dataset.backgroundColor[context.dataIndex]
+                                    };
                                   }
                                 }
                               }

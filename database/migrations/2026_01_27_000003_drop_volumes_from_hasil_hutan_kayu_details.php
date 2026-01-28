@@ -11,7 +11,9 @@ return new class extends Migration {
   public function up(): void
   {
     Schema::table('hasil_hutan_kayu_details', function (Blueprint $table) {
-      $table->dropColumn(['volume_target', 'volume_realization']);
+      if (Schema::hasColumn('hasil_hutan_kayu_details', 'volume_target')) {
+        $table->dropColumn(['volume_target', 'volume_realization']);
+      }
     });
   }
 

@@ -31,7 +31,6 @@ class RhlTeknisFactory extends Factory
       'regency_id' => $village?->district?->regency_id,
       'district_id' => $village?->district_id,
       'village_id' => $village?->id,
-      'coordinates' => fake()->latitude() . ', ' . fake()->longitude(),
       'status' => 'final',
       'created_by' => $user->id,
       'updated_by' => $user->id,

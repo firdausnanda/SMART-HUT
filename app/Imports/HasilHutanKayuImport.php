@@ -29,12 +29,7 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
       'tahun' => 'required|numeric',
       'bulan_angka' => 'required|numeric|min:1|max:12',
       'nama_kabupaten' => 'required|exists:m_regencies,name',
-      // Note: simple exists check allows duplicate names across provinces generally, 
-      // but we only have Jatim regencies seeded usually.
       'nama_kecamatan' => 'required|exists:m_districts,name',
-      'jenis_kayu' => 'required|exists:m_kayu,name',
-      'target_volume' => 'required|numeric',
-      'realisasi_volume' => 'nullable|numeric',
     ];
   }
 
@@ -43,7 +38,6 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     return [
       'nama_kabupaten.exists' => 'Kabupaten tidak ditemukan.',
       'nama_kecamatan.exists' => 'Kecamatan tidak ditemukan.',
-      'jenis_kayu.exists' => 'Jenis Kayu tidak ditemukan.',
       'bulan_angka.min' => 'Bulan harus 1-12.',
       'bulan_angka.max' => 'Bulan harus 1-12.',
     ];
@@ -54,13 +48,7 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     if (!isset($row['tahun']))
       return null;
 
-    // 1. Lookup Kayu ID
-    $kayu = Kayu::where('name', 'like', '%' . $row['jenis_kayu'] . '%')->first();
-    // Validation ensures existence, but logic needs ID.
-    if (!$kayu)
-      return null;
-
-    // 2. Lookup Regency ID
+    // Resolve Location
     $regency = DB::table('m_regencies')
       ->where('province_id', 35)
       ->where('name', 'like', '%' . $row['nama_kabupaten'] . '%')
@@ -68,52 +56,69 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     if (!$regency)
       return null;
 
-    // 3. Lookup District ID - Try to find within regency first
     $district = DB::table('m_districts')
       ->where('regency_id', $regency->id)
       ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
       ->first();
 
-    // Fallback or Strict? If validation passed 'exists:m_districts,name', it means name exists SOMEWHERE.
-    // But if it doesn't match this regency, we have a logic error.
-    // For import robustness, if not found in regency, we might return null which causes current row to be skipped (return null in ToModel skips).
-    // BUT strict validation won't catch " District exists but in wrong Regency".
-    // To handle that, we'd need closure validation. 
-    // For now, if we can't find it in the regency, let's try fuzzy search or just fail (return null).
-    // Since we are skipping on failure, returning null here effectively skips without error message?
-    // Actually, returning null in `model` just means "don't create model".
-    // SkipsOnFailure works for Validation failures.
-    // If we want to report "District not found in Regency", we need to force a validation error or throw exception.
-    // But throwing exception stops import unless SkipsOnError used.
-    // Let's rely on basic validation + creating model. If $district is null, we can't create.
-
     if (!$district) {
-      // Try name only search if you want
       $district = DB::table('m_districts')
         ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
         ->first();
     }
-
     if (!$district)
       return null;
 
-    return DB::transaction(function () use ($row, $district, $regency, $kayu) {
+    // Build Details array from dynamic columns
+    $detailsData = [];
+    $allKayu = Kayu::all();
+
+    foreach ($allKayu as $kayu) {
+      // Excel heading logic converts "Kayu Jati - Target" to "kayu_jati_target"
+      // or similar depending on Maatwebsite slugging.
+      // Usually simple slug: 'Jati - Target' -> 'jati_target'
+      // We rely on the template generating "Name - Target"
+
+      $slugName = \Illuminate\Support\Str::slug($kayu->name, '_');
+      $targetKey = $slugName . '_target';
+      $realizationKey = $slugName . '_realisasi';
+
+      // Check if keys exist in row (even if null or 0)
+      // Note: HeadingRow slugifies headers.
+      if (array_key_exists($targetKey, $row)) {
+        $target = $row[$targetKey];
+        $realization = $row[$realizationKey] ?? 0;
+
+        // Only add if there is a target or realization value
+        if ($target > 0 || $realization > 0) {
+          $detailsData[] = [
+            'kayu_id' => $kayu->id,
+            'volume_target' => $target ?? 0,
+            'volume_realization' => $realization ?? 0,
+          ];
+        }
+      }
+    }
+
+    if (empty($detailsData)) {
+      return null;
+    }
+
+    return DB::transaction(function () use ($row, $district, $regency, $detailsData) {
       $parent = HasilHutanKayu::create([
         'year' => $row['tahun'],
         'month' => $row['bulan_angka'],
-        'province_id' => 35, // Default JAWA TIMUR
+        'province_id' => 35,
         'regency_id' => $regency->id,
         'district_id' => $district->id,
         'forest_type' => $this->forestType,
-        'annual_volume_target' => $row['target_volume'] ?? 0,
-        'annual_volume_realization' => $row['realisasi_volume'] ?? 0,
         'status' => 'draft',
         'created_by' => Auth::id(),
       ]);
 
-      $parent->details()->create([
-        'kayu_id' => $kayu->id,
-      ]);
+      foreach ($detailsData as $detail) {
+        $parent->details()->create($detail);
+      }
 
       return $parent;
     });

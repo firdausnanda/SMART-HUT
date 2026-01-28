@@ -651,7 +651,9 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                         <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-xs font-bold text-emerald-700">
                           {item.creator?.name ? item.creator.name.charAt(0).toUpperCase() : '?'}
                         </div>
-                        <div className="font-medium text-gray-800 text-sm">{item.creator?.name || 'Unknown'}</div>
+                        <div className="font-medium text-gray-800 text-sm">
+                          {item.creator?.name ? (item.creator.name.length > 15 ? item.creator.name.substring(0, 15) + '...' : item.creator.name) : 'Unknown'}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -672,10 +674,14 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="font-bold text-gray-900">{item.annual_volume_target}</span>
+                      <span className="font-bold text-gray-900">
+                        {item.details?.reduce((acc, curr) => acc + parseFloat(curr.volume_target || 0), 0).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="font-bold text-emerald-700">{item.annual_volume_realization}</span>
+                      <span className="font-bold text-emerald-700">
+                        {item.details?.reduce((acc, curr) => acc + parseFloat(curr.volume_realization || 0), 0).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
+                      </span>
                     </td>
                     <td className="px-6 py-4 text-center">
                       <StatusBadge status={item.status} />
