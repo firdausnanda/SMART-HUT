@@ -530,24 +530,27 @@ class DashboardController extends Controller
                 ->pluck('total', 'commodity');
 
             // Bukan Kayu for this type
-            $binaUsahaData[$key]['bukan_kayu_total'] = (float) \App\Models\HasilHutanBukanKayu::where('year', $currentYear)
-                ->where('status', 'final')
-                ->where('forest_type', $type)
-                ->sum('annual_volume_target');
-
-            $binaUsahaData[$key]['bukan_kayu_monthly'] = \App\Models\HasilHutanBukanKayu::where('year', $currentYear)
-                ->where('status', 'final')
-                ->where('forest_type', $type)
-                ->selectRaw('month, sum(annual_volume_target) as total')
-                ->groupBy('month')
-                ->pluck('total', 'month');
-
-            $binaUsahaData[$key]['bukan_kayu_commodity'] = \App\Models\HasilHutanBukanKayu::join('m_bukan_kayu', 'hasil_hutan_bukan_kayu.id_bukan_kayu', '=', 'm_bukan_kayu.id')
+            $binaUsahaData[$key]['bukan_kayu_total'] = (float) \App\Models\HasilHutanBukanKayu::join('hasil_hutan_bukan_kayu_details', 'hasil_hutan_bukan_kayu.id', '=', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id')
                 ->where('hasil_hutan_bukan_kayu.year', $currentYear)
                 ->where('hasil_hutan_bukan_kayu.status', 'final')
-                ->where('forest_type', $type)
-                ->selectRaw('m_bukan_kayu.name as commodity, sum(hasil_hutan_bukan_kayu.annual_volume_target) as total')
-                ->groupBy('m_bukan_kayu.name')
+                ->where('hasil_hutan_bukan_kayu.forest_type', $type)
+                ->sum('hasil_hutan_bukan_kayu_details.volume');
+
+            $binaUsahaData[$key]['bukan_kayu_monthly'] = \App\Models\HasilHutanBukanKayu::join('hasil_hutan_bukan_kayu_details', 'hasil_hutan_bukan_kayu.id', '=', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id')
+                ->where('hasil_hutan_bukan_kayu.year', $currentYear)
+                ->where('hasil_hutan_bukan_kayu.status', 'final')
+                ->where('hasil_hutan_bukan_kayu.forest_type', $type)
+                ->selectRaw('hasil_hutan_bukan_kayu.month, sum(hasil_hutan_bukan_kayu_details.volume) as total')
+                ->groupBy('hasil_hutan_bukan_kayu.month')
+                ->pluck('total', 'month');
+
+            $binaUsahaData[$key]['bukan_kayu_commodity'] = \App\Models\HasilHutanBukanKayu::join('hasil_hutan_bukan_kayu_details', 'hasil_hutan_bukan_kayu.id', '=', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id')
+                ->join('m_commodities', 'hasil_hutan_bukan_kayu_details.commodity_id', '=', 'm_commodities.id')
+                ->where('hasil_hutan_bukan_kayu.year', $currentYear)
+                ->where('hasil_hutan_bukan_kayu.status', 'final')
+                ->where('hasil_hutan_bukan_kayu.forest_type', $type)
+                ->selectRaw('m_commodities.name as commodity, sum(hasil_hutan_bukan_kayu_details.volume) as total')
+                ->groupBy('m_commodities.name')
                 ->orderByDesc('total')
                 ->limit(5)
                 ->pluck('total', 'commodity');
