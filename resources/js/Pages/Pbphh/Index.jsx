@@ -452,7 +452,7 @@ export default function Index({ auth, datas, stats, filters = {} }) {
               </div>
             </div>
 
-            <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 relative z-10 w-full">
+            <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 relative z-10 w-full">
               {/* Search Input */}
               <div className="relative w-full sm:max-w-md group">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-20">
@@ -475,6 +475,39 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                     </svg>
                   </div>
                 )}
+              </div>
+
+              {/* Rows Per Page Selector */}
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 p-1.5 rounded-xl h-[52px]">
+                <span className="text-emerald-100 text-xs font-bold pl-2 whitespace-nowrap">Baris:</span>
+                <select
+                  className="text-sm font-bold bg-transparent border-0 text-white focus:ring-0 cursor-pointer [&>option]:text-gray-900 py-1 pl-1 pr-8"
+                  value={currentFilters.per_page || 10}
+                  onChange={(e) => {
+                    setLoadingText('Memuat Ulang...');
+                    setIsLoading(true);
+                    router.get(
+                      route('pbphh.index'),
+                      {
+                        search: searchTerm,
+                        sort: currentFilters.sort,
+                        direction: currentFilters.direction,
+                        per_page: e.target.value
+                      },
+                      {
+                        preserveState: true,
+                        preserveScroll: true,
+                        replace: true,
+                        onFinish: () => setIsLoading(false)
+                      }
+                    );
+                  }}
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
               </div>
             </div>
           </div>
@@ -521,26 +554,8 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                       onClick={() => handleSort('name')}
                     >
                       <div className="flex items-center gap-1">
-                        Nama Industri
+                        Identitas Perusahaan
                         <SortIcon field="name" />
-                      </div>
-                    </th>
-                    <th
-                      className="px-6 py-4 font-bold tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group"
-                      onClick={() => handleSort('number')}
-                    >
-                      <div className="flex items-center gap-1">
-                        Nomor Izin
-                        <SortIcon field="number" />
-                      </div>
-                    </th>
-                    <th
-                      className="px-6 py-4 font-bold tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group"
-                      onClick={() => handleSort('location')}
-                    >
-                      <div className="flex items-center gap-1">
-                        Lokasi
-                        <SortIcon field="location" />
                       </div>
                     </th>
                     <th
@@ -548,17 +563,8 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                       onClick={() => handleSort('investment')}
                     >
                       <div className="flex items-center gap-1">
-                        Nilai Investasi
+                        Kinerja (Investasi / TK)
                         <SortIcon field="investment" />
-                      </div>
-                    </th>
-                    <th
-                      className="px-6 py-4 font-bold tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group"
-                      onClick={() => handleSort('workers')}
-                    >
-                      <div className="flex items-center gap-1">
-                        Tenaga Kerja
-                        <SortIcon field="workers" />
                       </div>
                     </th>
                     <th
@@ -597,26 +603,35 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                         </td>
                         <td className="px-6 py-4">
                           <div className="font-bold text-gray-900">{item.name}</div>
-                          <div className="text-xs text-gray-400 mt-0.5">
-                            {item.creator?.name || 'Unknown'} • {new Date(item.created_at).toLocaleDateString('id-ID')}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200 mt-1 mb-1">
                             {item.number}
                           </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col">
-                            <span className="text-xs font-bold text-gray-700 leading-tight">{item.district?.name || '-'}</span>
-                            <span className="text-[10px] text-gray-400 leading-tight">{item.regency?.name || '-'}</span>
+                          <div className="flex flex-col text-xs text-gray-500">
+                            <span>{item.district?.name || '-'}, {item.regency?.name || '-'}</span>
+                          </div>
+                          <div className="text-[10px] text-gray-400 mt-1">
+                            Input: {item.creator?.name || 'Unknown'}
                           </div>
                         </td>
-                        <td className="px-6 py-4 font-medium text-gray-900">{formatCurrency(item.investment_value)}</td>
                         <td className="px-6 py-4">
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
-                            {item.number_of_workers} Orang
-                          </span>
+                          <div className="flex flex-col gap-1.5">
+                            <div className="flex items-center gap-1.5" title="Nilai Investasi">
+                              <div className="p-1 rounded bg-emerald-50 text-emerald-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </div>
+                              <span className="font-bold text-gray-700 text-xs">{formatCurrency(item.investment_value)}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5" title="Tenaga Kerja">
+                              <div className="p-1 rounded bg-blue-50 text-blue-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                              </div>
+                              <span className="font-bold text-gray-700 text-xs">{item.number_of_workers} Orang</span>
+                            </div>
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           {item.present_condition ? (
@@ -630,14 +645,29 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                           )}
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex flex-col gap-1">
+                          <div className="flex flex-col gap-2">
                             {item.jenis_produksi && item.jenis_produksi.length > 0 ? (
                               item.jenis_produksi.map((jp, idx) => (
-                                <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-700 border border-amber-100">
-                                  {jp.name} ({jp.pivot?.kapasitas_ijin || '-'})
-                                </span>
+                                <div key={idx} className="flex items-start gap-2 p-2 rounded-lg bg-orange-50/50 border border-orange-100/50 hover:bg-orange-50 hover:border-orange-200 transition-colors group/item">
+                                  <div className="mt-0.5 p-1 rounded-md bg-orange-100 text-orange-600 group-hover/item:bg-orange-200 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-bold text-gray-800 leading-tight">{jp.name}</span>
+                                    <div className="flex items-center gap-1 mt-0.5">
+                                      <span className="text-[10px] uppercase font-semibold text-orange-600/80 tracking-wide">Kapasitas:</span>
+                                      <span className="text-[10px] font-medium text-gray-600 bg-white px-1.5 py-0.5 rounded border border-orange-100">
+                                        {jp.pivot?.kapasitas_ijin || '-'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
                               ))
-                            ) : '-'}
+                            ) : (
+                              <span className="text-gray-400 text-xs italic">- Tidak ada data -</span>
+                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4">

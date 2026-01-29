@@ -59,7 +59,8 @@ class PbphhController extends Controller
         $dbColumn = $sortMap[$sortField] ?? 'pbphh.created_at';
         return $query->orderBy($dbColumn, $sortDirection);
       })
-      ->paginate(10)
+
+      ->paginate($request->query('per_page', 10))
       ->withQueryString();
 
     // Stats
@@ -74,7 +75,8 @@ class PbphhController extends Controller
       'filters' => [
         'search' => $request->search,
         'sort' => $sortField,
-        'direction' => $sortDirection
+        'direction' => $sortDirection,
+        'per_page' => $request->query('per_page', 10),
       ],
     ]);
   }

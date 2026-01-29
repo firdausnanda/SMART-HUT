@@ -21,7 +21,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
     year: filters.year || new Date().getFullYear(),
     search: filters.search || '',
     sort: filters.sort || '',
-    direction: filters.direction || 'asc'
+    direction: filters.direction || 'asc',
+    per_page: filters.per_page || 10
   });
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -92,6 +93,22 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
       preserveState: true,
       preserveScroll: true
     });
+  };
+
+  const handlePerPageChange = (perPage) => {
+    const newParams = { ...params, per_page: perPage };
+    setParams(newParams);
+    setLoadingText('Memuat Ulang...');
+    setIsLoading(true);
+    router.get(
+      route('nilai-transaksi-ekonomi.index'),
+      newParams,
+      {
+        preserveState: true,
+        preserveScroll: true,
+        onFinish: () => setIsLoading(false)
+      }
+    );
   };
 
   const SortIcon = ({ field }) => {
@@ -377,10 +394,18 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                   {isSearching && <div className="absolute right-3 top-1/2 -translate-y-1/2"><svg className="animate-spin h-4 w-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>}
                 </div>
               </div>
-              <div className="flex gap-2">
-                <div className="text-sm text-gray-400 font-bold bg-gray-50 px-3 py-1 rounded-full border border-gray-100 shrink-0 self-center">
-                  {datas.total} Data Teritem
-                </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
+                <select
+                  className="text-sm font-bold border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 py-1"
+                  value={params.per_page || 10}
+                  onChange={(e) => handlePerPageChange(e.target.value)}
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
               </div>
             </div>
 
@@ -453,13 +478,7 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                         <SortIcon field="nama_kth" />
                       </div>
                     </th>
-                    <th className="px-6 py-4">Komoditas & Volume</th>
-                    <th className="px-6 py-4 text-right cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('nilai')}>
-                      <div className="flex items-center justify-end gap-1">
-                        Nilai Transaksi
-                        <SortIcon field="nilai" />
-                      </div>
-                    </th>
+                    <th className="px-6 py-4">Detail Transaksi</th>
                     <th className="px-6 py-4">Input Oleh</th>
                     <th className="px-6 py-4 text-center cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('status')}>
                       <div className="flex items-center justify-center gap-1">
@@ -495,19 +514,22 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex flex-col gap-1">
-                          {item.details && item.details.map((d, idx) => (
-                            <div key={idx} className="flex items-center justify-between text-xs border-b border-gray-50 pb-1 last:border-0 last:pb-0">
-                              <span className="font-bold text-gray-600">{d.commodity?.name}</span>
-                              <span className="text-gray-400 font-mono">{formatNumber(d.volume_produksi)} <span className="text-[10px]">{d.satuan}</span></span>
-                            </div>
-                          ))}
+                        <div className="flex flex-col gap-2">
+                          <div className="flex flex-col gap-1">
+                            {item.details && item.details.map((d, idx) => (
+                              <div key={idx} className="flex items-center justify-between text-xs border-b border-gray-50 pb-1 last:border-0 last:pb-0">
+                                <span className="font-bold text-gray-600">{d.commodity?.name}</span>
+                                <span className="text-gray-400 font-mono">{formatNumber(d.volume_produksi)} <span className="text-[10px]">{d.satuan}</span></span>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="pt-2 border-t border-gray-100 flex justify-between items-center">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase">Total:</span>
+                            <span className="text-emerald-700 font-bold text-sm leading-tight">
+                              {formatRupiah(item.total_nilai_transaksi)}
+                            </span>
+                          </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <span className="text-emerald-700 font-bold text-base leading-tight">
-                          {formatRupiah(item.total_nilai_transaksi)}
-                        </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">

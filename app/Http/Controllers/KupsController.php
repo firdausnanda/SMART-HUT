@@ -67,7 +67,7 @@ class KupsController extends Controller
       $query->latest('kups.created_at');
     }
 
-    $kups = $query->paginate(10)->withQueryString();
+    $kups = $query->paginate($request->query('per_page', 10))->withQueryString();
 
     // Calculate Stats
     $stats = [
@@ -79,7 +79,9 @@ class KupsController extends Controller
     return Inertia::render('Kups/Index', [
       'kups' => $kups,
       'stats' => $stats,
-      'filters' => $request->only(['search', 'sort', 'direction']),
+      'filters' => array_merge($request->only(['search', 'sort', 'direction']), [
+        'per_page' => (int) $request->query('per_page', 10),
+      ]),
     ]);
   }
 

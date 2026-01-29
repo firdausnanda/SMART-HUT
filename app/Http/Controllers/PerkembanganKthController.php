@@ -73,7 +73,7 @@ class PerkembanganKthController extends Controller
         $query->orderBy('perkembangan_kth.created_at', 'desc');
       })
       ->with(['creator', 'regency_rel', 'district_rel', 'village_rel'])
-      ->paginate(10)
+      ->paginate($request->query('per_page', 10))
       ->withQueryString();
 
     $stats = [
@@ -100,6 +100,7 @@ class PerkembanganKthController extends Controller
         'search' => $request->search,
         'sort' => $sort,
         'direction' => $direction,
+        'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
     ]);

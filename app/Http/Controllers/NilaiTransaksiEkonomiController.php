@@ -69,7 +69,7 @@ class NilaiTransaksiEkonomiController extends Controller
         $query->orderBy('nilai_transaksi_ekonomi.created_at', 'desc');
       })
       ->with(['creator', 'regency_rel', 'district_rel', 'village_rel', 'details.commodity'])
-      ->paginate(10)
+      ->paginate($request->query('per_page', 10))
       ->withQueryString();
 
     $stats = [
@@ -92,6 +92,7 @@ class NilaiTransaksiEkonomiController extends Controller
         'search' => $request->search,
         'sort' => $sort,
         'direction' => $direction,
+        'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
     ]);

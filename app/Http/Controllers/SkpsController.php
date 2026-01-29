@@ -67,7 +67,7 @@ class SkpsController extends Controller
         return $query->latest('skps.created_at');
       })
       ->with(['creator', 'regency', 'district', 'skema'])
-      ->paginate(10)
+      ->paginate($request->query('per_page', 10))
       ->withQueryString();
 
     $stats = SkemaPerhutananSosial::leftJoin('skps', function ($join) {
@@ -85,6 +85,7 @@ class SkpsController extends Controller
         'search' => $request->search,
         'sort' => $request->sort,
         'direction' => $request->direction,
+        'per_page' => (int) $request->query('per_page', 10),
       ],
     ]);
   }

@@ -176,7 +176,8 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
             year,
             search: searchTerm,
             sort: filters.sort,
-            direction: filters.direction
+            direction: filters.direction,
+            per_page: filters.per_page
         }, {
             preserveState: true,
             replace: true,
@@ -192,7 +193,8 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                     search: value,
                     year: filters.year,
                     sort: filters.sort,
-                    direction: filters.direction
+                    direction: filters.direction,
+                    per_page: filters.per_page
                 },
                 {
                     preserveState: true,
@@ -203,7 +205,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                 }
             );
         }, 500),
-        [filters.year]
+        [filters.year, filters.per_page]
     );
 
     const onSearchChange = (e) => {
@@ -344,12 +346,34 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                 search: searchTerm,
                 year: filters.year,
                 sort: field,
-                direction: newDirection
+                direction: newDirection,
+                per_page: filters.per_page
             },
             {
                 preserveState: true,
                 preserveScroll: true,
                 replace: true
+            }
+        );
+    };
+
+    const handlePerPageChange = (perPage) => {
+        setLoadingText('Memuat Ulang...');
+        setIsLoading(true);
+        router.get(
+            route('rehab-lahan.index'),
+            {
+                search: searchTerm,
+                year: filters.year,
+                sort: filters.sort,
+                direction: filters.direction,
+                per_page: perPage
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                onFinish: () => setIsLoading(false)
             }
         );
     };
@@ -529,8 +553,18 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                                     )}
                                 </div>
                             </div>
-                            <div className="text-sm text-gray-400 font-bold bg-gray-50 px-3 py-1 rounded-full border border-gray-100 shrink-0">
-                                {stats.total_count} Data Teritem
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
+                                <select
+                                    className="text-sm font-bold border-gray-200 rounded-lg focus:ring-primary-500 focus:border-primary-500 py-1"
+                                    value={filters.per_page || 10}
+                                    onChange={(e) => handlePerPageChange(e.target.value)}
+                                >
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
                             </div>
                         </div>
                         <div className="overflow-x-auto">

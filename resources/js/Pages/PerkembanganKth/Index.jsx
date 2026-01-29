@@ -26,7 +26,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
     year: filters.year,
     search: filters.search || '',
     sort: filters.sort || '',
-    direction: filters.direction || 'asc'
+    direction: filters.direction || 'asc',
+    per_page: filters.per_page || 10
   });
 
   const formatNumber = (num) => new Intl.NumberFormat('id-ID').format(num);
@@ -110,6 +111,22 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
       preserveState: true,
       preserveScroll: true
     });
+  };
+
+  const handlePerPageChange = (perPage) => {
+    const newParams = { ...params, per_page: perPage };
+    setParams(newParams);
+    setLoadingText('Memuat Ulang...');
+    setIsLoading(true);
+    router.get(
+      route('perkembangan-kth.index'),
+      newParams,
+      {
+        preserveState: true,
+        preserveScroll: true,
+        onFinish: () => setIsLoading(false)
+      }
+    );
   };
 
   const SortIcon = ({ field }) => {
@@ -472,8 +489,18 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                   )}
                 </div>
               </div>
-              <div className="text-sm text-gray-400 font-bold bg-gray-50 px-3 py-1 rounded-full border border-gray-100 shrink-0">
-                {stats.total_kth} Data Teritem
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
+                <select
+                  className="text-sm font-bold border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 py-1"
+                  value={params.per_page || 10}
+                  onChange={(e) => handlePerPageChange(e.target.value)}
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
               </div>
             </div>
             <div className="overflow-x-auto min-h-[400px]">
@@ -491,22 +518,10 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                       </div>
                     </th>
                     <th className="px-6 py-4">Bulan / Tahun</th>
-                    <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('location')}>
-                      <div className="flex items-center gap-1">
-                        Lokasi
-                        <SortIcon field="location" />
-                      </div>
-                    </th>
                     <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('nama_kth')}>
                       <div className="flex items-center gap-1">
-                        Nama KTH
+                        Identitas KTH
                         <SortIcon field="nama_kth" />
-                      </div>
-                    </th>
-                    <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('nomor_register')}>
-                      <div className="flex items-center gap-1">
-                        No. Register
-                        <SortIcon field="nomor_register" />
                       </div>
                     </th>
                     <th className="px-6 py-4 text-center cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('kelas')}>
@@ -517,14 +532,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                     </th>
                     <th className="px-6 py-4 text-center cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('anggota')}>
                       <div className="flex items-center justify-center gap-1">
-                        Anggota
+                        Kapasitas
                         <SortIcon field="anggota" />
-                      </div>
-                    </th>
-                    <th className="px-6 py-4 text-center cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('luas')}>
-                      <div className="flex items-center justify-center gap-1">
-                        Luas (Ha)
-                        <SortIcon field="luas" />
                       </div>
                     </th>
                     <th className="px-6 py-4 text-center cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('status')}>
@@ -555,28 +564,57 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                         <div className="text-xs text-gray-400 font-semibold">{item.year}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-medium text-gray-800">{item.village_name || '-'}</div>
-                        <div className="text-xs text-primary-600 font-bold uppercase tracking-tighter">
-                          {item.district_name}, {item.regency_name}
+                        <div className="font-bold text-gray-900 text-sm">{item.nama_kth}</div>
+                        <div className="flex flex-col gap-0.5 mt-1">
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span className="uppercase tracking-tight font-medium">
+                              {item.village_name || '-'}, {item.district_name || '-'}
+                            </span>
+                          </div>
+                          {item.nomor_register && (
+                            <div className="flex items-center gap-1 text-[10px] text-gray-400 font-mono bg-gray-50 px-1.5 py-0.5 rounded w-fit">
+                              <span className="font-bold">REG:</span> {item.nomor_register}
+                            </div>
+                          )}
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-bold text-gray-900">{item.nama_kth}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="text-gray-600">{item.nomor_register || '-'}</span>
                       </td>
                       <td className="px-6 py-4 text-center">
                         <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${getKelasBadgeColor(item.kelas_kelembagaan)}`}>
                           {getKelasLabel(item.kelas_kelembagaan)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="font-bold text-gray-900">{formatNumber(item.jumlah_anggota)}</span>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1 items-center">
+                          <div className="flex items-center gap-1.5 min-w-[100px]">
+                            <div className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                              </svg>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-gray-900">{formatNumber(item.jumlah_anggota)}</span>
+                              <span className="text-[9px] text-gray-400 uppercase leading-none">Anggota</span>
+                            </div>
+                          </div>
+                          <div className="w-full h-px bg-gray-100 my-0.5"></div>
+                          <div className="flex items-center gap-1.5 min-w-[100px]">
+                            <div className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                              </svg>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-gray-900">{formatNumber(item.luas_kelola)} Ha</span>
+                              <span className="text-[9px] text-gray-400 uppercase leading-none">Luas Kelola</span>
+                            </div>
+                          </div>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="font-bold text-primary-700">{formatNumber(item.luas_kelola)}</span>
-                      </td>
+
                       <td className="px-6 py-4 text-center">
                         <StatusBadge status={item.status} />
                       </td>

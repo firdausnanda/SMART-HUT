@@ -59,12 +59,37 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
         year: filters.year, // Use filters.year to maintain consistency
         search: searchTerm,
         sort: field,
-        direction: newDirection
+        direction: newDirection,
+        per_page: filters.per_page
       },
       {
         preserveState: true,
         preserveScroll: true,
         replace: true
+      }
+    );
+  };
+
+
+
+  const handlePerPageChange = (perPage) => {
+    setLoadingText('Memuat Ulang...');
+    setIsLoading(true);
+    router.get(
+      route('hasil-hutan-kayu.index'),
+      {
+        forest_type,
+        search: searchTerm,
+        year: filters.year,
+        sort: filters.sort,
+        direction: filters.direction,
+        per_page: perPage
+      },
+      {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+        onFinish: () => setIsLoading(false)
       }
     );
   };
@@ -212,7 +237,8 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
       year: selectedYear,
       search: searchTerm,
       sort: filters.sort,
-      direction: filters.direction
+      direction: filters.direction,
+      per_page: filters.per_page
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -231,7 +257,8 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
           year: filters.year,
           search: value,
           sort: filters.sort,
-          direction: filters.direction
+          direction: filters.direction,
+          per_page: filters.per_page
         },
         {
           preserveState: true,
@@ -242,7 +269,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
         }
       );
     }, 500),
-    [forest_type, filters.year]
+    [forest_type, filters.year, filters.per_page]
   );
 
   const onSearchChange = (e) => {
@@ -557,8 +584,18 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                 )}
               </div>
             </div>
-            <div className="text-sm text-gray-400 font-bold bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
-              {datas.total} Data Item
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
+              <select
+                className="text-sm font-bold border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 py-1"
+                value={filters.per_page || 10}
+                onChange={(e) => handlePerPageChange(e.target.value)}
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -582,16 +619,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                       <SortIcon field="month" />
                     </div>
                   </th>
-                  <th className="px-6 py-4">Input Oleh</th>
-                  <th
-                    className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group"
-                    onClick={() => handleSort('pengelola')}
-                  >
-                    <div className="flex items-center gap-1">
-                      Lokasi (Pengelola)
-                      <SortIcon field="pengelola" />
-                    </div>
-                  </th>
+                  <th className="px-6 py-4">Identitas</th>
                   <th
                     className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group"
                     onClick={() => handleSort('kayu')}
@@ -601,24 +629,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                       <SortIcon field="kayu" />
                     </div>
                   </th>
-                  <th
-                    className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group"
-                    onClick={() => handleSort('target')}
-                  >
-                    <div className="flex items-center gap-1">
-                      Target Volume
-                      <SortIcon field="target" />
-                    </div>
-                  </th>
-                  <th
-                    className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group"
-                    onClick={() => handleSort('realization')}
-                  >
-                    <div className="flex items-center gap-1">
-                      Realisasi Volume
-                      <SortIcon field="realization" />
-                    </div>
-                  </th>
+                  <th className="px-6 py-4 text-center">Volume (Target / Realisasi)</th>
                   <th
                     className="px-6 py-4 text-center cursor-pointer hover:bg-gray-100 transition-colors group"
                     onClick={() => handleSort('status')}
@@ -647,18 +658,18 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                       <div className="text-xs text-gray-400 font-semibold">Tgl. Input: {new Date(item.created_at).toLocaleDateString('id-ID')}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-xs font-bold text-emerald-700">
-                          {item.creator?.name ? item.creator.name.charAt(0).toUpperCase() : '?'}
-                        </div>
-                        <div className="font-medium text-gray-800 text-sm">
-                          {item.creator?.name ? (item.creator.name.length > 15 ? item.creator.name.substring(0, 15) + '...' : item.creator.name) : 'Unknown'}
+                      <div className="flex flex-col gap-1">
+                        <div className="font-medium text-gray-800">{item.pengelola_hutan_name || '-'}</div>
+                        <div className="text-xs text-gray-500">{item.regency_name || 'N/A'}</div>
+                        <div className="flex items-center gap-1 mt-1">
+                          <div className="h-4 w-4 rounded-full bg-emerald-100 flex items-center justify-center text-[8px] font-bold text-emerald-700">
+                            {item.creator?.name ? item.creator.name.charAt(0).toUpperCase() : '?'}
+                          </div>
+                          <span className="text-xs text-gray-400">
+                            {item.creator?.name ? (item.creator.name.length > 15 ? item.creator.name.substring(0, 15) + '...' : item.creator.name) : 'Unknown'}
+                          </span>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-gray-800">{item.pengelola_hutan_name || '-'}</div>
-                      <div className="text-xs text-gray-500">{item.regency_name || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="font-medium text-gray-800">
@@ -673,15 +684,21 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                         ) : '-'}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="font-bold text-gray-900">
-                        {item.details?.reduce((acc, curr) => acc + parseFloat(curr.volume_target || 0), 0).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="font-bold text-emerald-700">
-                        {item.details?.reduce((acc, curr) => acc + parseFloat(curr.volume_realization || 0), 0).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
-                      </span>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex justify-between items-center text-xs border-b border-gray-100 pb-1">
+                          <span className="text-gray-400">Target:</span>
+                          <span className="font-bold text-gray-900">
+                            {item.details?.reduce((acc, curr) => acc + parseFloat(curr.volume_target || 0), 0).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-gray-400">Realisasi:</span>
+                          <span className="font-bold text-emerald-700">
+                            {item.details?.reduce((acc, curr) => acc + parseFloat(curr.volume_realization || 0), 0).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-center">
                       <StatusBadge status={item.status} />

@@ -65,7 +65,7 @@ class RehabManggroveController extends Controller
         $dbColumn = $sortMap[$sortField] ?? 'rehab_manggrove.created_at';
         return $query->orderBy($dbColumn, $sortDirection);
       })
-      ->paginate(10)
+      ->paginate($request->query('per_page', 10))
       ->withQueryString();
 
     $stats = [
@@ -86,7 +86,8 @@ class RehabManggroveController extends Controller
         'year' => (int) $selectedYear,
         'search' => $request->search,
         'sort' => $sortField,
-        'direction' => $sortDirection
+        'direction' => $sortDirection,
+        'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
       'sumberDana' => SumberDana::all()

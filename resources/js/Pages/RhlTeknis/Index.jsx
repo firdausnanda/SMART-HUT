@@ -82,12 +82,34 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
         search: searchTerm,
         year: filters.year,
         sort: field,
-        direction: newDirection
+        direction: newDirection,
+        per_page: filters.per_page
       },
       {
         preserveState: true,
         preserveScroll: true,
         replace: true
+      }
+    );
+  };
+
+  const handlePerPageChange = (perPage) => {
+    setLoadingText('Memuat Ulang...');
+    setIsLoading(true);
+    router.get(
+      route('rhl-teknis.index'),
+      {
+        search: searchTerm,
+        year: filters.year,
+        sort: filters.sort,
+        direction: filters.direction,
+        per_page: perPage
+      },
+      {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+        onFinish: () => setIsLoading(false)
       }
     );
   };
@@ -175,7 +197,8 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
       year,
       search: searchTerm,
       sort: filters.sort,
-      direction: filters.direction
+      direction: filters.direction,
+      per_page: filters.per_page
     }, {
       preserveState: true,
       replace: true,
@@ -191,7 +214,8 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
           search: value,
           year: filters.year,
           sort: filters.sort,
-          direction: filters.direction
+          direction: filters.direction,
+          per_page: filters.per_page
         },
         {
           preserveState: true,
@@ -202,7 +226,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
         }
       );
     }, 500),
-    [filters.year]
+    [filters.year, filters.per_page]
   );
 
   const onSearchChange = (e) => {
@@ -399,7 +423,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
           {/* Table Section */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-              <div className="flex items-center gap-4 flex-1">
+              <div className="flex items-center gap-4">
                 <h3 className="font-bold text-gray-800">Daftar Laporan</h3>
                 <div className="h-6 w-px bg-gray-200"></div>
                 <div className="flex items-center gap-2">
@@ -414,7 +438,23 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                     ))}
                   </select>
                 </div>
-                <div className="max-w-xs w-full ml-auto md:ml-4 relative">
+              </div>
+
+              <div className="flex items-center gap-4 flex-1 md:flex-none justify-end w-full md:w-auto">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-gray-400 uppercase hidden sm:inline-block">Baris:</span>
+                  <select
+                    className="text-sm font-bold border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 py-1"
+                    value={filters.per_page || 10}
+                    onChange={(e) => handlePerPageChange(e.target.value)}
+                  >
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+                <div className="w-full md:w-64 relative">
                   <TextInput
                     type="text"
                     className="w-full text-sm pr-10"
@@ -459,7 +499,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                       onClick={() => handleSort('location')}
                     >
                       <div className="flex items-center gap-1">
-                        Lokasi
+                        Identitas (Lokasi / Input)
                         <SortIcon field="location" />
                       </div>
                     </th>
@@ -469,20 +509,10 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                       onClick={() => handleSort('target')}
                     >
                       <div className="flex items-center justify-center gap-1">
-                        Capaian & Target
+                        Target/Capaian/Dana
                         <SortIcon field="target" />
                       </div>
                     </th>
-                    <th
-                      className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group"
-                      onClick={() => handleSort('fund_source')}
-                    >
-                      <div className="flex items-center gap-1">
-                        Sumber Dana
-                        <SortIcon field="fund_source" />
-                      </div>
-                    </th>
-                    <th className="px-6 py-4 text-center">Input Oleh</th>
                     <th
                       className="px-6 py-4 text-center cursor-pointer hover:bg-gray-100 transition-colors group"
                       onClick={() => handleSort('status')}
@@ -515,68 +545,72 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                           <div className="text-[10px] text-gray-400 font-semibold">{item.year}</div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex flex-col gap-0.5">
-                            <span className="font-bold text-gray-900 text-xs">{item.regency_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
-                            <span className="text-[10px] text-gray-500">Kec. {item.district_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
-                            <span className="text-[10px] text-gray-500">Desa {item.village_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-start gap-2">
+                              <div className="mt-0.5 p-1 rounded-md bg-indigo-50 text-indigo-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-bold text-gray-900 text-xs leading-tight">{item.regency_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
+                                <span className="text-[10px] text-gray-500 leading-tight mt-0.5">Kec. {item.district_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
+                                <span className="text-[10px] text-gray-500 leading-tight">Desa {item.village_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
+                              </div>
+                            </div>
 
+                            <div className="mt-1 pt-1.5 border-t border-gray-100 flex items-center gap-1.5 pl-1">
+                              <div className="p-0.5 rounded-full bg-gray-100 text-gray-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="text-[10px] font-medium text-gray-500 truncate max-w-[120px]" title={item.creator?.name}>{item.creator?.name || 'Unknown'}</span>
+                            </div>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex flex-col gap-1.5 min-w-[200px]">
-                            {item.details.map((detail, idx) => (
-                              <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-100/50 hover:bg-white hover:border-emerald-200 hover:shadow-sm transition-all group">
-                                <div className="flex items-center gap-2.5 overflow-hidden">
-                                  <div className="shrink-0 p-1.5 bg-emerald-100 text-emerald-600 rounded-md group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                                      <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-                                    </svg>
+                          <div className="flex flex-col gap-2 min-w-[220px]">
+                            <div className="space-y-1.5 p-2 bg-gray-50/50 rounded-xl border border-gray-100">
+                              {item.details.map((detail, idx) => (
+                                <div key={idx} className="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-100 shadow-sm">
+                                  <div className="flex items-center gap-2 overflow-hidden">
+                                    <div className="shrink-0 w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                                    <span className="text-xs font-semibold text-gray-700 truncate max-w-[140px]" title={detail.bangunan_kta?.name}>{detail.bangunan_kta?.name || '-'}</span>
                                   </div>
-                                  <span className="text-xs font-bold text-gray-700 group-hover:text-gray-900 truncate" title={detail.bangunan_kta?.name}>{detail.bangunan_kta?.name || '-'}</span>
-                                </div>
-                                <div className="shrink-0 ml-2">
-                                  <span className="text-[10px] font-mono font-bold text-gray-600 bg-white border border-gray-200 px-2 py-0.5 rounded-md shadow-sm group-hover:border-emerald-200 group-hover:text-emerald-700 transition-colors">
+                                  <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
                                     {detail.unit_amount}
                                   </span>
                                 </div>
-                              </div>
-                            ))}
-                            {item.details.length === 0 && (
-                              <div className="flex items-center justify-center p-3 rounded-lg border border-dashed border-gray-200 bg-gray-50/50">
-                                <span className="text-gray-400 italic text-xs">Tidak ada detail</span>
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <div className="flex flex-col items-center gap-1.5">
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-base font-black text-emerald-700">{formatNumber(totalUnits)}</span>
-                              <span className="text-[10px] font-bold text-gray-400 uppercase">/ {formatNumber(item.target_annual)} Unit</span>
-                            </div>
-                            <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden border border-gray-50">
-                              <div
-                                className={`h-full transition-all duration-500 rounded-full ${percentage >= 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-blue-500'}`}
-                                style={{ width: `${Math.min(percentage, 100)}%` }}
-                              ></div>
+                              ))}
+                              {item.details.length === 0 && (
+                                <div className="text-center py-2">
+                                  <span className="text-gray-400 italic text-[10px]">- Kosong -</span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase whitespace-nowrap">
-                            {item.fund_source}
-                          </span>
-                        </td>
                         <td className="px-6 py-4 text-center">
-                          <div className="flex flex-col">
-                            <span className="text-xs font-bold text-gray-800 truncate" title={item.creator?.name}>
-                              {item.creator?.name?.length > 20
-                                ? `${item.creator.name.substring(0, 20)}...`
-                                : item.creator?.name || 'Sistem'}
+                          <div className="flex flex-col items-center gap-2">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100 shadow-sm whitespace-nowrap">
+                              {item.fund_source}
                             </span>
-                            <span className="text-[9px] text-gray-400 font-medium italic">{new Date(item.created_at).toLocaleDateString('id-ID')}</span>
+                            <div className="flex flex-col items-center gap-1 w-full">
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-base font-black text-emerald-700">{formatNumber(totalUnits)}</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase">/ {formatNumber(item.target_annual)} Unit</span>
+                              </div>
+                              <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden border border-gray-50">
+                                <div
+                                  className={`h-full transition-all duration-500 rounded-full ${percentage >= 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-blue-500'}`}
+                                  style={{ width: `${Math.min(percentage, 100)}%` }}
+                                ></div>
+                              </div>
+                            </div>
                           </div>
                         </td>
+
                         <td className="px-6 py-4 text-center">
                           <StatusBadge status={item.status} />
                         </td>

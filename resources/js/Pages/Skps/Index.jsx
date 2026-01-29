@@ -54,12 +54,37 @@ export default function Index({ auth, datas, stats, filters = {} }) {
       {
         search: searchTerm,
         sort: field,
-        direction: newDirection
+        search: searchTerm,
+        sort: field,
+        direction: newDirection,
+        per_page: filters.per_page
       },
       {
         preserveState: true,
         preserveScroll: true,
         replace: true
+      }
+    );
+  };
+
+
+
+  const handlePerPageChange = (perPage) => {
+    setLoadingText('Memuat Ulang...');
+    setIsLoading(true);
+    router.get(
+      route('skps.index'),
+      {
+        search: searchTerm,
+        sort: filters.sort,
+        direction: filters.direction,
+        per_page: perPage
+      },
+      {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+        onFinish: () => setIsLoading(false)
       }
     );
   };
@@ -177,7 +202,8 @@ export default function Index({ auth, datas, stats, filters = {} }) {
         {
           search: value,
           sort: filters.sort,
-          direction: filters.direction
+          direction: filters.direction,
+          per_page: filters.per_page
         },
         {
           preserveState: true,
@@ -188,7 +214,7 @@ export default function Index({ auth, datas, stats, filters = {} }) {
         }
       );
     }, 500),
-    []
+    [filters.per_page]
   );
 
   const onSearchChange = (e) => {
@@ -476,6 +502,22 @@ export default function Index({ auth, datas, stats, filters = {} }) {
 
           {/* Table Section */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between gap-4">
+              <h3 className="font-bold text-gray-800">Daftar Data SKPS</h3>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
+                <select
+                  className="text-sm font-bold border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 py-1"
+                  value={filters.per_page || 10}
+                  onChange={(e) => handlePerPageChange(e.target.value)}
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+            </div>
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-left text-sm text-gray-500 min-w-[1000px]">
                 <thead className="bg-gray-50/50 text-gray-700 uppercase tracking-wider text-[11px] font-bold">

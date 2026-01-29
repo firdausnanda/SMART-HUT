@@ -65,7 +65,7 @@ class HasilHutanBukanKayuController extends Controller
         $dbColumn = $sortMap[$sortField] ?? 'hasil_hutan_bukan_kayu.created_at';
         return $query->orderBy($dbColumn, $sortDirection);
       })
-      ->paginate(10)
+      ->paginate($request->query('per_page', 10))
       ->withQueryString();
 
     // Stats
@@ -103,7 +103,8 @@ class HasilHutanBukanKayuController extends Controller
         'year' => $selectedYear,
         'search' => $request->search,
         'sort' => $sortField,
-        'direction' => $sortDirection
+        'direction' => $sortDirection,
+        'per_page' => (int) $request->query('per_page', 10),
       ],
     ]);
   }

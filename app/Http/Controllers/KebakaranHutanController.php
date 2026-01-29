@@ -70,7 +70,7 @@ class KebakaranHutanController extends Controller
         $dbColumn = $sortMap[$sortField] ?? 'kebakaran_hutan.created_at';
         return $query->orderBy($dbColumn, $sortDirection);
       })
-      ->paginate(10)
+      ->paginate($request->query('per_page', 10))
       ->withQueryString();
 
     $stats = [
@@ -95,7 +95,8 @@ class KebakaranHutanController extends Controller
         'year' => (int) $selectedYear,
         'search' => $request->search,
         'sort' => $sortField,
-        'direction' => $sortDirection
+        'direction' => $sortDirection,
+        'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
     ]);

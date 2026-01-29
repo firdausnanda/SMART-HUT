@@ -66,7 +66,7 @@ class RehabLahanController extends Controller
                 $column = $sortMap[$sortField] ?? 'rehab_lahan.created_at';
                 return $query->orderBy($column, $sortDirection);
             })
-            ->paginate(10)
+            ->paginate($request->query('per_page', 10))
             ->withQueryString();
 
         $stats = [
@@ -88,6 +88,7 @@ class RehabLahanController extends Controller
                 'search' => $request->search,
                 'sort' => $sortField,
                 'direction' => $sortDirection,
+                'per_page' => (int) $request->query('per_page', 10),
             ],
             'availableYears' => $availableYears,
             'sumberDana' => SumberDana::all()

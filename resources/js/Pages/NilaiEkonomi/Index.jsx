@@ -18,7 +18,7 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memproses...');
   const [selectedIds, setSelectedIds] = useState([]);
-  const [params, setParams] = useState(filters || {});
+  const [params, setParams] = useState({ ...filters, per_page: filters.per_page || 10 });
 
   const SortIcon = ({ field }) => {
     return (
@@ -47,9 +47,19 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
     if (params.sort === field && params.direction === 'asc') {
       direction = 'desc';
     }
-    setParams({ ...params, sort: field, direction });
+    const newParams = { ...params, sort: field, direction };
+    setParams(newParams);
 
-    router.get(route('nilai-ekonomi.index'), { ...params, sort: field, direction }, {
+    router.get(route('nilai-ekonomi.index'), newParams, {
+      preserveState: true,
+      preserveScroll: true
+    });
+  };
+
+  const handlePerPageChange = (perPage) => {
+    const newParams = { ...params, per_page: perPage };
+    setParams(newParams);
+    router.get(route('nilai-ekonomi.index'), newParams, {
       preserveState: true,
       preserveScroll: true
     });
@@ -394,8 +404,18 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
               </div>
             </div>
 
-            <div className="text-sm text-gray-400 font-bold bg-gray-50 px-3 py-1 rounded-full border border-gray-100 shrink-0">
-              {data.total} Data Teritem
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
+              <select
+                className="text-sm font-bold border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 py-1"
+                value={params.per_page || 10}
+                onChange={(e) => handlePerPageChange(e.target.value)}
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
             </div>
           </div>
 
@@ -413,25 +433,18 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
                       />
                     </div>
                   </th>
+                  <th className="px-6 py-4 text-center">Periode</th>
                   <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('nama_kelompok')}>
                     <div className="flex items-center gap-1">
-                      Nama Kelompok
+                      Identitas Kelompok
                       <SortIcon field="nama_kelompok" />
                     </div>
                   </th>
-                  <th className="px-6 py-4">Komoditas</th>
-                  <th className="px-6 py-4 text-center">Volume</th>
+                  <th className="px-6 py-4">Produksi</th>
                   <th className="px-6 py-4 text-right cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('total_transaction_value')}>
                     <div className="flex items-center justify-end gap-1">
                       Nilai Transaksi
                       <SortIcon field="total_transaction_value" />
-                    </div>
-                  </th>
-                  <th className="px-6 py-4 text-center">Periode</th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('location')}>
-                    <div className="flex items-center gap-1">
-                      Lokasi
-                      <SortIcon field="location" />
                     </div>
                   </th>
                   <th className="px-6 py-4 text-center cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('status')}>
@@ -458,30 +471,29 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
                           />
                         </div>
                       </td>
-                      <td className="px-6 py-4 font-bold text-gray-900">{item.nama_kelompok}</td>
                       <td className="px-6 py-4">
-                        <div className="flex flex-wrap gap-1">
-                          {item.details && item.details.map((d, idx) => (
-                            <span key={idx} className="px-2.5 py-1 bg-gray-100 text-gray-600 border border-gray-200 rounded-lg text-[10px] font-bold uppercase tracking-wider">
-                              {d.commodity?.name || '-'}
-                            </span>
-                          ))}
-                          {(!item.details || item.details.length === 0) && '-'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-center font-bold text-gray-700">
-                        {item.details ? formatNumber(item.details.reduce((acc, curr) => acc + parseFloat(curr.production_volume), 0)) : 0}
-                      </td>
-                      <td className="px-6 py-4 text-right font-mono text-primary-700 font-bold text-base">
-                        {formatRupiah(item.total_transaction_value)}
-                      </td>
-                      <td className="px-6 py-4 text-center">
                         <div className="font-bold text-gray-900">{new Date(0, item.month - 1).toLocaleString('id-ID', { month: 'long' })}</div>
                         <div className="text-xs text-gray-400 font-semibold">{item.year}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-medium text-gray-800">{item.regency?.name}</div>
-                        <div className="text-xs text-primary-600 font-bold uppercase tracking-tighter">{item.district?.name}</div>
+                        <div className="font-bold text-gray-900">{item.nama_kelompok}</div>
+                        <div className="text-xs text-emerald-600 font-bold uppercase tracking-tighter">
+                          {item.regency?.name}, {item.district?.name}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1">
+                          {item.details && item.details.map((d, idx) => (
+                            <div key={idx} className="flex items-center justify-between text-xs border-b border-gray-50 pb-1 last:border-0 last:pb-0 gap-2">
+                              <span className="font-bold text-gray-600">{d.commodity?.name}</span>
+                              <span className="text-gray-400 font-mono whitespace-nowrap">{formatNumber(d.production_volume)} <span className="text-[10px]">{d.satuan || 'Kg'}</span></span>
+                            </div>
+                          ))}
+                          {(!item.details || item.details.length === 0) && '-'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right font-mono text-primary-700 font-bold text-base">
+                        {formatRupiah(item.total_transaction_value)}
                       </td>
                       <td className="px-6 py-4 text-center">
                         <StatusBadge status={item.status} />

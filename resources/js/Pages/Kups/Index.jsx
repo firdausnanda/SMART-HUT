@@ -55,7 +55,7 @@ export default function Index({ auth, kups, stats, filters }) {
     }
     setParams({ ...params, sort: field, direction });
 
-    router.get(route('kups.index'), { ...params, sort: field, direction }, {
+    router.get(route('kups.index'), { ...params, sort: field, direction, per_page: params.per_page }, {
       preserveState: true,
       preserveScroll: true
     });
@@ -75,6 +75,21 @@ export default function Index({ auth, kups, stats, filters }) {
     } else {
       setSelectedIds([...selectedIds, id]);
     }
+  };
+
+  const handlePerPageChange = (perPage) => {
+    setLoadingText('Memuat Ulang...');
+    setIsLoading(true);
+    setParams({ ...params, per_page: perPage });
+    router.get(
+      route('kups.index'),
+      { ...params, per_page: perPage },
+      {
+        preserveState: true,
+        preserveScroll: true,
+        onFinish: () => setIsLoading(false)
+      }
+    );
   };
 
   const handleBulkAction = (action) => {
@@ -151,7 +166,7 @@ export default function Index({ auth, kups, stats, filters }) {
       setIsSearching(true);
       router.get(
         route('kups.index'),
-        { ...params, search: query },
+        { ...params, search: query, per_page: params.per_page },
         {
           preserveState: true,
           preserveScroll: true,
@@ -438,8 +453,18 @@ export default function Index({ auth, kups, stats, filters }) {
                   )}
                 </div>
               </div>
-              <div className="text-sm text-gray-400 font-bold bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
-                {kups.total} Data Ditampilkan
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
+                <select
+                  className="text-sm font-bold border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 py-1"
+                  value={params.per_page || 10}
+                  onChange={(e) => handlePerPageChange(e.target.value)}
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
               </div>
             </div>
 

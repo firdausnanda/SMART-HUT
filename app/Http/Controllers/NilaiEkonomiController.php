@@ -72,7 +72,7 @@ class NilaiEkonomiController extends Controller
             'count' => $query->clone()->count(),
         ];
 
-        $data = $query->paginate(10)->withQueryString();
+        $data = $query->paginate($request->query('per_page', 10))->withQueryString();
 
         $dbYears = NilaiEkonomi::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
         $fixedYears = range(2025, 2021);
@@ -86,6 +86,7 @@ class NilaiEkonomiController extends Controller
                 'search' => $request->search,
                 'sort' => $request->sort,
                 'direction' => $request->direction,
+                'per_page' => (int) $request->query('per_page', 10),
             ],
             'stats' => $stats,
             'availableYears' => $availableYears,
