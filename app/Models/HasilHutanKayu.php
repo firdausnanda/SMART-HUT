@@ -18,7 +18,7 @@ class HasilHutanKayu extends Model
         "month",
         "province_id",
         "regency_id",
-        "district_id",
+        "pengelola_hutan_id",
         "forest_type",
         // "annual_volume_target",
         // "annual_volume_realization",
@@ -44,9 +44,9 @@ class HasilHutanKayu extends Model
         return $this->belongsTo(Regencies::class, 'regency_id');
     }
 
-    public function district()
+    public function pengelolaHutan()
     {
-        return $this->belongsTo(Districts::class, 'district_id');
+        return $this->belongsTo(PengelolaHutan::class, 'pengelola_hutan_id');
     }
 
     public function details()

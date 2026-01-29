@@ -29,7 +29,7 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
       'tahun' => 'required|numeric',
       'bulan_angka' => 'required|numeric|min:1|max:12',
       'nama_kabupaten' => 'required|exists:m_regencies,name',
-      'nama_kecamatan' => 'required|exists:m_districts,name',
+      // 'nama_pengelola_hutan' => 'nullable|string', 
     ];
   }
 
@@ -56,18 +56,14 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     if (!$regency)
       return null;
 
-    $district = DB::table('m_districts')
-      ->where('regency_id', $regency->id)
-      ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
-      ->first();
-
-    if (!$district) {
-      $district = DB::table('m_districts')
-        ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
-        ->first();
+    // Resolve Pengelola Hutan (Optional/Nullable in DB but good to have)
+    $pengelolaHutanId = null;
+    if (!empty($row['nama_pengelola_hutan'])) {
+      $pengelola = \App\Models\PengelolaHutan::firstOrCreate(
+        ['name' => $row['nama_pengelola_hutan']]
+      );
+      $pengelolaHutanId = $pengelola->id;
     }
-    if (!$district)
-      return null;
 
     // Build Details array from dynamic columns
     $detailsData = [];
@@ -104,13 +100,13 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
       return null;
     }
 
-    return DB::transaction(function () use ($row, $district, $regency, $detailsData) {
+    return DB::transaction(function () use ($row, $regency, $pengelolaHutanId, $detailsData) {
       $parent = HasilHutanKayu::create([
         'year' => $row['tahun'],
         'month' => $row['bulan_angka'],
         'province_id' => 35,
         'regency_id' => $regency->id,
-        'district_id' => $district->id,
+        'pengelola_hutan_id' => $pengelolaHutanId,
         'forest_type' => $this->forestType,
         'status' => 'draft',
         'created_by' => Auth::id(),

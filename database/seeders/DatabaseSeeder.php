@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             BukanKayuSeeder::class,
             JenisProduksiSeeder::class,
             SkemaPerhutananSosialSeeder::class,
+            PengelolaHutanSeeder::class,
             RehabLahanSeeder::class,
             PenghijauanLingkunganSeeder::class,
             RehabManggroveSeeder::class,

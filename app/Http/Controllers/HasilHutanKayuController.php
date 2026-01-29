@@ -33,11 +33,11 @@ class HasilHutanKayuController extends Controller
 
     $datas = HasilHutanKayu::query()
       ->leftJoin('m_regencies', 'hasil_hutan_kayu.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_districts', 'hasil_hutan_kayu.district_id', '=', 'm_districts.id')
+      ->leftJoin('m_pengelola_hutan', 'hasil_hutan_kayu.pengelola_hutan_id', '=', 'm_pengelola_hutan.id')
       ->select(
         'hasil_hutan_kayu.*',
         'm_regencies.name as regency_name',
-        'm_districts.name as district_name'
+        'm_pengelola_hutan.name as pengelola_hutan_name'
       )
       ->where('forest_type', $forestType)
       ->when($selectedYear, function ($query, $year) {
@@ -49,14 +49,15 @@ class HasilHutanKayuController extends Controller
             $q2->where('name', 'like', "%{$search}%");
           })
             ->orWhere('m_regencies.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%");
+            ->orWhere('m_pengelola_hutan.name', 'like', "%{$search}%");
         });
       })
-      ->with(['creator', 'regency', 'district', 'details.kayu'])
+      ->with(['creator', 'regency', 'pengelolaHutan', 'details.kayu'])
       ->when($sortField, function ($query) use ($sortField, $sortDirection) {
         $sortMap = [
           'month' => 'hasil_hutan_kayu.month',
-          'location' => 'm_districts.name',
+          'location' => 'm_regencies.name', // Simplified to regency since district removed
+          'pengelola' => 'm_pengelola_hutan.name',
           'target' => 'hasil_hutan_kayu_details.volume_target',
           'realization' => 'hasil_hutan_kayu_details.volume_realization',
           'status' => 'hasil_hutan_kayu.status',
@@ -120,7 +121,8 @@ class HasilHutanKayuController extends Controller
       'forest_type' => $forestType,
       'kayu_list' => Kayu::all(),
       'provinces' => DB::table('m_provinces')->where('id', '35')->get(), // Default Jawa Timur
-      'regencies' => DB::table('m_regencies')->where('province_id', '35')->get()
+      'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
+      'pengelola_hutan_list' => \App\Models\PengelolaHutan::all(),
     ]);
   }
 
@@ -131,7 +133,7 @@ class HasilHutanKayuController extends Controller
       'month' => 'required|integer|min:1|max:12',
       'province_id' => 'required|exists:m_provinces,id',
       'regency_id' => 'required|exists:m_regencies,id',
-      'district_id' => 'required|exists:m_districts,id',
+      'pengelola_hutan_id' => 'nullable|exists:m_pengelola_hutan,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
       'details' => 'required|array|min:1',
       'details.*.kayu_id' => 'required|exists:m_kayu,id',
@@ -145,7 +147,7 @@ class HasilHutanKayuController extends Controller
         'month' => $validated['month'],
         'province_id' => $validated['province_id'],
         'regency_id' => $validated['regency_id'],
-        'district_id' => $validated['district_id'],
+        'pengelola_hutan_id' => $validated['pengelola_hutan_id'] ?? null,
         'forest_type' => $validated['forest_type'],
         'status' => 'draft'
       ]);
@@ -166,11 +168,11 @@ class HasilHutanKayuController extends Controller
   public function edit(HasilHutanKayu $hasilHutanKayu)
   {
     return Inertia::render('HasilHutanKayu/Edit', [
-      'data' => $hasilHutanKayu->load(['details.kayu', 'regency', 'district']),
+      'data' => $hasilHutanKayu->load(['details.kayu', 'regency', 'pengelolaHutan']),
       'kayu_list' => Kayu::all(),
       'provinces' => DB::table('m_provinces')->where('id', '35')->get(),
       'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
-      'districts' => DB::table('m_districts')->where('regency_id', $hasilHutanKayu->regency_id)->get(),
+      'pengelola_hutan_list' => \App\Models\PengelolaHutan::all(),
     ]);
   }
 
@@ -181,7 +183,7 @@ class HasilHutanKayuController extends Controller
       'month' => 'required|integer|min:1|max:12',
       'province_id' => 'required|exists:m_provinces,id',
       'regency_id' => 'required|exists:m_regencies,id',
-      'district_id' => 'required|exists:m_districts,id',
+      'pengelola_hutan_id' => 'nullable|exists:m_pengelola_hutan,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
       'details' => 'required|array|min:1',
       'details.*.kayu_id' => 'required|exists:m_kayu,id',
@@ -195,7 +197,7 @@ class HasilHutanKayuController extends Controller
         'month' => $validated['month'],
         'province_id' => $validated['province_id'],
         'regency_id' => $validated['regency_id'],
-        'district_id' => $validated['district_id'],
+        'pengelola_hutan_id' => $validated['pengelola_hutan_id'] ?? null,
         'forest_type' => $validated['forest_type'],
       ]);
 

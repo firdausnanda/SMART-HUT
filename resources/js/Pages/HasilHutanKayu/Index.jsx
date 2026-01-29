@@ -543,7 +543,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                 <TextInput
                   type="text"
                   className="w-full text-sm pr-10"
-                  placeholder="Cari Kayu/Lokasi..."
+                  placeholder="Cari Kayu/Pengelola..."
                   value={searchTerm}
                   onChange={onSearchChange}
                 />
@@ -585,11 +585,11 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                   <th className="px-6 py-4">Input Oleh</th>
                   <th
                     className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group"
-                    onClick={() => handleSort('location')}
+                    onClick={() => handleSort('pengelola')}
                   >
                     <div className="flex items-center gap-1">
-                      Lokasi (Kec/Desa)
-                      <SortIcon field="location" />
+                      Lokasi (Pengelola)
+                      <SortIcon field="pengelola" />
                     </div>
                   </th>
                   <th
@@ -657,7 +657,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-medium text-gray-800">{item.district_name || 'N/A'}</div>
+                      <div className="font-medium text-gray-800">{item.pengelola_hutan_name || '-'}</div>
                       <div className="text-xs text-gray-500">{item.regency_name || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4">

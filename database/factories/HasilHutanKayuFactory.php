@@ -19,18 +19,24 @@ class HasilHutanKayuFactory extends Factory
    */
   public function definition(): array
   {
-    $village = Villages::whereHas('district.regency', function ($q) {
-      $q->where('province_id', 35)->whereIn('name', [
-        'KABUPATEN TRENGGALEK',
-        'KABUPATEN TULUNGAGUNG',
-        'KABUPATEN KEDIRI',
-        'KOTA KEDIRI'
-      ]);
-    })->inRandomOrder()->first();
+    // Simplified location logic since district is removed
+    $regency_name = fake()->randomElement([
+      'KABUPATEN TRENGGALEK',
+      'KABUPATEN TULUNGAGUNG',
+      'KABUPATEN KEDIRI',
+      'KOTA KEDIRI'
+    ]);
 
-    $district = $village->district;
-    $regency = $district->regency;
-    $kayu = Kayu::inRandomOrder()->first();
+    $regency = \App\Models\Regencies::where('name', $regency_name)
+      ->where('province_id', 35)
+      ->first();
+
+    // Fallback if not found (should generally exist if seeded)
+    if (!$regency) {
+      $regency = \App\Models\Regencies::where('province_id', 35)->inRandomOrder()->first();
+    }
+
+    $pengelola = \App\Models\PengelolaHutan::firstOrCreate(['name' => fake()->company() . ' Forest Manager']);
     $user = User::inRandomOrder()->first();
 
     return [
@@ -38,7 +44,7 @@ class HasilHutanKayuFactory extends Factory
       'month' => fake()->month(),
       'province_id' => 35,
       'regency_id' => $regency->id,
-      'district_id' => $district->id,
+      'pengelola_hutan_id' => $pengelola->id,
       'forest_type' => fake()->randomElement(['Hutan Rakyat', 'Hutan Negara']),
       'status' => 'final',
       'approved_by_kasi_at' => now(),
