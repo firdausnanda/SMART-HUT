@@ -14,6 +14,7 @@ export default function Create({ auth, kayu_list, forest_type, pengelola_hutan_l
     month: new Date().getMonth() + 1,
     province_id: 35, // JAWA TIMUR
     regency_id: '',
+    district_id: '',
     pengelola_hutan_id: '',
     forest_type: forest_type || 'Hutan Negara',
     annual_volume_target: '',
@@ -22,10 +23,11 @@ export default function Create({ auth, kayu_list, forest_type, pengelola_hutan_l
   });
 
   const [regencies, setRegencies] = useState([]);
-  const [pengelolaHutanList, setPengelolaHutanList] = useState([]); // Or load via async select if large list
+  const [districts, setDistricts] = useState([]);
+  const [pengelolaHutanList, setPengelolaHutanList] = useState([]);
 
   const [loadingRegencies, setLoadingRegencies] = useState(false);
-  // const [loadingDistricts, setLoadingDistricts] = useState(false); // No longer needed
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
 
   const formatLabel = (name) => {
     if (!name) return '';
@@ -51,21 +53,22 @@ export default function Create({ auth, kayu_list, forest_type, pengelola_hutan_l
   }, []);
 
   // Load Districts when Regency changes
-  // Load Pengelola Hutan (Simulated or fetched)
-  // For now, let's assume we fetch all or search. 
-  // Since we replaced district with pengelola_hutan, we might need an API endpoint or pass as prop if small.
-  // The controller index didn't pass it, but create method usually passes lists.
-  // I will assume we can fetch it or use AsyncSelect.
-  // Let's us AsyncSelect strategy or simple fetch.
-  // Attempt to fetch from an API endpoint if exists, OR since user didn't specify an API for M_Pengelola, 
-  // I'll assume we might need to add it to props or fetch it.
-  // Checking controller: I added 'pengelola_hutan_list' => \App\Models\PengelolaHutan::all() to EDIT but NOT CREATE properly in my mental model? 
-  // Wait, I didn't verify if I added it to Create prop in controller properly.
-  // Let's check logic: Controller `create` method wasn't updated to pass `pengelola_hutan_list`.
-  // I should update Controller CREATE method too. But I can't go back easily.
-  // I will use AsyncSelect with a new endpoint OR just fetch it here via axios if I can.
-  // Actually, I can use `router` or `usePage` but resources are better.
-  // Let's just fetch it in useEffect for now.
+  useEffect(() => {
+    if (data.regency_id && forest_type !== 'Hutan Negara') {
+      setLoadingDistricts(true);
+      axios.get(route('locations.districts', data.regency_id))
+        .then(res => {
+          setDistricts(res.data.map(item => ({
+            value: item.id,
+            label: formatLabel(item.name)
+          })));
+          setLoadingDistricts(false);
+        })
+        .catch(() => setLoadingDistricts(false));
+    } else {
+      setDistricts([]);
+    }
+  }, [data.regency_id, forest_type]);
 
   const [pengelolaOptions, setPengelolaOptions] = useState([]);
   const [loadingPengelola, setLoadingPengelola] = useState(false);
@@ -271,7 +274,7 @@ export default function Create({ auth, kayu_list, forest_type, pengelola_hutan_l
                       setData((prev) => ({
                         ...prev,
                         regency_id: opt?.value || '',
-                        // district_id: '', // Removed
+                        district_id: '', // Reset district
                       }));
                     }}
                     placeholder="Pilih Kabupaten..."
@@ -281,23 +284,47 @@ export default function Create({ auth, kayu_list, forest_type, pengelola_hutan_l
                   <InputError message={errors.regency_id} className="mt-2" />
                 </div>
 
-                <div>
-                  <InputLabel value="Pengelola Hutan" className="text-gray-700 font-bold mb-2" />
-                  <Select
-                    options={pengelola_hutan_list.map(p => ({ value: p.id, label: p.name }))}
-                    onChange={(opt) => {
-                      setData((prev) => ({
-                        ...prev,
-                        pengelola_hutan_id: opt?.value || '',
-                      }));
-                    }}
-                    placeholder="Pilih Pengelola Hutan..."
-                    styles={selectStyles}
-                    isClearable={true}
-                    value={pengelola_hutan_list.map(p => ({ value: p.id, label: p.name })).find(p => p.value === data.pengelola_hutan_id) || null}
-                  />
-                  <InputError message={errors.pengelola_hutan_id} className="mt-2" />
-                </div>
+                {forest_type !== 'Hutan Negara' && (
+                  <div>
+                    <InputLabel value="Kecamatan" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={districts}
+                      isLoading={loadingDistricts}
+                      isDisabled={!data.regency_id}
+                      onChange={(opt) => {
+                        setData((prev) => ({
+                          ...prev,
+                          district_id: opt?.value || '',
+                        }));
+                      }}
+                      placeholder="Pilih Kecamatan..."
+                      styles={selectStyles}
+                      isClearable
+                      value={districts.find(d => d.value === data.district_id) || null}
+                    />
+                    <InputError message={errors.district_id} className="mt-2" />
+                  </div>
+                )}
+
+                {forest_type === 'Hutan Negara' && (
+                  <div>
+                    <InputLabel value="Pengelola Hutan" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={pengelola_hutan_list.map(p => ({ value: p.id, label: p.name }))}
+                      onChange={(opt) => {
+                        setData((prev) => ({
+                          ...prev,
+                          pengelola_hutan_id: opt?.value || '',
+                        }));
+                      }}
+                      placeholder="Pilih Pengelola Hutan..."
+                      styles={selectStyles}
+                      isClearable={true}
+                      value={pengelola_hutan_list.map(p => ({ value: p.id, label: p.name })).find(p => p.value === data.pengelola_hutan_id) || null}
+                    />
+                    <InputError message={errors.pengelola_hutan_id} className="mt-2" />
+                  </div>
+                )}
 
                 <div className="md:col-span-2 space-y-4">
                   <div className="flex items-center justify-between">

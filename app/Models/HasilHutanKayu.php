@@ -15,33 +15,36 @@ class HasilHutanKayu extends Model
 
     protected $fillable = [
         "year",
-        "month",
-        "province_id",
-        "regency_id",
-        "pengelola_hutan_id",
-        "forest_type",
-        // "annual_volume_target",
-        // "annual_volume_realization",
-        // "id_kayu",
-        "status",
-        "approved_by_kasi_at",
-        "approved_by_cdk_at",
-        "rejection_note",
+        'year',
+        'month',
+        'province_id',
+        'regency_id',
+        'district_id',
+        'pengelola_hutan_id',
+        'forest_type',
+        'status',
+        'rejected_note',
+        'approved_by_kasi_at',
+        'approved_by_cdk_at',
         'created_by',
         'updated_by',
-        'deleted_by',
     ];
 
     protected $table = 'hasil_hutan_kayu';
 
     public function province()
     {
-        return $this->belongsTo(Provinces::class, 'province_id');
+        return $this->belongsTo(\App\Models\Provinces::class, 'province_id');
     }
 
     public function regency()
     {
-        return $this->belongsTo(Regencies::class, 'regency_id');
+        return $this->belongsTo(\App\Models\Regencies::class, 'regency_id');
+    }
+
+    public function district()
+    {
+        return $this->belongsTo(\App\Models\Districts::class, 'district_id');
     }
 
     public function pengelolaHutan()

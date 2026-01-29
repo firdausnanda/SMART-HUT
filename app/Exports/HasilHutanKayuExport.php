@@ -31,13 +31,15 @@ class HasilHutanKayuExport implements FromQuery, WithHeadings, WithMapping, Shou
 
   public function headings(): array
   {
+    $locationLabel = $this->forestType === 'Hutan Negara' ? 'Pengelola Hutan' : 'Kecamatan';
+
     return [
       'ID',
       'Tahun',
       'Bulan',
       'Provinsi',
       'Kabupaten',
-      'Pengelola Hutan',
+      $locationLabel,
       'Detail Kayu (Jenis)',
       'Total Target (m3)',
       'Total Realisasi (m3)',
@@ -53,13 +55,17 @@ class HasilHutanKayuExport implements FromQuery, WithHeadings, WithMapping, Shou
       return ($detail->kayu->name ?? '-') . ' (T:' . floatval($detail->volume_target) . ', R:' . floatval($detail->volume_realization) . ')';
     })->implode(', ');
 
+    $locationName = $this->forestType === 'Hutan Negara'
+      ? ($row->pengelolaHutan->name ?? '-')
+      : ($row->district->name ?? '-');
+
     return [
       $row->id,
       $row->year,
       date('F', mktime(0, 0, 0, $row->month, 10)), // Month name
       'JAWA TIMUR',
       $row->regency->name ?? '-',
-      $row->pengelolaHutan->name ?? '-',
+      $locationName,
       $detailsString,
       $row->details->sum('volume_target'),
       $row->details->sum('volume_realization'),

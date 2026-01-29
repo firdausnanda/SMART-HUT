@@ -29,6 +29,7 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
       'Bulan (Angka)',
       'Nama Kabupaten',
       'Nama Kecamatan',
+      'Nama Pengelola Hutan',
     ];
 
     foreach ($this->kayus as $kayu) {
@@ -78,9 +79,10 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
 
         // Add comments
         $sheet->getComment('C1')->getText()->createTextRun('Isi dengan Nama Kabupaten/Kota (KABUPATEN TRENGGALEK,KABUPATEN TULUNGAGUNG,KABUPATEN KEDIRI,KOTA KEDIRI)');
-        $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan (e.g. KECAMATAN TRENGGALEK)');
+        $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan (Wajib untuk Hutan Rakyat/Sosial)');
+        $sheet->getComment('E1')->getText()->createTextRun('Isi dengan Nama Pengelola Hutan (Wajib untuk Hutan Negara)');
 
-        $colIndex = 4; // Start at Column E (0-indexed: A=0, B=1, C=2, D=3, E=4)
+        $colIndex = 5; // Start at Column F (0-indexed: F=5)
         foreach ($this->kayus as $kayu) {
           // Target Column
           $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);

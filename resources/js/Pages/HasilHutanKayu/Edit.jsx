@@ -14,6 +14,7 @@ export default function Edit({ auth, data: item, kayu_list, pengelola_hutan_list
     month: item.month || new Date().getMonth() + 1,
     province_id: item.province_id || 35,
     regency_id: item.regency_id || '',
+    district_id: item.district_id || '',
     pengelola_hutan_id: item.pengelola_hutan_id || '',
     forest_type: item.forest_type || 'Hutan Negara',
     details: (item.details && item.details.length > 0)
@@ -26,8 +27,10 @@ export default function Edit({ auth, data: item, kayu_list, pengelola_hutan_list
   });
 
   const [regencies, setRegencies] = useState([]);
+  const [districts, setDistricts] = useState([]);
 
   const [loadingRegencies, setLoadingRegencies] = useState(false);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
 
   const formatLabel = (name) => {
     if (!name) return '';
@@ -53,7 +56,23 @@ export default function Edit({ auth, data: item, kayu_list, pengelola_hutan_list
   }, []);
 
   // Load Districts when Regency changes
-  // Removed District loading effect
+  // Load Districts when Regency changes
+  useEffect(() => {
+    if (data.regency_id && data.forest_type !== 'Hutan Negara') {
+      setLoadingDistricts(true);
+      axios.get(route('locations.districts', data.regency_id))
+        .then(res => {
+          setDistricts(res.data.map(i => ({
+            value: i.id,
+            label: formatLabel(i.name)
+          })));
+          setLoadingDistricts(false);
+        })
+        .catch(() => setLoadingDistricts(false));
+    } else {
+      setDistricts([]);
+    }
+  }, [data.regency_id, data.forest_type]);
 
   const addDetail = () => {
     setData('details', [...data.details, { kayu_id: '', volume_target: '', volume_realization: '' }]);
@@ -242,7 +261,7 @@ export default function Edit({ auth, data: item, kayu_list, pengelola_hutan_list
                       setData((prev) => ({
                         ...prev,
                         regency_id: opt?.value || '',
-                        // district_id: '',
+                        district_id: '',
                       }));
                     }}
                     placeholder="Pilih Kabupaten..."
@@ -252,23 +271,47 @@ export default function Edit({ auth, data: item, kayu_list, pengelola_hutan_list
                   <InputError message={errors.regency_id} className="mt-2" />
                 </div>
 
-                <div>
-                  <InputLabel value="Pengelola Hutan" className="text-gray-700 font-bold mb-2" />
-                  <Select
-                    options={pengelola_hutan_list.map(p => ({ value: p.id, label: p.name }))}
-                    value={pengelola_hutan_list.map(p => ({ value: p.id, label: p.name })).find(p => p.value === data.pengelola_hutan_id) || (item.pengelolaHutan ? { value: item.pengelola_hutan_id, label: item.pengelolaHutan.name } : null)}
-                    onChange={(opt) => {
-                      setData((prev) => ({
-                        ...prev,
-                        pengelola_hutan_id: opt?.value || '',
-                      }));
-                    }}
-                    placeholder="Pilih Pengelola Hutan..."
-                    styles={selectStyles}
-                    isClearable
-                  />
-                  <InputError message={errors.pengelola_hutan_id} className="mt-2" />
-                </div>
+                {data.forest_type !== 'Hutan Negara' && (
+                  <div>
+                    <InputLabel value="Kecamatan" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={districts}
+                      isLoading={loadingDistricts}
+                      isDisabled={!data.regency_id}
+                      value={districts.find(d => d.value == data.district_id) || (item.district ? { value: item.district_id, label: formatLabel(item.district.name) } : null)}
+                      onChange={(opt) => {
+                        setData((prev) => ({
+                          ...prev,
+                          district_id: opt?.value || '',
+                        }));
+                      }}
+                      placeholder="Pilih Kecamatan..."
+                      styles={selectStyles}
+                      isClearable
+                    />
+                    <InputError message={errors.district_id} className="mt-2" />
+                  </div>
+                )}
+
+                {data.forest_type === 'Hutan Negara' && (
+                  <div>
+                    <InputLabel value="Pengelola Hutan" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={pengelola_hutan_list.map(p => ({ value: p.id, label: p.name }))}
+                      value={pengelola_hutan_list.map(p => ({ value: p.id, label: p.name })).find(p => p.value === data.pengelola_hutan_id) || (item.pengelolaHutan ? { value: item.pengelola_hutan_id, label: item.pengelolaHutan.name } : null)}
+                      onChange={(opt) => {
+                        setData((prev) => ({
+                          ...prev,
+                          pengelola_hutan_id: opt?.value || '',
+                        }));
+                      }}
+                      placeholder="Pilih Pengelola Hutan..."
+                      styles={selectStyles}
+                      isClearable
+                    />
+                    <InputError message={errors.pengelola_hutan_id} className="mt-2" />
+                  </div>
+                )}
 
                 <div className="md:col-span-2 space-y-4">
                   <div className="flex items-center justify-between">

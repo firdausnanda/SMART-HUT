@@ -25,12 +25,20 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
 
   public function rules(): array
   {
-    return [
+    $rules = [
       'tahun' => 'required|numeric',
       'bulan_angka' => 'required|numeric|min:1|max:12',
       'nama_kabupaten' => 'required|exists:m_regencies,name',
-      // 'nama_pengelola_hutan' => 'nullable|string', 
     ];
+
+    if ($this->forestType !== 'Hutan Negara') {
+      $rules['nama_kecamatan'] = 'required|exists:m_districts,name';
+    }
+    // For Hutan Negara, pengelola is optional in import usually because name might not match or be new, 
+    // but better if we require it or allow creation. Current logic allows creation. 
+    // Let's keep it implicitly optional in rules but checked in model if provided.
+
+    return $rules;
   }
 
   public function customValidationMessages()
@@ -38,6 +46,7 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     return [
       'nama_kabupaten.exists' => 'Kabupaten tidak ditemukan.',
       'nama_kecamatan.exists' => 'Kecamatan tidak ditemukan.',
+      'nama_kecamatan.required' => 'Kecamatan wajib diisi untuk jenis hutan ini.',
       'bulan_angka.min' => 'Bulan harus 1-12.',
       'bulan_angka.max' => 'Bulan harus 1-12.',
     ];
@@ -56,9 +65,31 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     if (!$regency)
       return null;
 
+    $district = null;
+    $districtId = null;
+
+    if ($this->forestType !== 'Hutan Negara') {
+      if (empty($row['nama_kecamatan'])) {
+        return null; // Should be caught by validation, but safe check
+      }
+      $district = DB::table('m_districts')
+        ->where('regency_id', $regency->id)
+        ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
+        ->first();
+
+      if (!$district) {
+        $district = DB::table('m_districts')
+          ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
+          ->first();
+      }
+      if (!$district)
+        return null;
+      $districtId = $district->id;
+    }
+
     // Resolve Pengelola Hutan (Optional/Nullable in DB but good to have)
     $pengelolaHutanId = null;
-    if (!empty($row['nama_pengelola_hutan'])) {
+    if ($this->forestType === 'Hutan Negara' && !empty($row['nama_pengelola_hutan'])) {
       $pengelola = \App\Models\PengelolaHutan::firstOrCreate(
         ['name' => $row['nama_pengelola_hutan']]
       );
@@ -100,12 +131,13 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
       return null;
     }
 
-    return DB::transaction(function () use ($row, $regency, $pengelolaHutanId, $detailsData) {
+    return DB::transaction(function () use ($row, $regency, $districtId, $pengelolaHutanId, $detailsData) {
       $parent = HasilHutanKayu::create([
         'year' => $row['tahun'],
         'month' => $row['bulan_angka'],
         'province_id' => 35,
         'regency_id' => $regency->id,
+        'district_id' => $districtId,
         'pengelola_hutan_id' => $pengelolaHutanId,
         'forest_type' => $this->forestType,
         'status' => 'draft',
