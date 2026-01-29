@@ -8,13 +8,14 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
 
-export default function Edit({ auth, data: data_item, commodity_list = [] }) {
+export default function Edit({ auth, data: data_item, commodity_list = [], pengelola_hutan = [] }) {
   const { data, setData, put, processing, errors } = useForm({
     year: data_item.year || new Date().getFullYear(),
     month: data_item.month || new Date().getMonth() + 1,
     province_id: 35,
     regency_id: data_item.regency_id || '',
     district_id: data_item.district_id || '',
+    pengelola_hutan_id: data_item.pengelola_hutan_id || '',
     forest_type: data_item.forest_type || 'Hutan Negara',
     volume_target: data_item.volume_target || '',
     details: data_item.details?.map(d => ({
@@ -281,25 +282,42 @@ export default function Edit({ auth, data: data_item, commodity_list = [] }) {
                   <InputError message={errors.regency_id} className="mt-2" />
                 </div>
 
-                <div>
-                  <InputLabel value="Kecamatan" className="text-gray-700 font-bold mb-2" />
-                  <Select
-                    options={districts}
-                    isLoading={loadingDistricts}
-                    isDisabled={!data.regency_id}
-                    value={districts.find(d => d.value === data.district_id) || (data_item.district && data_item.district_id === data.district_id ? { value: data_item.district_id, label: formatLabel(data_item.district.name) } : null)}
-                    onChange={(opt) => {
-                      setData((prev) => ({
-                        ...prev,
-                        district_id: opt?.value || '',
-                      }));
-                    }}
-                    placeholder="Pilih Kecamatan..."
-                    styles={selectStyles}
-                    isClearable
-                  />
-                  <InputError message={errors.district_id} className="mt-2" />
-                </div>
+                {data.forest_type !== 'Hutan Negara' && (
+                  <div>
+                    <InputLabel value="Kecamatan" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={districts}
+                      isLoading={loadingDistricts}
+                      isDisabled={!data.regency_id}
+                      value={districts.find(d => d.value === data.district_id) || (data_item.district && data_item.district_id === data.district_id ? { value: data_item.district_id, label: formatLabel(data_item.district.name) } : null)}
+                      onChange={(opt) => {
+                        setData((prev) => ({
+                          ...prev,
+                          district_id: opt?.value || '',
+                        }));
+                      }}
+                      placeholder="Pilih Kecamatan..."
+                      styles={selectStyles}
+                      isClearable
+                    />
+                    <InputError message={errors.district_id} className="mt-2" />
+                  </div>
+                )}
+
+                {data.forest_type === 'Hutan Negara' && (
+                  <div>
+                    <InputLabel value="Pengelola Hutan" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={pengelola_hutan.map(p => ({ value: p.id, label: p.name }))}
+                      value={pengelola_hutan.find(p => p.id === data.pengelola_hutan_id) ? { value: data.pengelola_hutan_id, label: pengelola_hutan.find(p => p.id === data.pengelola_hutan_id).name } : null}
+                      onChange={(opt) => setData('pengelola_hutan_id', opt?.value || '')}
+                      placeholder="Pilih Pengelola Hutan..."
+                      styles={selectStyles}
+                      isClearable
+                    />
+                    <InputError message={errors.pengelola_hutan_id} className="mt-2" />
+                  </div>
+                )}
 
                 <div className="md:col-span-2 mt-4">
                   <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4 border-b border-emerald-100 pb-2">Target Produksi</h4>

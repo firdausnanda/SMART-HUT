@@ -17,7 +17,7 @@ export default function Edit({ auth, data: item, jenis_produksi_list }) {
     district_id: item.district_id || '',
     investment_value: item.investment_value || '',
     number_of_workers: item.number_of_workers || '',
-    present_condition: item.present_condition ?? true,
+    present_condition: item.present_condition ? 1 : 0,
     jenis_produksi: (item.jenis_produksi && item.jenis_produksi.length > 0) ? item.jenis_produksi.map(p => ({
       jenis_produksi_id: p.id,
       kapasitas_ijin: p.pivot?.kapasitas_ijin || ''
@@ -391,8 +391,8 @@ export default function Edit({ auth, data: item, jenis_produksi_list }) {
                       <input
                         type="radio"
                         name="present_condition"
-                        checked={data.present_condition === true}
-                        onChange={() => setData('present_condition', true)}
+                        checked={data.present_condition == 1}
+                        onChange={() => setData('present_condition', 1)}
                         className="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500"
                       />
                       <span className="ml-2 text-sm font-medium text-gray-700">Beroperasi</span>
@@ -401,8 +401,8 @@ export default function Edit({ auth, data: item, jenis_produksi_list }) {
                       <input
                         type="radio"
                         name="present_condition"
-                        checked={data.present_condition === false}
-                        onChange={() => setData('present_condition', false)}
+                        checked={data.present_condition == 0}
+                        onChange={() => setData('present_condition', 0)}
                         className="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500"
                       />
                       <span className="ml-2 text-sm font-medium text-gray-700">Tidak Beroperasi</span>

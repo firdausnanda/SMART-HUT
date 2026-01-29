@@ -16,21 +16,33 @@ use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 class HasilHutanBukanKayuTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle, WithStyles, WithEvents
 {
   protected $commodities;
+  protected $forestType;
 
-  public function __construct()
+  public function __construct($forestType = 'Hutan Negara')
   {
     $this->commodities = \App\Models\Commodity::all();
+    $this->forestType = $forestType;
   }
 
   public function headings(): array
   {
-    $headers = [
-      'Tahun',
-      'Bulan (Angka)',
-      'Nama Kabupaten',
-      'Nama Kecamatan',
-      'Total Target',
-    ];
+    if ($this->forestType === 'Hutan Negara') {
+      $headers = [
+        'Tahun',
+        'Bulan (Angka)',
+        'Nama Kabupaten',
+        'Nama Pengelola',
+        'Total Target',
+      ];
+    } else {
+      $headers = [
+        'Tahun',
+        'Bulan (Angka)',
+        'Nama Kabupaten',
+        'Nama Kecamatan',
+        'Total Target',
+      ];
+    }
 
     foreach ($this->commodities as $commodity) {
       $headers[] = $commodity->name . ' - Realisasi';
@@ -42,7 +54,7 @@ class HasilHutanBukanKayuTemplateExport implements WithHeadings, ShouldAutoSize,
 
   public function title(): string
   {
-    return 'Template Import Data';
+    return 'Template Import Data ' . $this->forestType;
   }
 
   public function styles(Worksheet $sheet)
@@ -76,11 +88,16 @@ class HasilHutanBukanKayuTemplateExport implements WithHeadings, ShouldAutoSize,
           $sheet->getCell("B$i")->setDataValidation(clone $validation);
         }
 
-        // Freeze the first row (headers) and first 5 columns (Location info + Total Target)
+        // Freeze Pane based on location info
         $sheet->freezePane('F2');
 
         $sheet->getComment('C1')->getText()->createTextRun('Isi dengan Nama Kabupaten (e.g. KABUPATEN TRENGGALEK)');
-        $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan (e.g. KECAMATAN PANGGUL)');
+
+        if ($this->forestType === 'Hutan Negara') {
+          $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Pengelola (e.g. RPH PANGGUL)');
+        } else {
+          $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan (e.g. KECAMATAN PANGGUL)');
+        }
       },
     ];
   }

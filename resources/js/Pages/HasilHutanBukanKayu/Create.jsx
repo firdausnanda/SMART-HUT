@@ -8,13 +8,14 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
 
-export default function Create({ auth, commodity_list = [], forest_type }) { // Renamed kayu_list to commodity_list with default empty array
+export default function Create({ auth, commodity_list = [], pengelola_hutan = [], forest_type }) { // Added pengelola_hutan prop
   const { data, setData, post, processing, errors } = useForm({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
     province_id: 35, // JAWA TIMUR
     regency_id: '',
     district_id: '',
+    pengelola_hutan_id: '',
     forest_type: forest_type || 'Hutan Negara',
     volume_target: '',
     details: [
@@ -276,25 +277,41 @@ export default function Create({ auth, commodity_list = [], forest_type }) { // 
                   <InputError message={errors.regency_id} className="mt-2" />
                 </div>
 
-                <div>
-                  <InputLabel value="Kecamatan" className="text-gray-700 font-bold mb-2" />
-                  <Select
-                    options={districts}
-                    isLoading={loadingDistricts}
-                    isDisabled={!data.regency_id}
-                    onChange={(opt) => {
-                      setData((prev) => ({
-                        ...prev,
-                        district_id: opt?.value || '',
-                      }));
-                    }}
-                    placeholder="Pilih Kecamatan..."
-                    styles={selectStyles}
-                    isClearable
-                    value={districts.find(d => d.value === data.district_id) || null}
-                  />
-                  <InputError message={errors.district_id} className="mt-2" />
-                </div>
+                {forest_type !== 'Hutan Negara' && (
+                  <div>
+                    <InputLabel value="Kecamatan" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={districts}
+                      isLoading={loadingDistricts}
+                      isDisabled={!data.regency_id}
+                      onChange={(opt) => {
+                        setData((prev) => ({
+                          ...prev,
+                          district_id: opt?.value || '',
+                        }));
+                      }}
+                      placeholder="Pilih Kecamatan..."
+                      styles={selectStyles}
+                      isClearable
+                      value={districts.find(d => d.value === data.district_id) || null}
+                    />
+                    <InputError message={errors.district_id} className="mt-2" />
+                  </div>
+                )}
+
+                {forest_type === 'Hutan Negara' && (
+                  <div>
+                    <InputLabel value="Pengelola Hutan" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={pengelola_hutan.map(p => ({ value: p.id, label: p.name }))}
+                      onChange={(opt) => setData('pengelola_hutan_id', opt?.value || '')}
+                      placeholder="Pilih Pengelola Hutan..."
+                      styles={selectStyles}
+                      isClearable
+                    />
+                    <InputError message={errors.pengelola_hutan_id} className="mt-2" />
+                  </div>
+                )}
 
                 <div className="md:col-span-2 mt-4">
                   <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4 border-b border-emerald-100 pb-2">Target Produksi</h4>

@@ -37,8 +37,10 @@ class HasilHutanBukanKayuController extends Controller
       ->select(
         'hasil_hutan_bukan_kayu.*',
         'm_regencies.name as regency_name',
-        'm_districts.name as district_name'
+        'm_districts.name as district_name',
+        'm_pengelola_hutan.name as pengelola_hutan_name'
       )
+      ->leftJoin('m_pengelola_hutan', 'hasil_hutan_bukan_kayu.pengelola_hutan_id', '=', 'm_pengelola_hutan.id')
       ->where('forest_type', $forestType)
       ->when($selectedYear, function ($query, $year) {
         return $query->where('hasil_hutan_bukan_kayu.year', $year);
@@ -49,10 +51,11 @@ class HasilHutanBukanKayuController extends Controller
             $q2->where('name', 'like', "%{$search}%");
           })
             ->orWhere('m_regencies.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%");
+            ->orWhere('m_districts.name', 'like', "%{$search}%")
+            ->orWhere('m_pengelola_hutan.name', 'like', "%{$search}%");
         });
       })
-      ->with(['creator', 'regency', 'district', 'details.commodity'])
+      ->with(['creator', 'regency', 'district', 'pengelolaHutan', 'details.commodity'])
       ->when($sortField, function ($query) use ($sortField, $sortDirection) {
         $sortMap = [
           'month' => 'hasil_hutan_bukan_kayu.month',
@@ -116,7 +119,8 @@ class HasilHutanBukanKayuController extends Controller
       'forest_type' => $forestType,
       'commodity_list' => \App\Models\Commodity::all(), // Changed from BukanKayu
       'provinces' => DB::table('m_provinces')->where('id', '35')->get(),
-      'regencies' => DB::table('m_regencies')->where('province_id', '35')->get()
+      'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
+      'pengelola_hutan' => \App\Models\PengelolaHutan::all(),
     ]);
   }
 
@@ -127,7 +131,8 @@ class HasilHutanBukanKayuController extends Controller
       'month' => 'required|integer|min:1|max:12',
       'province_id' => 'required|exists:m_provinces,id',
       'regency_id' => 'required|exists:m_regencies,id',
-      'district_id' => 'required|exists:m_districts,id',
+      'district_id' => 'required_unless:forest_type,Hutan Negara|nullable|exists:m_districts,id',
+      'pengelola_hutan_id' => 'nullable|exists:m_pengelola_hutan,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
       'volume_target' => 'required|numeric|min:0',
       'details' => 'required|array|min:1',
@@ -142,7 +147,8 @@ class HasilHutanBukanKayuController extends Controller
         'month' => $validated['month'],
         'province_id' => $validated['province_id'],
         'regency_id' => $validated['regency_id'],
-        'district_id' => $validated['district_id'],
+        'district_id' => $validated['district_id'] ?? null,
+        'pengelola_hutan_id' => $validated['pengelola_hutan_id'] ?? null,
         'forest_type' => $validated['forest_type'],
         'volume_target' => $validated['volume_target'],
         'status' => 'draft'
@@ -169,6 +175,7 @@ class HasilHutanBukanKayuController extends Controller
       'provinces' => DB::table('m_provinces')->where('id', '35')->get(),
       'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
       'districts' => DB::table('m_districts')->where('regency_id', $hasilHutanBukanKayu->regency_id)->get(),
+      'pengelola_hutan' => \App\Models\PengelolaHutan::all(),
     ]);
   }
 
@@ -179,7 +186,8 @@ class HasilHutanBukanKayuController extends Controller
       'month' => 'required|integer|min:1|max:12',
       'province_id' => 'required|exists:m_provinces,id',
       'regency_id' => 'required|exists:m_regencies,id',
-      'district_id' => 'required|exists:m_districts,id',
+      'district_id' => 'required_unless:forest_type,Hutan Negara|nullable|exists:m_districts,id',
+      'pengelola_hutan_id' => 'nullable|exists:m_pengelola_hutan,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
       'volume_target' => 'required|numeric|min:0',
       'details' => 'required|array|min:1',
@@ -194,7 +202,8 @@ class HasilHutanBukanKayuController extends Controller
         'month' => $validated['month'],
         'province_id' => $validated['province_id'],
         'regency_id' => $validated['regency_id'],
-        'district_id' => $validated['district_id'],
+        'district_id' => $validated['district_id'] ?? null,
+        'pengelola_hutan_id' => $validated['pengelola_hutan_id'] ?? null,
         'forest_type' => $validated['forest_type'],
         'volume_target' => $validated['volume_target'],
       ]);
@@ -237,7 +246,7 @@ class HasilHutanBukanKayuController extends Controller
         'status' => 'waiting_cdk',
         'approved_by_kasi_at' => now(),
       ]);
-      return redirect()->back()->with('success', 'Laporan disetujui dan diteruskan ke KaCDK.');
+      return redirect()->back()->with('success', 'Laporan disetujui and diteruskan ke KaCDK.');
     }
 
     if (($user->hasRole('kacdk') || $user->hasRole('admin')) && $hasilHutanBukanKayu->status === 'waiting_cdk') {
@@ -272,9 +281,10 @@ class HasilHutanBukanKayuController extends Controller
     return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\HasilHutanBukanKayuExport($forestType, $year), 'hasil-hutan-bukan-kayu-' . date('Y-m-d') . '.xlsx');
   }
 
-  public function template()
+  public function template(Request $request)
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\HasilHutanBukanKayuTemplateExport, 'template_import_hasil_hutan_bukan_kayu.xlsx');
+    $forestType = $request->query('forest_type', 'Hutan Negara');
+    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\HasilHutanBukanKayuTemplateExport($forestType), 'template_import_hasil_hutan_bukan_kayu.xlsx');
   }
 
   public function import(Request $request)

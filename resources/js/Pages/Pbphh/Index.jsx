@@ -10,6 +10,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 
 const MySwal = withReactContent(Swal);
 import Pagination from '@/Components/Pagination';
+import StatusBadge from '@/Components/StatusBadge';
 
 export default function Index({ auth, datas, stats, filters = {} }) {
   // Use filters prop safely with default empty object
@@ -324,22 +325,6 @@ export default function Index({ auth, datas, stats, filters = {} }) {
     });
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'draft':
-        return <span className="px-3 py-1 text-xs font-bold text-gray-700 bg-gray-100 rounded-full border border-gray-200">Draft</span>;
-      case 'waiting_kasi':
-        return <span className="px-3 py-1 text-xs font-bold text-blue-700 bg-blue-100 rounded-full border border-blue-200">Menunggu Kasi</span>;
-      case 'waiting_cdk':
-        return <span className="px-3 py-1 text-xs font-bold text-orange-700 bg-orange-100 rounded-full border border-orange-200">Menunggu KaCDK</span>;
-      case 'final':
-        return <span className="px-3 py-1 text-xs font-bold text-emerald-700 bg-emerald-100 rounded-full border border-emerald-200">Final</span>;
-      case 'rejected':
-        return <span className="px-3 py-1 text-xs font-bold text-red-700 bg-red-100 rounded-full border border-red-200">Ditolak</span>;
-      default:
-        return <span className="px-3 py-1 text-xs font-bold text-gray-500 bg-gray-100 rounded-full border border-gray-200">{status}</span>;
-    }
-  };
 
   const userCanEdit = (item) => {
     if (isAdmin) return true;
@@ -671,7 +656,7 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          {getStatusBadge(item.status)}
+                          <StatusBadge status={item.status} />
                           {item.status === 'rejected' && item.rejection_note && (
                             <div className="text-xs text-red-500 mt-1 italic max-w-[150px] truncate" title={item.rejection_note}>
                               "{item.rejection_note}"

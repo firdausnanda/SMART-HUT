@@ -54,8 +54,6 @@ export default function Index({ auth, datas, stats, filters = {} }) {
       {
         search: searchTerm,
         sort: field,
-        search: searchTerm,
-        sort: field,
         direction: newDirection,
         per_page: filters.per_page
       },

@@ -610,13 +610,12 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                       <SortIcon field="month" />
                     </div>
                   </th>
-                  <th className="px-6 py-4">Input Oleh</th>
                   <th
                     className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group"
                     onClick={() => handleSort('location')}
                   >
                     <div className="flex items-center gap-1">
-                      Lokasi (Kec/Desa)
+                      Identitas
                       <SortIcon field="location" />
                     </div>
                   </th>
@@ -666,16 +665,29 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                       <div className="text-xs text-gray-400 font-semibold">Tgl. Input: {new Date(item.created_at).toLocaleDateString('id-ID')}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-xs font-bold text-emerald-700">
-                          {item.creator?.name ? item.creator.name.charAt(0).toUpperCase() : '?'}
+                      <div className="flex flex-col items-start text-left">
+                        {forest_type === 'Hutan Negara' ? (
+                          <div className="font-bold text-gray-900 leading-tight mb-0.5">{item.pengelola_hutan_name || '-'}</div>
+                        ) : (
+                          <div className="font-bold text-gray-900 leading-tight mb-0.5">{item.district_name || 'N/A'}</div>
+                        )}
+                        <div className="text-[10px] text-emerald-600 font-black uppercase tracking-widest flex items-center gap-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          {item.regency_name || 'N/A'}
                         </div>
-                        <div className="font-medium text-gray-800 text-sm">{item.creator?.name || 'Unknown'}</div>
+
+                        <div className="flex items-center gap-1.5 mt-2 bg-slate-50 px-2 py-1 rounded-lg w-fit border border-slate-100/50 group-hover:bg-white group-hover:border-emerald-100 transition-colors">
+                          <div className="h-4 w-4 rounded-full bg-emerald-100 flex items-center justify-center text-[7px] font-black text-emerald-700 border border-emerald-200 shrink-0">
+                            {item.creator?.name ? item.creator.name.substring(0, 2).toUpperCase() : '??'}
+                          </div>
+                          <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tight truncate max-w-[100px]" title={item.creator?.name || ''}>
+                            {item.creator?.name || 'Unknown'}
+                          </span>
+                        </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-gray-800">{item.district_name || 'N/A'}</div>
-                      <div className="text-xs text-gray-500">{item.regency_name || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4">
                       {item.details && item.details.length > 0 ? (
@@ -690,17 +702,20 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <div className="flex justify-between items-center text-xs border-b border-emerald-100 pb-1">
-                          <span className="text-gray-400">Total Target:</span>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex justify-between items-center text-xs border-b border-gray-100 pb-1">
+                          <span className="text-gray-400">Target:</span>
                           <span className="font-bold text-gray-900">
                             {parseFloat(item.volume_target || 0).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
                           </span>
                         </div>
-                        <span className="font-bold text-blue-600 text-xs mt-0.5">
-                          R: {formatNumber(item.details ? item.details.reduce((acc, curr) => acc + parseFloat(curr.annual_volume_realization || 0), 0) : 0)}
-                        </span>
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-gray-400">Realisasi:</span>
+                          <span className="font-bold text-emerald-700">
+                            {item.details?.reduce((acc, curr) => acc + parseFloat(curr.annual_volume_realization || 0), 0).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -900,7 +915,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                 </p>
                 <button
                   type="button"
-                  onClick={() => window.location.href = route('hasil-hutan-bukan-kayu.template')}
+                  onClick={() => window.location.href = route('hasil-hutan-bukan-kayu.template', { forest_type })}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

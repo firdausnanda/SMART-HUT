@@ -22,7 +22,7 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
   public function query()
   {
     return HasilHutanBukanKayu::query()
-      ->with(['regency', 'district', 'details.commodity', 'creator'])
+      ->with(['regency', 'district', 'pengelolaHutan', 'details.commodity', 'creator'])
       ->where('forest_type', $this->forestType)
       ->when($this->year, function ($q) {
         return $q->where('year', $this->year);
@@ -38,6 +38,7 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
       'Provinsi',
       'Kabupaten/Kota',
       'Kecamatan',
+      'Pengelola Hutan',
       'Komoditas (Realisasi)', // Combined column
       'Total Target',
       'Total Realisasi',
@@ -64,6 +65,7 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
       'JAWA TIMUR',
       $row->regency->name ?? '-',
       $row->district->name ?? '-',
+      $row->pengelolaHutan->name ?? '-',
       $detailsString ?: '-',
       $totalVolume,
       $totalRealization,

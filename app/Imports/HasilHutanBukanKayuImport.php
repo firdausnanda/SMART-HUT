@@ -27,12 +27,22 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
 
   public function rules(): array
   {
+    if ($this->forestType === 'Hutan Negara') {
+      return [
+        'tahun' => 'required|numeric',
+        'bulan_angka' => 'required|numeric|min:1|max:12',
+        'nama_kabupaten' => 'required|exists:m_regencies,name',
+        'nama_pengelola' => 'required|string',
+        'total_target' => 'required|numeric|min:0',
+      ];
+    }
+
     return [
       'tahun' => 'required|numeric',
       'bulan_angka' => 'required|numeric|min:1|max:12',
       'nama_kabupaten' => 'required|exists:m_regencies,name',
-      'total_target' => 'required|numeric|min:0',
       'nama_kecamatan' => 'required|exists:m_districts,name',
+      'total_target' => 'required|numeric|min:0',
     ];
   }
 
@@ -44,6 +54,7 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       'bulan_angka.min' => 'Bulan harus 1-12.',
       'bulan_angka.max' => 'Bulan harus 1-12.',
       'total_target.required' => 'Total Target wajib diisi.',
+      'nama_pengelola.required' => 'Nama Pengelola wajib diisi untuk Hutan Negara.',
     ];
   }
 
@@ -60,19 +71,35 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
     if (!$regency)
       return null;
 
-    // 2. Lookup District ID
-    $district = DB::table('m_districts')
-      ->where('regency_id', $regency->id) // Strict check
-      ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
-      ->first();
-
-    if (!$district) {
+    // 2. Lookup District ID (only for Rakyat/Sosial)
+    $districtId = null;
+    if ($this->forestType !== 'Hutan Negara' && !empty($row['nama_kecamatan'])) {
       $district = DB::table('m_districts')
+        ->where('regency_id', $regency->id) // Strict check
         ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
         ->first();
+
+      if (!$district) {
+        $district = DB::table('m_districts')
+          ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
+          ->first();
+      }
+      $districtId = $district?->id;
     }
 
-    if (!$district)
+    if ($this->forestType !== 'Hutan Negara' && !$districtId)
+      return null;
+
+    // 2.5 Lookup Pengelola ID (only for Hutan Negara)
+    $pengelolaId = null;
+    if ($this->forestType === 'Hutan Negara' && !empty($row['nama_pengelola'])) {
+      $pengelola = DB::table('m_pengelola_hutan')
+        ->where('name', 'like', '%' . $row['nama_pengelola'] . '%')
+        ->first();
+      $pengelolaId = $pengelola?->id;
+    }
+
+    if ($this->forestType === 'Hutan Negara' && !$pengelolaId)
       return null;
 
     // Create Parent
@@ -81,7 +108,8 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       'month' => $row['bulan_angka'],
       'province_id' => 35, // Default JAWA TIMUR
       'regency_id' => $regency->id,
-      'district_id' => $district->id,
+      'district_id' => $districtId,
+      'pengelola_hutan_id' => $pengelolaId,
       'forest_type' => $this->forestType,
       'volume_target' => $row['total_target'] ?? 0,
       'status' => 'draft',
