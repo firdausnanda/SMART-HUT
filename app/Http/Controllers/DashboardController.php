@@ -544,7 +544,7 @@ class DashboardController extends Controller
                 ->where('hasil_hutan_bukan_kayu.year', $currentYear)
                 ->where('hasil_hutan_bukan_kayu.status', 'final')
                 ->where('hasil_hutan_bukan_kayu.forest_type', $type)
-                ->selectRaw('m_commodities.name as commodity, sum(hasil_hutan_bukan_kayu_details.volume) as total')
+                ->selectRaw('m_commodities.name as commodity, sum(hasil_hutan_bukan_kayu_details.annual_volume_realization) as total')
                 ->groupBy('m_commodities.name')
                 ->orderByDesc('total')
                 ->limit(5)
