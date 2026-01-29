@@ -297,9 +297,10 @@ class HasilHutanKayuController extends Controller
     return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\HasilHutanKayuExport($forestType, $year), 'hasil-hutan-kayu-' . date('Y-m-d') . '.xlsx');
   }
 
-  public function template()
+  public function template(Request $request)
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\HasilHutanKayuTemplateExport, 'template_import_hasil_hutan_kayu.xlsx');
+    $forestType = $request->query('forest_type', 'Hutan Negara');
+    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\HasilHutanKayuTemplateExport($forestType), 'template_import_hasil_hutan_kayu.xlsx');
   }
 
   public function import(Request $request)

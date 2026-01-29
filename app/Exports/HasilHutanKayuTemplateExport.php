@@ -16,20 +16,23 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle, WithStyles, WithEvents
 {
   protected $kayus;
+  protected $forestType;
 
-  public function __construct()
+  public function __construct($forestType = 'Hutan Negara')
   {
     $this->kayus = Kayu::all();
+    $this->forestType = $forestType;
   }
 
   public function headings(): array
   {
+    $locationLabel = $this->forestType === 'Hutan Negara' ? 'Nama Pengelola Hutan' : 'Nama Kecamatan';
+
     $headers = [
       'Tahun',
       'Bulan (Angka)',
       'Nama Kabupaten',
-      'Nama Kecamatan',
-      'Nama Pengelola Hutan',
+      $locationLabel,
     ];
 
     foreach ($this->kayus as $kayu) {
@@ -79,10 +82,14 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
 
         // Add comments
         $sheet->getComment('C1')->getText()->createTextRun('Isi dengan Nama Kabupaten/Kota (KABUPATEN TRENGGALEK,KABUPATEN TULUNGAGUNG,KABUPATEN KEDIRI,KOTA KEDIRI)');
-        $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan (Wajib untuk Hutan Rakyat/Sosial)');
-        $sheet->getComment('E1')->getText()->createTextRun('Isi dengan Nama Pengelola Hutan (Wajib untuk Hutan Negara)');
 
-        $colIndex = 5; // Start at Column F (0-indexed: F=5)
+        if ($this->forestType === 'Hutan Negara') {
+          $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Pengelola Hutan');
+        } else {
+          $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan');
+        }
+
+        $colIndex = 4; // Start at Column E (0-indexed: E=4)
         foreach ($this->kayus as $kayu) {
           // Target Column
           $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
