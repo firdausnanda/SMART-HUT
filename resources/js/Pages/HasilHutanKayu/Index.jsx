@@ -885,7 +885,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                 </p>
                 <button
                   type="button"
-                  onClick={() => window.location.href = route('hasil-hutan-kayu.template')}
+                  onClick={() => window.location.href = route('hasil-hutan-kayu.template', { forest_type })}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
