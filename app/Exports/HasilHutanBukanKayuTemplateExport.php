@@ -34,6 +34,7 @@ class HasilHutanBukanKayuTemplateExport implements WithHeadings, ShouldAutoSize,
     foreach ($this->commodities as $commodity) {
       $headers[] = $commodity->name . ' - Target';
       $headers[] = $commodity->name . ' - Realisasi';
+      $headers[] = $commodity->name . ' - Satuan';
     }
 
     return $headers;

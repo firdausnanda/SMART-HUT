@@ -94,9 +94,11 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       $slug = \Illuminate\Support\Str::slug($commodity->name, '_');
       $targetKey = $slug . '_target';
       $realizationKey = $slug . '_realisasi';
+      $unitKey = $slug . '_satuan';
 
       $targetVolume = $row[$targetKey] ?? 0;
       $realizationVolume = $row[$realizationKey] ?? 0;
+      $unit = $row[$unitKey] ?? 'Kg';
 
       // Only add detail if there is non-zero data
       if ($targetVolume > 0 || $realizationVolume > 0) {
@@ -104,7 +106,7 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
           'commodity_id' => $commodity->id,
           'volume' => $targetVolume,
           'annual_volume_realization' => $realizationVolume,
-          'unit' => 'Kg',
+          'unit' => $unit,
         ]);
       }
     }

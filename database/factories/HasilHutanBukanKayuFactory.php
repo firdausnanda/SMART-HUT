@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\BukanKayu;
+use App\Models\HasilHutanBukanKayu;
 use App\Models\User;
 use App\Models\Villages;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -40,13 +41,26 @@ class HasilHutanBukanKayuFactory extends Factory
       'regency_id' => $regency->id,
       'district_id' => $district->id,
       'forest_type' => fake()->randomElement(['Hutan Rakyat', 'Hutan Negara']),
-      'annual_volume_target' => fake()->randomFloat(2, 50, 5000),
-      'id_bukan_kayu' => $bukanKayu->id ?? 1,
       'status' => 'final',
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
       'created_by' => $user->id,
       'updated_by' => $user->id,
     ];
+  }
+
+  public function configure()
+  {
+    return $this->afterCreating(function (HasilHutanBukanKayu $hhbk) {
+      $commodities = \App\Models\Commodity::inRandomOrder()->limit(rand(1, 3))->get();
+      foreach ($commodities as $commodity) {
+        $hhbk->details()->create([
+          'commodity_id' => $commodity->id,
+          'volume' => fake()->randomFloat(2, 50, 1000),
+          'annual_volume_realization' => fake()->randomFloat(2, 40, 900),
+          'unit' => fake()->randomElement(['Kg', 'Ton', 'Ltr']),
+        ]);
+      }
+    });
   }
 }

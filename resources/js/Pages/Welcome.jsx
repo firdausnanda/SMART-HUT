@@ -1,6 +1,26 @@
 import { Link, Head } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
-export default function Welcome({ auth, laravelVersion, phpVersion }) {
+const CountUp = ({ end, duration }) => {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+        let startTime = null;
+        const step = (timestamp) => {
+            if (!startTime) startTime = timestamp;
+            const progress = Math.min((timestamp - startTime) / duration, 1);
+            setCount(Math.floor(progress * end));
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }, [end, duration]);
+
+    return <span className="text-2xl font-black text-gray-800">{count.toLocaleString('id-ID')}</span>;
+};
+
+export default function Welcome({ auth, laravelVersion, phpVersion, totalData = 0 }) {
     return (
         <>
             <Head title="Sistem Monitoring Analisis Real Time Data Kehutanan" />
@@ -159,17 +179,17 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     </div>
 
                                     {/* Stats Glass Card */}
-                                    <div className="absolute top-12 -left-6 z-30 perspective-1000 hover:z-40">
-                                        <div className="flex items-center gap-4 bg-white/90 backdrop-blur-xl p-4 pr-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 transform transition-all duration-300 hover:scale-105 hover:shadow-emerald-900/20">
-                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+                                    <div className="absolute top-12 -left-6 z-30 perspective-1000 hover:z-40 animate-float">
+                                        <div className="flex items-center gap-4 bg-white/90 backdrop-blur-xl p-4 pr-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 transform transition-all duration-300 hover:scale-105 hover:shadow-emerald-900/20 group">
+                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 group-hover:rotate-12 transition-transform duration-300">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                                                 </svg>
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Data Validasi</p>
+                                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Total Data Terinput</p>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-2xl font-black text-gray-800">100%</span>
+                                                    <CountUp end={totalData} duration={2000} />
                                                     <span className="flex h-2 w-2 relative">
                                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>

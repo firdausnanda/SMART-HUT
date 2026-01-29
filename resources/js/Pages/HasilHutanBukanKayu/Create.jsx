@@ -27,6 +27,16 @@ export default function Create({ auth, commodity_list = [], forest_type }) { // 
   const [loadingRegencies, setLoadingRegencies] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
 
+  const unitOptions = [
+    { value: 'Kg', label: 'Kg' },
+    { value: 'Ton', label: 'Ton' },
+    { value: 'Ltr', label: 'Liter' },
+    { value: 'Batang', label: 'Batang' },
+    { value: 'Ikat', label: 'Ikat' },
+    { value: 'Buah', label: 'Buah' },
+    { value: 'M3', label: 'M3' },
+  ];
+
   const formatLabel = (name) => {
     if (!name) return '';
     return name.toLowerCase()
@@ -314,7 +324,7 @@ export default function Create({ auth, commodity_list = [], forest_type }) { // 
                             </svg>
                           </button>
                         )}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           <div>
                             <InputLabel value={`Komoditas #${index + 1}`} className="text-gray-700 font-bold mb-2 text-xs" />
                             <Select
@@ -322,7 +332,7 @@ export default function Create({ auth, commodity_list = [], forest_type }) { // 
                               onChange={(opt) => updateDetail(index, 'commodity_id', opt?.value || '')}
                               placeholder="Pilih Jenis..."
                               styles={selectStyles}
-                              menuPlacement="auto"
+                              menuPlacement="top"
                               isClearable
                               value={commodity_list?.find(k => k.id === detail.commodity_id) ? { value: detail.commodity_id, label: commodity_list.find(k => k.id === detail.commodity_id).name } : null}
                             />
@@ -330,33 +340,40 @@ export default function Create({ auth, commodity_list = [], forest_type }) { // 
                           </div>
                           <div>
                             <InputLabel value="Target Volume" className="text-gray-700 font-bold mb-2 text-xs" />
-                            <div className="relative">
-                              <TextInput
-                                type="number"
-                                step="any"
-                                className="w-full pr-12"
-                                value={detail.volume}
-                                onChange={(e) => updateDetail(index, 'volume', e.target.value)}
-                                placeholder="0.00"
-                              />
-                              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400 text-xs font-bold">Kg/Ltr</div>
-                            </div>
+                            <TextInput
+                              type="number"
+                              step="any"
+                              className="w-full"
+                              value={detail.volume}
+                              onChange={(e) => updateDetail(index, 'volume', e.target.value)}
+                              placeholder="0.00"
+                            />
                             {errors[`details.${index}.volume`] && <InputError message="Wajib diisi." className="mt-1" />}
                           </div>
                           <div>
                             <InputLabel value="Realisasi Volume" className="text-gray-700 font-bold mb-2 text-xs" />
-                            <div className="relative">
-                              <TextInput
-                                type="number"
-                                step="any"
-                                className="w-full pr-12"
-                                value={detail.annual_volume_realization}
-                                onChange={(e) => updateDetail(index, 'annual_volume_realization', e.target.value)}
-                                placeholder="0.00"
-                              />
-                              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400 text-xs font-bold">Kg/Ltr</div>
-                            </div>
+                            <TextInput
+                              type="number"
+                              step="any"
+                              className="w-full"
+                              value={detail.annual_volume_realization}
+                              onChange={(e) => updateDetail(index, 'annual_volume_realization', e.target.value)}
+                              placeholder="0.00"
+                            />
                             {errors[`details.${index}.annual_volume_realization`] && <InputError message="Wajib diisi." className="mt-1" />}
+                          </div>
+                          <div>
+                            <InputLabel value="Satuan" className="text-gray-700 font-bold mb-2 text-xs" />
+                            <Select
+                              options={unitOptions}
+                              value={unitOptions.find(u => u.value === detail.unit)}
+                              onChange={(opt) => updateDetail(index, 'unit', opt?.value || 'Kg')}
+                              placeholder="Pilih Satuan..."
+                              styles={selectStyles}
+                              menuPlacement="top"
+                              isClearable={false}
+                            />
+                            {errors[`details.${index}.unit`] && <InputError message="Wajib diisi." className="mt-1" />}
                           </div>
                         </div>
                       </div>
