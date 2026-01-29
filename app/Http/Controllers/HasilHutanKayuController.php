@@ -61,7 +61,7 @@ class HasilHutanKayuController extends Controller
           'month' => 'hasil_hutan_kayu.month',
           'location' => 'm_regencies.name', // Default sort, can be improved to sort by district/pengelola depending on row? Impossible in SQL sort easily. Just leave as regency or district name if joined.
           'pengelola' => 'm_pengelola_hutan.name',
-          'target' => 'hasil_hutan_kayu_details.volume_target',
+          'target' => 'hasil_hutan_kayu.volume_target',
           'realization' => 'hasil_hutan_kayu_details.volume_realization',
           'status' => 'hasil_hutan_kayu.status',
           'created_at' => 'hasil_hutan_kayu.created_at',
@@ -83,8 +83,7 @@ class HasilHutanKayuController extends Controller
       'total_volume' => HasilHutanKayu::where('forest_type', $forestType)
         ->when($selectedYear, fn($q) => $q->where('year', $selectedYear))
         ->where('status', 'final')
-        ->join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
-        ->sum('hasil_hutan_kayu_details.volume_target'),
+        ->sum('volume_target'),
       'verified_count' => HasilHutanKayu::where('forest_type', $forestType)
         ->when($selectedYear, fn($q) => $q->where('year', $selectedYear))
         ->where('status', 'final')
@@ -139,9 +138,9 @@ class HasilHutanKayuController extends Controller
       'district_id' => 'nullable|exists:m_districts,id',
       'pengelola_hutan_id' => 'nullable|exists:m_pengelola_hutan,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
+      'volume_target' => 'required|numeric|min:0',
       'details' => 'required|array|min:1',
       'details.*.kayu_id' => 'required|exists:m_kayu,id',
-      'details.*.volume_target' => 'required|numeric|min:0',
       'details.*.volume_realization' => 'required|numeric|min:0',
     ]);
 
@@ -162,13 +161,13 @@ class HasilHutanKayuController extends Controller
         'district_id' => $validated['district_id'] ?? null,
         'pengelola_hutan_id' => $validated['pengelola_hutan_id'] ?? null,
         'forest_type' => $validated['forest_type'],
+        'volume_target' => $validated['volume_target'],
         'status' => 'draft'
       ]);
 
       foreach ($validated['details'] as $detail) {
         $parent->details()->create([
           'kayu_id' => $detail['kayu_id'],
-          'volume_target' => $detail['volume_target'],
           'volume_realization' => $detail['volume_realization'],
         ]);
       }
@@ -199,9 +198,9 @@ class HasilHutanKayuController extends Controller
       'district_id' => 'nullable|exists:m_districts,id',
       'pengelola_hutan_id' => 'nullable|exists:m_pengelola_hutan,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
+      'volume_target' => 'required|numeric|min:0',
       'details' => 'required|array|min:1',
       'details.*.kayu_id' => 'required|exists:m_kayu,id',
-      'details.*.volume_target' => 'required|numeric|min:0',
       'details.*.volume_realization' => 'required|numeric|min:0',
     ]);
 
@@ -222,13 +221,13 @@ class HasilHutanKayuController extends Controller
         'district_id' => $validated['district_id'] ?? null,
         'pengelola_hutan_id' => $validated['pengelola_hutan_id'] ?? null,
         'forest_type' => $validated['forest_type'],
+        'volume_target' => $validated['volume_target'],
       ]);
 
       $hasilHutanKayu->details()->delete();
       foreach ($validated['details'] as $detail) {
         $hasilHutanKayu->details()->create([
           'kayu_id' => $detail['kayu_id'],
-          'volume_target' => $detail['volume_target'],
           'volume_realization' => $detail['volume_realization'],
         ]);
       }

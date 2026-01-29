@@ -692,9 +692,12 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="font-bold text-emerald-600 text-xs">
-                          T: {formatNumber(item.details ? item.details.reduce((acc, curr) => acc + parseFloat(curr.volume || 0), 0) : 0)}
-                        </span>
+                        <div className="flex justify-between items-center text-xs border-b border-emerald-100 pb-1">
+                          <span className="text-gray-400">Total Target:</span>
+                          <span className="font-bold text-gray-900">
+                            {parseFloat(item.volume_target || 0).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
                         <span className="font-bold text-blue-600 text-xs mt-0.5">
                           R: {formatNumber(item.details ? item.details.reduce((acc, curr) => acc + parseFloat(curr.annual_volume_realization || 0), 0) : 0)}
                         </span>

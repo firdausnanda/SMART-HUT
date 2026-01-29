@@ -29,10 +29,10 @@ class HasilHutanBukanKayuTemplateExport implements WithHeadings, ShouldAutoSize,
       'Bulan (Angka)',
       'Nama Kabupaten',
       'Nama Kecamatan',
+      'Total Target',
     ];
 
     foreach ($this->commodities as $commodity) {
-      $headers[] = $commodity->name . ' - Target';
       $headers[] = $commodity->name . ' - Realisasi';
       $headers[] = $commodity->name . ' - Satuan';
     }
@@ -76,8 +76,8 @@ class HasilHutanBukanKayuTemplateExport implements WithHeadings, ShouldAutoSize,
           $sheet->getCell("B$i")->setDataValidation(clone $validation);
         }
 
-        // Freeze the first row (headers) and first 4 columns (Location info)
-        $sheet->freezePane('E2');
+        // Freeze the first row (headers) and first 5 columns (Location info + Total Target)
+        $sheet->freezePane('F2');
 
         $sheet->getComment('C1')->getText()->createTextRun('Isi dengan Nama Kabupaten (e.g. KABUPATEN TRENGGALEK)');
         $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan (e.g. KECAMATAN PANGGUL)');

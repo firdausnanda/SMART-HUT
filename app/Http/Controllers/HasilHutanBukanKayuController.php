@@ -76,8 +76,7 @@ class HasilHutanBukanKayuController extends Controller
       'total_volume' => HasilHutanBukanKayu::where('forest_type', $forestType)
         ->when($selectedYear, fn($q) => $q->where('year', $selectedYear))
         ->where('status', 'final')
-        ->join('hasil_hutan_bukan_kayu_details', 'hasil_hutan_bukan_kayu.id', '=', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id')
-        ->sum('hasil_hutan_bukan_kayu_details.volume'),
+        ->sum('volume_target'),
       'verified_count' => HasilHutanBukanKayu::where('forest_type', $forestType)
         ->when($selectedYear, fn($q) => $q->where('year', $selectedYear))
         ->where('status', 'final')
@@ -130,9 +129,9 @@ class HasilHutanBukanKayuController extends Controller
       'regency_id' => 'required|exists:m_regencies,id',
       'district_id' => 'required|exists:m_districts,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
+      'volume_target' => 'required|numeric|min:0',
       'details' => 'required|array|min:1',
       'details.*.commodity_id' => 'required|exists:m_commodities,id',
-      'details.*.volume' => 'required|numeric|min:0',
       'details.*.annual_volume_realization' => 'nullable|numeric|min:0',
       'details.*.unit' => 'nullable|string',
     ]);
@@ -145,13 +144,13 @@ class HasilHutanBukanKayuController extends Controller
         'regency_id' => $validated['regency_id'],
         'district_id' => $validated['district_id'],
         'forest_type' => $validated['forest_type'],
+        'volume_target' => $validated['volume_target'],
         'status' => 'draft'
       ]);
 
       foreach ($validated['details'] as $detail) {
         $parent->details()->create([
           'commodity_id' => $detail['commodity_id'],
-          'volume' => $detail['volume'],
           'annual_volume_realization' => $detail['annual_volume_realization'] ?? 0,
           'unit' => $detail['unit'] ?? 'Kg',
         ]);
@@ -182,9 +181,9 @@ class HasilHutanBukanKayuController extends Controller
       'regency_id' => 'required|exists:m_regencies,id',
       'district_id' => 'required|exists:m_districts,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
+      'volume_target' => 'required|numeric|min:0',
       'details' => 'required|array|min:1',
       'details.*.commodity_id' => 'required|exists:m_commodities,id',
-      'details.*.volume' => 'required|numeric|min:0',
       'details.*.annual_volume_realization' => 'nullable|numeric|min:0',
       'details.*.unit' => 'nullable|string',
     ]);
@@ -197,13 +196,13 @@ class HasilHutanBukanKayuController extends Controller
         'regency_id' => $validated['regency_id'],
         'district_id' => $validated['district_id'],
         'forest_type' => $validated['forest_type'],
+        'volume_target' => $validated['volume_target'],
       ]);
 
       $hasilHutanBukanKayu->details()->delete();
       foreach ($validated['details'] as $detail) {
         $hasilHutanBukanKayu->details()->create([
           'commodity_id' => $detail['commodity_id'],
-          'volume' => $detail['volume'],
           'annual_volume_realization' => $detail['annual_volume_realization'] ?? 0,
           'unit' => $detail['unit'] ?? 'Kg',
         ]);

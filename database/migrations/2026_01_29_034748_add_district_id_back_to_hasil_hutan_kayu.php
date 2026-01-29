@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('hasil_hutan_kayu', function (Blueprint $table) {
-            $table->foreignId('district_id')->nullable()->after('regency_id')->constrained('m_districts')->nullOnDelete();
+            $table->foreignId('district_id')->nullable()->after('regency_id');
         });
     }
 

@@ -22,6 +22,7 @@ class HasilHutanBukanKayu extends Model
         "regency_id",
         "district_id",
         "forest_type",
+        "volume_target",
         "status",
         "approved_by_kasi_at",
         "approved_by_cdk_at",

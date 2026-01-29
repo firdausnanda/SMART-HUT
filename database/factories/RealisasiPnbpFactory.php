@@ -39,7 +39,7 @@ class RealisasiPnbpFactory extends Factory
       'month' => fake()->month(),
       'province_id' => 35,
       'regency_id' => $regency->id,
-      'types_of_forest_products' => fake()->randomElement(['Kayu Jati', 'Getah Pinus', 'Rotan']),
+      'types_of_forest_products' => fake()->randomElement(['Kayu', 'Non Kayu', 'Jasa Lingkungan']),
       'id_pengelola_wisata' => $pengelola_wisata->id,
       'pnbp_target' => fake()->numberBetween(1000000, 100000000),
       'pnbp_realization' => fake()->numberBetween(100000, 10000000),

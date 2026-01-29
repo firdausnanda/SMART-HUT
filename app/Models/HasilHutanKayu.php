@@ -22,6 +22,7 @@ class HasilHutanKayu extends Model
         'district_id',
         'pengelola_hutan_id',
         'forest_type',
+        'volume_target',
         'status',
         'rejected_note',
         'approved_by_kasi_at',

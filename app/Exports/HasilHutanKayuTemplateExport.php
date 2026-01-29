@@ -32,11 +32,11 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
       'Tahun',
       'Bulan (Angka)',
       'Nama Kabupaten',
+      'Total Target (m3)',
       $locationLabel,
     ];
 
     foreach ($this->kayus as $kayu) {
-      $headers[] = $kayu->name . ' - Target';
       $headers[] = $kayu->name . ' - Realisasi';
     }
 
@@ -81,21 +81,16 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
         }
 
         // Add comments
-        $sheet->getComment('C1')->getText()->createTextRun('Isi dengan Nama Kabupaten/Kota (KABUPATEN TRENGGALEK,KABUPATEN TULUNGAGUNG,KABUPATEN KEDIRI,KOTA KEDIRI)');
+        $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Total Target Volume (Angka) untuk periode dan lokasi ini');
 
         if ($this->forestType === 'Hutan Negara') {
-          $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Pengelola Hutan');
+          $sheet->getComment('E1')->getText()->createTextRun('Isi dengan Nama Pengelola Hutan');
         } else {
-          $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan');
+          $sheet->getComment('E1')->getText()->createTextRun('Isi dengan Nama Kecamatan');
         }
 
-        $colIndex = 4; // Start at Column E (0-indexed: E=4)
+        $colIndex = 5; // Start at Column F (0-indexed: F=5)
         foreach ($this->kayus as $kayu) {
-          // Target Column
-          $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
-          $sheet->getComment($colLetter . '1')->getText()->createTextRun('Target Volume (Angka) untuk ' . $kayu->name);
-          $colIndex++;
-
           // Realization Column
           $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
           $sheet->getComment($colLetter . '1')->getText()->createTextRun('Realisasi Volume (Angka) untuk ' . $kayu->name);

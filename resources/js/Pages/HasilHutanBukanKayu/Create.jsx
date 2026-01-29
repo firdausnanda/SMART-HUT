@@ -16,8 +16,9 @@ export default function Create({ auth, commodity_list = [], forest_type }) { // 
     regency_id: '',
     district_id: '',
     forest_type: forest_type || 'Hutan Negara',
+    volume_target: '',
     details: [
-      { commodity_id: '', volume: '', annual_volume_realization: '', unit: 'Kg' }
+      { commodity_id: '', annual_volume_realization: '', unit: 'Kg' }
     ]
   });
 
@@ -296,15 +297,35 @@ export default function Create({ auth, commodity_list = [], forest_type }) { // 
                 </div>
 
                 <div className="md:col-span-2 mt-4">
+                  <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4 border-b border-emerald-100 pb-2">Target Produksi</h4>
+                </div>
+
+                <div className="md:col-span-2">
+                  <InputLabel htmlFor="volume_target" value="Target Volume (Total)" className="text-gray-700 font-bold mb-2" />
+                  <TextInput
+                    id="volume_target"
+                    type="number"
+                    step="0.01"
+                    className="w-full md:w-1/2"
+                    value={data.volume_target}
+                    onChange={(e) => setData('volume_target', e.target.value)}
+                    placeholder="0.00"
+                    required
+                  />
+                  <InputError message={errors.volume_target} className="mt-2" />
+                  <p className="mt-1 text-xs text-gray-400 font-medium">Target volume total untuk periode dan lokasi yang dipilih.</p>
+                </div>
+
+                <div className="md:col-span-2 mt-4">
                   <div className="flex items-center justify-between mb-4 border-b border-emerald-100 pb-2">
-                    <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Detail Hasil Hutan</h4>
+                    <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Detail Realisasi Komoditas</h4>
                     <button
                       type="button"
                       onClick={addDetail}
-                      className="text-xs font-bold text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-200/50"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                       </svg>
                       Tambah Komoditas
                     </button>
@@ -312,46 +333,34 @@ export default function Create({ auth, commodity_list = [], forest_type }) { // 
 
                   <div className="space-y-4">
                     {data.details.map((detail, index) => (
-                      <div key={index} className="p-4 bg-gray-50 rounded-xl border border-gray-200 relative group">
+                      <div key={index} className="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 relative group hover:border-emerald-200 transition-all duration-300">
                         {data.details.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeDetail(index)}
-                            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors"
+                            className="absolute -top-2 -right-2 bg-white text-red-400 hover:text-red-500 p-1.5 rounded-full shadow-sm border border-red-50 hover:border-red-100 transition-all opacity-0 group-hover:opacity-100"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                             </svg>
                           </button>
                         )}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div>
-                            <InputLabel value={`Komoditas #${index + 1}`} className="text-gray-700 font-bold mb-2 text-xs" />
+                            <InputLabel value="Komoditas" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
                             <Select
                               options={commodity_list?.map(k => ({ value: k.id, label: k.name })) || []}
                               onChange={(opt) => updateDetail(index, 'commodity_id', opt?.value || '')}
-                              placeholder="Pilih Jenis..."
+                              placeholder="Pilih Komoditas..."
                               styles={selectStyles}
-                              menuPlacement="top"
+                              menuPlacement="auto"
                               isClearable
                               value={commodity_list?.find(k => k.id === detail.commodity_id) ? { value: detail.commodity_id, label: commodity_list.find(k => k.id === detail.commodity_id).name } : null}
                             />
                             {errors[`details.${index}.commodity_id`] && <InputError message="Wajib diisi." className="mt-1" />}
                           </div>
                           <div>
-                            <InputLabel value="Target Volume" className="text-gray-700 font-bold mb-2 text-xs" />
-                            <TextInput
-                              type="number"
-                              step="any"
-                              className="w-full"
-                              value={detail.volume}
-                              onChange={(e) => updateDetail(index, 'volume', e.target.value)}
-                              placeholder="0.00"
-                            />
-                            {errors[`details.${index}.volume`] && <InputError message="Wajib diisi." className="mt-1" />}
-                          </div>
-                          <div>
-                            <InputLabel value="Realisasi Volume" className="text-gray-700 font-bold mb-2 text-xs" />
+                            <InputLabel value="Realisasi Volume" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
                             <TextInput
                               type="number"
                               step="any"
@@ -363,14 +372,14 @@ export default function Create({ auth, commodity_list = [], forest_type }) { // 
                             {errors[`details.${index}.annual_volume_realization`] && <InputError message="Wajib diisi." className="mt-1" />}
                           </div>
                           <div>
-                            <InputLabel value="Satuan" className="text-gray-700 font-bold mb-2 text-xs" />
+                            <InputLabel value="Satuan" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
                             <Select
                               options={unitOptions}
                               value={unitOptions.find(u => u.value === detail.unit)}
                               onChange={(opt) => updateDetail(index, 'unit', opt?.value || 'Kg')}
                               placeholder="Pilih Satuan..."
                               styles={selectStyles}
-                              menuPlacement="top"
+                              menuPlacement="auto"
                               isClearable={false}
                             />
                             {errors[`details.${index}.unit`] && <InputError message="Wajib diisi." className="mt-1" />}

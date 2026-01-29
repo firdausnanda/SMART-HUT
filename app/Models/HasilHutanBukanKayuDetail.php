@@ -12,7 +12,6 @@ class HasilHutanBukanKayuDetail extends Model
   protected $fillable = [
     'hasil_hutan_bukan_kayu_id',
     'commodity_id',
-    'volume',
     'annual_volume_realization',
     'unit',
   ];

@@ -41,6 +41,7 @@ class HasilHutanBukanKayuFactory extends Factory
       'regency_id' => $regency->id,
       'district_id' => $district->id,
       'forest_type' => fake()->randomElement(['Hutan Rakyat', 'Hutan Negara']),
+      'volume_target' => fake()->randomFloat(2, 50, 2000),
       'status' => 'final',
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
@@ -56,7 +57,6 @@ class HasilHutanBukanKayuFactory extends Factory
       foreach ($commodities as $commodity) {
         $hhbk->details()->create([
           'commodity_id' => $commodity->id,
-          'volume' => fake()->randomFloat(2, 50, 1000),
           'annual_volume_realization' => fake()->randomFloat(2, 40, 900),
           'unit' => fake()->randomElement(['Kg', 'Ton', 'Ltr']),
         ]);

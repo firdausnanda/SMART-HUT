@@ -22,7 +22,7 @@ class RealisasiPnbpImport implements ToModel, WithHeadingRow, WithValidation, Sk
       'bulan_angka_1_12' => 'required|numeric|min:1|max:12',
       'nama_kabupatenkota' => 'required|string',
       'nama_pengelola_wisata' => 'required|string',
-      'jenis_hasil_hutan' => 'required|string',
+      'jenis_hasil_hutan' => 'required|string|in:Kayu,Non Kayu,Jasa Lingkungan',
       'target_pnbp' => 'required',
       'realisasi_pnbp' => 'required',
     ];

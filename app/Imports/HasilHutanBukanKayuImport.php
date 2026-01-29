@@ -31,6 +31,7 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       'tahun' => 'required|numeric',
       'bulan_angka' => 'required|numeric|min:1|max:12',
       'nama_kabupaten' => 'required|exists:m_regencies,name',
+      'total_target' => 'required|numeric|min:0',
       'nama_kecamatan' => 'required|exists:m_districts,name',
     ];
   }
@@ -42,6 +43,7 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       'nama_kecamatan.exists' => 'Kecamatan tidak ditemukan.',
       'bulan_angka.min' => 'Bulan harus 1-12.',
       'bulan_angka.max' => 'Bulan harus 1-12.',
+      'total_target.required' => 'Total Target wajib diisi.',
     ];
   }
 
@@ -81,30 +83,24 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       'regency_id' => $regency->id,
       'district_id' => $district->id,
       'forest_type' => $this->forestType,
+      'volume_target' => $row['total_target'] ?? 0,
       'status' => 'draft',
       'created_by' => Auth::id(),
     ]);
 
     // 3. Loop through commodities and check for data in row
     foreach ($this->commodities as $commodity) {
-      // Laravel Excel typically converts to snake_case.
-      // "Madu - Target" -> "madu_target"
-      // "Madu - Realisasi" -> "madu_realisasi"
-      // Handle potential special characters in commodity name if needed, but assuming simple logic for now.
       $slug = \Illuminate\Support\Str::slug($commodity->name, '_');
-      $targetKey = $slug . '_target';
       $realizationKey = $slug . '_realisasi';
       $unitKey = $slug . '_satuan';
 
-      $targetVolume = $row[$targetKey] ?? 0;
       $realizationVolume = $row[$realizationKey] ?? 0;
       $unit = $row[$unitKey] ?? 'Kg';
 
       // Only add detail if there is non-zero data
-      if ($targetVolume > 0 || $realizationVolume > 0) {
+      if ($realizationVolume > 0) {
         $hhbk->details()->create([
           'commodity_id' => $commodity->id,
-          'volume' => $targetVolume,
           'annual_volume_realization' => $realizationVolume,
           'unit' => $unit,
         ]);

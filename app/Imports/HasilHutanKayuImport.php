@@ -29,6 +29,7 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
       'tahun' => 'required|numeric',
       'bulan_angka' => 'required|numeric|min:1|max:12',
       'nama_kabupaten' => 'required|exists:m_regencies,name',
+      'total_target_m3' => 'required|numeric|min:0',
     ];
 
     if ($this->forestType !== 'Hutan Negara') {
@@ -101,27 +102,18 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     $allKayu = Kayu::all();
 
     foreach ($allKayu as $kayu) {
-      // Excel heading logic converts "Kayu Jati - Target" to "kayu_jati_target"
-      // or similar depending on Maatwebsite slugging.
-      // Usually simple slug: 'Jati - Target' -> 'jati_target'
-      // We rely on the template generating "Name - Target"
-
       $slugName = \Illuminate\Support\Str::slug($kayu->name, '_');
-      $targetKey = $slugName . '_target';
       $realizationKey = $slugName . '_realisasi';
 
-      // Check if keys exist in row (even if null or 0)
-      // Note: HeadingRow slugifies headers.
-      if (array_key_exists($targetKey, $row)) {
-        $target = $row[$targetKey];
+      // Check if realization key exists in row
+      if (array_key_exists($realizationKey, $row)) {
         $realization = $row[$realizationKey] ?? 0;
 
-        // Only add if there is a target or realization value
-        if ($target > 0 || $realization > 0) {
+        // Only add if there is a realization value
+        if ($realization > 0) {
           $detailsData[] = [
             'kayu_id' => $kayu->id,
-            'volume_target' => $target ?? 0,
-            'volume_realization' => $realization ?? 0,
+            'volume_realization' => $realization,
           ];
         }
       }
@@ -140,6 +132,7 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
         'district_id' => $districtId,
         'pengelola_hutan_id' => $pengelolaHutanId,
         'forest_type' => $this->forestType,
+        'volume_target' => $row['total_target_m3'],
         'status' => 'draft',
         'created_by' => Auth::id(),
       ]);

@@ -34,11 +34,11 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
     return [
       'ID',
       'Tahun',
-      'Bulan',
+      'Bulan (Angka)',
       'Provinsi',
       'Kabupaten/Kota',
       'Kecamatan',
-      'Komoditas (Target / Realisasi)', // Combined column
+      'Komoditas (Realisasi)', // Combined column
       'Total Target',
       'Total Realisasi',
       'Status',
@@ -51,10 +51,10 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
   {
     $detailsString = $row->details->map(function ($d) {
       $real = $d->annual_volume_realization ?? 0;
-      return ($d->commodity->name ?? '?') . ': ' . $d->volume . ' / ' . $real . ' ' . $d->unit;
+      return ($d->commodity->name ?? '?') . ': ' . $real . ' ' . $d->unit;
     })->join(",\n");
 
-    $totalVolume = $row->details->sum('volume');
+    $totalVolume = $row->volume_target;
     $totalRealization = $row->details->sum('annual_volume_realization');
 
     return [

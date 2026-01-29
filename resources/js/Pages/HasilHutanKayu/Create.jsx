@@ -17,9 +17,9 @@ export default function Create({ auth, kayu_list, forest_type, pengelola_hutan_l
     district_id: '',
     pengelola_hutan_id: '',
     forest_type: forest_type || 'Hutan Negara',
-    annual_volume_target: '',
-    annual_volume_realization: '',
-    details: [{ kayu_id: '', volume_target: '', volume_realization: '' }],
+    volume_target: '',
+    // annual_volume_realization: '', // Unused?
+    details: [{ kayu_id: '', volume_realization: '' }],
   });
 
   const [regencies, setRegencies] = useState([]);
@@ -89,7 +89,7 @@ export default function Create({ auth, kayu_list, forest_type, pengelola_hutan_l
   }, []);
 
   const addDetail = () => {
-    setData('details', [...data.details, { kayu_id: '', volume_target: '', volume_realization: '' }]);
+    setData('details', [...data.details, { kayu_id: '', volume_realization: '' }]);
   };
 
   const removeDetail = (index) => {
@@ -326,97 +326,111 @@ export default function Create({ auth, kayu_list, forest_type, pengelola_hutan_l
                   </div>
                 )}
 
-                <div className="md:col-span-2 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <InputLabel value="Detail Kayu & Volume" className="text-gray-700 font-bold" />
+                <div className="md:col-span-2 mt-4">
+                  <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4 border-b border-emerald-100 pb-2">Target Produksi</h4>
+                </div>
+
+                <div className="md:col-span-2">
+                  <InputLabel htmlFor="volume_target" value="Target Volume (m³)" className="text-gray-700 font-bold mb-2" />
+                  <TextInput
+                    id="volume_target"
+                    type="number"
+                    step="0.01"
+                    className="w-full md:w-1/2"
+                    value={data.volume_target}
+                    onChange={(e) => setData('volume_target', e.target.value)}
+                    placeholder="0.00"
+                    required
+                  />
+                  <InputError message={errors.volume_target} className="mt-2" />
+                  <p className="mt-1 text-xs text-gray-400 font-medium">Target volume total untuk periode dan lokasi yang dipilih.</p>
+                </div>
+
+                <div className="md:col-span-2 mt-4">
+                  <div className="flex items-center justify-between border-b border-emerald-100 pb-2 mb-4">
+                    <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Detail Realisasi Kayu</h4>
                     <button
                       type="button"
                       onClick={addDetail}
-                      className="px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-bold rounded-lg hover:bg-emerald-200 transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-200/50"
                     >
-                      + Tambah Kayu
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Tambah Detail
                     </button>
                   </div>
 
-                  {data.details.map((detail, index) => (
-                    <div key={index} className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 relative group">
-                      {data.details.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeDetail(index)}
-                          className="absolute top-2 right-2 text-red-400 hover:text-red-600 p-1"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
-                        </button>
-                      )}
+                  <div className="space-y-4">
+                    {data.details.map((detail, index) => (
+                      <div key={index} className="bg-gray-50/50 p-5 rounded-2xl border border-gray-100 relative group hover:border-emerald-200 transition-all duration-300">
+                        {data.details.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeDetail(index)}
+                            className="absolute -top-2 -right-2 bg-white text-red-400 hover:text-red-600 p-1.5 rounded-full shadow-sm border border-red-50 hover:border-red-100 transition-all opacity-0 group-hover:opacity-100"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                        )}
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="md:col-span-1">
-                          <InputLabel value="Jenis Kayu" className="text-xs text-gray-500 mb-1" />
-                          <Select
-                            options={kayuOptions}
-                            value={kayuOptions.find(opt => opt.value === detail.kayu_id) || null}
-                            onChange={(opt) => updateDetail(index, 'kayu_id', opt?.value)}
-                            placeholder="Pilih Kayu..."
-                            styles={selectStyles}
-                            menuPlacement="top"
-                          />
-                          <InputError message={errors[`details.${index}.kayu_id`]} className="mt-1" />
-                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <InputLabel value="Jenis Kayu" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
+                            <Select
+                              options={kayuOptions}
+                              value={kayuOptions.find(opt => opt.value === detail.kayu_id) || null}
+                              onChange={(opt) => updateDetail(index, 'kayu_id', opt?.value)}
+                              placeholder="Pilih Jenis Kayu..."
+                              styles={selectStyles}
+                              menuPlacement="auto"
+                            />
+                            <InputError message={errors[`details.${index}.kayu_id`]} className="mt-1" />
+                          </div>
 
-                        <div>
-                          <InputLabel value="Target (m³)" className="text-xs text-gray-500 mb-1" />
-                          <TextInput
-                            type="number"
-                            step="0.01"
-                            className="w-full text-sm"
-                            value={detail.volume_target}
-                            onChange={(e) => updateDetail(index, 'volume_target', e.target.value)}
-                            placeholder="0.00"
-                          />
-                          <InputError message={errors[`details.${index}.volume_target`]} className="mt-1" />
-                        </div>
-
-                        <div>
-                          <InputLabel value="Realisasi (m³)" className="text-xs text-gray-500 mb-1" />
-                          <TextInput
-                            type="number"
-                            step="0.01"
-                            className="w-full text-sm"
-                            value={detail.volume_realization}
-                            onChange={(e) => updateDetail(index, 'volume_realization', e.target.value)}
-                            placeholder="0.00"
-                          />
-                          <InputError message={errors[`details.${index}.volume_realization`]} className="mt-1" />
+                          <div>
+                            <InputLabel value="Realisasi (m³)" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
+                            <TextInput
+                              type="number"
+                              step="0.01"
+                              className="w-full"
+                              value={detail.volume_realization}
+                              onChange={(e) => updateDetail(index, 'volume_realization', e.target.value)}
+                              placeholder="0.00"
+                            />
+                            <InputError message={errors[`details.${index}.volume_realization`]} className="mt-1" />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                   <InputError message={errors.details} className="mt-2" />
                 </div>
-
               </div>
 
-              <div className="pt-6 border-t border-gray-100 flex items-center justify-end gap-4">
+              <div className="pt-8 border-t border-gray-100 flex items-center justify-end gap-4 overflow-hidden">
                 <Link
                   href={route('hasil-hutan-kayu.index', { forest_type })}
                   className="px-6 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors"
                 >
-                  Batal
+                  Batalkan
                 </Link>
                 <PrimaryButton
-                  className="px-8 py-3 bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-bold shadow-lg shadow-emerald-900/20 transition-all transform active:scale-95"
+                  className="px-10 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-900/10 hover:shadow-emerald-900/20 transition-all transform active:scale-95 flex items-center gap-2"
                   loading={processing}
                 >
-                  {processing ? 'Menyimpan...' : 'Simpan Data'}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {processing ? 'Sedang Menyimpan...' : 'Simpan Laporan'}
                 </PrimaryButton>
               </div>
             </form>
           </div>
         </div>
-      </div>
-    </AuthenticatedLayout>
+      </div >
+    </AuthenticatedLayout >
   );
 }

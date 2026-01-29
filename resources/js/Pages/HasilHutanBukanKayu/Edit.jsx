@@ -8,22 +8,20 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
 
-export default function Edit({ auth, data: item, commodity_list = [] }) {
-  const { data, setData, patch, processing, errors } = useForm({
-    year: item.year || new Date().getFullYear(),
-    month: item.month || new Date().getMonth() + 1,
-    province_id: item.province_id || 35,
-    regency_id: item.regency_id || '',
-    district_id: item.district_id || '',
-    forest_type: item.forest_type || 'Hutan Negara',
-    details: item.details && item.details.length > 0 ? item.details.map(d => ({
+export default function Edit({ auth, data: data_item, commodity_list = [] }) {
+  const { data, setData, put, processing, errors } = useForm({
+    year: data_item.year || new Date().getFullYear(),
+    month: data_item.month || new Date().getMonth() + 1,
+    province_id: 35,
+    regency_id: data_item.regency_id || '',
+    district_id: data_item.district_id || '',
+    forest_type: data_item.forest_type || 'Hutan Negara',
+    volume_target: data_item.volume_target || '',
+    details: data_item.details?.map(d => ({
       commodity_id: d.commodity_id,
-      volume: d.volume,
-      annual_volume_realization: d.annual_volume_realization || '',
+      annual_volume_realization: d.annual_volume_realization,
       unit: d.unit || 'Kg'
-    })) : [
-      { commodity_id: '', volume: '', annual_volume_realization: '', unit: 'Kg' }
-    ]
+    })) || [{ commodity_id: '', annual_volume_realization: '', unit: 'Kg' }]
   });
 
   const [regencies, setRegencies] = useState([]);
@@ -56,9 +54,9 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
     setLoadingRegencies(true);
     axios.get(route('locations.regencies', 35))
       .then(res => {
-        setRegencies(res.data.map(i => ({
-          value: i.id,
-          label: formatLabel(i.name)
+        setRegencies(res.data.map(item => ({
+          value: item.id,
+          label: formatLabel(item.name)
         })));
         setLoadingRegencies(false);
       })
@@ -72,9 +70,9 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
       if (typeof route !== 'undefined') {
         axios.get(route('locations.districts', data.regency_id))
           .then(res => {
-            setDistricts(res.data.map(i => ({
-              value: i.id,
-              label: formatLabel(i.name)
+            setDistricts(res.data.map(item => ({
+              value: item.id,
+              label: formatLabel(item.name)
             })));
             setLoadingDistricts(false);
           })
@@ -87,13 +85,13 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
 
   const submit = (e) => {
     e.preventDefault();
-    patch(route('hasil-hutan-bukan-kayu.update', item.id));
+    put(route('hasil-hutan-bukan-kayu.update', data_item.id));
   };
 
   const addDetail = () => {
     setData('details', [
       ...data.details,
-      { commodity_id: '', volume: '', annual_volume_realization: '', unit: 'Kg' }
+      { commodity_id: '', annual_volume_realization: '', unit: 'Kg' }
     ]);
   };
 
@@ -195,13 +193,13 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
   return (
     <AuthenticatedLayout
       user={auth.user}
-      header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Edit Data Produksi dari {data.forest_type}</h2>}
+      header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Edit Data Produksi {data_item.forest_type}</h2>}
     >
-      <Head title={`Edit Produksi dari ${data.forest_type} - Hasil Hutan Bukan Kayu`} />
+      <Head title={`Edit Produksi ${data_item.forest_type} - Hasil Hutan Bukan Kayu`} />
 
       <div className="max-w-4xl mx-auto">
         <Link
-          href={route('hasil-hutan-bukan-kayu.index', { forest_type: data.forest_type })}
+          href={route('hasil-hutan-bukan-kayu.index', { forest_type: data_item.forest_type })}
           className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-800 transition-colors mb-6 group"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -212,9 +210,9 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-8 border-b border-gray-100 bg-gray-50/50">
-            <h3 className="text-xl font-bold text-gray-900">Formulir Edit Data</h3>
+            <h3 className="text-xl font-bold text-gray-900">Perbarui Data Laporan</h3>
             <p className="mt-1 text-sm text-gray-500">
-              Perbarui informasi hasil hutan bukan kayu di bawah ini.
+              Ubah informasi di bawah ini untuk memperbarui data hasil hutan bukan kayu ({data_item.forest_type}).
             </p>
           </div>
 
@@ -242,7 +240,7 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
                   <InputLabel htmlFor="month" value="Bulan Laporan" className="text-gray-700 font-bold mb-2" />
                   <select
                     id="month"
-                    className="w-full bg-gray-50 border-gray-200 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 rounded-xl shadow-sm transition-all duration-200 py-[11px] text-sm disabled:bg-gray-100/50 disabled:text-gray-400 disabled:border-gray-100 disabled:cursor-not-allowed"
+                    className="w-full bg-gray-50 border-gray-200 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 rounded-xl shadow-sm transition-all duration-200 py-[11px] text-sm"
                     value={data.month}
                     onChange={(e) => setData('month', e.target.value)}
                   >
@@ -268,7 +266,7 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
                   <Select
                     options={regencies}
                     isLoading={loadingRegencies}
-                    value={regencies.find(r => r.value == data.regency_id) || (item.regency ? { value: item.regency_id, label: formatLabel(item.regency.name) } : null)}
+                    value={regencies.find(r => r.value === data.regency_id) || (data_item.regency ? { value: data_item.regency_id, label: formatLabel(data_item.regency.name) } : null)}
                     onChange={(opt) => {
                       setData((prev) => ({
                         ...prev,
@@ -289,7 +287,7 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
                     options={districts}
                     isLoading={loadingDistricts}
                     isDisabled={!data.regency_id}
-                    value={districts.find(d => d.value == data.district_id) || (item.district ? { value: item.district_id, label: formatLabel(item.district.name) } : null)}
+                    value={districts.find(d => d.value === data.district_id) || (data_item.district && data_item.district_id === data.district_id ? { value: data_item.district_id, label: formatLabel(data_item.district.name) } : null)}
                     onChange={(opt) => {
                       setData((prev) => ({
                         ...prev,
@@ -304,15 +302,35 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
                 </div>
 
                 <div className="md:col-span-2 mt-4">
+                  <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4 border-b border-emerald-100 pb-2">Target Produksi</h4>
+                </div>
+
+                <div className="md:col-span-2">
+                  <InputLabel htmlFor="volume_target" value="Target Volume (Total)" className="text-gray-700 font-bold mb-2" />
+                  <TextInput
+                    id="volume_target"
+                    type="number"
+                    step="0.01"
+                    className="w-full md:w-1/2"
+                    value={data.volume_target}
+                    onChange={(e) => setData('volume_target', e.target.value)}
+                    placeholder="0.00"
+                    required
+                  />
+                  <InputError message={errors.volume_target} className="mt-2" />
+                  <p className="mt-1 text-xs text-gray-400 font-medium">Target volume total untuk periode dan lokasi yang dipilih.</p>
+                </div>
+
+                <div className="md:col-span-2 mt-4">
                   <div className="flex items-center justify-between mb-4 border-b border-emerald-100 pb-2">
-                    <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Detail Hasil Hutan</h4>
+                    <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Detail Realisasi Komoditas</h4>
                     <button
                       type="button"
                       onClick={addDetail}
-                      className="text-xs font-bold text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-200/50"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                       </svg>
                       Tambah Komoditas
                     </button>
@@ -320,46 +338,34 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
 
                   <div className="space-y-4">
                     {data.details.map((detail, index) => (
-                      <div key={index} className="p-4 bg-gray-50 rounded-xl border border-gray-200 relative group">
+                      <div key={index} className="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 relative group hover:border-emerald-200 transition-all duration-300">
                         {data.details.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeDetail(index)}
-                            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors"
+                            className="absolute -top-2 -right-2 bg-white text-red-400 hover:text-red-500 p-1.5 rounded-full shadow-sm border border-red-50 hover:border-red-100 transition-all opacity-0 group-hover:opacity-100"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                             </svg>
                           </button>
                         )}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div>
-                            <InputLabel value={`Komoditas #${index + 1}`} className="text-gray-700 font-bold mb-2 text-xs" />
+                            <InputLabel value="Komoditas" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
                             <Select
                               options={commodity_list?.map(k => ({ value: k.id, label: k.name })) || []}
                               onChange={(opt) => updateDetail(index, 'commodity_id', opt?.value || '')}
-                              placeholder="Pilih Jenis..."
+                              placeholder="Pilih Komoditas..."
                               styles={selectStyles}
-                              menuPlacement="top"
+                              menuPlacement="auto"
                               isClearable
                               value={commodity_list?.find(k => k.id === detail.commodity_id) ? { value: detail.commodity_id, label: commodity_list.find(k => k.id === detail.commodity_id).name } : null}
                             />
                             {errors[`details.${index}.commodity_id`] && <InputError message="Wajib diisi." className="mt-1" />}
                           </div>
                           <div>
-                            <InputLabel value="Target Volume" className="text-gray-700 font-bold mb-2 text-xs" />
-                            <TextInput
-                              type="number"
-                              step="any"
-                              className="w-full"
-                              value={detail.volume}
-                              onChange={(e) => updateDetail(index, 'volume', e.target.value)}
-                              placeholder="0.00"
-                            />
-                            {errors[`details.${index}.volume`] && <InputError message="Wajib diisi." className="mt-1" />}
-                          </div>
-                          <div>
-                            <InputLabel value="Realisasi Volume" className="text-gray-700 font-bold mb-2 text-xs" />
+                            <InputLabel value="Realisasi Volume" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
                             <TextInput
                               type="number"
                               step="any"
@@ -371,14 +377,14 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
                             {errors[`details.${index}.annual_volume_realization`] && <InputError message="Wajib diisi." className="mt-1" />}
                           </div>
                           <div>
-                            <InputLabel value="Satuan" className="text-gray-700 font-bold mb-2 text-xs" />
+                            <InputLabel value="Satuan" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
                             <Select
                               options={unitOptions}
                               value={unitOptions.find(u => u.value === detail.unit)}
                               onChange={(opt) => updateDetail(index, 'unit', opt?.value || 'Kg')}
                               placeholder="Pilih Satuan..."
                               styles={selectStyles}
-                              menuPlacement="top"
+                              menuPlacement="auto"
                               isClearable={false}
                             />
                             {errors[`details.${index}.unit`] && <InputError message="Wajib diisi." className="mt-1" />}
@@ -391,9 +397,10 @@ export default function Edit({ auth, data: item, commodity_list = [] }) {
                 </div>
 
               </div>
+
               <div className="pt-6 border-t border-gray-100 flex items-center justify-end gap-4">
                 <Link
-                  href={route('hasil-hutan-bukan-kayu.index', { forest_type: data.forest_type })}
+                  href={route('hasil-hutan-bukan-kayu.index', { forest_type: data_item.forest_type })}
                   className="px-6 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors"
                 >
                   Batal

@@ -36,6 +36,8 @@ class HasilHutanKayuFactory extends Factory
       $regency = \App\Models\Regencies::where('province_id', 35)->inRandomOrder()->first();
     }
 
+    $district = \App\Models\Districts::where('regency_id', $regency->id)->inRandomOrder()->first();
+
     $pengelola = \App\Models\PengelolaHutan::firstOrCreate(['name' => fake()->company() . ' Forest Manager']);
     $user = User::inRandomOrder()->first();
 
@@ -44,8 +46,10 @@ class HasilHutanKayuFactory extends Factory
       'month' => fake()->month(),
       'province_id' => 35,
       'regency_id' => $regency->id,
+      'district_id' => $district?->id,
       'pengelola_hutan_id' => $pengelola->id,
       'forest_type' => fake()->randomElement(['Hutan Rakyat', 'Hutan Negara']),
+      'volume_target' => fake()->randomFloat(2, 50, 2000),
       'status' => 'final',
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
@@ -61,7 +65,6 @@ class HasilHutanKayuFactory extends Factory
       foreach ($kayus as $kayu) {
         $hasilHutanKayu->details()->create([
           'kayu_id' => $kayu->id,
-          'volume_target' => fake()->randomFloat(2, 10, 1000),
           'volume_realization' => fake()->randomFloat(2, 10, 1000),
         ]);
       }

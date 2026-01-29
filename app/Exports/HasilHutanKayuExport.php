@@ -52,7 +52,7 @@ class HasilHutanKayuExport implements FromQuery, WithHeadings, WithMapping, Shou
   public function map($row): array
   {
     $detailsString = $row->details->map(function ($detail) {
-      return ($detail->kayu->name ?? '-') . ' (T:' . floatval($detail->volume_target) . ', R:' . floatval($detail->volume_realization) . ')';
+      return ($detail->kayu->name ?? '-') . ' (R:' . floatval($detail->volume_realization) . ')';
     })->implode(', ');
 
     $locationName = $this->forestType === 'Hutan Negara'
@@ -67,7 +67,7 @@ class HasilHutanKayuExport implements FromQuery, WithHeadings, WithMapping, Shou
       $row->regency->name ?? '-',
       $locationName,
       $detailsString,
-      $row->details->sum('volume_target'),
+      $row->volume_target,
       $row->details->sum('volume_realization'),
       $row->status,
       $row->creator->name ?? 'Unknown',

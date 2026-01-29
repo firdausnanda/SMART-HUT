@@ -689,7 +689,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                         <div className="flex justify-between items-center text-xs border-b border-gray-100 pb-1">
                           <span className="text-gray-400">Target:</span>
                           <span className="font-bold text-gray-900">
-                            {item.details?.reduce((acc, curr) => acc + parseFloat(curr.volume_target || 0), 0).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
+                            {parseFloat(item.volume_target || 0).toLocaleString('id-ID', { maximumFractionDigits: 2 })}
                           </span>
                         </div>
                         <div className="flex justify-between items-center text-xs">
