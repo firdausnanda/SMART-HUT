@@ -13,6 +13,6 @@ class RehabLahanSeeder extends Seeder
      */
     public function run(): void
     {
-        RehabLahan::factory()->count(100)->create();
+        RehabLahan::factory()->count(500)->create();
     }
 }

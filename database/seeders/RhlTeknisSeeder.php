@@ -16,7 +16,7 @@ class RhlTeknisSeeder extends Seeder
   {
     $bangunanKtaIds = BangunanKta::pluck('id')->toArray();
 
-    RhlTeknis::factory(100)->create()->each(function ($rhlTeknis) use ($bangunanKtaIds) {
+    RhlTeknis::factory(500)->create()->each(function ($rhlTeknis) use ($bangunanKtaIds) {
       $numDetails = rand(1, 3);
       for ($i = 0; $i < $numDetails; $i++) {
         RhlTeknisDetail::create([

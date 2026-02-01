@@ -12,6 +12,6 @@ class PenghijauanLingkunganSeeder extends Seeder
      */
     public function run(): void
     {
-        PenghijauanLingkungan::factory(100)->create();
+        PenghijauanLingkungan::factory(500)->create();
     }
 }

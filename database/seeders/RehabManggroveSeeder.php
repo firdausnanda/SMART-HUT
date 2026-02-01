@@ -12,6 +12,6 @@ class RehabManggroveSeeder extends Seeder
    */
   public function run(): void
   {
-    RehabManggrove::factory(100)->create();
+    RehabManggrove::factory(500)->create();
   }
 }

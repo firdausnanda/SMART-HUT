@@ -12,6 +12,6 @@ class SkpsSeeder extends Seeder
    */
   public function run(): void
   {
-    Skps::factory(100)->create();
+    Skps::factory(500)->create();
   }
 }

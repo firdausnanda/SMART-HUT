@@ -25,7 +25,7 @@ class NilaiTransaksiEkonomiSeeder extends Seeder
       ]);
     }
 
-    NilaiTransaksiEkonomi::factory()->count(100)->create()->each(function ($record) use ($commodities) {
+    NilaiTransaksiEkonomi::factory()->count(500)->create()->each(function ($record) use ($commodities) {
       $detailCount = rand(1, 3);
       $totalValue = 0;
 

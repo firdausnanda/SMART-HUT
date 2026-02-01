@@ -12,6 +12,6 @@ class ReboisasiPsSeeder extends Seeder
    */
   public function run(): void
   {
-    ReboisasiPS::factory(100)->create();
+    ReboisasiPS::factory(500)->create();
   }
 }

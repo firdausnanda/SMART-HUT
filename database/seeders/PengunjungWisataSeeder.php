@@ -12,6 +12,6 @@ class PengunjungWisataSeeder extends Seeder
    */
   public function run(): void
   {
-    PengunjungWisata::factory(100)->create();
+    PengunjungWisata::factory(500)->create();
   }
 }

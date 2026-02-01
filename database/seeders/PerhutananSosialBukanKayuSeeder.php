@@ -12,7 +12,7 @@ class PerhutananSosialBukanKayuSeeder extends Seeder
    */
   public function run(): void
   {
-    HasilHutanBukanKayu::factory(100)->create([
+    HasilHutanBukanKayu::factory(500)->create([
       'forest_type' => 'Perhutanan Sosial',
     ]);
   }

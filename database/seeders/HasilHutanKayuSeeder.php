@@ -12,6 +12,6 @@ class HasilHutanKayuSeeder extends Seeder
    */
   public function run(): void
   {
-    HasilHutanKayu::factory(100)->create();
+    HasilHutanKayu::factory(500)->create();
   }
 }

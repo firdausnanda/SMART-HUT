@@ -12,6 +12,6 @@ class KupsSeeder extends Seeder
    */
   public function run(): void
   {
-    Kups::factory(100)->create();
+    Kups::factory(500)->create();
   }
 }

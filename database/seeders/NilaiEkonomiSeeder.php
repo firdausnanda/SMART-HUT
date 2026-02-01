@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\NilaiEkonomi;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -28,7 +29,7 @@ class NilaiEkonomiSeeder extends Seeder
             ]);
         }
 
-        \App\Models\NilaiEkonomi::factory()->count(100)->create()->each(function ($nilaiEkonomi) {
+        NilaiEkonomi::factory()->count(500)->create()->each(function ($nilaiEkonomi) {
             $numCommodities = rand(1, 3);
             $totalValue = 0;
 

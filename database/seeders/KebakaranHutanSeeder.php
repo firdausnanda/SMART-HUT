@@ -12,6 +12,6 @@ class KebakaranHutanSeeder extends Seeder
    */
   public function run(): void
   {
-    KebakaranHutan::factory(100)->create();
+    KebakaranHutan::factory(500)->create();
   }
 }

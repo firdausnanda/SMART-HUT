@@ -9,6 +9,6 @@ class PerkembanganKthSeeder extends Seeder
 {
   public function run(): void
   {
-    PerkembanganKth::factory()->count(100)->create();
+    PerkembanganKth::factory()->count(500)->create();
   }
 }
