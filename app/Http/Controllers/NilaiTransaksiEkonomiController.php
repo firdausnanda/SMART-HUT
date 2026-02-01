@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\NilaiTransaksiEkonomi;
 use App\Models\Commodity;
+use App\Models\NilaiTransaksiEkonomiDetail;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
@@ -23,66 +24,67 @@ class NilaiTransaksiEkonomiController extends Controller
 
   public function index(Request $request)
   {
-    $selectedYear = $request->query('year');
-    if (!$selectedYear) {
-      $selectedYear = NilaiTransaksiEkonomi::max('year') ?? date('Y');
-    }
+    $selectedYear = $request->query('year')
+      ?? NilaiTransaksiEkonomi::max('year')
+      ?? date('Y');
 
     $sort = $request->query('sort');
     $direction = $request->query('direction', 'asc');
 
     $datas = NilaiTransaksiEkonomi::query()
-      ->leftJoin('m_regencies', 'nilai_transaksi_ekonomi.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_districts', 'nilai_transaksi_ekonomi.district_id', '=', 'm_districts.id')
-      ->leftJoin('m_villages', 'nilai_transaksi_ekonomi.village_id', '=', 'm_villages.id')
-      ->select(
-        'nilai_transaksi_ekonomi.*',
-        'm_regencies.name as regency_name',
-        'm_districts.name as district_name',
-        'm_villages.name as village_name'
-      )
-      ->when($selectedYear, fn($q, $y) => $q->where('nilai_transaksi_ekonomi.year', $y))
-      ->when($request->search, function ($query, $search) {
-        $query->where(function ($q) use ($search) {
-          $q->where('nilai_transaksi_ekonomi.nama_kth', 'like', "%{$search}%")
-            ->orWhere('m_villages.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%")
-            ->orWhere('m_regencies.name', 'like', "%{$search}%")
-            ->orWhereHas('details.commodity', function ($q2) use ($search) {
-              $q2->where('name', 'like', "%{$search}%");
-            });
-        });
+      ->with([
+        'creator:id,name',
+        'regency_rel:id,name',
+        'district_rel:id,name',
+        'village_rel:id,name',
+        'details:id,nilai_transaksi_ekonomi_id,commodity_id,volume_produksi,satuan',
+        'details.commodity:id,name'
+      ])
+      ->where('year', $selectedYear)
+
+      ->when($request->search, function ($q, $search) {
+        $q->where('nama_kth', 'like', "%{$search}%")
+          ->orWhereHas('village_rel', fn($q) => $q->where('name', 'like', "%{$search}%"))
+          ->orWhereHas('district_rel', fn($q) => $q->where('name', 'like', "%{$search}%"))
+          ->orWhereHas('regency_rel', fn($q) => $q->where('name', 'like', "%{$search}%"))
+          ->orWhereHas('details.commodity', fn($q) => $q->where('name', 'like', "%{$search}%"));
       })
-      ->when($sort, function ($query, $sort) use ($direction) {
-        if ($sort === 'location') {
-          $query->orderBy('m_districts.name', $direction);
-        } elseif ($sort === 'nama_kth') {
-          $query->orderBy('nilai_transaksi_ekonomi.nama_kth', $direction);
-        } elseif ($sort === 'nilai') {
-          $query->orderBy('nilai_transaksi_ekonomi.total_nilai_transaksi', $direction);
-        } elseif ($sort === 'status') {
-          $query->orderBy('nilai_transaksi_ekonomi.status', $direction);
-        } else {
-          $query->orderBy('nilai_transaksi_ekonomi.created_at', 'desc');
-        }
-      }, function ($query) {
-        $query->orderBy('nilai_transaksi_ekonomi.created_at', 'desc');
-      })
-      ->with(['creator', 'regency_rel', 'district_rel', 'village_rel', 'details.commodity'])
-      ->paginate($request->query('per_page', 10))
+
+      ->when($request->sort, function ($q) use ($request) {
+        match ($request->sort) {
+          'nama_kth' => $q->orderBy('nama_kth', $request->direction),
+          'nilai' => $q->orderBy('total_nilai_transaksi', $request->direction),
+          'status' => $q->orderBy('status', $request->direction),
+          default => $q->latest(),
+        };
+      }, fn($q) => $q->latest())
+
+      ->paginate($request->integer('per_page', 10))
       ->withQueryString();
 
-    $stats = [
-      'total_transaksi' => NilaiTransaksiEkonomi::where('year', $selectedYear)->where('status', 'final')->count(),
-      'total_nilai' => NilaiTransaksiEkonomi::where('year', $selectedYear)->where('status', 'final')->sum('total_nilai_transaksi'),
-      'total_volume' => \App\Models\NilaiTransaksiEkonomiDetail::whereHas('nilaiTransaksiEkonomi', fn($q) => $q->where('year', $selectedYear)->where('status', 'final'))->sum('volume_produksi'),
-      'total_kth' => NilaiTransaksiEkonomi::where('year', $selectedYear)->where('status', 'final')->distinct('nama_kth')->count('nama_kth'),
-    ];
+    $stats = cache()->remember(
+      "nilai-transaksi-stats-{$selectedYear}",
+      300,
+      function () use ($selectedYear) {
+        return [
+          'total_transaksi' => NilaiTransaksiEkonomi::where('year', $selectedYear)->where('status', 'final')->count(),
+          'total_nilai' => NilaiTransaksiEkonomi::where('year', $selectedYear)->where('status', 'final')->sum('total_nilai_transaksi'),
+          'total_volume' => NilaiTransaksiEkonomiDetail::whereHas(
+            'nilaiTransaksiEkonomi',
+            fn($q) => $q->where('year', $selectedYear)->where('status', 'final')
+          )->sum('volume_produksi'),
+          'total_kth' => NilaiTransaksiEkonomi::where('year', $selectedYear)->where('status', 'final')->distinct()->count('nama_kth'),
+        ];
+      }
+    );
 
-    $dbYears = NilaiTransaksiEkonomi::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
-    $fixedYears = range(2025, 2021);
-    $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-    rsort($availableYears);
+    $availableYears = cache()->remember('nilai-transaksi-years', 3600, function () {
+      $dbYears = NilaiTransaksiEkonomi::distinct()->pluck('year')->toArray();
+      $fixedYears = range(2025, 2021);
+      $years = array_unique(array_merge($dbYears, $fixedYears));
+      rsort($years);
+      return $years;
+    });
 
     return Inertia::render('NilaiTransaksiEkonomi/Index', [
       'datas' => $datas,
