@@ -22,71 +22,89 @@ class KebakaranHutanController extends Controller
 
   public function index(Request $request)
   {
-    $selectedYear = $request->query('year');
-    if (!$selectedYear) {
-      $selectedYear = KebakaranHutan::max('year') ?? date('Y');
-    }
+    $defaultYear = KebakaranHutan::max('year') ?? now()->year;
+    $selectedYear = $request->integer('year', $defaultYear);
 
     $sortField = $request->query('sort', 'created_at');
     $sortDirection = $request->query('direction', 'desc');
 
     $datas = KebakaranHutan::query()
-      ->leftJoin('m_regencies', 'kebakaran_hutan.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_districts', 'kebakaran_hutan.district_id', '=', 'm_districts.id')
-      ->leftJoin('m_villages', 'kebakaran_hutan.village_id', '=', 'm_villages.id')
-      ->leftJoin('m_pengelola_wisata', 'kebakaran_hutan.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
-      ->select(
-        'kebakaran_hutan.*',
-        'm_regencies.name as regency_name',
-        'm_districts.name as district_name',
-        'm_villages.name as village_name',
-        'm_pengelola_wisata.name as pengelola_name'
-      )
-      ->when($selectedYear, function ($query, $year) {
-        return $query->where('kebakaran_hutan.year', $year);
-      })
-      ->when($request->search, function ($query, $search) {
-        $query->where(function ($q) use ($search) {
-          $q->where('m_villages.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%")
-            ->orWhere('m_regencies.name', 'like', "%{$search}%")
-            ->orWhere('m_pengelola_wisata.name', 'like', "%{$search}%")
-            ->orWhere('kebakaran_hutan.area_function', 'like', "%{$search}%");
+      ->select([
+        'kebakaran_hutan.id',
+        'kebakaran_hutan.year',
+        'kebakaran_hutan.month',
+        'kebakaran_hutan.regency_id',
+        'kebakaran_hutan.district_id',
+        'kebakaran_hutan.village_id',
+        'kebakaran_hutan.id_pengelola_wisata',
+        'kebakaran_hutan.area_function',
+        'kebakaran_hutan.number_of_fires',
+        'kebakaran_hutan.fire_area',
+        'kebakaran_hutan.status',
+        'kebakaran_hutan.created_at',
+        'kebakaran_hutan.created_by',
+      ])
+      ->with([
+        'creator:id,name',
+        'regency:id,name',
+        'district:id,name',
+        'village:id,name',
+        'pengelolaWisata:id,name'
+      ])
+      ->where('year', $selectedYear)
+
+      ->when($request->search, function ($q, $search) {
+        $q->where(function ($qq) use ($search) {
+          $qq->where('area_function', 'like', "%{$search}%")
+            ->orWhereHas('village', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('district', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('regency', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('pengelolaWisata', fn($q) => $q->where('name', 'like', "%{$search}%"));
         });
       })
-      ->with(['creator', 'regency', 'district', 'village', 'pengelolaWisata'])
-      ->when($sortField, function ($query) use ($sortField, $sortDirection) {
-        $sortMap = [
-          'month' => 'kebakaran_hutan.month',
-          'location' => 'm_villages.name', // Approximate, allows sorting by village name
-          'pengelola' => 'm_pengelola_wisata.name',
-          'area_function' => 'kebakaran_hutan.area_function',
-          'number_of_fires' => 'kebakaran_hutan.number_of_fires',
-          'fire_area' => 'kebakaran_hutan.fire_area',
-          'status' => 'kebakaran_hutan.status',
-          'created_at' => 'kebakaran_hutan.created_at',
-        ];
 
-        $dbColumn = $sortMap[$sortField] ?? 'kebakaran_hutan.created_at';
-        return $query->orderBy($dbColumn, $sortDirection);
+      ->when($sortField === 'location', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_villages', 'kebakaran_hutan.village_id', '=', 'm_villages.id')
+          ->orderBy('m_villages.name', $sortDirection);
       })
-      ->paginate($request->query('per_page', 10))
+      ->when($sortField === 'pengelola', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_pengelola_wisata', 'kebakaran_hutan.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
+          ->orderBy('m_pengelola_wisata.name', $sortDirection);
+      })
+
+      ->when(!in_array($sortField, ['location', 'pengelola']), function ($q) use ($sortField, $sortDirection) {
+        match ($sortField) {
+          'month' => $q->orderBy('month', $sortDirection),
+          'area_function' => $q->orderBy('area_function', $sortDirection),
+          'number_of_fires' => $q->orderBy('number_of_fires', $sortDirection),
+          'fire_area' => $q->orderBy('fire_area', $sortDirection),
+          'status' => $q->orderBy('status', $sortDirection),
+          default => $q->orderBy('created_at', 'desc'),
+        };
+      })
+
+      ->paginate($request->integer('per_page', 10))
       ->withQueryString();
 
-    $stats = [
-      'total_fires' => KebakaranHutan::where('year', $selectedYear)->where('status', 'final')->sum('number_of_fires'),
-      'total_area' => KebakaranHutan::where('year', $selectedYear)->where('status', 'final')->sum('fire_area'), // Assuming string field might need handling if it has units, but model casts might be needed
-      'total_count' => KebakaranHutan::where('year', $selectedYear)->where('status', 'final')->count(),
-    ];
+    $stats = cache()->remember(
+      "karhutla-stats-{$selectedYear}",
+      300,
+      fn() => [
+        'total_fires' => KebakaranHutan::where('year', $selectedYear)->where('status', 'final')->sum('number_of_fires'),
+        'total_area' => KebakaranHutan::where('year', $selectedYear)->where('status', 'final')->get()->sum(function ($item) {
+          return (float) filter_var($item->fire_area, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        }),
+        'total_count' => KebakaranHutan::where('year', $selectedYear)->where('status', 'final')->count(),
+      ]
+    );
 
-    // Ensure total_area can be summed if it's a string in DB but represents number
-    // If it's alphanumeric (e.g. "10 Ha"), sum() might fail or return 0. 
-    // For now adhering to numeric assumption or basic sum.
-
-    $dbYears = KebakaranHutan::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
-    $fixedYears = range(2025, 2021);
-    $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-    rsort($availableYears);
+    $availableYears = cache()->remember('karhutla-years', 3600, function () {
+      $dbYears = KebakaranHutan::distinct()->pluck('year')->toArray();
+      $fixedYears = range(2025, 2021);
+      $years = array_unique(array_merge($dbYears, $fixedYears));
+      rsort($years);
+      return $years;
+    });
 
     return Inertia::render('KebakaranHutan/Index', [
       'datas' => $datas,

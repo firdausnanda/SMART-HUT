@@ -21,81 +21,94 @@ class RealisasiPnbpController extends Controller
 
   public function index(Request $request)
   {
-    $selectedYear = $request->query('year');
+    $selectedYear = $request->integer('year');
     if (!$selectedYear) {
-      $selectedYear = RealisasiPnbp::max('year') ?? date('Y');
+      $selectedYear = RealisasiPnbp::max('year') ?? now()->year;
     }
 
+    $sortField = $request->query('sort', 'created_at');
+    $sortDirection = $request->query('direction', 'desc');
+
     $datas = RealisasiPnbp::query()
-      ->leftJoin('m_regencies', 'realisasi_pnbp.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_pengelola_wisata', 'realisasi_pnbp.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
-      ->select(
-        'realisasi_pnbp.*',
-        'm_regencies.name as regency_name',
-        'm_pengelola_wisata.name as pengelola_name'
-      )
+      ->select([
+        'realisasi_pnbp.id',
+        'realisasi_pnbp.year',
+        'realisasi_pnbp.month',
+        'realisasi_pnbp.province_id',
+        'realisasi_pnbp.regency_id',
+        'realisasi_pnbp.id_pengelola_wisata',
+        'realisasi_pnbp.types_of_forest_products',
+        'realisasi_pnbp.pnbp_target',
+        'realisasi_pnbp.pnbp_realization',
+        'realisasi_pnbp.status',
+        'realisasi_pnbp.rejection_note',
+        'realisasi_pnbp.created_at',
+        'realisasi_pnbp.created_by',
+      ])
+      ->with([
+        'creator:id,name',
+        'regency:id,name',
+        'pengelola_wisata:id,name'
+      ])
       ->when($selectedYear, function ($query, $year) {
-        return $query->where('realisasi_pnbp.year', $year);
+        return $query->where('year', $year);
       })
       ->when($request->search, function ($query, $search) {
         $query->where(function ($q) use ($search) {
           $q->where('types_of_forest_products', 'like', "%{$search}%")
-            ->orWhere('m_regencies.name', 'like', "%{$search}%")
-            ->orWhere('m_pengelola_wisata.name', 'like', "%{$search}%");
+            ->orWhereHas('regency', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('pengelola_wisata', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
         });
       })
-      ->when($request->has('sort') && $request->has('direction'), function ($query) use ($request) {
-        $direction = $request->direction === 'desc' ? 'desc' : 'asc';
-        $sort = $request->sort;
-
-        switch ($sort) {
-          case 'month':
-            return $query->orderBy('realisasi_pnbp.month', $direction);
-          case 'pengelola':
-            return $query->orderBy('m_pengelola_wisata.name', $direction);
-          case 'forest_product':
-            return $query->orderBy('realisasi_pnbp.types_of_forest_products', $direction);
-          case 'target':
-            return $query->orderBy('realisasi_pnbp.pnbp_target', $direction);
-          case 'realization':
-            return $query->orderBy('realisasi_pnbp.pnbp_realization', $direction);
-          case 'status':
-            return $query->orderBy('realisasi_pnbp.status', $direction);
-          default:
-            return $query->orderBy('realisasi_pnbp.created_at', 'desc');
-        }
-      }, function ($query) {
-        return $query->latest('realisasi_pnbp.created_at');
+      ->when($sortField === 'pengelola', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_pengelola_wisata', 'realisasi_pnbp.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
+          ->orderBy('m_pengelola_wisata.name', $sortDirection);
       })
-      ->with(['creator', 'regency', 'pengelola_wisata'])
-      ->paginate(10)
+      ->when(!in_array($sortField, ['pengelola']), function ($q) use ($sortField, $sortDirection) {
+        match ($sortField) {
+          'month' => $q->orderBy('month', $sortDirection),
+          'forest_product' => $q->orderBy('types_of_forest_products', $sortDirection),
+          'target' => $q->orderBy('pnbp_target', $sortDirection),
+          'realization' => $q->orderBy('pnbp_realization', $sortDirection),
+          'status' => $q->orderBy('status', $sortDirection),
+          default => $q->orderBy('created_at', 'desc'),
+        };
+      })
+      ->paginate($request->integer('per_page', 10))
       ->withQueryString();
 
-    // Stats
-    $stats = [
-      'total_count' => RealisasiPnbp::when($selectedYear, fn($q) => $q->where('year', $selectedYear))->count(),
-      'verified_count' => RealisasiPnbp::where('status', 'final')
-        ->when($selectedYear, fn($q) => $q->where('year', $selectedYear))
-        ->count(),
-    ];
+    // Stats with caching
+    $cacheKey = "pnbp-stats-{$selectedYear}";
+    $stats = cache()->remember($cacheKey, 300, function () use ($selectedYear) {
+      return [
+        'total_count' => RealisasiPnbp::when($selectedYear, fn($q) => $q->where('year', $selectedYear))->count(),
+        'verified_count' => RealisasiPnbp::where('status', 'final')
+          ->when($selectedYear, fn($q) => $q->where('year', $selectedYear))
+          ->count(),
+      ];
+    });
 
-    // Available Years
-    $dbYears = RealisasiPnbp::distinct()
-      ->orderBy('year', 'desc')
-      ->pluck('year')
-      ->toArray();
-    $fixedYears = range(2025, 2021);
-    $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-    rsort($availableYears);
+    // Available Years with caching
+    $availableYears = cache()->remember('pnbp-years', 3600, function () {
+      $dbYears = RealisasiPnbp::distinct()
+        ->pluck('year')
+        ->toArray();
+      $fixedYears = range(2025, 2021);
+      $years = array_unique(array_merge($dbYears, $fixedYears));
+      rsort($years);
+      return $years;
+    });
 
     return Inertia::render('RealisasiPnbp/Index', [
       'datas' => $datas,
       'stats' => $stats,
       'available_years' => $availableYears,
       'filters' => [
-        'year' => $selectedYear,
-        'sort' => $request->sort,
-        'direction' => $request->direction,
+        'year' => (int) $selectedYear,
+        'search' => $request->search,
+        'sort' => $sortField,
+        'direction' => $sortDirection,
+        'per_page' => (int) $request->query('per_page', 10),
       ],
     ]);
   }

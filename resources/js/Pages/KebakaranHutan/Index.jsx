@@ -650,8 +650,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                         <div className="text-xs text-gray-400 font-semibold">{item.year}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-medium text-gray-800">{item.district_name || 'N/A'}</div>
-                        <div className="text-xs text-gray-500">{item.village_name || 'N/A'}</div>
+                        <div className="font-medium text-gray-800">{item.district?.name || 'N/A'}</div>
+                        <div className="text-xs text-gray-500">{item.village?.name || 'N/A'}</div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="font-medium text-gray-800">{item.pengelola_wisata?.name || '-'}</div>

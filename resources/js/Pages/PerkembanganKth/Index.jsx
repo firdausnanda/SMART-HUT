@@ -572,7 +572,7 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                             <span className="uppercase tracking-tight font-medium">
-                              {item.village_name || '-'}, {item.district_name || '-'}
+                              {item.village_rel?.name || '-'}, {item.district_rel?.name || '-'}
                             </span>
                           </div>
                           {item.nomor_register && (

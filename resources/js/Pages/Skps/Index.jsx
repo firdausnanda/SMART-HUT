@@ -590,16 +590,16 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                           />
                         </td>
                         <td className="px-6 py-4">
-                          <div className="font-bold text-gray-800">{item.district_name || 'Kecamatan N/A'}</div>
+                          <div className="font-bold text-gray-800">{item.district?.name || 'Kecamatan N/A'}</div>
                           <div className="text-xs text-primary-600 font-bold uppercase tracking-tighter">
-                            {item.regency_name || 'Kabupaten N/A'}
+                            {item.regency?.name || 'Kabupaten N/A'}
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="font-bold text-gray-900">{item.nama_kelompok || '-'}</div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="font-bold text-gray-900">{item.skema_name}</div>
+                          <div className="font-bold text-gray-900">{item.skema?.name}</div>
                           <div className="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full inline-block mt-1">
                             Luas: {item.ps_area} Ha
                           </div>

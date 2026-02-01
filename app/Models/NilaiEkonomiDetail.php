@@ -21,4 +21,9 @@ class NilaiEkonomiDetail extends Model
     {
         return $this->belongsTo(Commodity::class);
     }
+
+    public function nilaiEkonomi()
+    {
+        return $this->belongsTo(NilaiEkonomi::class);
+    }
 }

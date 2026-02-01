@@ -21,63 +21,82 @@ class ReboisasiPsController extends Controller
 
   public function index(Request $request)
   {
-    $selectedYear = $request->query('year');
-    if (!$selectedYear) {
-      $selectedYear = ReboisasiPS::max('year') ?? date('Y');
-    }
+    $defaultYear = ReboisasiPS::max('year') ?? now()->year;
+    $selectedYear = $request->integer('year', $defaultYear);
 
     $sortField = $request->query('sort', 'created_at');
     $sortDirection = $request->query('direction', 'desc');
 
     $datas = ReboisasiPS::query()
-      ->leftJoin('m_regencies', 'reboisasi_ps.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_districts', 'reboisasi_ps.district_id', '=', 'm_districts.id')
-      ->leftJoin('m_villages', 'reboisasi_ps.village_id', '=', 'm_villages.id')
-      ->select(
-        'reboisasi_ps.*',
-        'm_regencies.name as regency_name',
-        'm_districts.name as district_name',
-        'm_villages.name as village_name'
-      )
-      ->when($selectedYear, function ($query, $year) {
-        return $query->where('reboisasi_ps.year', $year);
-      })
-      ->when($request->search, function ($query, $search) {
-        $query->where(function ($q) use ($search) {
-          $q->where('m_villages.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%")
-            ->orWhere('m_regencies.name', 'like', "%{$search}%")
-            ->orWhere('reboisasi_ps.fund_source', 'like', "%{$search}%");
+      ->select([
+        'reboisasi_ps.id',
+        'reboisasi_ps.year',
+        'reboisasi_ps.month',
+        'reboisasi_ps.regency_id',
+        'reboisasi_ps.district_id',
+        'reboisasi_ps.village_id',
+        'reboisasi_ps.fund_source',
+        'reboisasi_ps.target_annual',
+        'reboisasi_ps.realization',
+        'reboisasi_ps.status',
+        'reboisasi_ps.created_at',
+        'reboisasi_ps.created_by',
+      ])
+      ->with([
+        'creator:id,name',
+        'regency_rel:id,name',
+        'district_rel:id,name',
+        'village_rel:id,name',
+      ])
+      ->where('year', $selectedYear)
+
+      ->when($request->search, function ($q, $search) {
+        $q->where(function ($qq) use ($search) {
+          $qq->where('fund_source', 'like', "%{$search}%")
+            ->orWhereHas('village_rel', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('district_rel', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('regency_rel', fn($q) => $q->where('name', 'like', "%{$search}%"));
         });
       })
-      ->with(['creator', 'regency_rel', 'district_rel', 'village_rel'])
-      ->when($sortField, function ($query) use ($sortField, $sortDirection) {
-        $sortMap = [
-          'month' => 'reboisasi_ps.month',
-          'location' => 'm_villages.name',
-          'realization' => 'reboisasi_ps.realization',
-          'target' => 'reboisasi_ps.target_annual',
-          'fund_source' => 'reboisasi_ps.fund_source',
-          'status' => 'reboisasi_ps.status',
-          'created_at' => 'reboisasi_ps.created_at',
-        ];
 
-        $dbColumn = $sortMap[$sortField] ?? 'reboisasi_ps.created_at';
-        return $query->orderBy($dbColumn, $sortDirection);
+      ->when($sortField === 'location', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_villages', 'reboisasi_ps.village_id', '=', 'm_villages.id')
+          ->orderBy('m_villages.name', $sortDirection);
       })
-      ->paginate($request->query('per_page', 10))
+
+      ->when($sortField !== 'location', function ($q) use ($sortField, $sortDirection) {
+        match ($sortField) {
+          'month' => $q->orderBy('month', $sortDirection),
+          'realization' => $q->orderBy('realization', $sortDirection),
+          'target' => $q->orderBy('target_annual', $sortDirection),
+          'fund_source' => $q->orderBy('fund_source', $sortDirection),
+          'status' => $q->orderBy('status', $sortDirection),
+          default => $q->orderBy('created_at', 'desc'),
+        };
+      })
+
+      ->paginate($request->integer('per_page', 10))
       ->withQueryString();
 
-    $stats = [
-      'total_target' => ReboisasiPS::where('year', $selectedYear)->where('status', 'final')->sum('target_annual'),
-      'total_realization' => ReboisasiPS::where('year', $selectedYear)->where('status', 'final')->sum('realization'),
-      'total_count' => ReboisasiPS::where('year', $selectedYear)->where('status', 'final')->count(),
-    ];
+    $stats = cache()->remember(
+      "reboisasi-ps-stats-{$selectedYear}",
+      300,
+      fn() => [
+        'total_target' => ReboisasiPS::where('year', $selectedYear)->where('status', 'final')->sum('target_annual'),
+        'total_realization' => ReboisasiPS::where('year', $selectedYear)->where('status', 'final')->sum('realization'),
+        'total_count' => ReboisasiPS::where('year', $selectedYear)->where('status', 'final')->count(),
+      ]
+    );
 
-    $dbYears = ReboisasiPS::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
-    $fixedYears = range(2025, 2021);
-    $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-    rsort($availableYears);
+    $availableYears = cache()->remember('reboisasi-ps-years', 3600, function () {
+      $dbYears = ReboisasiPS::distinct()->pluck('year')->toArray();
+      $fixedYears = range(2025, 2021);
+      $years = array_unique(array_merge($dbYears, $fixedYears));
+      rsort($years);
+      return $years;
+    });
+
+    $sumberDana = cache()->remember('sumber-dana', 3600, fn() => SumberDana::select('id', 'name')->get());
 
     return Inertia::render('ReboisasiPs/Index', [
       'datas' => $datas,
@@ -90,7 +109,7 @@ class ReboisasiPsController extends Controller
         'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
-      'sumberDana' => SumberDana::all()
+      'sumberDana' => $sumberDana
     ]);
   }
 

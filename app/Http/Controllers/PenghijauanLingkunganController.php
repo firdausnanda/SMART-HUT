@@ -21,63 +21,86 @@ class PenghijauanLingkunganController extends Controller
 
   public function index(Request $request)
   {
-    $selectedYear = $request->query('year');
-    if (!$selectedYear) {
-      $selectedYear = PenghijauanLingkungan::max('year') ?? date('Y');
-    }
+    $defaultYear = PenghijauanLingkungan::max('year') ?? now()->year;
+    $selectedYear = $request->integer('year', $defaultYear);
 
     $sortField = $request->query('sort', 'created_at');
     $sortDirection = $request->query('direction', 'desc');
 
     $datas = PenghijauanLingkungan::query()
-      ->leftJoin('m_regencies', 'penghijauan_lingkungan.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_districts', 'penghijauan_lingkungan.district_id', '=', 'm_districts.id')
-      ->leftJoin('m_villages', 'penghijauan_lingkungan.village_id', '=', 'm_villages.id')
-      ->select(
-        'penghijauan_lingkungan.*',
-        'm_regencies.name as regency_name',
-        'm_districts.name as district_name',
-        'm_villages.name as village_name'
-      )
-      ->when($selectedYear, function ($query, $year) {
-        return $query->where('penghijauan_lingkungan.year', $year);
-      })
-      ->when($request->search, function ($query, $search) {
-        $query->where(function ($q) use ($search) {
-          $q->where('m_villages.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%")
-            ->orWhere('m_regencies.name', 'like', "%{$search}%")
-            ->orWhere('penghijauan_lingkungan.fund_source', 'like', "%{$search}%");
+      ->select([
+        'penghijauan_lingkungan.id',
+        'penghijauan_lingkungan.year',
+        'penghijauan_lingkungan.month',
+        'penghijauan_lingkungan.regency_id',
+        'penghijauan_lingkungan.district_id',
+        'penghijauan_lingkungan.village_id',
+        'penghijauan_lingkungan.fund_source',
+        'penghijauan_lingkungan.target_annual',
+        'penghijauan_lingkungan.realization',
+        'penghijauan_lingkungan.status',
+        'penghijauan_lingkungan.created_at',
+        'penghijauan_lingkungan.created_by',
+      ])
+      ->with([
+        'creator:id,name',
+        'regency_rel:id,name',
+        'district_rel:id,name',
+        'village_rel:id,name',
+      ])
+      ->where('year', $selectedYear)
+
+      ->when($request->search, function ($q, $search) {
+        $q->where(function ($qq) use ($search) {
+          $qq->where('fund_source', 'like', "%{$search}%")
+            ->orWhereHas('village_rel', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('district_rel', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('regency_rel', fn($q) => $q->where('name', 'like', "%{$search}%"));
         });
       })
-      ->with(['creator', 'regency_rel', 'district_rel', 'village_rel'])
-      ->when($sortField, function ($query) use ($sortField, $sortDirection) {
-        $sortMap = [
-          'year' => 'penghijauan_lingkungan.year',
-          'month' => 'penghijauan_lingkungan.month',
-          'location' => 'm_villages.name',
-          'realization' => 'penghijauan_lingkungan.realization',
-          'fund_source' => 'penghijauan_lingkungan.fund_source',
-          'status' => 'penghijauan_lingkungan.status',
-          'created_at' => 'penghijauan_lingkungan.created_at',
-        ];
 
-        $dbColumn = $sortMap[$sortField] ?? 'penghijauan_lingkungan.created_at';
-        return $query->orderBy($dbColumn, $sortDirection);
+      ->when($sortField === 'location', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_villages', 'penghijauan_lingkungan.village_id', '=', 'm_villages.id')
+          ->orderBy('m_villages.name', $sortDirection);
       })
-      ->paginate($request->query('per_page', 10))
+
+      ->when($sortField !== 'location', function ($q) use ($sortField, $sortDirection) {
+        match ($sortField) {
+          'year' => $q->orderBy('year', $sortDirection),
+          'month' => $q->orderBy('month', $sortDirection),
+          'realization' => $q->orderBy('realization', $sortDirection),
+          'fund_source' => $q->orderBy('fund_source', $sortDirection),
+          'status' => $q->orderBy('status', $sortDirection),
+          default => $q->orderBy('created_at', 'desc'),
+        };
+      })
+
+      ->paginate($request->integer('per_page', 10))
       ->withQueryString();
 
-    $stats = [
-      'total_target' => PenghijauanLingkungan::where('year', $selectedYear)->where('status', 'final')->sum('target_annual'),
-      'total_realization' => PenghijauanLingkungan::where('year', $selectedYear)->where('status', 'final')->sum('realization'),
-      'total_count' => PenghijauanLingkungan::where('year', $selectedYear)->where('status', 'final')->count(),
-    ];
+    $stats = cache()->remember(
+      "penghijauan-lingkungan-stats-{$selectedYear}",
+      300,
+      fn() => [
+        'total_target' => PenghijauanLingkungan::where('year', $selectedYear)->where('status', 'final')->sum('target_annual'),
+        'total_realization' => PenghijauanLingkungan::where('year', $selectedYear)->where('status', 'final')->sum('realization'),
+        'total_count' => PenghijauanLingkungan::where('year', $selectedYear)->where('status', 'final')->count(),
+      ]
+    );
 
-    $dbYears = PenghijauanLingkungan::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
-    $fixedYears = range(2025, 2021);
-    $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-    rsort($availableYears);
+    $availableYears = cache()->remember('penghijauan-lingkungan-years', 3600, function () {
+      $dbYears = PenghijauanLingkungan::distinct()->pluck('year')->toArray();
+      $fixedYears = range(2025, 2021);
+      $years = array_unique(array_merge($dbYears, $fixedYears));
+      rsort($years);
+      return $years;
+    });
+
+    $sumberDana = cache()->remember(
+      'sumber-dana',
+      3600,
+      fn() => SumberDana::select('id', 'name')->get()
+    );
 
     return Inertia::render('PenghijauanLingkungan/Index', [
       'datas' => $datas,
@@ -90,7 +113,7 @@ class PenghijauanLingkunganController extends Controller
         'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
-      'sumberDana' => SumberDana::all()
+      'sumberDana' => $sumberDana
     ]);
   }
 

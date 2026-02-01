@@ -24,70 +24,87 @@ class RhlTeknisController extends Controller
 
   public function index(Request $request)
   {
-    $selectedYear = $request->query('year');
-    if (!$selectedYear) {
-      $selectedYear = RhlTeknis::max('year') ?? date('Y');
-    }
+    $defaultYear = RhlTeknis::max('year') ?? now()->year;
+    $selectedYear = $request->integer('year', $defaultYear);
 
     $sortField = $request->query('sort', 'created_at');
     $sortDirection = $request->query('direction', 'desc');
 
     $datas = RhlTeknis::query()
-      ->leftJoin('m_regencies', 'rhl_teknis.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_districts', 'rhl_teknis.district_id', '=', 'm_districts.id')
-      ->leftJoin('m_villages', 'rhl_teknis.village_id', '=', 'm_villages.id')
-      ->select(
-        'rhl_teknis.*',
-        'm_regencies.name as regency_name',
-        'm_districts.name as district_name',
-        'm_villages.name as village_name'
-      )
-      ->when($selectedYear, function ($query, $year) {
-        return $query->where('year', $year);
-      })
-      ->when($request->search, function ($query, $search) {
-        $query->where(function ($q) use ($search) {
-          $q->where('fund_source', 'like', "%{$search}%")
-            ->orWhereHas('details.bangunan_kta', function ($q2) use ($search) {
-              $q2->where('name', 'like', "%{$search}%");
-            })
-            ->orWhere('m_villages.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%")
-            ->orWhere('m_regencies.name', 'like', "%{$search}%");
+      ->select([
+        'rhl_teknis.id',
+        'rhl_teknis.year',
+        'rhl_teknis.month',
+        'rhl_teknis.regency_id',
+        'rhl_teknis.district_id',
+        'rhl_teknis.village_id',
+        'rhl_teknis.fund_source',
+        'rhl_teknis.target_annual',
+        'rhl_teknis.status',
+        'rhl_teknis.created_at',
+        'rhl_teknis.created_by',
+      ])
+      ->with([
+        'creator:id,name',
+        'regency:id,name',
+        'district:id,name',
+        'village:id,name',
+        'details.bangunan_kta:id,name'
+      ])
+      ->where('year', $selectedYear)
+
+      ->when($request->search, function ($q, $search) {
+        $q->where(function ($qq) use ($search) {
+          $qq->where('fund_source', 'like', "%{$search}%")
+            ->orWhereHas('details.bangunan_kta', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('village', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('district', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('regency', fn($q) => $q->where('name', 'like', "%{$search}%"));
         });
       })
-      ->with(['creator', 'details.bangunan_kta'])
-      ->when($sortField, function ($query) use ($sortField, $sortDirection) {
-        $sortMap = [
-          'period' => 'rhl_teknis.month',
-          'location' => 'm_villages.name',
-          'target' => 'rhl_teknis.target_annual',
-          'fund_source' => 'rhl_teknis.fund_source',
-          'status' => 'rhl_teknis.status',
-          'created_at' => 'rhl_teknis.created_at',
-        ];
 
-        $dbColumn = $sortMap[$sortField] ?? 'rhl_teknis.created_at';
-        return $query->orderBy($dbColumn, $sortDirection);
+      ->when($sortField === 'location', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_villages', 'rhl_teknis.village_id', '=', 'm_villages.id')
+          ->orderBy('m_villages.name', $sortDirection);
       })
-      ->paginate($request->query('per_page', 10))
+
+      ->when($sortField !== 'location', function ($q) use ($sortField, $sortDirection) {
+        match ($sortField) {
+          'period' => $q->orderBy('month', $sortDirection),
+          'target' => $q->orderBy('target_annual', $sortDirection),
+          'fund_source' => $q->orderBy('fund_source', $sortDirection),
+          'status' => $q->orderBy('status', $sortDirection),
+          default => $q->orderBy('created_at', 'desc'),
+        };
+      })
+
+      ->paginate($request->integer('per_page', 10))
       ->withQueryString();
 
-    $stats = [
-      'total_target' => RhlTeknis::where('year', $selectedYear)->where('status', 'final')->sum('target_annual'),
-      'total_units' => RhlTeknis::where('year', $selectedYear)
-        ->where('status', 'final')
-        ->whereHas('details')
-        ->withSum('details', 'unit_amount')
-        ->get()
-        ->sum('details_sum_unit_amount'),
-      'total_count' => RhlTeknis::where('year', $selectedYear)->where('status', 'final')->count(),
-    ];
+    $stats = cache()->remember(
+      "rhl-teknis-stats-{$selectedYear}",
+      300,
+      fn() => [
+        'total_target' => RhlTeknis::where('year', $selectedYear)->where('status', 'final')->sum('target_annual'),
+        'total_units' => RhlTeknis::where('year', $selectedYear)
+          ->where('status', 'final')
+          ->whereHas('details')
+          ->withSum('details', 'unit_amount')
+          ->get()
+          ->sum('details_sum_unit_amount'),
+        'total_count' => RhlTeknis::where('year', $selectedYear)->where('status', 'final')->count(),
+      ]
+    );
 
-    $dbYears = RhlTeknis::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
-    $fixedYears = range(2025, 2021);
-    $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-    rsort($availableYears);
+    $availableYears = cache()->remember('rhl-teknis-years', 3600, function () {
+      $dbYears = RhlTeknis::distinct()->pluck('year')->toArray();
+      $fixedYears = range(2025, 2021);
+      $years = array_unique(array_merge($dbYears, $fixedYears));
+      rsort($years);
+      return $years;
+    });
+
+    $sumberDana = cache()->remember('sumber-dana', 3600, fn() => SumberDana::select('id', 'name')->get());
 
     return Inertia::render('RhlTeknis/Index', [
       'datas' => $datas,
@@ -100,7 +117,7 @@ class RhlTeknisController extends Controller
         'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
-      'sumberDana' => SumberDana::all()
+      'sumberDana' => $sumberDana
     ]);
   }
 

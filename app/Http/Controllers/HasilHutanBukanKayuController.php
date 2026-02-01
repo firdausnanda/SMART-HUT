@@ -23,78 +23,97 @@ class HasilHutanBukanKayuController extends Controller
   public function index(Request $request)
   {
     $forestType = $request->query('forest_type', 'Hutan Negara');
-    $selectedYear = $request->query('year');
-    if (!$selectedYear) {
-      $selectedYear = HasilHutanBukanKayu::where('forest_type', $forestType)->max('year') ?? date('Y');
-    }
+    $defaultYear = HasilHutanBukanKayu::where('forest_type', $forestType)->max('year') ?? now()->year;
+    $selectedYear = $request->integer('year', $defaultYear);
 
     $sortField = $request->query('sort', 'created_at');
     $sortDirection = $request->query('direction', 'desc');
 
     $datas = HasilHutanBukanKayu::query()
-      ->leftJoin('m_regencies', 'hasil_hutan_bukan_kayu.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_districts', 'hasil_hutan_bukan_kayu.district_id', '=', 'm_districts.id')
-      ->select(
-        'hasil_hutan_bukan_kayu.*',
-        'm_regencies.name as regency_name',
-        'm_districts.name as district_name',
-        'm_pengelola_hutan.name as pengelola_hutan_name'
-      )
-      ->leftJoin('m_pengelola_hutan', 'hasil_hutan_bukan_kayu.pengelola_hutan_id', '=', 'm_pengelola_hutan.id')
+      ->select([
+        'hasil_hutan_bukan_kayu.id',
+        'hasil_hutan_bukan_kayu.year',
+        'hasil_hutan_bukan_kayu.month',
+        'hasil_hutan_bukan_kayu.regency_id',
+        'hasil_hutan_bukan_kayu.district_id',
+        'hasil_hutan_bukan_kayu.pengelola_hutan_id',
+        'hasil_hutan_bukan_kayu.forest_type',
+        'hasil_hutan_bukan_kayu.volume_target',
+        'hasil_hutan_bukan_kayu.status',
+        'hasil_hutan_bukan_kayu.created_at',
+        'hasil_hutan_bukan_kayu.created_by',
+      ])
+      ->with([
+        'creator:id,name',
+        'regency:id,name',
+        'district:id,name',
+        'pengelolaHutan:id,name',
+        'details.commodity:id,name'
+      ])
       ->where('forest_type', $forestType)
-      ->when($selectedYear, function ($query, $year) {
-        return $query->where('hasil_hutan_bukan_kayu.year', $year);
-      })
+      ->where('year', $selectedYear)
+
       ->when($request->search, function ($query, $search) {
         $query->where(function ($q) use ($search) {
-          $q->whereHas('details.commodity', function ($q2) use ($search) {
-            $q2->where('name', 'like', "%{$search}%");
-          })
-            ->orWhere('m_regencies.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%")
-            ->orWhere('m_pengelola_hutan.name', 'like', "%{$search}%");
+          $q->whereHas('details.commodity', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('regency', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('district', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('pengelolaHutan', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
         });
       })
-      ->with(['creator', 'regency', 'district', 'pengelolaHutan', 'details.commodity'])
-      ->when($sortField, function ($query) use ($sortField, $sortDirection) {
-        $sortMap = [
-          'month' => 'hasil_hutan_bukan_kayu.month',
-          'location' => 'm_districts.name',
-          // 'volume' => // Volume is now aggregate, difficult to sort by SQL simply without subquery. Defaulting complexity.
-          'status' => 'hasil_hutan_bukan_kayu.status',
-          'created_at' => 'hasil_hutan_bukan_kayu.created_at',
-        ];
 
-        $dbColumn = $sortMap[$sortField] ?? 'hasil_hutan_bukan_kayu.created_at';
-        return $query->orderBy($dbColumn, $sortDirection);
+      ->when($sortField === 'location', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_regencies', 'hasil_hutan_bukan_kayu.regency_id', '=', 'm_regencies.id')
+          ->leftJoin('m_districts', 'hasil_hutan_bukan_kayu.district_id', '=', 'm_districts.id')
+          ->orderByRaw("COALESCE(m_districts.name, m_regencies.name) $sortDirection");
       })
-      ->paginate($request->query('per_page', 10))
+      ->when($sortField === 'pengelola', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_pengelola_hutan', 'hasil_hutan_bukan_kayu.pengelola_hutan_id', '=', 'm_pengelola_hutan.id')
+          ->orderBy('m_pengelola_hutan.name', $sortDirection);
+      })
+
+      ->when(!in_array($sortField, ['location', 'pengelola']), function ($q) use ($sortField, $sortDirection) {
+        match ($sortField) {
+          'month' => $q->orderBy('month', $sortDirection),
+          // 'volume' => $q->orderBy('volume_target', $sortDirection), // Sorting by target volume
+          'status' => $q->orderBy('status', $sortDirection),
+          default => $q->orderBy('created_at', 'desc'),
+        };
+      })
+
+      ->paginate($request->integer('per_page', 10))
       ->withQueryString();
 
-    // Stats
-    $stats = [
-      'total_count' => HasilHutanBukanKayu::where('forest_type', $forestType)
-        ->when($selectedYear, fn($q) => $q->where('year', $selectedYear))
-        ->count(),
-      'total_volume' => HasilHutanBukanKayu::where('forest_type', $forestType)
-        ->when($selectedYear, fn($q) => $q->where('year', $selectedYear))
-        ->where('status', 'final')
-        ->sum('volume_target'),
-      'verified_count' => HasilHutanBukanKayu::where('forest_type', $forestType)
-        ->when($selectedYear, fn($q) => $q->where('year', $selectedYear))
-        ->where('status', 'final')
-        ->count(),
-    ];
+    // Stats with caching
+    $cacheKey = "hhbk-stats-{$forestType}-{$selectedYear}";
+    $stats = cache()->remember($cacheKey, 300, function () use ($forestType, $selectedYear) {
+      return [
+        'total_count' => HasilHutanBukanKayu::where('forest_type', $forestType)
+          ->where('year', $selectedYear)
+          ->count(),
+        'total_volume' => HasilHutanBukanKayu::where('forest_type', $forestType)
+          ->where('year', $selectedYear)
+          ->where('status', 'final')
+          ->sum('volume_target'),
+        'verified_count' => HasilHutanBukanKayu::where('forest_type', $forestType)
+          ->where('year', $selectedYear)
+          ->where('status', 'final')
+          ->count(),
+      ];
+    });
 
-    // Available Years
-    $dbYears = HasilHutanBukanKayu::where('forest_type', $forestType)
-      ->distinct()
-      ->orderBy('year', 'desc')
-      ->pluck('year')
-      ->toArray();
-    $fixedYears = range(2025, 2021);
-    $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-    rsort($availableYears);
+    // Available Years with caching
+    $yearsCacheKey = "hhbk-years-{$forestType}";
+    $availableYears = cache()->remember($yearsCacheKey, 3600, function () use ($forestType) {
+      $dbYears = HasilHutanBukanKayu::where('forest_type', $forestType)
+        ->distinct()
+        ->pluck('year')
+        ->toArray();
+      $fixedYears = range(2025, 2021);
+      $years = array_unique(array_merge($dbYears, $fixedYears));
+      rsort($years);
+      return $years;
+    });
 
     return Inertia::render('HasilHutanBukanKayu/Index', [
       'datas' => $datas,
@@ -102,7 +121,7 @@ class HasilHutanBukanKayuController extends Controller
       'stats' => $stats,
       'available_years' => $availableYears,
       'filters' => [
-        'year' => $selectedYear,
+        'year' => (int) $selectedYear,
         'search' => $request->search,
         'sort' => $sortField,
         'direction' => $sortDirection,

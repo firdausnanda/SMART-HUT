@@ -10,6 +10,7 @@ use App\Models\Districts;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class NilaiEkonomiController extends Controller
 {
@@ -24,68 +25,88 @@ class NilaiEkonomiController extends Controller
 
     public function index(Request $request)
     {
+        // Cache available years
+        $availableYears = cache()->remember('nilai-ekonomi-years', 300, function () {
+            $dbYears = NilaiEkonomi::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
+            $fixedYears = range(date('Y'), 2021);
+            $years = array_values(array_unique(array_merge($dbYears, $fixedYears)));
+            rsort($years);
+            return $years;
+        });
+
         $selectedYear = $request->query('year');
         if (!$selectedYear) {
-            $selectedYear = NilaiEkonomi::max('year') ?? date('Y');
+            $selectedYear = $availableYears[0] ?? date('Y');
         }
 
-        $query = NilaiEkonomi::query() // Use query() to start building
-            ->select('nilai_ekonomi.*') // Select main table columns to avoid id ambiguity
-            ->with(['province', 'regency', 'district', 'details.commodity', 'creator'])
-            ->leftJoin('m_districts', 'nilai_ekonomi.district_id', '=', 'm_districts.id') // Join for sorting by location
-            ->when($selectedYear, fn($q) => $q->where('nilai_ekonomi.year', $selectedYear));
+        $sortField = $request->query('sort', 'created_at');
+        $sortDirection = $request->query('direction', 'desc');
+
+        $query = NilaiEkonomi::query()
+            ->select([
+                'nilai_ekonomi.id',
+                'nilai_ekonomi.year',
+                'nilai_ekonomi.month',
+                'nilai_ekonomi.regency_id',
+                'nilai_ekonomi.district_id',
+                'nilai_ekonomi.nama_kelompok',
+                'nilai_ekonomi.total_transaction_value',
+                'nilai_ekonomi.status',
+                'nilai_ekonomi.created_at',
+                'nilai_ekonomi.created_by'
+            ])
+            ->with([
+                'province:id,name',
+                'regency:id,name',
+                'district:id,name',
+                'details.commodity:id,name',
+                'creator:id,name'
+            ])
+            ->where('nilai_ekonomi.year', $selectedYear);
 
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('nilai_ekonomi.nama_kelompok', 'like', "%{$search}%")
-                    ->orWhereHas('details.commodity', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%{$search}%");
-                    });
+                    ->orWhereHas('details.commodity', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('regency', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('district', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
             });
         }
 
-        // Dynamic Sorting
-        if ($request->has('sort') && $request->has('direction')) {
-            $sort = $request->sort;
-            $direction = $request->direction;
+        // Sorting logic
+        $query->when($sortField === 'location', function ($q) use ($sortDirection) {
+            $q->leftJoin('m_districts', 'nilai_ekonomi.district_id', '=', 'm_districts.id')
+                ->orderBy('m_districts.name', $sortDirection);
+        })
+            ->when(!in_array($sortField, ['location']), function ($q) use ($sortField, $sortDirection) {
+                match ($sortField) {
+                    'nama_kelompok' => $q->orderBy('nilai_ekonomi.nama_kelompok', $sortDirection),
+                    'total_transaction_value' => $q->orderBy('nilai_ekonomi.total_transaction_value', $sortDirection),
+                    'status' => $q->orderBy('nilai_ekonomi.status', $sortDirection),
+                    default => $q->orderBy('nilai_ekonomi.created_at', 'desc'),
+                };
+            });
 
-            if ($sort === 'location') {
-                $query->orderBy('m_districts.name', $direction);
-            } elseif ($sort === 'nama_kelompok') {
-                $query->orderBy('nilai_ekonomi.nama_kelompok', $direction);
-            } elseif ($sort === 'total_transaction_value') {
-                $query->orderBy('nilai_ekonomi.total_transaction_value', $direction);
-            } elseif ($sort === 'status') {
-                $query->orderBy('nilai_ekonomi.status', $direction);
-            } else {
-                // Default fallback or for other columns
-                $query->orderBy('nilai_ekonomi.' . $sort, $direction);
-            }
-        } else {
-            $query->latest('nilai_ekonomi.created_at');
-        }
+        $data = $query->paginate($request->integer('per_page', 10))->withQueryString();
 
-        $stats = [
-            'total_volume' => \App\Models\NilaiEkonomiDetail::whereIn('nilai_ekonomi_id', $query->clone()->pluck('nilai_ekonomi.id'))->sum('production_volume'),
-            'total_transaction' => $query->clone()->sum('nilai_ekonomi.total_transaction_value'),
-            'count' => $query->clone()->count(),
-        ];
-
-        $data = $query->paginate($request->query('per_page', 10))->withQueryString();
-
-        $dbYears = NilaiEkonomi::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
-        $fixedYears = range(2025, 2021);
-        $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-        rsort($availableYears);
+        // Stats Caching
+        $stats = cache()->remember('nilai-ekonomi-stats-' . $selectedYear, 300, function () use ($selectedYear) {
+            $baseQuery = NilaiEkonomi::where('year', $selectedYear);
+            return [
+                'total_volume' => \App\Models\NilaiEkonomiDetail::whereHas('nilaiEkonomi', fn($q) => $q->where('year', $selectedYear))->sum('production_volume'),
+                'total_transaction' => $baseQuery->sum('total_transaction_value'),
+                'count' => $baseQuery->count(),
+            ];
+        });
 
         return Inertia::render('NilaiEkonomi/Index', [
             'data' => $data,
             'filters' => [
                 'year' => $selectedYear,
                 'search' => $request->search,
-                'sort' => $request->sort,
-                'direction' => $request->direction,
+                'sort' => $sortField,
+                'direction' => $sortDirection,
                 'per_page' => (int) $request->query('per_page', 10),
             ],
             'stats' => $stats,
@@ -93,7 +114,124 @@ class NilaiEkonomiController extends Controller
         ]);
     }
 
-    // ... (create, store, edit, update methods remain unchanged)
+    public function create()
+    {
+        $commodities = Commodity::orderBy('name')->get();
+
+        return Inertia::render('NilaiEkonomi/Create', [
+            'commodities' => $commodities,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama_kelompok' => 'required|string|max:255',
+            'year' => 'required|integer',
+            'month' => 'required|integer|min:1|max:12',
+            'province_id' => 'required|exists:m_provinces,id',
+            'regency_id' => 'required|exists:m_regencies,id',
+            'district_id' => 'required|exists:m_districts,id',
+            'details' => 'required|array|min:1',
+            'details.*.commodity_id' => 'required|exists:m_commodities,id',
+            'details.*.production_volume' => 'required|numeric',
+            'details.*.satuan' => 'required|string',
+            'details.*.transaction_value' => 'required|numeric',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $totalTransaction = collect($request->details)->sum('transaction_value');
+
+            $nilaiEkonomi = NilaiEkonomi::create([
+                'nama_kelompok' => $request->nama_kelompok,
+                'year' => $request->year,
+                'month' => $request->month,
+                'province_id' => $request->province_id,
+                'regency_id' => $request->regency_id,
+                'district_id' => $request->district_id,
+                'total_transaction_value' => $totalTransaction,
+                'status' => 'draft',
+                'created_by' => Auth::id(),
+            ]);
+
+            foreach ($request->details as $detail) {
+                $nilaiEkonomi->details()->create([
+                    'commodity_id' => $detail['commodity_id'],
+                    'production_volume' => $detail['production_volume'],
+                    'satuan' => $detail['satuan'],
+                    'transaction_value' => $detail['transaction_value'],
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('nilai-ekonomi.index')->with('success', 'Data Nilai Ekonomi berhasil disimpan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+        }
+    }
+
+    public function edit(NilaiEkonomi $nilaiEkonomi)
+    {
+        $nilaiEkonomi->load(['details', 'province', 'regency', 'district']);
+        $commodities = Commodity::orderBy('name')->get();
+
+        return Inertia::render('NilaiEkonomi/Edit', [
+            'nilaiEkonomi' => $nilaiEkonomi,
+            'commodities' => $commodities,
+        ]);
+    }
+
+    public function update(Request $request, NilaiEkonomi $nilaiEkonomi)
+    {
+        $request->validate([
+            'nama_kelompok' => 'required|string|max:255',
+            'year' => 'required|integer',
+            'month' => 'required|integer|min:1|max:12',
+            'province_id' => 'required|exists:m_provinces,id',
+            'regency_id' => 'required|exists:m_regencies,id',
+            'district_id' => 'required|exists:m_districts,id',
+            'details' => 'required|array|min:1',
+            'details.*.commodity_id' => 'required|exists:m_commodities,id',
+            'details.*.production_volume' => 'required|numeric',
+            'details.*.satuan' => 'required|string',
+            'details.*.transaction_value' => 'required|numeric',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $totalTransaction = collect($request->details)->sum('transaction_value');
+
+            $nilaiEkonomi->update([
+                'nama_kelompok' => $request->nama_kelompok,
+                'year' => $request->year,
+                'month' => $request->month,
+                'province_id' => $request->province_id,
+                'regency_id' => $request->regency_id,
+                'district_id' => $request->district_id,
+                'total_transaction_value' => $totalTransaction,
+                'updated_by' => Auth::id(),
+            ]);
+
+            // Replace details
+            $nilaiEkonomi->details()->delete();
+            foreach ($request->details as $detail) {
+                $nilaiEkonomi->details()->create([
+                    'commodity_id' => $detail['commodity_id'],
+                    'production_volume' => $detail['production_volume'],
+                    'satuan' => $detail['satuan'],
+                    'transaction_value' => $detail['transaction_value'],
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('nilai-ekonomi.index')->with('success', 'Data Nilai Ekonomi berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
+        }
+    }
 
     public function destroy(NilaiEkonomi $nilaiEkonomi)
     {

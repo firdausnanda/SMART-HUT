@@ -24,67 +24,78 @@ class SkpsController extends Controller
 
   public function index(Request $request)
   {
+    $sortField = $request->query('sort', 'created_at');
+    $sortDirection = $request->query('direction', 'desc');
+
     $datas = Skps::query()
-      ->leftJoin('m_regencies', 'skps.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_districts', 'skps.district_id', '=', 'm_districts.id')
-      ->leftJoin('m_skema_perhutanan_sosial', 'skps.id_skema_perhutanan_sosial', '=', 'm_skema_perhutanan_sosial.id')
-      ->select(
-        'skps.*',
-        'm_regencies.name as regency_name',
-        'm_districts.name as district_name',
-        'm_skema_perhutanan_sosial.name as skema_name'
-      )
+      ->select([
+        'skps.id',
+        'skps.province_id',
+        'skps.regency_id',
+        'skps.district_id',
+        'skps.id_skema_perhutanan_sosial',
+        'skps.nama_kelompok',
+        'skps.potential',
+        'skps.ps_area',
+        'skps.number_of_kk',
+        'skps.status',
+        'skps.rejection_note',
+        'skps.created_at',
+        'skps.created_by',
+      ])
+      ->with([
+        'creator:id,name',
+        'regency:id,name',
+        'district:id,name',
+        'skema:id,name'
+      ])
       ->when($request->search, function ($query, $search) {
         $query->where(function ($q) use ($search) {
-          $q->where('m_regencies.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%")
-            ->orWhere('m_skema_perhutanan_sosial.name', 'like', "%{$search}%");
+          $q->whereHas('regency', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('district', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('skema', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhere('nama_kelompok', 'like', "%{$search}%");
         });
       })
-      ->when($request->has('sort') && $request->has('direction'), function ($query) use ($request) {
-        $direction = $request->direction === 'desc' ? 'desc' : 'asc';
-        $sort = $request->sort;
-
-        switch ($sort) {
-          case 'location':
-            return $query->orderBy('m_districts.name', $direction);
-          case 'group_name':
-            return $query->orderBy('skps.nama_kelompok', $direction);
-          case 'skema':
-            return $query->orderBy('m_skema_perhutanan_sosial.name', $direction);
-          case 'area':
-            return $query->orderBy('skps.ps_area', $direction);
-          case 'potential':
-            return $query->orderBy('skps.potential', $direction);
-          case 'kk_count':
-            return $query->orderBy('skps.number_of_kk', $direction);
-          case 'status':
-            return $query->orderBy('skps.status', $direction);
-          default:
-            return $query->orderBy('skps.created_at', 'desc');
-        }
-      }, function ($query) {
-        return $query->latest('skps.created_at');
+      ->when($sortField === 'location', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_districts', 'skps.district_id', '=', 'm_districts.id')
+          ->orderBy('m_districts.name', $sortDirection);
       })
-      ->with(['creator', 'regency', 'district', 'skema'])
-      ->paginate($request->query('per_page', 10))
+      ->when($sortField === 'skema', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_skema_perhutanan_sosial', 'skps.id_skema_perhutanan_sosial', '=', 'm_skema_perhutanan_sosial.id')
+          ->orderBy('m_skema_perhutanan_sosial.name', $sortDirection);
+      })
+      ->when(!in_array($sortField, ['location', 'skema']), function ($q) use ($sortField, $sortDirection) {
+        match ($sortField) {
+          'group_name' => $q->orderBy('nama_kelompok', $sortDirection),
+          'area' => $q->orderBy('ps_area', $sortDirection),
+          'potential' => $q->orderBy('potential', $sortDirection),
+          'kk_count' => $q->orderBy('number_of_kk', $sortDirection),
+          'status' => $q->orderBy('status', $sortDirection),
+          default => $q->orderBy('created_at', 'desc'),
+        };
+      })
+      ->paginate($request->integer('per_page', 10))
       ->withQueryString();
 
-    $stats = SkemaPerhutananSosial::leftJoin('skps', function ($join) {
-      $join->on('m_skema_perhutanan_sosial.id', '=', 'skps.id_skema_perhutanan_sosial')
-        ->where('skps.status', 'final');
-    })
-      ->selectRaw('m_skema_perhutanan_sosial.name, count(skps.id) as total')
-      ->groupBy('m_skema_perhutanan_sosial.id', 'm_skema_perhutanan_sosial.name')
-      ->get();
+    // Stats with caching
+    $stats = cache()->remember('skps-stats', 300, function () {
+      return SkemaPerhutananSosial::leftJoin('skps', function ($join) {
+        $join->on('m_skema_perhutanan_sosial.id', '=', 'skps.id_skema_perhutanan_sosial')
+          ->where('skps.status', 'final');
+      })
+        ->selectRaw('m_skema_perhutanan_sosial.name, count(skps.id) as total')
+        ->groupBy('m_skema_perhutanan_sosial.id', 'm_skema_perhutanan_sosial.name')
+        ->get();
+    });
 
     return Inertia::render('Skps/Index', [
       'datas' => $datas,
       'stats' => $stats,
       'filters' => [
         'search' => $request->search,
-        'sort' => $request->sort,
-        'direction' => $request->direction,
+        'sort' => $sortField,
+        'direction' => $sortDirection,
         'per_page' => (int) $request->query('per_page', 10),
       ],
     ]);

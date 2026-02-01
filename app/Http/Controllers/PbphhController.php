@@ -25,49 +25,62 @@ class PbphhController extends Controller
     $sortDirection = $request->query('direction', 'desc');
 
     $datas = Pbphh::query()
-      ->leftJoin('m_regencies', 'pbphh.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_districts', 'pbphh.district_id', '=', 'm_districts.id')
-      ->select(
-        'pbphh.*',
-        'm_regencies.name as regency_name',
-        'm_districts.name as district_name'
-      )
+      ->select([
+        'pbphh.id',
+        'pbphh.name',
+        'pbphh.number',
+        'pbphh.province_id',
+        'pbphh.regency_id',
+        'pbphh.district_id',
+        'pbphh.investment_value',
+        'pbphh.number_of_workers',
+        'pbphh.present_condition',
+        'pbphh.status',
+        'pbphh.rejection_note',
+        'pbphh.created_at',
+        'pbphh.created_by',
+      ])
+      ->with([
+        'creator:id,name',
+        'regency:id,name',
+        'district:id,name',
+        'jenis_produksi:id,name'
+      ])
       ->when($request->search, function ($query, $search) {
         $query->where(function ($q) use ($search) {
-          $q->where('pbphh.name', 'like', "%{$search}%")
-            ->orWhere('pbphh.number', 'like', "%{$search}%")
-            ->orWhereHas('jenis_produksi', function ($q2) use ($search) {
-              $q2->where('name', 'like', "%{$search}%");
-            })
-            ->orWhere('m_regencies.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%");
+          $q->where('name', 'like', "%{$search}%")
+            ->orWhere('number', 'like', "%{$search}%")
+            ->orWhereHas('jenis_produksi', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('regency', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('district', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
         });
       })
-      ->with(['creator', 'regency', 'district', 'jenis_produksi'])
-      ->when($sortField, function ($query) use ($sortField, $sortDirection) {
-        $sortMap = [
-          'name' => 'pbphh.name',
-          'number' => 'pbphh.number',
-          'location' => 'm_districts.name',
-          'investment' => 'pbphh.investment_value',
-          'workers' => 'pbphh.number_of_workers',
-          'condition' => 'pbphh.present_condition',
-          'status' => 'pbphh.status',
-          'created_at' => 'pbphh.created_at',
-        ];
-
-        $dbColumn = $sortMap[$sortField] ?? 'pbphh.created_at';
-        return $query->orderBy($dbColumn, $sortDirection);
+      ->when($sortField === 'location', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_regencies', 'pbphh.regency_id', '=', 'm_regencies.id')
+          ->leftJoin('m_districts', 'pbphh.district_id', '=', 'm_districts.id')
+          ->orderByRaw("COALESCE(m_districts.name, m_regencies.name) $sortDirection");
       })
-
-      ->paginate($request->query('per_page', 10))
+      ->when(!in_array($sortField, ['location']), function ($q) use ($sortField, $sortDirection) {
+        match ($sortField) {
+          'name' => $q->orderBy('name', $sortDirection),
+          'number' => $q->orderBy('number', $sortDirection),
+          'investment' => $q->orderBy('investment_value', $sortDirection),
+          'workers' => $q->orderBy('number_of_workers', $sortDirection),
+          'condition' => $q->orderBy('present_condition', $sortDirection),
+          'status' => $q->orderBy('status', $sortDirection),
+          default => $q->orderBy('created_at', 'desc'),
+        };
+      })
+      ->paginate($request->integer('per_page', 10))
       ->withQueryString();
 
-    // Stats
-    $stats = [
-      'total_count' => Pbphh::count(),
-      'verified_count' => Pbphh::where('status', 'final')->count(),
-    ];
+    // Stats with caching
+    $stats = cache()->remember('pbphh-stats', 300, function () {
+      return [
+        'total_count' => Pbphh::count(),
+        'verified_count' => Pbphh::where('status', 'final')->count(),
+      ];
+    });
 
     return Inertia::render('Pbphh/Index', [
       'datas' => $datas,
@@ -76,7 +89,7 @@ class PbphhController extends Controller
         'search' => $request->search,
         'sort' => $sortField,
         'direction' => $sortDirection,
-        'per_page' => $request->query('per_page', 10),
+        'per_page' => (int) $request->query('per_page', 10),
       ],
     ]);
   }

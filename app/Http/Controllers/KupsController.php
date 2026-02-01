@@ -23,65 +23,61 @@ class KupsController extends Controller
 
   public function index(Request $request)
   {
-    $query = Kups::query()
-      ->select('kups.*')
-      ->with(['province', 'regency', 'district'])
-      ->leftJoin('m_districts', 'kups.district_id', '=', 'm_districts.id');
+    $sortField = $request->query('sort', 'created_at');
+    $sortDirection = $request->query('direction', 'desc');
 
-    // Filter by Year (if applicable, though KUPS table doesn't have year column strictly, sticking to standard filters if needed or just basic)
-    // Ignoring year filter for now as schema doesn't have it, but standard filters might be requested separately.
+    $datas = Kups::query()
+      ->select([
+        'kups.id',
+        'kups.province_id',
+        'kups.regency_id',
+        'kups.district_id',
+        'kups.nama_kups',
+        'kups.category',
+        'kups.commodity',
+        'kups.status',
+        'kups.rejection_note',
+        'kups.created_at',
+        'kups.created_by'
+      ])
+      ->with(['regency:id,name', 'district:id,name'])
+      ->when($request->search, function ($query, $search) {
+        $query->where(function ($q) use ($search) {
+          $q->whereHas('regency', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('district', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhere('nama_kups', 'like', "%{$search}%")
+            ->orWhere('category', 'like', "%{$search}%")
+            ->orWhere('commodity', 'like', "%{$search}%");
+        });
+      })
+      ->when($sortField === 'location', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_districts', 'kups.district_id', '=', 'm_districts.id')
+          ->orderBy('m_districts.name', $sortDirection);
+      })
+      ->when(!in_array($sortField, ['location']), function ($q) use ($sortField, $sortDirection) {
+        $q->orderBy($sortField, $sortDirection);
+      })
+      ->paginate($request->integer('per_page', 10))
+      ->withQueryString();
 
-    if ($request->has('search')) {
-      $search = $request->search;
-      $query->where(function ($q) use ($search) {
-        $q->where('kups.commodity', 'like', "%{$search}%")
-          ->orWhere('kups.category', 'like', "%{$search}%")
-          ->orWhere('kups.nama_kups', 'like', "%{$search}%")
-          ->orWhereHas('regency', function ($q2) use ($search) {
-            $q2->where('name', 'like', "%{$search}%");
-          })
-          ->orWhereHas('district', function ($q2) use ($search) {
-            $q2->where('name', 'like', "%{$search}%");
-          });
-      });
-    }
-
-    if ($request->has('sort') && $request->has('direction')) {
-      $sort = $request->sort;
-      $direction = $request->direction;
-
-      if ($sort === 'location') {
-        $query->orderBy('m_districts.name', $direction);
-      } elseif ($sort === 'nama_kups') {
-        $query->orderBy('kups.nama_kups', $direction);
-      } elseif ($sort === 'category') {
-        $query->orderBy('kups.category', $direction);
-      } elseif ($sort === 'commodity') {
-        $query->orderBy('kups.commodity', $direction);
-      } elseif ($sort === 'status') {
-        $query->orderBy('kups.status', $direction);
-      } else {
-        $query->orderBy('kups.' . $sort, $direction);
-      }
-    } else {
-      $query->latest('kups.created_at');
-    }
-
-    $kups = $query->paginate($request->query('per_page', 10))->withQueryString();
-
-    // Calculate Stats
-    $stats = [
-      'total_categories' => Kups::distinct('category')->count('category'),
-      'total_commodities' => Kups::distinct('commodity')->count('commodity'),
-      'total_count' => Kups::count(),
-    ];
+    // Stats with caching
+    $stats = cache()->remember('kups-stats', 300, function () {
+      return [
+        'total_categories' => Kups::distinct('category')->count('category'),
+        'total_commodities' => Kups::distinct('commodity')->count('commodity'),
+        'total_count' => Kups::count(),
+      ];
+    });
 
     return Inertia::render('Kups/Index', [
-      'kups' => $kups,
+      'kups' => $datas,
       'stats' => $stats,
-      'filters' => array_merge($request->only(['search', 'sort', 'direction']), [
+      'filters' => [
+        'search' => $request->search,
+        'sort' => $sortField,
+        'direction' => $sortDirection,
         'per_page' => (int) $request->query('per_page', 10),
-      ]),
+      ],
     ]);
   }
 

@@ -261,7 +261,7 @@ export default function Edit({ auth, skemas, data: initialData }) {
                     styles={selectStyles}
                     isClearable
                     menuPlacement="top"
-                    value={skemas.map(s => ({ value: s.id, label: s.name })).find(o => o.value === data.id_skema_perhutanan_sosial) || null}
+                    value={skemas.map(s => ({ value: s.id, label: s.name })).find(o => o.value == data.id_skema_perhutanan_sosial) || null}
                   />
                   <InputError message={errors.id_skema_perhutanan_sosial} className="mt-2" />
                 </div>

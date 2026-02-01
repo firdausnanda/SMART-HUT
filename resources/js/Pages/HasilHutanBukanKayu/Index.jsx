@@ -667,16 +667,16 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                     <td className="px-6 py-4">
                       <div className="flex flex-col items-start text-left">
                         {forest_type === 'Hutan Negara' ? (
-                          <div className="font-bold text-gray-900 leading-tight mb-0.5">{item.pengelola_hutan_name || '-'}</div>
+                          <div className="font-bold text-gray-900 leading-tight mb-0.5">{item.pengelola_hutan?.name || '-'}</div>
                         ) : (
-                          <div className="font-bold text-gray-900 leading-tight mb-0.5">{item.district_name || 'N/A'}</div>
+                          <div className="font-bold text-gray-900 leading-tight mb-0.5">{item.district?.name || 'Kecamatan N/A'}</div>
                         )}
                         <div className="text-[10px] text-emerald-600 font-black uppercase tracking-widest flex items-center gap-1">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
-                          {item.regency_name || 'N/A'}
+                          {item.regency?.name || 'Kabupaten N/A'}
                         </div>
 
                         <div className="flex items-center gap-1.5 mt-2 bg-slate-50 px-2 py-1 rounded-lg w-fit border border-slate-100/50 group-hover:bg-white group-hover:border-emerald-100 transition-colors">

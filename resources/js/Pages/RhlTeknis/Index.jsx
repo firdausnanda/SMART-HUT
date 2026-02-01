@@ -553,9 +553,9 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                                 </svg>
                               </div>
                               <div className="flex flex-col">
-                                <span className="font-bold text-gray-900 text-xs leading-tight">{item.regency_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
-                                <span className="text-[10px] text-gray-500 leading-tight mt-0.5">Kec. {item.district_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
-                                <span className="text-[10px] text-gray-500 leading-tight">Desa {item.village_name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase())}</span>
+                                <span className="font-bold text-gray-900 text-xs leading-tight">{item.regency?.name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase()) ?? '-'}</span>
+                                <span className="text-[10px] text-gray-500 leading-tight mt-0.5">Kec. {item.district?.name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase()) ?? '-'}</span>
+                                <span className="text-[10px] text-gray-500 leading-tight">Desa {item.village?.name?.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase()) ?? '-'}</span>
                               </div>
                             </div>
 

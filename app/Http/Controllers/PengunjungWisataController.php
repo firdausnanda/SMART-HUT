@@ -20,57 +20,69 @@ class PengunjungWisataController extends Controller
 
   public function index(Request $request)
   {
-    $selectedYear = $request->query('year');
-    if (!$selectedYear) {
-      $selectedYear = PengunjungWisata::max('year') ?? date('Y');
-    }
+    $defaultYear = PengunjungWisata::max('year') ?? now()->year;
+    $selectedYear = $request->integer('year', $defaultYear);
 
     $sortField = $request->query('sort', 'created_at');
     $sortDirection = $request->query('direction', 'desc');
 
     $datas = PengunjungWisata::query()
-      ->with(['pengelolaWisata', 'creator'])
-      ->when($selectedYear, function ($query, $year) {
-        return $query->where('year', $year);
-      })
-      ->when($request->search, function ($query, $search) {
-        $query->whereHas('pengelolaWisata', function ($q) use ($search) {
-          $q->where('name', 'like', "%{$search}%");
-        });
-      })
-      ->when($sortField, function ($query) use ($sortField, $sortDirection) {
-        $sortMap = [
-          'month' => 'month',
-          'pengelola' => 'pengelolaWisata.name', // Relation sorting needs careful handling or join
-          'visitors' => 'number_of_visitors',
-          'income' => 'gross_income',
-          'status' => 'status',
-          'created_at' => 'created_at',
-        ];
+      ->select([
+        'pengunjung_wisata.id',
+        'pengunjung_wisata.year',
+        'pengunjung_wisata.month',
+        'pengunjung_wisata.id_pengelola_wisata',
+        'pengunjung_wisata.number_of_visitors',
+        'pengunjung_wisata.gross_income',
+        'pengunjung_wisata.status',
+        'pengunjung_wisata.created_at',
+        'pengunjung_wisata.created_by',
+      ])
+      ->with([
+        'pengelolaWisata:id,name',
+        'creator:id,name'
+      ])
+      ->where('year', $selectedYear)
 
-        if ($sortField === 'pengelola') {
-          return $query->join('m_pengelola_wisata', 'pengunjung_wisata.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
-            ->orderBy('m_pengelola_wisata.name', $sortDirection)
-            ->select('pengunjung_wisata.*'); // Avoid column collision
-        }
-
-        $dbColumn = $sortMap[$sortField] ?? 'created_at';
-        $dbColumn = $sortMap[$sortField] ?? 'created_at';
-        return $query->orderBy($dbColumn, $sortDirection);
+      ->when($request->search, function ($q, $search) {
+        $q->whereHas('pengelolaWisata', fn($qq) => $qq->where('name', 'like', "%{$search}%"));
       })
-      ->paginate($request->query('per_page', 10))
+
+      ->when($sortField === 'pengelola', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_pengelola_wisata', 'pengunjung_wisata.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
+          ->orderBy('m_pengelola_wisata.name', $sortDirection);
+      })
+
+      ->when($sortField !== 'pengelola', function ($q) use ($sortField, $sortDirection) {
+        match ($sortField) {
+          'month' => $q->orderBy('month', $sortDirection),
+          'visitors' => $q->orderBy('number_of_visitors', $sortDirection),
+          'income' => $q->orderBy('gross_income', $sortDirection),
+          'status' => $q->orderBy('status', $sortDirection),
+          default => $q->orderBy('created_at', 'desc'),
+        };
+      })
+
+      ->paginate($request->integer('per_page', 10))
       ->withQueryString();
 
-    $stats = [
-      'total_visitors' => PengunjungWisata::where('year', $selectedYear)->where('status', 'final')->sum('number_of_visitors'),
-      'total_income' => PengunjungWisata::where('year', $selectedYear)->where('status', 'final')->sum('gross_income'),
-      'total_count' => PengunjungWisata::where('year', $selectedYear)->where('status', 'final')->count(),
-    ];
+    $stats = cache()->remember(
+      "wisata-stats-{$selectedYear}",
+      300,
+      fn() => [
+        'total_visitors' => PengunjungWisata::where('year', $selectedYear)->where('status', 'final')->sum('number_of_visitors'),
+        'total_income' => PengunjungWisata::where('year', $selectedYear)->where('status', 'final')->sum('gross_income'),
+        'total_count' => PengunjungWisata::where('year', $selectedYear)->where('status', 'final')->count(),
+      ]
+    );
 
-    $dbYears = PengunjungWisata::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
-    $fixedYears = range(2025, 2021);
-    $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-    rsort($availableYears);
+    $availableYears = cache()->remember('wisata-years', 3600, function () {
+      $dbYears = PengunjungWisata::distinct()->pluck('year')->toArray();
+      $fixedYears = range(2025, 2021);
+      $years = array_unique(array_merge($dbYears, $fixedYears));
+      rsort($years);
+      return $years;
+    });
 
     return Inertia::render('PengunjungWisata/Index', [
       'datas' => $datas,

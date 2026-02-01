@@ -21,76 +21,91 @@ class PerkembanganKthController extends Controller
 
   public function index(Request $request)
   {
+    // Caching Available Years
+    $availableYears = cache()->remember('perkembangan-kth-years', 300, function () {
+      $dbYears = PerkembanganKth::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
+      $fixedYears = range(date('Y'), 2021);
+      $years = array_values(array_unique(array_merge($dbYears, $fixedYears)));
+      rsort($years);
+      return $years;
+    });
+
     $selectedYear = $request->query('year');
     if (!$selectedYear) {
-      $selectedYear = PerkembanganKth::max('year') ?? date('Y');
+      $selectedYear = $availableYears[0] ?? date('Y');
     }
 
-    $sort = $request->query('sort');
-    $direction = $request->query('direction', 'asc');
+    $sortField = $request->query('sort', 'created_at');
+    $sortDirection = $request->query('direction', 'desc');
 
-    $datas = PerkembanganKth::query()
-      ->leftJoin('m_regencies', 'perkembangan_kth.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_districts', 'perkembangan_kth.district_id', '=', 'm_districts.id')
-      ->leftJoin('m_villages', 'perkembangan_kth.village_id', '=', 'm_villages.id')
-      ->select(
-        'perkembangan_kth.*',
-        'm_regencies.name as regency_name',
-        'm_districts.name as district_name',
-        'm_villages.name as village_name'
-      )
-      ->when($selectedYear, function ($query, $year) {
-        return $query->where('perkembangan_kth.year', $year);
-      })
-      ->when($request->search, function ($query, $search) {
-        $query->where(function ($q) use ($search) {
-          $q->where('perkembangan_kth.nama_kth', 'like', "%{$search}%")
-            ->orWhere('perkembangan_kth.nomor_register', 'like', "%{$search}%")
-            ->orWhere('m_villages.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%")
-            ->orWhere('m_regencies.name', 'like', "%{$search}%");
-        });
-      })
-      ->when($sort, function ($query, $sort) use ($direction) {
-        if ($sort === 'location') {
-          $query->orderBy('m_districts.name', $direction);
-        } elseif ($sort === 'nama_kth') {
-          $query->orderBy('perkembangan_kth.nama_kth', $direction);
-        } elseif ($sort === 'nomor_register') {
-          $query->orderBy('perkembangan_kth.nomor_register', $direction);
-        } elseif ($sort === 'kelas') {
-          $query->orderBy('perkembangan_kth.kelas_kelembagaan', $direction);
-        } elseif ($sort === 'anggota') {
-          $query->orderBy('perkembangan_kth.jumlah_anggota', $direction);
-        } elseif ($sort === 'luas') {
-          $query->orderBy('perkembangan_kth.luas_kelola', $direction);
-        } elseif ($sort === 'status') {
-          $query->orderBy('perkembangan_kth.status', $direction);
-        } else {
-          $query->orderBy('perkembangan_kth.created_at', 'desc');
-        }
-      }, function ($query) {
-        $query->orderBy('perkembangan_kth.created_at', 'desc');
-      })
-      ->with(['creator', 'regency_rel', 'district_rel', 'village_rel'])
-      ->paginate($request->query('per_page', 10))
-      ->withQueryString();
+    $query = PerkembanganKth::query()
+      ->select([
+        'perkembangan_kth.id',
+        'perkembangan_kth.year',
+        'perkembangan_kth.month',
+        'perkembangan_kth.regency_id',
+        'perkembangan_kth.district_id',
+        'perkembangan_kth.village_id',
+        'perkembangan_kth.nama_kth',
+        'perkembangan_kth.nomor_register',
+        'perkembangan_kth.kelas_kelembagaan',
+        'perkembangan_kth.jumlah_anggota',
+        'perkembangan_kth.luas_kelola',
+        'perkembangan_kth.status',
+        'perkembangan_kth.created_at',
+        'perkembangan_kth.created_by'
+      ])
+      ->with([
+        'creator:id,name',
+        'regency_rel:id,name',
+        'district_rel:id,name',
+        'village_rel:id,name'
+      ])
+      ->where('perkembangan_kth.year', $selectedYear);
 
-    $stats = [
-      'total_kth' => PerkembanganKth::where('year', $selectedYear)->where('status', 'final')->count(),
-      'total_anggota' => PerkembanganKth::where('year', $selectedYear)->where('status', 'final')->sum('jumlah_anggota'),
-      'total_luas' => PerkembanganKth::where('year', $selectedYear)->where('status', 'final')->sum('luas_kelola'),
-      'by_kelas' => [
-        'pemula' => PerkembanganKth::where('year', $selectedYear)->where('status', 'final')->where('kelas_kelembagaan', 'pemula')->count(),
-        'madya' => PerkembanganKth::where('year', $selectedYear)->where('status', 'final')->where('kelas_kelembagaan', 'madya')->count(),
-        'utama' => PerkembanganKth::where('year', $selectedYear)->where('status', 'final')->where('kelas_kelembagaan', 'utama')->count(),
-      ]
-    ];
+    if ($request->has('search')) {
+      $search = $request->search;
+      $query->where(function ($q) use ($search) {
+        $q->where('perkembangan_kth.nama_kth', 'like', "%{$search}%")
+          ->orWhere('perkembangan_kth.nomor_register', 'like', "%{$search}%")
+          ->orWhereHas('village_rel', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+          ->orWhereHas('district_rel', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+          ->orWhereHas('regency_rel', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
+      });
+    }
 
-    $dbYears = PerkembanganKth::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
-    $fixedYears = range(2025, 2021);
-    $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-    rsort($availableYears);
+    // Sorting logic
+    $query->when($sortField === 'location', function ($q) use ($sortDirection) {
+      $q->leftJoin('m_districts', 'perkembangan_kth.district_id', '=', 'm_districts.id')
+        ->orderBy('m_districts.name', $sortDirection);
+    })->when(!in_array($sortField, ['location']), function ($q) use ($sortField, $sortDirection) {
+      match ($sortField) {
+        'nama_kth' => $q->orderBy('perkembangan_kth.nama_kth', $sortDirection),
+        'nomor_register' => $q->orderBy('perkembangan_kth.nomor_register', $sortDirection),
+        'kelas' => $q->orderBy('perkembangan_kth.kelas_kelembagaan', $sortDirection),
+        'anggota' => $q->orderBy('perkembangan_kth.jumlah_anggota', $sortDirection),
+        'luas' => $q->orderBy('perkembangan_kth.luas_kelola', $sortDirection),
+        'status' => $q->orderBy('perkembangan_kth.status', $sortDirection),
+        default => $q->orderBy('perkembangan_kth.created_at', 'desc'),
+      };
+    });
+
+    $datas = $query->paginate($request->integer('per_page', 10))->withQueryString();
+
+    // Stats Caching
+    $stats = cache()->remember('perkembangan-kth-stats-' . $selectedYear, 300, function () use ($selectedYear) {
+      $baseQuery = PerkembanganKth::where('year', $selectedYear)->where('status', 'final');
+      return [
+        'total_kth' => (clone $baseQuery)->count(),
+        'total_anggota' => (clone $baseQuery)->sum('jumlah_anggota'),
+        'total_luas' => (clone $baseQuery)->sum('luas_kelola'),
+        'by_kelas' => [
+          'pemula' => (clone $baseQuery)->where('kelas_kelembagaan', 'pemula')->count(),
+          'madya' => (clone $baseQuery)->where('kelas_kelembagaan', 'madya')->count(),
+          'utama' => (clone $baseQuery)->where('kelas_kelembagaan', 'utama')->count(),
+        ]
+      ];
+    });
 
     return Inertia::render('PerkembanganKth/Index', [
       'datas' => $datas,
@@ -98,8 +113,8 @@ class PerkembanganKthController extends Controller
       'filters' => [
         'year' => (int) $selectedYear,
         'search' => $request->search,
-        'sort' => $sort,
-        'direction' => $direction,
+        'sort' => $sortField,
+        'direction' => $sortDirection,
         'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,

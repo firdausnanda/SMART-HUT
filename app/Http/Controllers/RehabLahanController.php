@@ -21,64 +21,82 @@ class RehabLahanController extends Controller
 
     public function index(Request $request)
     {
-        $selectedYear = $request->query('year');
-        if (!$selectedYear) {
-            $selectedYear = RehabLahan::max('year') ?? date('Y');
-        }
+        $defaultYear = RehabLahan::max('year') ?? now()->year;
+        $selectedYear = $request->integer('year', $defaultYear);
 
         $sortField = $request->query('sort', 'created_at');
         $sortDirection = $request->query('direction', 'desc');
 
         $datas = RehabLahan::query()
-            ->leftJoin('m_regencies', 'rehab_lahan.regency_id', '=', 'm_regencies.id')
-            ->leftJoin('m_districts', 'rehab_lahan.district_id', '=', 'm_districts.id')
-            ->leftJoin('m_villages', 'rehab_lahan.village_id', '=', 'm_villages.id')
-            ->select(
-                'rehab_lahan.*',
-                'm_regencies.name as regency_name',
-                'm_districts.name as district_name',
-                'm_villages.name as village_name'
-            )
-            ->when($selectedYear, function ($query, $year) {
-                return $query->where('rehab_lahan.year', $year);
-            })
-            ->when($request->search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('m_villages.name', 'like', "%{$search}%")
-                        ->orWhere('m_districts.name', 'like', "%{$search}%")
-                        ->orWhere('m_regencies.name', 'like', "%{$search}%")
-                        ->orWhere('rehab_lahan.fund_source', 'like', "%{$search}%");
+            ->select([
+                'rehab_lahan.id',
+                'rehab_lahan.year',
+                'rehab_lahan.month',
+                'rehab_lahan.regency_id',
+                'rehab_lahan.district_id',
+                'rehab_lahan.village_id',
+                'rehab_lahan.fund_source',
+                'rehab_lahan.target_annual',
+                'rehab_lahan.realization',
+                'rehab_lahan.status',
+                'rehab_lahan.created_at',
+                'rehab_lahan.created_by',
+            ])
+            ->with([
+                'creator:id,name',
+                'regency_rel:id,name',
+                'district_rel:id,name',
+                'village_rel:id,name',
+            ])
+            ->where('year', $selectedYear)
+
+            ->when($request->search, function ($q, $search) {
+                $q->where(function ($qq) use ($search) {
+                    $qq->where('fund_source', 'like', "%{$search}%")
+                        ->orWhereHas('village_rel', fn($q) => $q->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('district_rel', fn($q) => $q->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('regency_rel', fn($q) => $q->where('name', 'like', "%{$search}%"));
                 });
             })
-            ->with(['creator', 'regency_rel', 'district_rel', 'village_rel'])
-            ->when($sortField, function ($query) use ($sortField, $sortDirection) {
-                // Map frontend sort keys to database columns
-                $sortMap = [
-                    'year' => 'rehab_lahan.year',
-                    'month' => 'rehab_lahan.month', // Sort by month for "Bulan / Tahun"
-                    'location' => 'm_villages.name', // Sort by village name for location
-                    'realization' => 'rehab_lahan.realization',
-                    'fund_source' => 'rehab_lahan.fund_source',
-                    'status' => 'rehab_lahan.status',
-                    'created_at' => 'rehab_lahan.created_at',
-                ];
 
-                $column = $sortMap[$sortField] ?? 'rehab_lahan.created_at';
-                return $query->orderBy($column, $sortDirection);
+            ->when($sortField === 'location', function ($q) use ($sortDirection) {
+                $q->leftJoin('m_villages', 'rehab_lahan.village_id', '=', 'm_villages.id')
+                    ->orderBy('m_villages.name', $sortDirection);
             })
-            ->paginate($request->query('per_page', 10))
+
+            ->when($sortField !== 'location', function ($q) use ($sortField, $sortDirection) {
+                match ($sortField) {
+                    'year' => $q->orderBy('year', $sortDirection),
+                    'month' => $q->orderBy('month', $sortDirection),
+                    'realization' => $q->orderBy('realization', $sortDirection),
+                    'fund_source' => $q->orderBy('fund_source', $sortDirection),
+                    'status' => $q->orderBy('status', $sortDirection),
+                    default => $q->orderBy('created_at', 'desc'),
+                };
+            })
+
+            ->paginate($request->integer('per_page', 10))
             ->withQueryString();
 
-        $stats = [
-            'total_target' => RehabLahan::where('year', $selectedYear)->where('status', 'final')->sum('target_annual'),
-            'total_realization' => RehabLahan::where('year', $selectedYear)->where('status', 'final')->sum('realization'),
-            'total_count' => RehabLahan::where('year', $selectedYear)->where('status', 'final')->count(),
-        ];
+        $stats = cache()->remember(
+            "rehab-lahan-stats-{$selectedYear}",
+            300,
+            fn() => [
+                'total_target' => RehabLahan::where('year', $selectedYear)->where('status', 'final')->sum('target_annual'),
+                'total_realization' => RehabLahan::where('year', $selectedYear)->where('status', 'final')->sum('realization'),
+                'total_count' => RehabLahan::where('year', $selectedYear)->where('status', 'final')->count(),
+            ]
+        );
 
-        $dbYears = RehabLahan::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
-        $fixedYears = range(2025, 2021);
-        $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-        rsort($availableYears);
+        $availableYears = cache()->remember('rehab-lahan-years', 3600, function () {
+            $dbYears = RehabLahan::distinct()->pluck('year')->toArray();
+            $fixedYears = range(2025, 2021);
+            $years = array_unique(array_merge($dbYears, $fixedYears));
+            rsort($years);
+            return $years;
+        });
+
+        $sumberDana = cache()->remember('sumber-dana', 3600, fn() => SumberDana::select('id', 'name')->get());
 
         return Inertia::render('RehabLahan/Index', [
             'datas' => $datas,
@@ -91,7 +109,7 @@ class RehabLahanController extends Controller
                 'per_page' => (int) $request->query('per_page', 10),
             ],
             'availableYears' => $availableYears,
-            'sumberDana' => SumberDana::all()
+            'sumberDana' => $sumberDana
         ]);
     }
 

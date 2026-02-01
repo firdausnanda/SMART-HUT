@@ -592,9 +592,9 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                         <div className="text-xs text-gray-400 font-semibold">{item.year}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-medium text-gray-800">{item.village_name || item.village}</div>
+                        <div className="font-medium text-gray-800">{item.village_rel?.name ?? '-'}</div>
                         <div className="text-xs text-primary-600 font-bold uppercase tracking-tighter">
-                          {item.district_name || item.district}, {item.regency_name}
+                          {item.district_rel?.name ?? '-'}, {item.regency_rel?.name ?? '-'}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">

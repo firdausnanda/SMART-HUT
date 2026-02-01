@@ -21,63 +21,82 @@ class RehabManggroveController extends Controller
 
   public function index(Request $request)
   {
-    $selectedYear = $request->query('year');
-    if (!$selectedYear) {
-      $selectedYear = RehabManggrove::max('year') ?? date('Y');
-    }
+    $defaultYear = RehabManggrove::max('year') ?? now()->year;
+    $selectedYear = $request->integer('year', $defaultYear);
 
     $sortField = $request->query('sort', 'created_at');
     $sortDirection = $request->query('direction', 'desc');
 
     $datas = RehabManggrove::query()
-      ->leftJoin('m_regencies', 'rehab_manggrove.regency_id', '=', 'm_regencies.id')
-      ->leftJoin('m_districts', 'rehab_manggrove.district_id', '=', 'm_districts.id')
-      ->leftJoin('m_villages', 'rehab_manggrove.village_id', '=', 'm_villages.id')
-      ->select(
-        'rehab_manggrove.*',
-        'm_regencies.name as regency_name',
-        'm_districts.name as district_name',
-        'm_villages.name as village_name'
-      )
-      ->when($selectedYear, function ($query, $year) {
-        return $query->where('rehab_manggrove.year', $year);
-      })
-      ->when($request->search, function ($query, $search) {
-        $query->where(function ($q) use ($search) {
-          $q->where('m_villages.name', 'like', "%{$search}%")
-            ->orWhere('m_districts.name', 'like', "%{$search}%")
-            ->orWhere('m_regencies.name', 'like', "%{$search}%")
-            ->orWhere('rehab_manggrove.fund_source', 'like', "%{$search}%");
+      ->select([
+        'rehab_manggrove.id',
+        'rehab_manggrove.year',
+        'rehab_manggrove.month',
+        'rehab_manggrove.regency_id',
+        'rehab_manggrove.district_id',
+        'rehab_manggrove.village_id',
+        'rehab_manggrove.fund_source',
+        'rehab_manggrove.target_annual',
+        'rehab_manggrove.realization',
+        'rehab_manggrove.status',
+        'rehab_manggrove.created_at',
+        'rehab_manggrove.created_by',
+      ])
+      ->with([
+        'creator:id,name',
+        'regency_rel:id,name',
+        'district_rel:id,name',
+        'village_rel:id,name',
+      ])
+      ->where('year', $selectedYear)
+
+      ->when($request->search, function ($q, $search) {
+        $q->where(function ($qq) use ($search) {
+          $qq->where('fund_source', 'like', "%{$search}%")
+            ->orWhereHas('village_rel', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('district_rel', fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('regency_rel', fn($q) => $q->where('name', 'like', "%{$search}%"));
         });
       })
-      ->with(['creator', 'regency_rel', 'district_rel', 'village_rel'])
-      ->when($sortField, function ($query) use ($sortField, $sortDirection) {
-        $sortMap = [
-          'year' => 'rehab_manggrove.year',
-          'month' => 'rehab_manggrove.month',
-          'location' => 'm_villages.name',
-          'realization' => 'rehab_manggrove.realization',
-          'fund_source' => 'rehab_manggrove.fund_source',
-          'status' => 'rehab_manggrove.status',
-          'created_at' => 'rehab_manggrove.created_at',
-        ];
 
-        $dbColumn = $sortMap[$sortField] ?? 'rehab_manggrove.created_at';
-        return $query->orderBy($dbColumn, $sortDirection);
+      ->when($sortField === 'location', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_villages', 'rehab_manggrove.village_id', '=', 'm_villages.id')
+          ->orderBy('m_villages.name', $sortDirection);
       })
-      ->paginate($request->query('per_page', 10))
+
+      ->when($sortField !== 'location', function ($q) use ($sortField, $sortDirection) {
+        match ($sortField) {
+          'year' => $q->orderBy('year', $sortDirection),
+          'month' => $q->orderBy('month', $sortDirection),
+          'realization' => $q->orderBy('realization', $sortDirection),
+          'fund_source' => $q->orderBy('fund_source', $sortDirection),
+          'status' => $q->orderBy('status', $sortDirection),
+          default => $q->orderBy('created_at', 'desc'),
+        };
+      })
+
+      ->paginate($request->integer('per_page', 10))
       ->withQueryString();
 
-    $stats = [
-      'total_target' => RehabManggrove::where('year', $selectedYear)->where('status', 'final')->sum('target_annual'),
-      'total_realization' => RehabManggrove::where('year', $selectedYear)->where('status', 'final')->sum('realization'),
-      'total_count' => RehabManggrove::where('year', $selectedYear)->where('status', 'final')->count(),
-    ];
+    $stats = cache()->remember(
+      "rehab-manggrove-stats-{$selectedYear}",
+      300,
+      fn() => [
+        'total_target' => RehabManggrove::where('year', $selectedYear)->where('status', 'final')->sum('target_annual'),
+        'total_realization' => RehabManggrove::where('year', $selectedYear)->where('status', 'final')->sum('realization'),
+        'total_count' => RehabManggrove::where('year', $selectedYear)->where('status', 'final')->count(),
+      ]
+    );
 
-    $dbYears = RehabManggrove::distinct()->orderBy('year', 'desc')->pluck('year')->toArray();
-    $fixedYears = range(2025, 2021);
-    $availableYears = array_values(array_unique(array_merge($dbYears, $fixedYears)));
-    rsort($availableYears);
+    $availableYears = cache()->remember('rehab-manggrove-years', 3600, function () {
+      $dbYears = RehabManggrove::distinct()->pluck('year')->toArray();
+      $fixedYears = range(2025, 2021);
+      $years = array_unique(array_merge($dbYears, $fixedYears));
+      rsort($years);
+      return $years;
+    });
+
+    $sumberDana = cache()->remember('sumber-dana', 3600, fn() => SumberDana::select('id', 'name')->get());
 
     return Inertia::render('RehabManggrove/Index', [
       'datas' => $datas,
@@ -90,7 +109,7 @@ class RehabManggroveController extends Controller
         'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
-      'sumberDana' => SumberDana::all()
+      'sumberDana' => $sumberDana
     ]);
   }
 
