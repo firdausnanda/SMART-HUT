@@ -662,10 +662,14 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        {forest_type === 'Hutan Negara' ? (
+                        {forest_type === 'Hutan Negara' && (
                           <div className="font-bold text-gray-900 leading-tight mb-0.5">{item.pengelola_hutan?.name || '-'}</div>
-                        ) : (
+                        )}
+                        {forest_type === 'Hutan Rakyat' && (
                           <div className="font-bold text-gray-900 leading-tight mb-0.5">{item.district?.name || 'Kecamatan N/A'}</div>
+                        )}
+                        {forest_type === 'Perhutanan Sosial' && (
+                          <div className="font-bold text-gray-900 leading-tight mb-0.5">{item.pengelola_wisata?.name || '-'}</div>
                         )}
                         <div className="text-[10px] text-emerald-600 font-black uppercase tracking-widest flex items-center gap-1">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">

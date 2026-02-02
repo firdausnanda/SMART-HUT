@@ -22,7 +22,7 @@ class HasilHutanKayuExport implements FromQuery, WithHeadings, WithMapping, Shou
   public function query()
   {
     return HasilHutanKayu::query()
-      ->with(['regency', 'pengelolaHutan', 'details.kayu', 'creator'])
+      ->with(['regency', 'district', 'pengelolaHutan', 'pengelolaWisata', 'details.kayu', 'creator'])
       ->where('forest_type', $this->forestType)
       ->when($this->year, function ($q) {
         return $q->where('year', $this->year);
@@ -31,7 +31,12 @@ class HasilHutanKayuExport implements FromQuery, WithHeadings, WithMapping, Shou
 
   public function headings(): array
   {
-    $locationLabel = $this->forestType === 'Hutan Negara' ? 'Pengelola Hutan' : 'Kecamatan';
+    $locationLabel = 'Kecamatan';
+    if ($this->forestType === 'Hutan Negara') {
+      $locationLabel = 'Pengelola Hutan';
+    } elseif ($this->forestType === 'Perhutanan Sosial') {
+      $locationLabel = 'Pengelola Wisata';
+    }
 
     return [
       'ID',
@@ -55,9 +60,14 @@ class HasilHutanKayuExport implements FromQuery, WithHeadings, WithMapping, Shou
       return ($detail->kayu->name ?? '-') . ' (R:' . floatval($detail->volume_realization) . ')';
     })->implode(', ');
 
-    $locationName = $this->forestType === 'Hutan Negara'
-      ? ($row->pengelolaHutan->name ?? '-')
-      : ($row->district->name ?? '-');
+    $locationName = '-';
+    if ($this->forestType === 'Hutan Negara') {
+      $locationName = $row->pengelolaHutan->name ?? '-';
+    } elseif ($this->forestType === 'Perhutanan Sosial') {
+      $locationName = $row->pengelolaWisata->name ?? '-';
+    } else {
+      $locationName = $row->district->name ?? '-';
+    }
 
     return [
       $row->id,

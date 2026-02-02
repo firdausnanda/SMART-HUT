@@ -21,6 +21,7 @@ class HasilHutanKayu extends Model
         'regency_id',
         'district_id',
         'pengelola_hutan_id',
+        'pengelola_wisata_id',
         'forest_type',
         'volume_target',
         'status',
@@ -51,6 +52,11 @@ class HasilHutanKayu extends Model
     public function pengelolaHutan()
     {
         return $this->belongsTo(PengelolaHutan::class, 'pengelola_hutan_id');
+    }
+
+    public function pengelolaWisata()
+    {
+        return $this->belongsTo(PengelolaWisata::class, 'pengelola_wisata_id');
     }
 
     public function details()

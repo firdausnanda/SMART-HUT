@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
 
-export default function Edit({ auth, data: item, kayu_list, pengelola_hutan_list = [] }) {
+export default function Edit({ auth, data: item, kayu_list, pengelola_hutan_list = [], pengelola_wisata_list = [] }) {
   const { data, setData, patch, processing, errors } = useForm({
     year: item.year || new Date().getFullYear(),
     month: item.month || new Date().getMonth() + 1,
@@ -16,6 +16,8 @@ export default function Edit({ auth, data: item, kayu_list, pengelola_hutan_list
     regency_id: item.regency_id || '',
     district_id: item.district_id || '',
     pengelola_hutan_id: item.pengelola_hutan_id || '',
+    pengelola_wisata_id: item.pengelola_wisata_id || '',
+    forest_type: item.forest_type || '', // Assuming item.forest_type exists
     volume_target: item.volume_target || '',
     details: (item.details && item.details.length > 0)
       ? item.details.map(d => ({
@@ -270,7 +272,7 @@ export default function Edit({ auth, data: item, kayu_list, pengelola_hutan_list
                   <InputError message={errors.regency_id} className="mt-2" />
                 </div>
 
-                {data.forest_type !== 'Hutan Negara' && (
+                {data.forest_type === 'Hutan Rakyat' && (
                   <div>
                     <InputLabel value="Kecamatan" className="text-gray-700 font-bold mb-2" />
                     <Select
@@ -289,6 +291,26 @@ export default function Edit({ auth, data: item, kayu_list, pengelola_hutan_list
                       isClearable
                     />
                     <InputError message={errors.district_id} className="mt-2" />
+                  </div>
+                )}
+
+                {data.forest_type === 'Perhutanan Sosial' && (
+                  <div>
+                    <InputLabel value="Pengelola" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={pengelola_wisata_list.map(p => ({ value: p.id, label: p.name }))}
+                      value={pengelola_wisata_list.map(p => ({ value: p.id, label: p.name })).find(p => p.value === data.pengelola_wisata_id) || (item.pengelola_wisata ? { value: item.pengelola_wisata_id, label: item.pengelola_wisata.name } : null)}
+                      onChange={(opt) => {
+                        setData((prev) => ({
+                          ...prev,
+                          pengelola_wisata_id: opt?.value || '',
+                        }));
+                      }}
+                      placeholder="Pilih Pengelola Wisata..."
+                      styles={selectStyles}
+                      isClearable
+                    />
+                    <InputError message={errors.pengelola_wisata_id} className="mt-2" />
                   </div>
                 )}
 

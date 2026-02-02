@@ -38,6 +38,7 @@ class HasilHutanKayuController extends Controller
         'hasil_hutan_kayu.regency_id',
         'hasil_hutan_kayu.district_id',
         'hasil_hutan_kayu.pengelola_hutan_id',
+        'hasil_hutan_kayu.pengelola_wisata_id',
         'hasil_hutan_kayu.forest_type',
         'hasil_hutan_kayu.volume_target',
         'hasil_hutan_kayu.status',
@@ -49,6 +50,7 @@ class HasilHutanKayuController extends Controller
         'regency:id,name',
         'district:id,name',
         'pengelolaHutan:id,name',
+        'pengelolaWisata:id,name',
         'details.kayu:id,name'
       ])
       ->where('forest_type', $forestType)
@@ -59,7 +61,8 @@ class HasilHutanKayuController extends Controller
           $q->whereHas('details.kayu', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
             ->orWhereHas('regency', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
             ->orWhereHas('district', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
-            ->orWhereHas('pengelolaHutan', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
+            ->orWhereHas('pengelolaHutan', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+            ->orWhereHas('pengelolaWisata', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
         });
       })
 
@@ -70,7 +73,8 @@ class HasilHutanKayuController extends Controller
       })
       ->when($sortField === 'pengelola', function ($q) use ($sortDirection) {
         $q->leftJoin('m_pengelola_hutan', 'hasil_hutan_kayu.pengelola_hutan_id', '=', 'm_pengelola_hutan.id')
-          ->orderBy('m_pengelola_hutan.name', $sortDirection);
+          ->leftJoin('m_pengelola_wisata', 'hasil_hutan_kayu.pengelola_wisata_id', '=', 'm_pengelola_wisata.id')
+          ->orderByRaw("COALESCE(m_pengelola_hutan.name, m_pengelola_wisata.name) $sortDirection");
       })
 
       ->when(!in_array($sortField, ['location', 'pengelola']), function ($q) use ($sortField, $sortDirection) {
@@ -142,6 +146,7 @@ class HasilHutanKayuController extends Controller
       'provinces' => DB::table('m_provinces')->where('id', '35')->get(), // Default Jawa Timur
       'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
       'pengelola_hutan_list' => \App\Models\PengelolaHutan::all(),
+      'pengelola_wisata_list' => \App\Models\PengelolaWisata::all(),
     ]);
   }
 
@@ -154,6 +159,7 @@ class HasilHutanKayuController extends Controller
       'regency_id' => 'required|exists:m_regencies,id',
       'district_id' => 'nullable|exists:m_districts,id',
       'pengelola_hutan_id' => 'nullable|exists:m_pengelola_hutan,id',
+      'pengelola_wisata_id' => 'nullable|exists:m_pengelola_wisata,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
       'volume_target' => 'required|numeric|min:0',
       'details' => 'required|array|min:1',
@@ -165,8 +171,11 @@ class HasilHutanKayuController extends Controller
     if ($validated['forest_type'] === 'Hutan Negara' && empty($validated['pengelola_hutan_id'])) {
       return redirect()->back()->withErrors(['pengelola_hutan_id' => 'Pengelola Hutan wajib diisi untuk Hutan Negara.'])->withInput();
     }
-    if ($validated['forest_type'] !== 'Hutan Negara' && empty($validated['district_id'])) {
+    if ($validated['forest_type'] === 'Hutan Rakyat' && empty($validated['district_id'])) {
       return redirect()->back()->withErrors(['district_id' => 'Kecamatan wajib diisi.'])->withInput();
+    }
+    if ($validated['forest_type'] === 'Perhutanan Sosial' && empty($validated['pengelola_wisata_id'])) {
+      return redirect()->back()->withErrors(['pengelola_wisata_id' => 'Pengelola Wisata wajib diisi.'])->withInput();
     }
 
     DB::transaction(function () use ($validated) {
@@ -175,8 +184,9 @@ class HasilHutanKayuController extends Controller
         'month' => $validated['month'],
         'province_id' => $validated['province_id'],
         'regency_id' => $validated['regency_id'],
-        'district_id' => $validated['district_id'] ?? null,
-        'pengelola_hutan_id' => $validated['pengelola_hutan_id'] ?? null,
+        'district_id' => ($validated['forest_type'] === 'Hutan Rakyat') ? $validated['district_id'] : null,
+        'pengelola_hutan_id' => ($validated['forest_type'] === 'Hutan Negara') ? $validated['pengelola_hutan_id'] : null,
+        'pengelola_wisata_id' => ($validated['forest_type'] === 'Perhutanan Sosial') ? $validated['pengelola_wisata_id'] : null,
         'forest_type' => $validated['forest_type'],
         'volume_target' => $validated['volume_target'],
         'status' => 'draft'
@@ -197,11 +207,12 @@ class HasilHutanKayuController extends Controller
   public function edit(HasilHutanKayu $hasilHutanKayu)
   {
     return Inertia::render('HasilHutanKayu/Edit', [
-      'data' => $hasilHutanKayu->load(['details.kayu', 'regency', 'district', 'pengelolaHutan']),
+      'data' => $hasilHutanKayu->load(['details.kayu', 'regency', 'district', 'pengelolaHutan', 'pengelolaWisata']),
       'kayu_list' => Kayu::all(),
       'provinces' => DB::table('m_provinces')->where('id', '35')->get(),
       'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
       'pengelola_hutan_list' => \App\Models\PengelolaHutan::all(),
+      'pengelola_wisata_list' => \App\Models\PengelolaWisata::all(),
     ]);
   }
 
@@ -214,6 +225,7 @@ class HasilHutanKayuController extends Controller
       'regency_id' => 'required|exists:m_regencies,id',
       'district_id' => 'nullable|exists:m_districts,id',
       'pengelola_hutan_id' => 'nullable|exists:m_pengelola_hutan,id',
+      'pengelola_wisata_id' => 'nullable|exists:m_pengelola_wisata,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
       'volume_target' => 'required|numeric|min:0',
       'details' => 'required|array|min:1',
@@ -225,8 +237,11 @@ class HasilHutanKayuController extends Controller
     if ($validated['forest_type'] === 'Hutan Negara' && empty($validated['pengelola_hutan_id'])) {
       return redirect()->back()->withErrors(['pengelola_hutan_id' => 'Pengelola Hutan wajib diisi untuk Hutan Negara.'])->withInput();
     }
-    if ($validated['forest_type'] !== 'Hutan Negara' && empty($validated['district_id'])) {
+    if ($validated['forest_type'] === 'Hutan Rakyat' && empty($validated['district_id'])) {
       return redirect()->back()->withErrors(['district_id' => 'Kecamatan wajib diisi.'])->withInput();
+    }
+    if ($validated['forest_type'] === 'Perhutanan Sosial' && empty($validated['pengelola_wisata_id'])) {
+      return redirect()->back()->withErrors(['pengelola_wisata_id' => 'Pengelola Wisata wajib diisi.'])->withInput();
     }
 
     DB::transaction(function () use ($validated, $hasilHutanKayu) {
@@ -235,8 +250,9 @@ class HasilHutanKayuController extends Controller
         'month' => $validated['month'],
         'province_id' => $validated['province_id'],
         'regency_id' => $validated['regency_id'],
-        'district_id' => $validated['district_id'] ?? null,
-        'pengelola_hutan_id' => $validated['pengelola_hutan_id'] ?? null,
+        'district_id' => ($validated['forest_type'] === 'Hutan Rakyat') ? $validated['district_id'] : null,
+        'pengelola_hutan_id' => ($validated['forest_type'] === 'Hutan Negara') ? $validated['pengelola_hutan_id'] : null,
+        'pengelola_wisata_id' => ($validated['forest_type'] === 'Perhutanan Sosial') ? $validated['pengelola_wisata_id'] : null,
         'forest_type' => $validated['forest_type'],
         'volume_target' => $validated['volume_target'],
       ]);

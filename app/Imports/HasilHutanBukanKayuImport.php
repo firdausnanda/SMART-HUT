@@ -37,6 +37,16 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       ];
     }
 
+    if ($this->forestType === 'Perhutanan Sosial') {
+      return [
+        'tahun' => 'required|numeric',
+        'bulan_angka' => 'required|numeric|min:1|max:12',
+        'nama_kabupaten' => 'required|exists:m_regencies,name',
+        'nama_pengelola_wisata' => 'required|exists:m_pengelola_wisata,name',
+        'total_target' => 'required|numeric|min:0',
+      ];
+    }
+
     return [
       'tahun' => 'required|numeric',
       'bulan_angka' => 'required|numeric|min:1|max:12',
@@ -55,6 +65,8 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       'bulan_angka.max' => 'Bulan harus 1-12.',
       'total_target.required' => 'Total Target wajib diisi.',
       'nama_pengelola.required' => 'Nama Pengelola wajib diisi untuk Hutan Negara.',
+      'nama_pengelola_wisata.required' => 'Nama Pengelola wajib diisi untuk Perhutanan Sosial.',
+      'nama_pengelola_wisata.exists' => 'Data Pengelola Wisata tidak ditemukan.',
     ];
   }
 
@@ -102,14 +114,27 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
     if ($this->forestType === 'Hutan Negara' && !$pengelolaId)
       return null;
 
+    // 2.7 Lookup Pengelola Wisata ID (only for Perhutanan Sosial)
+    $pengelolaWisataId = null;
+    if ($this->forestType === 'Perhutanan Sosial' && !empty($row['nama_pengelola_wisata'])) {
+      $pengelolaWisata = DB::table('m_pengelola_wisata')
+        ->where('name', 'like', '%' . $row['nama_pengelola_wisata'] . '%')
+        ->first();
+      $pengelolaWisataId = $pengelolaWisata?->id;
+    }
+
+    if ($this->forestType === 'Perhutanan Sosial' && !$pengelolaWisataId)
+      return null;
+
     // Create Parent
     $hhbk = HasilHutanBukanKayu::create([
       'year' => $row['tahun'],
       'month' => $row['bulan_angka'],
       'province_id' => 35, // Default JAWA TIMUR
       'regency_id' => $regency->id,
-      'district_id' => $districtId,
-      'pengelola_hutan_id' => $pengelolaId,
+      'district_id' => $this->forestType === 'Hutan Rakyat' ? $districtId : null,
+      'pengelola_hutan_id' => $this->forestType === 'Hutan Negara' ? $pengelolaId : null,
+      'pengelola_wisata_id' => $this->forestType === 'Perhutanan Sosial' ? $pengelolaWisataId : null,
       'forest_type' => $this->forestType,
       'volume_target' => $row['total_target'] ?? 0,
       'status' => 'draft',

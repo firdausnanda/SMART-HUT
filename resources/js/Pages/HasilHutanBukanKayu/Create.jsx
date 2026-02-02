@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
 
-export default function Create({ auth, commodity_list = [], pengelola_hutan = [], forest_type }) { // Added pengelola_hutan prop
+export default function Create({ auth, commodity_list = [], pengelola_hutan = [], pengelola_wisata_list = [], forest_type }) { // Added pengelola_wisata_list prop
   const { data, setData, post, processing, errors } = useForm({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
@@ -16,6 +16,7 @@ export default function Create({ auth, commodity_list = [], pengelola_hutan = []
     regency_id: '',
     district_id: '',
     pengelola_hutan_id: '',
+    pengelola_wisata_id: '',
     forest_type: forest_type || 'Hutan Negara',
     volume_target: '',
     details: [
@@ -277,7 +278,7 @@ export default function Create({ auth, commodity_list = [], pengelola_hutan = []
                   <InputError message={errors.regency_id} className="mt-2" />
                 </div>
 
-                {forest_type !== 'Hutan Negara' && (
+                {forest_type === 'Hutan Rakyat' && (
                   <div>
                     <InputLabel value="Kecamatan" className="text-gray-700 font-bold mb-2" />
                     <Select
@@ -310,6 +311,26 @@ export default function Create({ auth, commodity_list = [], pengelola_hutan = []
                       isClearable
                     />
                     <InputError message={errors.pengelola_hutan_id} className="mt-2" />
+                  </div>
+                )}
+
+                {forest_type === 'Perhutanan Sosial' && (
+                  <div>
+                    <InputLabel value="Pengelola" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={pengelola_wisata_list.map(p => ({ value: p.id, label: p.name }))}
+                      onChange={(opt) => {
+                        setData((prev) => ({
+                          ...prev,
+                          pengelola_wisata_id: opt?.value || '',
+                        }));
+                      }}
+                      placeholder="Pilih Pengelola..."
+                      styles={selectStyles}
+                      isClearable={true}
+                      value={pengelola_wisata_list.map(p => ({ value: p.id, label: p.name })).find(p => p.value === data.pengelola_wisata_id) || null}
+                    />
+                    <InputError message={errors.pengelola_wisata_id} className="mt-2" />
                   </div>
                 )}
 

@@ -34,6 +34,14 @@ class HasilHutanBukanKayuTemplateExport implements WithHeadings, ShouldAutoSize,
         'Nama Pengelola',
         'Total Target',
       ];
+    } elseif ($this->forestType === 'Perhutanan Sosial') {
+      $headers = [
+        'Tahun',
+        'Bulan (Angka)',
+        'Nama Kabupaten',
+        'Nama Pengelola Wisata',
+        'Total Target',
+      ];
     } else {
       $headers = [
         'Tahun',
@@ -95,6 +103,8 @@ class HasilHutanBukanKayuTemplateExport implements WithHeadings, ShouldAutoSize,
 
         if ($this->forestType === 'Hutan Negara') {
           $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Pengelola (e.g. RPH PANGGUL)');
+        } elseif ($this->forestType === 'Perhutanan Sosial') {
+          $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Pengelola Wisata');
         } else {
           $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan (e.g. KECAMATAN PANGGUL)');
         }

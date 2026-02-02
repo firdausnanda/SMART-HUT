@@ -26,7 +26,12 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
 
   public function headings(): array
   {
-    $locationLabel = $this->forestType === 'Hutan Negara' ? 'Nama Pengelola Hutan' : 'Nama Kecamatan';
+    $locationLabel = 'Nama Kecamatan';
+    if ($this->forestType === 'Hutan Negara') {
+      $locationLabel = 'Nama Pengelola Hutan';
+    } elseif ($this->forestType === 'Perhutanan Sosial') {
+      $locationLabel = 'Nama Pengelola Wisata';
+    }
 
     $headers = [
       'Tahun',
@@ -85,6 +90,8 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
 
         if ($this->forestType === 'Hutan Negara') {
           $sheet->getComment('E1')->getText()->createTextRun('Isi dengan Nama Pengelola Hutan');
+        } elseif ($this->forestType === 'Perhutanan Sosial') {
+          $sheet->getComment('E1')->getText()->createTextRun('Isi dengan Nama Pengelola Wisata');
         } else {
           $sheet->getComment('E1')->getText()->createTextRun('Isi dengan Nama Kecamatan');
         }
