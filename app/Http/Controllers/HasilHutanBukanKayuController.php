@@ -37,6 +37,7 @@ class HasilHutanBukanKayuController extends Controller
         'hasil_hutan_bukan_kayu.regency_id',
         'hasil_hutan_bukan_kayu.district_id',
         'hasil_hutan_bukan_kayu.pengelola_hutan_id',
+        'hasil_hutan_bukan_kayu.pengelola_wisata_id',
         'hasil_hutan_bukan_kayu.forest_type',
         'hasil_hutan_bukan_kayu.volume_target',
         'hasil_hutan_bukan_kayu.status',

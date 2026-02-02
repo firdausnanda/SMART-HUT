@@ -99,7 +99,7 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       $districtId = $district?->id;
     }
 
-    if ($this->forestType !== 'Hutan Negara' && !$districtId)
+    if ($this->forestType === 'Hutan Rakyat' && !$districtId)
       return null;
 
     // 2.5 Lookup Pengelola ID (only for Hutan Negara)
