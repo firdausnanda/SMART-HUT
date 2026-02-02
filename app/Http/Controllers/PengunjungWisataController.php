@@ -320,4 +320,37 @@ class PengunjungWisataController extends Controller
 
     return redirect()->back()->with('success', $count . ' laporan berhasil disetujui.');
   }
+
+  /**
+   * Bulk reject records.
+   */
+  public function bulkReject(Request $request)
+  {
+    $request->validate([
+      'ids' => 'required|array',
+      'ids.*' => 'exists:pengunjung_wisata,id',
+      'rejection_note' => 'required|string|max:255',
+    ]);
+
+    $user = auth()->user();
+    $count = 0;
+
+    if ($user->hasRole('kasi') || $user->hasRole('admin')) {
+      $count = PengunjungWisata::whereIn('id', $request->ids)
+        ->where('status', 'waiting_kasi')
+        ->update([
+          'status' => 'rejected',
+          'rejection_note' => $request->rejection_note,
+        ]);
+    } elseif ($user->hasRole('kacdk') || $user->hasRole('admin')) {
+      $count = PengunjungWisata::whereIn('id', $request->ids)
+        ->where('status', 'waiting_cdk')
+        ->update([
+          'status' => 'rejected',
+          'rejection_note' => $request->rejection_note,
+        ]);
+    }
+
+    return redirect()->back()->with('success', $count . ' laporan berhasil ditolak.');
+  }
 }

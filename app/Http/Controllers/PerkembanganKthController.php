@@ -339,6 +339,39 @@ class PerkembanganKthController extends Controller
     return redirect()->back()->with('success', 'Laporan telah ditolak dengan catatan.');
   }
 
+  public function bulkReject(Request $request)
+  {
+    $request->validate([
+      'ids' => 'required|array',
+      'ids.*' => 'exists:perkembangan_kth,id',
+      'rejection_note' => 'required|string|max:255',
+    ]);
+
+    $user = auth()->user();
+    $ids = $request->ids;
+    $count = 0;
+
+    if ($user->hasRole('kasi') || $user->hasRole('admin')) {
+      $count = PerkembanganKth::whereIn('id', $ids)
+        ->where('status', 'waiting_kasi')
+        ->update([
+          'status' => 'rejected',
+          'rejection_note' => $request->rejection_note,
+        ]);
+    }
+
+    if ($user->hasRole('kacdk') || $user->hasRole('admin')) {
+      $count = PerkembanganKth::whereIn('id', $ids)
+        ->where('status', 'waiting_cdk')
+        ->update([
+          'status' => 'rejected',
+          'rejection_note' => $request->rejection_note,
+        ]);
+    }
+
+    return redirect()->back()->with('success', $count . ' laporan berhasil ditolak.');
+  }
+
   /**
    * Export data to Excel.
    */

@@ -11,6 +11,7 @@ import Pagination from '@/Components/Pagination';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import LoadingOverlay from '@/Components/LoadingOverlay';
+import BulkActionToolbar from '@/Components/BulkActionToolbar';
 
 const MySwal = withReactContent(Swal);
 
@@ -95,6 +96,7 @@ export default function Index({ auth, datas, stats, filters = {} }) {
     let routeName = '';
     let confirmText = '';
     let color = '#3085d6';
+    let showInput = false;
 
     switch (action) {
       case 'delete':
@@ -115,14 +117,28 @@ export default function Index({ auth, datas, stats, filters = {} }) {
         routeName = 'skps.bulk-approve';
         color = '#15803d';
         break;
+      case 'reject':
+        title = 'Tolak Data Terpilih?';
+        confirmText = 'Ya, Tolak!';
+        routeName = 'skps.bulk-reject';
+        color = '#d33';
+        showInput = true;
+        break;
       default:
         return;
     }
 
     MySwal.fire({
       title: title,
-      text: `${selectedIds.length} data terpilih akan diproses.`,
+      text: showInput ? 'Berikan alasan penolakan:' : `${selectedIds.length} data terpilih akan diproses.`,
       icon: 'warning',
+      input: showInput ? 'textarea' : undefined,
+      inputPlaceholder: showInput ? 'Tuliskan catatan penolakan di sini...' : undefined,
+      inputValidator: showInput ? (value) => {
+        if (!value) {
+          return 'Alasan penolakan harus diisi!'
+        }
+      } : undefined,
       showCancelButton: true,
       confirmButtonColor: color,
       confirmButtonText: confirmText,
@@ -132,7 +148,10 @@ export default function Index({ auth, datas, stats, filters = {} }) {
       if (result.isConfirmed) {
         setLoadingText('Memproses Aksi Massal...');
         setIsLoading(true);
-        router.post(route(routeName), { ids: selectedIds }, {
+        router.post(route(routeName), {
+          ids: selectedIds,
+          rejection_note: showInput ? result.value : undefined
+        }, {
           preserveScroll: true,
           onSuccess: () => {
             setSelectedIds([]);
@@ -735,62 +754,15 @@ export default function Index({ auth, datas, stats, filters = {} }) {
         </div>
       </AuthenticatedLayout>
 
-      {
-        selectedIds.length > 0 && createPortal(
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-[9999] flex items-center gap-4 animate-in slide-in-from-bottom-5 duration-300">
-            <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg">
-              <span className="font-bold text-gray-700">{selectedIds.length}</span>
-              <span className="text-xs font-semibold text-gray-500 uppercase">Dipilih</span>
-            </div>
-            <div className="h-8 w-px bg-gray-200"></div>
-            <div className="flex items-center gap-2">
-              {(canSubmit) && (
-                <button
-                  onClick={() => handleBulkAction('submit')}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm shadow-blue-200"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Ajukan
-                </button>
-              )}
-              {(canApprove) && (
-                <button
-                  onClick={() => handleBulkAction('approve')}
-                  className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm shadow-emerald-200"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Setujui
-                </button>
-              )}
-              {(canDelete) && (
-                <button
-                  onClick={() => handleBulkAction('delete')}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm shadow-red-200"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  Hapus
-                </button>
-              )}
-            </div>
-            <button
-              onClick={() => setSelectedIds([])}
-              className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors"
-              title="Batalkan Pilihan"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>,
-          document.body
-        )
-      }
+      <BulkActionToolbar
+        selectedIds={selectedIds}
+        setSelectedIds={setSelectedIds}
+        handleBulkAction={handleBulkAction}
+        canEdit={canEdit}
+        canApprove={canApprove}
+        canDelete={canDelete}
+        isAdmin={isAdmin}
+      />
 
       {/* Import Modal */}
       <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>

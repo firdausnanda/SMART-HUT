@@ -12,6 +12,7 @@ import StatusBadge from '@/Components/StatusBadge';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import LoadingOverlay from '@/Components/LoadingOverlay';
+import BulkActionToolbar from '@/Components/BulkActionToolbar';
 
 const MySwal = withReactContent(Swal);
 
@@ -153,39 +154,78 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
   const handleBulkAction = (action) => {
     if (selectedIds.length === 0) return;
 
-    let title, text, routeName;
+    let title = '';
+    let routeName = '';
+    let confirmText = '';
+    let color = '#3085d6';
+    let showInput = false;
 
-    if (action === 'delete') {
-      title = 'Hapus data terpilih?';
-      text = 'Data yang dihapus tidak dapat dikembalikan!';
-      routeName = 'nilai-transaksi-ekonomi.bulk-delete';
-    } else if (action === 'submit') {
-      title = 'Submit data terpilih?';
-      text = 'Data akan dikirim ke Kasi.';
-      routeName = 'nilai-transaksi-ekonomi.bulk-submit';
-    } else if (action === 'approve') {
-      title = 'Setujui data terpilih?';
-      text = 'Data akan disetujui.';
-      routeName = 'nilai-transaksi-ekonomi.bulk-approve';
+    switch (action) {
+      case 'delete':
+        title = 'Hapus Data Terpilih?';
+        confirmText = 'Ya, Hapus!';
+        routeName = 'nilai-transaksi-ekonomi.bulk-delete';
+        color = '#d33';
+        break;
+      case 'submit':
+        title = 'Ajukan Data Terpilih?';
+        confirmText = 'Ya, Ajukan!';
+        routeName = 'nilai-transaksi-ekonomi.bulk-submit';
+        color = '#15803d';
+        break;
+      case 'approve':
+        title = 'Setujui Data Terpilih?';
+        confirmText = 'Ya, Setujui!';
+        routeName = 'nilai-transaksi-ekonomi.bulk-approve';
+        color = '#15803d';
+        break;
+      case 'reject':
+        title = 'Tolak Data Terpilih?';
+        confirmText = 'Ya, Tolak!';
+        routeName = 'nilai-transaksi-ekonomi.bulk-reject';
+        color = '#d33';
+        showInput = true;
+        break;
+      default:
+        return;
     }
 
     MySwal.fire({
       title: title,
-      text: text,
+      text: showInput ? 'Berikan alasan penolakan:' : `${selectedIds.length} data terpilih akan diproses.`,
       icon: 'warning',
+      input: showInput ? 'textarea' : undefined,
+      inputPlaceholder: showInput ? 'Tuliskan catatan penolakan di sini...' : undefined,
+      inputValidator: showInput ? (value) => {
+        if (!value) {
+          return 'Alasan penolakan harus diisi!'
+        }
+      } : undefined,
       showCancelButton: true,
-      confirmButtonColor: action === 'delete' ? '#d33' : '#15803d',
-      confirmButtonText: 'Ya, Lanjutkan!',
-      cancelButtonText: 'Batal'
+      confirmButtonColor: color,
+      confirmButtonText: confirmText,
+      cancelButtonText: 'Batal',
+      borderRadius: '1.25rem',
     }).then((result) => {
       if (result.isConfirmed) {
-        setLoadingText('Memproses Bulk Action...');
+        setLoadingText('Memproses Aksi Massal...');
         setIsLoading(true);
-        router.post(route(routeName), { ids: selectedIds }, {
-          onFinish: () => {
-            setIsLoading(false);
+        router.post(route(routeName), {
+          ids: selectedIds,
+          rejection_note: showInput ? result.value : undefined
+        }, {
+          preserveScroll: true,
+          onSuccess: () => {
             setSelectedIds([]);
-          }
+            MySwal.fire({
+              title: 'Berhasil!',
+              text: 'Aksi massal berhasil dilakukan.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+          },
+          onFinish: () => setIsLoading(false)
         });
       }
     });
@@ -392,55 +432,6 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                 </select>
               </div>
             </div>
-
-            {
-              selectedIds.length > 0 && createPortal(
-                <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-in slide-in-from-bottom-5 duration-300 flex items-center gap-4 min-w-[300px]">
-                  <div className="flex items-center gap-3 pr-4 border-r border-gray-100">
-                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 font-bold text-sm">
-                      {selectedIds.length}
-                    </span>
-                    <span className="text-sm font-medium text-gray-600">Terpilih</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {(canEdit || isAdmin) && (
-                      <button
-                        onClick={() => handleBulkAction('submit')}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex flex-col items-center gap-1 group min-w-[60px]"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 9l3 3m0 0l-3 3m3-3H9" />
-                        </svg>
-                        <span className="text-[10px] font-bold">Ajukan</span>
-                      </button>
-                    )}
-                    {(canApprove || isAdmin) && (
-                      <button
-                        onClick={() => handleBulkAction('approve')}
-                        className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors flex flex-col items-center gap-1 group min-w-[60px]"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span className="text-[10px] font-bold">Setujui</span>
-                      </button>
-                    )}
-                    {(canDelete || isAdmin) && (
-                      <button
-                        onClick={() => handleBulkAction('delete')}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex flex-col items-center gap-1 group min-w-[60px]"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        <span className="text-[10px] font-bold">Hapus</span>
-                      </button>
-                    )}
-                  </div>
-                </div>,
-                document.body
-              )
-            }
             <div className="overflow-x-auto min-h-[400px]">
               <table className="w-full text-left text-sm text-gray-500 min-w-[1000px]">
                 <thead className="bg-gray-50/50 text-gray-700 uppercase tracking-wider text-[11px] font-bold">
@@ -645,6 +636,16 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
           </div>
         </div>
       </div>
+
+      <BulkActionToolbar
+        selectedIds={selectedIds}
+        setSelectedIds={setSelectedIds}
+        handleBulkAction={handleBulkAction}
+        canEdit={canEdit}
+        canApprove={canApprove}
+        canDelete={canDelete}
+        isAdmin={isAdmin}
+      />
 
       <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
         <form onSubmit={handleImportSubmit} className="p-0 overflow-hidden">

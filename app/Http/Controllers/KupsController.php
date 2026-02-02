@@ -301,4 +301,37 @@ class KupsController extends Controller
 
     return redirect()->back()->with('success', 'Data berhasil diimport.');
   }
+
+  public function bulkReject(Request $request)
+  {
+    $request->validate([
+      'ids' => 'required|array',
+      'ids.*' => 'exists:kups,id',
+      'rejection_note' => 'required|string|max:255',
+    ]);
+
+    $user = auth()->user();
+    $ids = $request->ids;
+    $count = 0;
+
+    if ($user->hasRole('kasi') || $user->hasRole('admin')) {
+      $count = Kups::whereIn('id', $ids)
+        ->where('status', 'waiting_kasi')
+        ->update([
+          'status' => 'rejected',
+          'rejection_note' => $request->rejection_note,
+        ]);
+    }
+
+    if ($user->hasRole('kacdk') || $user->hasRole('admin')) {
+      $count = Kups::whereIn('id', $ids)
+        ->where('status', 'waiting_cdk')
+        ->update([
+          'status' => 'rejected',
+          'rejection_note' => $request->rejection_note,
+        ]);
+    }
+
+    return redirect()->back()->with('success', $count . ' laporan berhasil ditolak.');
+  }
 }
