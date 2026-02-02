@@ -435,12 +435,12 @@ class DashboardController extends Controller
                     : [];
 
                 $binaUsahaData[$key]['bukan_kayu_commodity'] = \App\Models\HasilHutanBukanKayu::join('hasil_hutan_bukan_kayu_details', 'hasil_hutan_bukan_kayu.id', '=', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id')
-                    ->join('m_commodities', 'hasil_hutan_bukan_kayu_details.commodity_id', '=', 'm_commodities.id')
+                    ->join('m_bukan_kayu', 'hasil_hutan_bukan_kayu_details.bukan_kayu_id', '=', 'm_bukan_kayu.id')
                     ->where('hasil_hutan_bukan_kayu.year', $currentYear)
                     ->where('hasil_hutan_bukan_kayu.status', 'final')
                     ->where('hasil_hutan_bukan_kayu.forest_type', $type)
-                    ->selectRaw('m_commodities.name as commodity, sum(hasil_hutan_bukan_kayu_details.annual_volume_realization) as total')
-                    ->groupBy('m_commodities.name')
+                    ->selectRaw('m_bukan_kayu.name as commodity, sum(hasil_hutan_bukan_kayu_details.annual_volume_realization) as total')
+                    ->groupBy('m_bukan_kayu.name')
                     ->orderByDesc('total')
                     ->limit(5)
                     ->pluck('total', 'commodity');

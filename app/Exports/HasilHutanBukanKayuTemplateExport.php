@@ -20,7 +20,7 @@ class HasilHutanBukanKayuTemplateExport implements WithHeadings, ShouldAutoSize,
 
   public function __construct($forestType = 'Hutan Negara')
   {
-    $this->commodities = \App\Models\Commodity::all();
+    $this->commodities = BukanKayu::all();
     $this->forestType = $forestType;
   }
 

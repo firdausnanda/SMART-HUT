@@ -22,7 +22,7 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
   public function __construct($forestType)
   {
     $this->forestType = $forestType;
-    $this->commodities = \App\Models\Commodity::all();
+    $this->commodities = \App\Models\BukanKayu::all();
   }
 
   public function rules(): array
@@ -153,7 +153,7 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       // Only add detail if there is non-zero data
       if ($realizationVolume > 0) {
         $hhbk->details()->create([
-          'commodity_id' => $commodity->id,
+          'bukan_kayu_id' => $commodity->id,
           'annual_volume_realization' => $realizationVolume,
           'unit' => $unit,
         ]);

@@ -22,7 +22,7 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
   public function query()
   {
     return HasilHutanBukanKayu::query()
-      ->with(['regency', 'district', 'pengelolaHutan', 'pengelolaWisata', 'details.commodity', 'creator'])
+      ->with(['regency', 'district', 'pengelolaHutan', 'pengelolaWisata', 'details.bukanKayu', 'creator'])
       ->where('forest_type', $this->forestType)
       ->when($this->year, function ($q) {
         return $q->where('year', $this->year);
@@ -51,7 +51,7 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
   {
     $detailsString = $row->details->map(function ($d) {
       $real = $d->annual_volume_realization ?? 0;
-      return ($d->commodity->name ?? '?') . ': ' . $real . ' ' . $d->unit;
+      return ($d->bukanKayu->name ?? '?') . ': ' . $real . ' ' . $d->unit;
     })->join(",\n");
 
     $totalVolume = $row->volume_target;

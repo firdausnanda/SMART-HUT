@@ -11,7 +11,7 @@ class HasilHutanBukanKayuDetail extends Model
 
   protected $fillable = [
     'hasil_hutan_bukan_kayu_id',
-    'commodity_id',
+    'bukan_kayu_id',
     'annual_volume_realization',
     'unit',
   ];
@@ -21,8 +21,8 @@ class HasilHutanBukanKayuDetail extends Model
     return $this->belongsTo(HasilHutanBukanKayu::class, 'hasil_hutan_bukan_kayu_id');
   }
 
-  public function commodity()
+  public function bukanKayu()
   {
-    return $this->belongsTo(Commodity::class, 'commodity_id');
+    return $this->belongsTo(BukanKayu::class, 'bukan_kayu_id');
   }
 }

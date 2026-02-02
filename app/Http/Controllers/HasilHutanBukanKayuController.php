@@ -49,14 +49,14 @@ class HasilHutanBukanKayuController extends Controller
         'district:id,name',
         'pengelolaHutan:id,name',
         'pengelolaWisata:id,name',
-        'details.commodity:id,name'
+        'details.bukanKayu:id,name'
       ])
       ->where('forest_type', $forestType)
       ->where('year', $selectedYear)
 
       ->when($request->search, function ($query, $search) {
         $query->where(function ($q) use ($search) {
-          $q->whereHas('details.commodity', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+          $q->whereHas('details.bukanKayu', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
             ->orWhereHas('regency', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
             ->orWhereHas('district', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
             ->orWhereHas('pengelolaHutan', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
@@ -139,7 +139,7 @@ class HasilHutanBukanKayuController extends Controller
 
     return Inertia::render('HasilHutanBukanKayu/Create', [
       'forest_type' => $forestType,
-      'commodity_list' => \App\Models\Commodity::all(), // Changed from BukanKayu
+      'bukan_kayu_list' => \App\Models\BukanKayu::all(),
       'provinces' => DB::table('m_provinces')->where('id', '35')->get(),
       'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
       'pengelola_hutan' => \App\Models\PengelolaHutan::all(),
@@ -160,7 +160,7 @@ class HasilHutanBukanKayuController extends Controller
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
       'volume_target' => 'required|numeric|min:0',
       'details' => 'required|array|min:1',
-      'details.*.commodity_id' => 'required|exists:m_commodities,id',
+      'details.*.bukan_kayu_id' => 'required|exists:m_bukan_kayu,id',
       'details.*.annual_volume_realization' => 'nullable|numeric|min:0',
       'details.*.unit' => 'nullable|string',
     ]);
@@ -192,7 +192,7 @@ class HasilHutanBukanKayuController extends Controller
 
       foreach ($validated['details'] as $detail) {
         $parent->details()->create([
-          'commodity_id' => $detail['commodity_id'],
+          'bukan_kayu_id' => $detail['bukan_kayu_id'],
           'annual_volume_realization' => $detail['annual_volume_realization'] ?? 0,
           'unit' => $detail['unit'] ?? 'Kg',
         ]);
@@ -206,8 +206,8 @@ class HasilHutanBukanKayuController extends Controller
   public function edit(HasilHutanBukanKayu $hasilHutanBukanKayu)
   {
     return Inertia::render('HasilHutanBukanKayu/Edit', [
-      'data' => $hasilHutanBukanKayu->load(['details.commodity', 'regency', 'district', 'pengelolaHutan', 'pengelolaWisata']),
-      'commodity_list' => \App\Models\Commodity::all(),
+      'data' => $hasilHutanBukanKayu->load(['details.bukanKayu', 'regency', 'district', 'pengelolaHutan', 'pengelolaWisata']),
+      'bukan_kayu_list' => \App\Models\BukanKayu::all(),
       'provinces' => DB::table('m_provinces')->where('id', '35')->get(),
       'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
       'districts' => DB::table('m_districts')->where('regency_id', $hasilHutanBukanKayu->regency_id)->get(),
@@ -223,12 +223,13 @@ class HasilHutanBukanKayuController extends Controller
       'month' => 'required|integer|min:1|max:12',
       'province_id' => 'required|exists:m_provinces,id',
       'regency_id' => 'required|exists:m_regencies,id',
-      'district_id' => 'required_unless:forest_type,Hutan Negara|nullable|exists:m_districts,id',
+      'district_id' => 'nullable|exists:m_districts,id',
       'pengelola_hutan_id' => 'nullable|exists:m_pengelola_hutan,id',
+      'pengelola_wisata_id' => 'nullable|exists:m_pengelola_wisata,id',
       'forest_type' => 'required|in:Hutan Negara,Hutan Rakyat,Perhutanan Sosial',
       'volume_target' => 'required|numeric|min:0',
       'details' => 'required|array|min:1',
-      'details.*.commodity_id' => 'required|exists:m_commodities,id',
+      'details.*.bukan_kayu_id' => 'required|exists:m_bukan_kayu,id',
       'details.*.annual_volume_realization' => 'nullable|numeric|min:0',
       'details.*.unit' => 'nullable|string',
     ]);
@@ -260,7 +261,7 @@ class HasilHutanBukanKayuController extends Controller
       $hasilHutanBukanKayu->details()->delete();
       foreach ($validated['details'] as $detail) {
         $hasilHutanBukanKayu->details()->create([
-          'commodity_id' => $detail['commodity_id'],
+          'bukan_kayu_id' => $detail['bukan_kayu_id'],
           'annual_volume_realization' => $detail['annual_volume_realization'] ?? 0,
           'unit' => $detail['unit'] ?? 'Kg',
         ]);

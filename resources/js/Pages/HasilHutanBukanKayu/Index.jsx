@@ -624,11 +624,11 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                   </th>
                   <th
                     className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group"
-                    onClick={() => handleSort('commodity')}
+                    onClick={() => handleSort('bukan_kayu')}
                   >
                     <div className="flex items-center gap-1">
-                      Jenis Komoditas
-                      <SortIcon field="commodity" />
+                      Jenis Bukan Kayu
+                      <SortIcon field="bukan_kayu" />
                     </div>
                   </th>
                   <th
@@ -701,7 +701,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                         <div className="flex flex-wrap gap-1">
                           {item.details.map((detail, idx) => (
                             <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                              {detail.commodity?.name || '-'} <span className="text-[10px] opacity-75 ml-1">({detail.unit})</span>
+                              {detail.bukan_kayu?.name || '-'} <span className="text-[10px] opacity-75 ml-1">({detail.unit})</span>
                             </span>
                           ))}
                         </div>

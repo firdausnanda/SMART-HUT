@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
 
-export default function Edit({ auth, data: data_item, commodity_list = [], pengelola_hutan = [], pengelola_wisata_list = [] }) {
+export default function Edit({ auth, data: data_item, bukan_kayu_list = [], pengelola_hutan = [], pengelola_wisata_list = [] }) {
   const { data, setData, put, processing, errors } = useForm({
     year: data_item.year || new Date().getFullYear(),
     month: data_item.month || new Date().getMonth() + 1,
@@ -20,10 +20,10 @@ export default function Edit({ auth, data: data_item, commodity_list = [], penge
     forest_type: data_item.forest_type || 'Hutan Negara',
     volume_target: data_item.volume_target || '',
     details: data_item.details?.map(d => ({
-      commodity_id: d.commodity_id,
+      bukan_kayu_id: d.bukan_kayu_id,
       annual_volume_realization: d.annual_volume_realization,
       unit: d.unit || 'Kg'
-    })) || [{ commodity_id: '', annual_volume_realization: '', unit: 'Kg' }]
+    })) || [{ bukan_kayu_id: '', annual_volume_realization: '', unit: 'Kg' }]
   });
 
   const [regencies, setRegencies] = useState([]);
@@ -93,7 +93,7 @@ export default function Edit({ auth, data: data_item, commodity_list = [], penge
   const addDetail = () => {
     setData('details', [
       ...data.details,
-      { commodity_id: '', annual_volume_realization: '', unit: 'Kg' }
+      { bukan_kayu_id: '', annual_volume_realization: '', unit: 'Kg' }
     ]);
   };
 
@@ -371,7 +371,7 @@ export default function Edit({ auth, data: data_item, commodity_list = [], penge
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                       </svg>
-                      Tambah Komoditas
+                      Tambah Bukan Kayu
                     </button>
                   </div>
 
@@ -391,17 +391,17 @@ export default function Edit({ auth, data: data_item, commodity_list = [], penge
                         )}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div>
-                            <InputLabel value="Komoditas" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
+                            <InputLabel value="Jenis Bukan Kayu" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
                             <Select
-                              options={commodity_list?.map(k => ({ value: k.id, label: k.name })) || []}
-                              onChange={(opt) => updateDetail(index, 'commodity_id', opt?.value || '')}
-                              placeholder="Pilih Komoditas..."
+                              options={bukan_kayu_list?.map(k => ({ value: k.id, label: k.name })) || []}
+                              onChange={(opt) => updateDetail(index, 'bukan_kayu_id', opt?.value || '')}
+                              placeholder="Pilih Bukan Kayu..."
                               styles={selectStyles}
                               menuPlacement="auto"
                               isClearable
-                              value={commodity_list?.find(k => k.id === detail.commodity_id) ? { value: detail.commodity_id, label: commodity_list.find(k => k.id === detail.commodity_id).name } : null}
+                              value={bukan_kayu_list?.find(k => k.id === detail.bukan_kayu_id) ? { value: detail.bukan_kayu_id, label: bukan_kayu_list.find(k => k.id === detail.bukan_kayu_id).name } : null}
                             />
-                            {errors[`details.${index}.commodity_id`] && <InputError message="Wajib diisi." className="mt-1" />}
+                            {errors[`details.${index}.bukan_kayu_id`] && <InputError message="Wajib diisi." className="mt-1" />}
                           </div>
                           <div>
                             <InputLabel value="Realisasi Volume" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
