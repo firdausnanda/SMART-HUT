@@ -23,7 +23,14 @@ class UserController extends Controller
    */
   public function index(Request $request)
   {
-    $query = User::with('roles')->has('roles');
+    $roleFilter = $request->input('role_filter', 'with_role');
+    $query = User::with('roles');
+
+    if ($roleFilter === 'with_role') {
+      $query->has('roles');
+    } elseif ($roleFilter === 'without_role') {
+      $query->doesntHave('roles');
+    }
 
     if ($request->has('search')) {
       $search = $request->search;
@@ -38,7 +45,7 @@ class UserController extends Controller
 
     return Inertia::render('User/Index', [
       'users' => $users,
-      'filters' => $request->only(['search'])
+      'filters' => $request->only(['search', 'role_filter'])
     ]);
   }
 

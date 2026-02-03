@@ -12,6 +12,7 @@ export default function Index({ auth, users, filters }) {
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('Memproses...');
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
+    const [roleFilter, setRoleFilter] = useState(filters.role_filter || 'with_role');
 
     const isAdmin = auth.user.roles.includes('admin');
     const userPermissions = auth.user.permissions || [];
@@ -19,18 +20,22 @@ export default function Index({ auth, users, filters }) {
     const canEdit = userPermissions.includes('users.edit') || isAdmin;
     const canDelete = userPermissions.includes('users.delete') || isAdmin;
 
-    // Debounced search handler
-    const handleSearch = useCallback(
-        debounce((query) => {
-            router.get(
-                route('users.index'),
-                { search: query },
-                {
-                    preserveState: true,
-                    preserveScroll: true,
-                    replace: true,
-                }
-            );
+    // Unified filter handler
+    const performQuery = (query, filter) => {
+        router.get(
+            route('users.index'),
+            { search: query, role_filter: filter },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            }
+        );
+    };
+
+    const debouncedSearch = useCallback(
+        debounce((query, filter) => {
+            performQuery(query, filter);
         }, 500),
         []
     );
@@ -38,7 +43,12 @@ export default function Index({ auth, users, filters }) {
     const onSearchChange = (e) => {
         const query = e.target.value;
         setSearchQuery(query);
-        handleSearch(query);
+        debouncedSearch(query, roleFilter);
+    };
+
+    const onRoleFilterChange = (filter) => {
+        setRoleFilter(filter);
+        performQuery(searchQuery, filter);
     };
 
     const handleDelete = (id) => {
@@ -142,11 +152,43 @@ export default function Index({ auth, users, filters }) {
                 {/* Table Section */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-wrap items-center gap-4">
                             <h3 className="font-bold text-gray-800">Daftar User</h3>
-                            <div className="h-6 w-px bg-gray-200"></div>
-                            <div className="text-sm text-gray-400 font-bold bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
-                                {users.total} User Terdaftar
+                            <div className="h-6 w-px bg-gray-200 hidden md:block"></div>
+
+                            {/* Role Filter Tabs */}
+                            <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+                                <button
+                                    onClick={() => onRoleFilterChange('with_role')}
+                                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${roleFilter === 'with_role'
+                                        ? 'bg-white text-primary-700 shadow-sm border border-gray-100'
+                                        : 'text-gray-400 hover:text-gray-600'
+                                        }`}
+                                >
+                                    Punya Role
+                                </button>
+                                <button
+                                    onClick={() => onRoleFilterChange('without_role')}
+                                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${roleFilter === 'without_role'
+                                        ? 'bg-white text-primary-700 shadow-sm border border-gray-100'
+                                        : 'text-gray-400 hover:text-gray-600'
+                                        }`}
+                                >
+                                    Tanpa Role
+                                </button>
+                                <button
+                                    onClick={() => onRoleFilterChange('all')}
+                                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${roleFilter === 'all'
+                                        ? 'bg-white text-primary-700 shadow-sm border border-gray-100'
+                                        : 'text-gray-400 hover:text-gray-600'
+                                        }`}
+                                >
+                                    Semua
+                                </button>
+                            </div>
+
+                            <div className="text-sm text-gray-400 font-bold bg-white px-3 py-1 rounded-full border border-gray-100 shadow-sm">
+                                {users.total} User
                             </div>
                         </div>
 
@@ -200,7 +242,7 @@ export default function Index({ auth, users, filters }) {
                                             </div>
                                         </td>
                                         <td className="px-6 py-5">
-                                            {user.roles.map((role, index) => {
+                                            {user.roles.length > 0 ? user.roles.map((role, index) => {
                                                 let badgeClass = "bg-gray-100 text-gray-600 border-gray-200";
                                                 if (role.name === 'admin' || role.name === 'super-admin') {
                                                     badgeClass = "bg-rose-50 text-rose-600 border-rose-100";
@@ -215,7 +257,11 @@ export default function Index({ auth, users, filters }) {
                                                         {role.description}
                                                     </span>
                                                 );
-                                            })}
+                                            }) : (
+                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide border bg-gray-50 text-gray-400 border-gray-100 italic">
+                                                    Tanpa Role
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="flex items-center justify-center gap-2">
