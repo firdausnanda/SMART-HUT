@@ -15,16 +15,19 @@ const PembinaanSlide = ({ section, currentYear, commonOptions }) => {
   }, [section.total, section.targetTotal]);
 
   const trendChartData = useMemo(() => {
+    const months = Array.from({ length: 12 }, (_, i) => i + 1);
+    const labels = months.map(m => {
+      const date = new Date();
+      date.setMonth(m - 1);
+      return date.toLocaleString('id-ID', { month: 'short' });
+    });
+
     return {
-      labels: section.chart ? Object.keys(section.chart).map(m => {
-        const date = new Date();
-        date.setMonth(m - 1);
-        return date.toLocaleString('id-ID', { month: 'short' });
-      }) : [],
+      labels,
       datasets: [
         {
           label: 'Realisasi ' + section.label,
-          data: section.chart ? Object.values(section.chart) : [],
+          data: months.map(m => section.chart?.[m] || 0),
           borderColor: section.color,
           backgroundColor: section.color + '20',
           fill: true,
@@ -34,7 +37,7 @@ const PembinaanSlide = ({ section, currentYear, commonOptions }) => {
         },
         {
           label: 'Target ' + section.label,
-          data: section.targetChart ? Object.values(section.targetChart) : [],
+          data: months.map(m => section.targetChart?.[m] || 0),
           borderColor: '#9ca3af', // gray-400
           backgroundColor: '#9ca3af20',
           fill: true,

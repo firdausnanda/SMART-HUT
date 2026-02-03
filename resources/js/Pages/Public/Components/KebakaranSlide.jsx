@@ -5,16 +5,19 @@ import StatsCard from './StatsCard'; // Optionally use StatsCard if applicable, 
 
 const KebakaranSlide = ({ stats, currentYear, commonOptions }) => {
   const incidentData = useMemo(() => {
+    const months = Array.from({ length: 12 }, (_, i) => i + 1);
+    const labels = months.map(m => {
+      const date = new Date();
+      date.setMonth(m - 1);
+      return date.toLocaleString('id-ID', { month: 'short' });
+    });
+
     return {
-      labels: stats?.perlindungan?.kebakaranMonthly ? Object.keys(stats.perlindungan.kebakaranMonthly).map(m => {
-        const date = new Date();
-        date.setMonth(m - 1);
-        return date.toLocaleString('id-ID', { month: 'short' });
-      }) : [],
+      labels,
       datasets: [
         {
           label: 'Jumlah Kejadian',
-          data: stats?.perlindungan?.kebakaranMonthly ? Object.values(stats.perlindungan.kebakaranMonthly).map(d => d.incidents) : [],
+          data: months.map(m => stats?.perlindungan?.kebakaranMonthly?.[m]?.incidents || 0),
           borderColor: '#dc2626',
           backgroundColor: '#dc262620',
           fill: true,
@@ -24,7 +27,7 @@ const KebakaranSlide = ({ stats, currentYear, commonOptions }) => {
         },
         {
           label: 'Luas Area (Ha)',
-          data: stats?.perlindungan?.kebakaranMonthly ? Object.values(stats.perlindungan.kebakaranMonthly).map(d => d.area) : [],
+          data: months.map(m => stats?.perlindungan?.kebakaranMonthly?.[m]?.area || 0),
           borderColor: '#f9f111ff',
           backgroundColor: '#fb923c20',
           fill: true,

@@ -34,10 +34,9 @@ class NilaiEkonomiController extends Controller
             return $years;
         });
 
-        $selectedYear = $request->query('year');
-        if (!$selectedYear) {
-            $selectedYear = $availableYears[0] ?? date('Y');
-        }
+        $selectedYear = $request->query('year')
+            ?? NilaiEkonomi::max('year')
+            ?? date('Y');
 
         $sortField = $request->query('sort', 'created_at');
         $sortDirection = $request->query('direction', 'desc');
@@ -165,6 +164,7 @@ class NilaiEkonomiController extends Controller
             }
 
             DB::commit();
+            $this->clearCache($request->year);
             return redirect()->route('nilai-ekonomi.index')->with('success', 'Data Nilai Ekonomi berhasil disimpan.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -226,6 +226,7 @@ class NilaiEkonomiController extends Controller
             }
 
             DB::commit();
+            $this->clearCache($request->year);
             return redirect()->route('nilai-ekonomi.index')->with('success', 'Data Nilai Ekonomi berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -235,9 +236,12 @@ class NilaiEkonomiController extends Controller
 
     public function destroy(NilaiEkonomi $nilaiEkonomi)
     {
+        $year = $nilaiEkonomi->year;
         $nilaiEkonomi->deleted_by = Auth::id();
         $nilaiEkonomi->save();
         $nilaiEkonomi->delete();
+
+        $this->clearCache($year);
 
         return redirect()->route('nilai-ekonomi.index')->with('success', 'Data Nilai Ekonomi berhasil dihapus.');
     }
@@ -272,6 +276,9 @@ class NilaiEkonomiController extends Controller
             $count = NilaiEkonomi::whereIn('id', $request->ids)->delete();
 
             return redirect()->back()->with('success', $count . ' data berhasil dihapus.');
+        }
+        if ($count > 0) {
+            $this->clearCache(); // Clear for all years if bulk delete
         }
         return back()->with('success', "$count data berhasil dihapus.");
     }
@@ -321,6 +328,8 @@ class NilaiEkonomiController extends Controller
             return redirect()->back()->with('success', 'Laporan telah disetujui secara final.');
         }
 
+        $this->clearCache($nilaiEkonomi->year);
+
         return redirect()->back()->with('error', 'Aksi tidak diijinkan.');
     }
 
@@ -351,6 +360,7 @@ class NilaiEkonomiController extends Controller
         }
 
         if ($updatedCount > 0) {
+            $this->clearCache();
             return back()->with('success', "$updatedCount data berhasil disetujui.");
         }
 
@@ -368,6 +378,7 @@ class NilaiEkonomiController extends Controller
             'rejection_note' => $request->rejection_note,
         ]);
 
+        $this->clearCache($nilaiEkonomi->year);
         return redirect()->back()->with('success', 'Laporan telah ditolak dengan catatan.');
     }
 
@@ -401,6 +412,23 @@ class NilaiEkonomiController extends Controller
                 ]);
         }
 
+        if ($count > 0) {
+            $this->clearCache();
+        }
+
         return redirect()->back()->with('success', $count . ' laporan berhasil ditolak.');
+    }
+
+    private function clearCache($year = null)
+    {
+        cache()->forget('nilai-ekonomi-years');
+        if ($year) {
+            cache()->forget('nilai-ekonomi-stats-' . $year);
+        } else {
+            // If year is not specified, clear for a reasonable range
+            for ($i = date('Y') - 5; $i <= date('Y'); $i++) {
+                cache()->forget('nilai-ekonomi-stats-' . $i);
+            }
+        }
     }
 }

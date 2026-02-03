@@ -199,10 +199,10 @@ class DashboardController extends Controller
                 return [
                     'total' => (float) (clone $baseQuery)->sum('realization'),
                     'target_total' => (float) (clone $baseQuery)->sum('target_annual'),
-                    'chart' => (clone $baseQuery)->selectRaw('month, sum(realization) as total')
-                        ->groupBy('month')->orderBy('month')->pluck('total', 'month'),
-                    'target_chart' => (clone $baseQuery)->selectRaw('month, sum(target_annual) as total')
-                        ->groupBy('month')->orderBy('month')->pluck('total', 'month'),
+                    'chart' => $this->fillMonths((clone $baseQuery)->selectRaw('month, sum(realization) as total')
+                        ->groupBy('month')->orderBy('month')->pluck('total', 'month')),
+                    'target_chart' => $this->fillMonths((clone $baseQuery)->selectRaw('month, sum(target_annual) as total')
+                        ->groupBy('month')->orderBy('month')->pluck('total', 'month')),
                     'fund' => SumberDana::leftJoin($tableName, function ($join) use ($tableName, $currentYear) {
                         $join->on('m_sumber_dana.name', '=', "$tableName.fund_source")
                             ->where("$tableName.year", '=', $currentYear)
@@ -239,19 +239,19 @@ class DashboardController extends Controller
 
             $rhlTeknisTargetTotal = (clone $rhlBase)->sum('target_annual');
 
-            $rhlTeknisChart = RhlTeknis::join('rhl_teknis_details', 'rhl_teknis.id', '=', 'rhl_teknis_details.rhl_teknis_id')
+            $rhlTeknisChart = $this->fillMonths(RhlTeknis::join('rhl_teknis_details', 'rhl_teknis.id', '=', 'rhl_teknis_details.rhl_teknis_id')
                 ->where('rhl_teknis.year', $currentYear)
                 ->where('rhl_teknis.status', 'final')
                 ->selectRaw('month, sum(rhl_teknis_details.unit_amount) as total')
                 ->groupBy('month')
                 ->orderBy('month')
-                ->pluck('total', 'month');
+                ->pluck('total', 'month'));
 
-            $rhlTeknisTargetChart = (clone $rhlBase)
+            $rhlTeknisTargetChart = $this->fillMonths((clone $rhlBase)
                 ->selectRaw('month, sum(target_annual) as total')
                 ->groupBy('month')
                 ->orderBy('month')
-                ->pluck('total', 'month');
+                ->pluck('total', 'month'));
 
             $rhlTeknisFund = SumberDana::leftJoin('rhl_teknis', function ($join) use ($currentYear) {
                 $join->on('m_sumber_dana.name', '=', 'rhl_teknis.fund_source')
@@ -329,8 +329,15 @@ class DashboardController extends Controller
                 ->groupBy('month')
                 ->get();
 
-            $kebakaranChart = $kebakaranMonthlyRaw->pluck('incidents', 'month')->all();
-            $kebakaranMonthlyData = $kebakaranMonthlyRaw->keyBy('month');
+            $kebakaranChart = $this->fillMonths($kebakaranMonthlyRaw->pluck('incidents', 'month'));
+            $kebakaranMonthlyData = [];
+            for ($i = 1; $i <= 12; $i++) {
+                $item = $kebakaranMonthlyRaw->where('month', $i)->first();
+                $kebakaranMonthlyData[$i] = [
+                    'incidents' => (int) ($item->incidents ?? 0),
+                    'area' => (float) ($item->area ?? 0),
+                ];
+            }
 
             $kebakaranByPengelola = KebakaranHutan::where('kebakaran_hutan.year', $currentYear)
                 ->where('kebakaran_hutan.status', 'final')
@@ -352,7 +359,14 @@ class DashboardController extends Controller
                 ->groupBy('month')
                 ->get();
 
-            $wisataMonthlyStats = $wisataMonthlyRaw->keyBy('month');
+            $wisataMonthlyStats = [];
+            for ($i = 1; $i <= 12; $i++) {
+                $item = $wisataMonthlyRaw->where('month', $i)->first();
+                $wisataMonthlyStats[$i] = [
+                    'visitors' => (int) ($item->visitors ?? 0),
+                    'income' => (float) ($item->income ?? 0),
+                ];
+            }
 
             $wisataByPengelola = PengunjungWisata::where('pengunjung_wisata.year', $currentYear)
                 ->where('pengunjung_wisata.status', 'final')
@@ -413,9 +427,11 @@ class DashboardController extends Controller
 
                 // Kayu for this type
                 $binaUsahaData[$key]['kayu_total'] = (float) ($kayuTotals[$type] ?? 0);
-                $binaUsahaData[$key]['kayu_monthly'] = isset($kayuMonthlyByForestType[$type])
+                $binaUsahaData[$key]['kayu_monthly'] = $this->fillMonths(
+                    isset($kayuMonthlyByForestType[$type])
                     ? $kayuMonthlyByForestType[$type]->pluck('total', 'month')
-                    : [];
+                    : []
+                );
 
                 $binaUsahaData[$key]['kayu_commodity'] = HasilHutanKayu::join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
                     ->join('m_kayu', 'hasil_hutan_kayu_details.kayu_id', '=', 'm_kayu.id')
@@ -430,9 +446,11 @@ class DashboardController extends Controller
 
                 // Bukan Kayu for this type
                 $binaUsahaData[$key]['bukan_kayu_total'] = (float) ($bukanKayuTotals[$type] ?? 0);
-                $binaUsahaData[$key]['bukan_kayu_monthly'] = isset($bukanKayuMonthlyByForestType[$type])
+                $binaUsahaData[$key]['bukan_kayu_monthly'] = $this->fillMonths(
+                    isset($bukanKayuMonthlyByForestType[$type])
                     ? $bukanKayuMonthlyByForestType[$type]->pluck('total', 'month')
-                    : [];
+                    : []
+                );
 
                 $binaUsahaData[$key]['bukan_kayu_commodity'] = \App\Models\HasilHutanBukanKayu::join('hasil_hutan_bukan_kayu_details', 'hasil_hutan_bukan_kayu.id', '=', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id')
                     ->join('m_bukan_kayu', 'hasil_hutan_bukan_kayu_details.bukan_kayu_id', '=', 'm_bukan_kayu.id')
@@ -470,24 +488,40 @@ class DashboardController extends Controller
                     ->toArray()
             ];
 
-            // PNBP - Optimized: Use CAST/REPLACE for logic that was previously handling formatted strings in PHP
-            $pnbpRealizationSql = "CAST(REPLACE(REPLACE(REPLACE(pnbp_realization, 'Rp', ''), '.', ''), ' ', '') AS UNSIGNED)";
+            // PNBP - Improved: Use DECIMAL for accurate summing of potential decimal values
+            $pnbpRealizationSql = "CAST(pnbp_realization AS DECIMAL(15,2))";
 
             $pnbpStats = [
                 'total_realization' => (float) RealisasiPnbp::where('year', $currentYear)->where('status', 'final')->sum(DB::raw($pnbpRealizationSql)),
                 'total_target' => (float) RealisasiPnbp::where('year', $currentYear)->where('status', 'final')->sum('pnbp_target'),
-                'monthly' => RealisasiPnbp::where('year', $currentYear)
-                    ->where('status', 'final')
-                    ->selectRaw("month, sum($pnbpRealizationSql) as realization, sum(pnbp_target) as target")
-                    ->groupBy('month')
-                    ->get()
-                    ->keyBy('month'),
+                'monthly' => (function () use ($currentYear, $pnbpRealizationSql) {
+                    $raw = RealisasiPnbp::where('year', $currentYear)
+                        ->where('status', 'final')
+                        ->selectRaw("month, sum($pnbpRealizationSql) as realization, sum(pnbp_target) as target")
+                        ->groupBy('month')
+                        ->get();
+                    $filled = [];
+                    for ($i = 1; $i <= 12; $i++) {
+                        $item = $raw->where('month', $i)->first();
+                        $filled[$i] = [
+                            'realization' => (float) ($item->realization ?? 0),
+                            'target' => (float) ($item->target ?? 0),
+                        ];
+                    }
+                    return $filled;
+                })(),
                 'by_regency' => RealisasiPnbp::join('m_regencies', 'realisasi_pnbp.regency_id', '=', 'm_regencies.id')
                     ->where('realisasi_pnbp.year', $currentYear)
                     ->where('realisasi_pnbp.status', 'final')
                     ->selectRaw("m_regencies.name as regency, sum($pnbpRealizationSql) as total")
                     ->groupBy('m_regencies.name')
-                    ->pluck('total', 'regency')
+                    ->pluck('total', 'regency'),
+                'by_pengelola' => RealisasiPnbp::join('m_pengelola_wisata', 'realisasi_pnbp.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
+                    ->where('realisasi_pnbp.year', $currentYear)
+                    ->where('realisasi_pnbp.status', 'final')
+                    ->selectRaw("m_pengelola_wisata.name as pengelola, SUM($pnbpRealizationSql) as total")
+                    ->groupBy('m_pengelola_wisata.name')
+                    ->pluck('total', 'pengelola')->toArray()
             ];
 
             return [
@@ -569,5 +603,17 @@ class DashboardController extends Controller
         $filename = 'laporan-rehabilitasi-lahan-' . $year . '-' . date('Y-m-d') . '.xlsx';
 
         return Excel::download(new RehabLahanExport($year), $filename);
+    }
+
+    /**
+     * Fill missing months with 0
+     */
+    private function fillMonths($data)
+    {
+        $filledData = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $filledData[$i] = (float) ($data[$i] ?? 0);
+        }
+        return $filledData;
     }
 }

@@ -67,6 +67,15 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
     });
   };
 
+  const handleYearChange = (year) => {
+    const newParams = { ...params, year: year, page: 1 };
+    setParams(newParams);
+    router.get(route('nilai-ekonomi.index'), newParams, {
+      preserveState: true,
+      preserveScroll: true
+    });
+  };
+
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       setSelectedIds(data.data.map((item) => item.id));
@@ -426,20 +435,36 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
                   </div>
                 )}
               </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-400 uppercase text-nowrap">Tahun:</span>
+                <select
+                  className="text-sm font-bold border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 py-1"
+                  value={params.year || new Date().getFullYear()}
+                  onChange={(e) => handleYearChange(e.target.value)}
+                >
+                  {availableYears && availableYears.map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
-              <select
-                className="text-sm font-bold border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 py-1"
-                value={params.per_page || 10}
-                onChange={(e) => handlePerPageChange(e.target.value)}
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
+            <div className="flex items-center gap-4">
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-400 uppercase text-nowrap">Baris:</span>
+                <select
+                  className="text-sm font-bold border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 py-1"
+                  value={params.per_page || 10}
+                  onChange={(e) => handlePerPageChange(e.target.value)}
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
             </div>
           </div>
 

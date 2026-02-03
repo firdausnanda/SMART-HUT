@@ -4,16 +4,19 @@ import { formatNumber, formatCurrency } from './utils';
 
 const JasaLingkunganSlide = ({ stats, currentYear, commonOptions }) => {
   const trendData = useMemo(() => {
+    const months = Array.from({ length: 12 }, (_, i) => i + 1);
+    const labels = months.map(m => {
+      const date = new Date();
+      date.setMonth(m - 1);
+      return date.toLocaleString('id-ID', { month: 'short' });
+    });
+
     return {
-      labels: stats?.perlindungan?.wisataMonthly ? Object.keys(stats.perlindungan.wisataMonthly).map(m => {
-        const date = new Date();
-        date.setMonth(m - 1);
-        return date.toLocaleString('id-ID', { month: 'short' });
-      }) : [],
+      labels,
       datasets: [
         {
           label: 'Jumlah Pengunjung',
-          data: stats?.perlindungan?.wisataMonthly ? Object.values(stats.perlindungan.wisataMonthly).map(d => d.visitors) : [],
+          data: months.map(m => stats?.perlindungan?.wisataMonthly?.[m]?.visitors || 0),
           borderColor: '#4f46e5',
           backgroundColor: '#4f46e520',
           fill: true,
@@ -23,7 +26,7 @@ const JasaLingkunganSlide = ({ stats, currentYear, commonOptions }) => {
         },
         {
           label: 'Pendapatan (Rp)',
-          data: stats?.perlindungan?.wisataMonthly ? Object.values(stats.perlindungan.wisataMonthly).map(d => d.income) : [],
+          data: months.map(m => stats?.perlindungan?.wisataMonthly?.[m]?.income || 0),
           borderColor: '#10b981',
           backgroundColor: '#10b98120',
           fill: true,

@@ -4,16 +4,19 @@ import { formatNumber } from './utils';
 
 const ProductionSlide = ({ source, stats, currentYear, commonOptions }) => {
   const woodTrendData = useMemo(() => {
+    const months = Array.from({ length: 12 }, (_, i) => i + 1);
+    const labels = months.map(m => {
+      const date = new Date();
+      date.setMonth(m - 1);
+      return date.toLocaleString('id-ID', { month: 'short' });
+    });
+
     return {
-      labels: stats?.bina_usaha[source.key]?.kayu_monthly ? Object.keys(stats.bina_usaha[source.key].kayu_monthly).map(m => {
-        const date = new Date();
-        date.setMonth(m - 1);
-        return date.toLocaleString('id-ID', { month: 'short' });
-      }) : [],
+      labels,
       datasets: [
         {
           label: 'Kayu (M³)',
-          data: stats?.bina_usaha[source.key]?.kayu_monthly ? Object.values(stats.bina_usaha[source.key].kayu_monthly) : [],
+          data: months.map(m => stats?.bina_usaha[source.key]?.kayu_monthly?.[m] || 0),
           borderColor: source.color,
           backgroundColor: `${source.color}20`,
           fill: true,
@@ -24,16 +27,19 @@ const ProductionSlide = ({ source, stats, currentYear, commonOptions }) => {
   }, [stats?.bina_usaha, source.key, source.color]);
 
   const nonWoodTrendData = useMemo(() => {
+    const months = Array.from({ length: 12 }, (_, i) => i + 1);
+    const labels = months.map(m => {
+      const date = new Date();
+      date.setMonth(m - 1);
+      return date.toLocaleString('id-ID', { month: 'short' });
+    });
+
     return {
-      labels: stats?.bina_usaha[source.key]?.bukan_kayu_monthly ? Object.keys(stats.bina_usaha[source.key].bukan_kayu_monthly).map(m => {
-        const date = new Date();
-        date.setMonth(m - 1);
-        return date.toLocaleString('id-ID', { month: 'short' });
-      }) : [],
+      labels,
       datasets: [
         {
           label: 'Bukan Kayu (Kg/Liter)',
-          data: stats?.bina_usaha[source.key]?.bukan_kayu_monthly ? Object.values(stats.bina_usaha[source.key].bukan_kayu_monthly) : [],
+          data: months.map(m => stats?.bina_usaha[source.key]?.bukan_kayu_monthly?.[m] || 0),
           borderColor: '#f59e0b',
           backgroundColor: '#f59e0b20',
           fill: true,

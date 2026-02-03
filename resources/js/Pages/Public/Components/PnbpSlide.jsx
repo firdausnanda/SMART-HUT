@@ -4,16 +4,19 @@ import { formatNumber, formatCurrency } from './utils';
 
 const PnbpSlide = ({ stats, currentYear, commonOptions }) => {
   const trendChartData = useMemo(() => {
+    const months = Array.from({ length: 12 }, (_, i) => i + 1);
+    const labels = months.map(m => {
+      const date = new Date();
+      date.setMonth(m - 1);
+      return date.toLocaleString('id-ID', { month: 'short' });
+    });
+
     return {
-      labels: stats?.bina_usaha?.pnbp?.monthly ? Object.keys(stats.bina_usaha.pnbp.monthly).map(m => {
-        const date = new Date();
-        date.setMonth(m - 1);
-        return date.toLocaleString('id-ID', { month: 'short' });
-      }) : [],
+      labels,
       datasets: [
         {
           label: 'Realisasi',
-          data: stats?.bina_usaha?.pnbp?.monthly ? Object.values(stats.bina_usaha.pnbp.monthly).map(d => d.realization) : [],
+          data: months.map(m => stats?.bina_usaha?.pnbp?.monthly?.[m]?.realization || 0),
           borderColor: '#d97706',
           backgroundColor: '#d9770620',
           fill: true,
@@ -21,7 +24,7 @@ const PnbpSlide = ({ stats, currentYear, commonOptions }) => {
         },
         {
           label: 'Target',
-          data: stats?.bina_usaha?.pnbp?.monthly ? Object.values(stats.bina_usaha.pnbp.monthly).map(d => d.target) : [],
+          data: months.map(m => stats?.bina_usaha?.pnbp?.monthly?.[m]?.target || 0),
           borderColor: '#cbd5e1',
           borderDash: [5, 5],
           tension: 0.4,
@@ -42,6 +45,18 @@ const PnbpSlide = ({ stats, currentYear, commonOptions }) => {
     };
   }, [stats?.bina_usaha?.pnbp?.by_regency]);
 
+  const pengelolaChartData = useMemo(() => {
+    return {
+      labels: stats?.bina_usaha?.pnbp?.by_pengelola ? Object.keys(stats.bina_usaha.pnbp.by_pengelola) : [],
+      datasets: [{
+        label: 'Realisasi (Rp)',
+        data: stats?.bina_usaha?.pnbp?.by_pengelola ? Object.values(stats.bina_usaha.pnbp.by_pengelola) : [],
+        backgroundColor: '#d33c06CC',
+        borderRadius: 6
+      }]
+    };
+  }, [stats?.bina_usaha?.pnbp?.by_pengelola]);
+
   const trendOptions = useMemo(() => ({
     ...commonOptions,
     maintainAspectRatio: false
@@ -52,7 +67,21 @@ const PnbpSlide = ({ stats, currentYear, commonOptions }) => {
     indexAxis: 'y',
     maintainAspectRatio: false,
     plugins: { ...commonOptions.plugins, legend: { display: false } },
-    scales: { y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }, x: { grid: { display: false } } }
+    scales: {
+      y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } },
+      x: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+    }
+  }), [commonOptions]);
+
+  const pengelolaBarOptions = useMemo(() => ({
+    ...commonOptions,
+    indexAxis: 'y',
+    maintainAspectRatio: false,
+    plugins: { ...commonOptions.plugins, legend: { display: false } },
+    scales: {
+      y: { grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' } } },
+      x: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+    }
   }), [commonOptions]);
 
   return (
@@ -113,6 +142,15 @@ const PnbpSlide = ({ stats, currentYear, commonOptions }) => {
                 <Bar
                   data={regencyChartData}
                   options={barOptions}
+                />
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+              <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">Realisasi per Pengelola</h4>
+              <div className="h-[300px]">
+                <Bar
+                  data={pengelolaChartData}
+                  options={pengelolaBarOptions}
                 />
               </div>
             </div>
