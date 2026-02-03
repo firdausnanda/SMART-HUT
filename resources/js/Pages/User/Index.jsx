@@ -232,7 +232,7 @@ export default function Index({ auth, users, filters }) {
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className="font-bold text-gray-900 text-sm group-hover:text-primary-700 transition-colors">{user.name}</span>
-                                                    <span className="text-xs text-gray-500 font-medium">{user.username}</span>
+                                                    <span className="text-xs text-gray-500 font-medium">{user.email}</span>
                                                 </div>
                                             </div>
                                         </td>
