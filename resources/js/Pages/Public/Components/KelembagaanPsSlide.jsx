@@ -8,7 +8,14 @@ const KelembagaanPsSlide = ({ stats, commonOptions }) => {
       labels: stats?.kelembagaan_ps?.scheme_distribution ? stats.kelembagaan_ps.scheme_distribution.map(d => d.scheme) : [],
       datasets: [{
         data: stats?.kelembagaan_ps?.scheme_distribution ? stats.kelembagaan_ps.scheme_distribution.map(d => d.count) : [],
-        backgroundColor: ['#059669', '#0284c7', '#f59e0b', '#f43f5e', '#6366f1'],
+        backgroundColor: [
+          '#10b981', // Emerald Green
+          '#f59e0b', // Amber
+          '#2d2d2dff', // Bright Blue
+          '#ec4899', // Hot Pink
+          '#8b5cf6', // Violet/Purple
+          '#ef4444'  // Red
+        ],
         borderWidth: 2,
         borderColor: '#ffffff',
         hoverOffset: 10,
