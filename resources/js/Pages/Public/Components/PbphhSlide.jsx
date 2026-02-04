@@ -17,7 +17,7 @@ const PbphhSlide = ({ stats, commonOptions }) => {
 
   const productionTypeChartData = useMemo(() => {
     return {
-      labels: stats?.bina_usaha?.pbphh?.by_production_type ? stats.bina_usaha.pbphh.by_production_type.map(d => d.type) : [],
+      labels: stats?.bina_usaha?.pbphh?.by_production_type ? stats.bina_usaha.pbphh.by_production_type.map(d => `${d.type} (${d.count} Unit)`) : [],
       datasets: [{
         label: 'Persentase (%)',
         data: stats?.bina_usaha?.pbphh?.by_production_type ? stats.bina_usaha.pbphh.by_production_type.map(d => (d.count / (stats.bina_usaha.pbphh.total_units || 1)) * 100) : [],
@@ -54,10 +54,20 @@ const PbphhSlide = ({ stats, commonOptions }) => {
     plugins: {
       ...commonOptions.plugins,
       legend: { display: false },
-      tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)}%` } }
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const index = ctx.dataIndex;
+            const dataItem = stats?.bina_usaha?.pbphh?.by_production_type?.[index];
+            const count = dataItem?.count || 0;
+            const percentage = ctx.raw.toFixed(1);
+            return ` ${percentage}% (${count} Unit)`;
+          }
+        }
+      }
     },
     scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, ticks: { callback: (val) => `${val}%` } } }
-  }), [commonOptions]);
+  }), [commonOptions, stats?.bina_usaha?.pbphh?.by_production_type]);
 
   const pieOptions = useMemo(() => ({
     layout: {
@@ -167,9 +177,9 @@ const PbphhSlide = ({ stats, commonOptions }) => {
             </div>
           </div>
 
-          {/* Jenis Produksi (%) */}
+          {/* Jenis Produksi (Total & %) */}
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col h-full">
-            <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Jenis Produksi (%)</h4>
+            <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Jenis Produksi (Total & %)</h4>
             <div className="h-[250px] mt-auto">
               <Bar
                 data={productionTypeChartData}
