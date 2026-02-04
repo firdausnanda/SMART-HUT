@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
@@ -7,8 +7,13 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import Select from 'react-select';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 export default function Edit({ auth, data: item, sumberDana, bangunanKta }) {
+  const { flash } = usePage().props;
   const { data, setData, patch, processing, errors } = useForm({
     year: item?.year || new Date().getFullYear(),
     month: item?.month || new Date().getMonth() + 1,
@@ -40,6 +45,15 @@ export default function Edit({ auth, data: item, sumberDana, bangunanKta }) {
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
+
+  useEffect(() => {
+    if (flash?.error) {
+      MySwal.fire({ title: 'Gagal', text: flash.error, icon: 'error', confirmButtonText: 'Tutup', confirmButtonColor: '#d33' });
+    }
+    if (flash?.success) {
+      MySwal.fire({ title: 'Berhasil', text: flash.success, icon: 'success', timer: 2000, showConfirmButton: false });
+    }
+  }, [flash]);
 
   // Initial load: Regencies for Jatim (35)
   useEffect(() => {

@@ -7,8 +7,13 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 export default function Create({ auth, sumberDana }) {
+    const { flash } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
         year: new Date().getFullYear(),
         month: new Date().getMonth() + 1,
@@ -40,6 +45,15 @@ export default function Create({ auth, sumberDana }) {
     };
 
     // Initial load: Regencies for Jatim (35)
+    useEffect(() => {
+        if (flash?.error) {
+            MySwal.fire({ title: 'Gagal', text: flash.error, icon: 'error', confirmButtonText: 'Tutup', confirmButtonColor: '#d33' });
+        }
+        if (flash?.success) {
+            MySwal.fire({ title: 'Berhasil', text: flash.success, icon: 'success', timer: 2000, showConfirmButton: false });
+        }
+    }, [flash]);
+
     useEffect(() => {
         setLoadingRegencies(true);
         axios.get(route('locations.regencies', 35))

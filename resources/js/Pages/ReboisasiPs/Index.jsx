@@ -17,7 +17,7 @@ import BulkActionToolbar from '@/Components/BulkActionToolbar';
 const MySwal = withReactContent(Swal);
 
 export default function Index({ auth, datas, stats, filters, availableYears, sumberDana }) {
-  const { flash } = usePage().props;
+  const { flash, errors } = usePage().props;
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memproses...');
   const [showImportModal, setShowImportModal] = useState(false);
@@ -42,7 +42,18 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
       MySwal.fire({ title: 'Import Gagal Sebagian', html: errorHtml, icon: 'error', confirmButtonText: 'Tutup', confirmButtonColor: '#d33', width: '600px' });
     }
     if (flash?.success) { MySwal.fire({ title: 'Berhasil', text: flash.success, icon: 'success', timer: 2000, showConfirmButton: false }); }
-  }, [flash]);
+    if (flash?.error) {
+      MySwal.fire({ title: 'Gagal', text: flash.error, icon: 'error', confirmButtonText: 'Tutup', confirmButtonColor: '#d33' });
+    }
+    if (Object.keys(errors).length > 0) {
+      let errorHtml = '<div class="text-left text-sm space-y-1">';
+      Object.keys(errors).forEach(key => {
+        errorHtml += `<div class="text-red-600 font-medium">• ${errors[key]}</div>`;
+      });
+      errorHtml += '</div>';
+      MySwal.fire({ title: 'Terjadi Kesalahan', html: errorHtml, icon: 'error', confirmButtonText: 'Tutup', confirmButtonColor: '#d33' });
+    }
+  }, [flash, errors]);
 
   /* Search State */
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
@@ -627,7 +638,14 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <StatusBadge status={item.status} />
+                        <div className="flex flex-col items-center gap-1">
+                          <StatusBadge status={item.status} />
+                          {item.status === 'rejected' && item.rejection_note && (
+                            <div className="text-[10px] text-rose-600 font-medium italic mt-1 max-w-[150px] leading-tight" title={item.rejection_note}>
+                              "{item.rejection_note.length > 50 ? item.rejection_note.substring(0, 50) + '...' : item.rejection_note}"
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className="flex justify-center gap-2">

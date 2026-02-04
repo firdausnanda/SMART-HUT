@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\PenghijauanLingkungan;
+use App\Actions\BulkWorkflowAction;
+use App\Enums\WorkflowAction;
+use App\Models\Regencies;
 use App\Models\SumberDana;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -39,6 +42,7 @@ class PenghijauanLingkunganController extends Controller
         'penghijauan_lingkungan.target_annual',
         'penghijauan_lingkungan.realization',
         'penghijauan_lingkungan.status',
+        'penghijauan_lingkungan.rejection_note',
         'penghijauan_lingkungan.created_at',
         'penghijauan_lingkungan.created_by',
       ])
@@ -297,36 +301,22 @@ class PenghijauanLingkunganController extends Controller
   public function bulkDestroy(Request $request)
   {
     $request->validate([
-      'ids' => 'required|array',
-      'ids.*' => 'exists:penghijauan_lingkungan,id',
+      'ids' => 'required|array|min:1',
+      'ids.*' => 'integer',
     ]);
 
-    $user = auth()->user();
-    $count = 0;
+    $count = app(BulkWorkflowAction::class)->execute(
+      PenghijauanLingkungan::class,
+      WorkflowAction::DELETE,
+      $request->ids,
+      auth()->user()
+    );
 
-    if ($user->hasAnyRole(['kasi', 'kacdk'])) {
-      return redirect()->back()->with('error', 'Aksi tidak diijinkan.');
+    if ($count === 0) {
+      return back()->with('error', 'Tidak ada data yang dapat dihapus atau Anda tidak memiliki hak akses.');
     }
 
-    if ($user->hasAnyRole(['pk', 'peh', 'pelaksana'])) {
-      $count = PenghijauanLingkungan::whereIn('id', $request->ids)
-        ->where('status', 'draft')
-        ->delete();
-
-      if ($count === 0) {
-        return redirect()->back()->with('error', 'Hanya data dengan status draft yang dapat dihapus.');
-      }
-
-      return redirect()->back()->with('success', $count . ' data berhasil dihapus.');
-    }
-
-    if ($user->hasRole('admin')) {
-      $count = PenghijauanLingkungan::whereIn('id', $request->ids)->delete();
-
-      return redirect()->back()->with('success', $count . ' data berhasil dihapus.');
-    }
-
-    return redirect()->back()->with('success', count($request->ids) . ' data berhasil dihapus.');
+    return back()->with('success', "{$count} data berhasil dihapus.");
   }
 
   /**
@@ -335,15 +325,18 @@ class PenghijauanLingkunganController extends Controller
   public function bulkSubmit(Request $request)
   {
     $request->validate([
-      'ids' => 'required|array',
-      'ids.*' => 'exists:penghijauan_lingkungan,id',
+      'ids' => 'required|array|min:1',
+      'ids.*' => 'integer',
     ]);
 
-    $count = PenghijauanLingkungan::whereIn('id', $request->ids)
-      ->whereIn('status', ['draft', 'rejected'])
-      ->update(['status' => 'waiting_kasi']);
+    $count = app(BulkWorkflowAction::class)->execute(
+      PenghijauanLingkungan::class,
+      WorkflowAction::SUBMIT,
+      $request->ids,
+      auth()->user()
+    );
 
-    return redirect()->back()->with('success', $count . ' laporan berhasil diajukan.');
+    return back()->with('success', "{$count} laporan berhasil diajukan.");
   }
 
   /**
@@ -352,30 +345,18 @@ class PenghijauanLingkunganController extends Controller
   public function bulkApprove(Request $request)
   {
     $request->validate([
-      'ids' => 'required|array',
-      'ids.*' => 'exists:penghijauan_lingkungan,id',
+      'ids' => 'required|array|min:1',
+      'ids.*' => 'integer',
     ]);
 
-    $user = auth()->user();
-    $count = 0;
+    $count = app(BulkWorkflowAction::class)->execute(
+      PenghijauanLingkungan::class,
+      WorkflowAction::APPROVE,
+      $request->ids,
+      auth()->user()
+    );
 
-    if ($user->hasRole('kasi') || $user->hasRole('admin')) {
-      $count = PenghijauanLingkungan::whereIn('id', $request->ids)
-        ->where('status', 'waiting_kasi')
-        ->update([
-          'status' => 'waiting_cdk',
-          'approved_by_kasi_at' => now(),
-        ]);
-    } elseif ($user->hasRole('kacdk') || $user->hasRole('admin')) {
-      $count = PenghijauanLingkungan::whereIn('id', $request->ids)
-        ->where('status', 'waiting_cdk')
-        ->update([
-          'status' => 'final',
-          'approved_by_cdk_at' => now(),
-        ]);
-    }
-
-    return redirect()->back()->with('success', $count . ' laporan berhasil disetujui.');
+    return back()->with('success', "{$count} laporan berhasil disetujui.");
   }
 
   /**
@@ -384,30 +365,19 @@ class PenghijauanLingkunganController extends Controller
   public function bulkReject(Request $request)
   {
     $request->validate([
-      'ids' => 'required|array',
-      'ids.*' => 'exists:penghijauan_lingkungan,id',
+      'ids' => 'required|array|min:1',
+      'ids.*' => 'integer',
       'rejection_note' => 'required|string|max:255',
     ]);
 
-    $user = auth()->user();
-    $count = 0;
+    $count = app(BulkWorkflowAction::class)->execute(
+      PenghijauanLingkungan::class,
+      WorkflowAction::REJECT,
+      $request->ids,
+      auth()->user(),
+      ['rejection_note' => $request->rejection_note]
+    );
 
-    if ($user->hasRole('kasi') || $user->hasRole('admin')) {
-      $count = PenghijauanLingkungan::whereIn('id', $request->ids)
-        ->where('status', 'waiting_kasi')
-        ->update([
-          'status' => 'rejected',
-          'rejection_note' => $request->rejection_note,
-        ]);
-    } elseif ($user->hasRole('kacdk') || $user->hasRole('admin')) {
-      $count = PenghijauanLingkungan::whereIn('id', $request->ids)
-        ->where('status', 'waiting_cdk')
-        ->update([
-          'status' => 'rejected',
-          'rejection_note' => $request->rejection_note,
-        ]);
-    }
-
-    return redirect()->back()->with('success', $count . ' laporan berhasil ditolak.');
+    return back()->with('success', "{$count} laporan berhasil ditolak.");
   }
 }

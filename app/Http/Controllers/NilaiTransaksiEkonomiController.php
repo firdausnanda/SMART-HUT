@@ -175,15 +175,17 @@ class NilaiTransaksiEkonomiController extends Controller
     $user = auth()->user();
     $updatedCount = 0;
 
-    if ($user->hasRole('kasi')) {
-      $updatedCount = NilaiTransaksiEkonomi::whereIn('id', $ids)
+    if ($user->hasRole('kasi') || $user->hasRole('admin')) {
+      $updatedCount += NilaiTransaksiEkonomi::whereIn('id', $ids)
         ->where('status', 'waiting_kasi')
         ->update([
           'status' => 'waiting_cdk',
           'approved_by_kasi_at' => now(),
         ]);
-    } elseif ($user->hasRole('kacdk') || $user->hasRole('admin')) {
-      $updatedCount = NilaiTransaksiEkonomi::whereIn('id', $ids)
+    }
+
+    if ($user->hasRole('kacdk') || $user->hasRole('admin')) {
+      $updatedCount += NilaiTransaksiEkonomi::whereIn('id', $ids)
         ->where('status', 'waiting_cdk')
         ->update([
           'status' => 'final',
