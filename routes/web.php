@@ -70,31 +70,26 @@ Route::middleware('auth')->group(function () {
     Route::get('/locations/districts/{regencyId}', [LocationController::class, 'getDistricts'])->name('locations.districts');
     Route::get('/locations/villages/{districtId}', [LocationController::class, 'getVillages'])->name('locations.villages');
 
-    Route::post('/rehab-lahan/{rehab_lahan}/submit', [RehabLahanController::class, 'submit'])->name('rehab-lahan.submit');
-    Route::post('/rehab-lahan/{rehab_lahan}/approve', [RehabLahanController::class, 'approve'])->name('rehab-lahan.approve');
-    Route::post('/rehab-lahan/{rehab_lahan}/reject', [RehabLahanController::class, 'reject'])->name('rehab-lahan.reject');
+    Route::post('rehab-lahan/{rehab_lahan}/single-workflow-action', [RehabLahanController::class, 'singleWorkflowAction'])->name('rehab-lahan.single-workflow-action');
     Route::get('rehab-lahan/export', [RehabLahanController::class, 'export'])->name('rehab-lahan.export');
     Route::get('rehab-lahan/template', [RehabLahanController::class, 'template'])->name('rehab-lahan.template');
     Route::post('rehab-lahan/import', [RehabLahanController::class, 'import'])->name('rehab-lahan.import');
     Route::post('rehab-lahan/bulk-workflow-action', [RehabLahanController::class, 'bulkWorkflowAction'])->name('rehab-lahan.bulk-workflow-action');
     Route::resource('rehab-lahan', RehabLahanController::class);
 
-    Route::post('/penghijauan-lingkungan/{penghijauan_lingkungan}/submit', [PenghijauanLingkunganController::class, 'submit'])->name('penghijauan-lingkungan.submit');
-    Route::post('/penghijauan-lingkungan/{penghijauan_lingkungan}/approve', [PenghijauanLingkunganController::class, 'approve'])->name('penghijauan-lingkungan.approve');
-    Route::post('/penghijauan-lingkungan/{penghijauan_lingkungan}/reject', [PenghijauanLingkunganController::class, 'reject'])->name('penghijauan-lingkungan.reject');
+    Route::post('penghijauan-lingkungan/{penghijauan_lingkungan}/single-workflow-action', [PenghijauanLingkunganController::class, 'singleWorkflowAction'])->name('penghijauan-lingkungan.single-workflow-action');
     Route::get('penghijauan-lingkungan/export', [PenghijauanLingkunganController::class, 'export'])->name('penghijauan-lingkungan.export');
     Route::get('penghijauan-lingkungan/template', [PenghijauanLingkunganController::class, 'template'])->name('penghijauan-lingkungan.template');
     Route::post('penghijauan-lingkungan/import', [PenghijauanLingkunganController::class, 'import'])->name('penghijauan-lingkungan.import');
     Route::post('penghijauan-lingkungan/bulk-workflow-action', [PenghijauanLingkunganController::class, 'bulkWorkflowAction'])->name('penghijauan-lingkungan.bulk-workflow-action');
     Route::resource('penghijauan-lingkungan', PenghijauanLingkunganController::class);
 
-    Route::post('/rehab-manggrove/{rehab_manggrove}/submit', [RehabManggroveController::class, 'submit'])->name('rehab-manggrove.submit');
-    Route::post('/rehab-manggrove/{rehab_manggrove}/approve', [RehabManggroveController::class, 'approve'])->name('rehab-manggrove.approve');
-    Route::post('/rehab-manggrove/{rehab_manggrove}/reject', [RehabManggroveController::class, 'reject'])->name('rehab-manggrove.reject');
+    Route::post('/rehab-manggrove/{rehab_manggrove}/single-workflow-action', [RehabManggroveController::class, 'singleWorkflowAction'])->name('rehab-manggrove.single-workflow-action');
     Route::get('rehab-manggrove/export', [RehabManggroveController::class, 'export'])->name('rehab-manggrove.export');
     Route::get('rehab-manggrove/template', [RehabManggroveController::class, 'template'])->name('rehab-manggrove.template');
     Route::post('rehab-manggrove/import', [RehabManggroveController::class, 'import'])->name('rehab-manggrove.import');
     Route::post('rehab-manggrove/bulk-workflow-action', [RehabManggroveController::class, 'bulkWorkflowAction'])->name('rehab-manggrove.bulk-workflow-action');
+    Route::resource('rehab-manggrove', RehabManggroveController::class);
 
     // RHL Teknis
     Route::get('rhl-teknis/export', [RhlTeknisController::class, 'export'])->name('rhl-teknis.export');
@@ -102,9 +97,7 @@ Route::middleware('auth')->group(function () {
     Route::post('rhl-teknis/import', [RhlTeknisController::class, 'import'])->name('rhl-teknis.import');
     Route::post('rhl-teknis/bulk-workflow-action', [RhlTeknisController::class, 'bulkWorkflowAction'])->name('rhl-teknis.bulk-workflow-action');
     Route::resource('rhl-teknis', RhlTeknisController::class)->parameters(['rhl-teknis' => 'rhl_teknis']);
-    Route::post('/rhl-teknis/{rhl_teknis}/submit', [RhlTeknisController::class, 'submit'])->name('rhl-teknis.submit');
-    Route::post('/rhl-teknis/{rhl_teknis}/approve', [RhlTeknisController::class, 'approve'])->name('rhl-teknis.approve');
-    Route::post('/rhl-teknis/{rhl_teknis}/reject', [RhlTeknisController::class, 'reject'])->name('rhl-teknis.reject');
+    Route::post('/rhl-teknis/{rhl_teknis}/single-workflow-action', [RhlTeknisController::class, 'singleWorkflowAction'])->name('rhl-teknis.single-workflow-action');
 
     // Reboisasi Area PS
     Route::get('reboisasi-ps/export', [ReboisasiPsController::class, 'export'])->name('reboisasi-ps.export');
@@ -112,9 +105,7 @@ Route::middleware('auth')->group(function () {
     Route::post('reboisasi-ps/import', [ReboisasiPsController::class, 'import'])->name('reboisasi-ps.import');
     Route::post('reboisasi-ps/bulk-workflow-action', [ReboisasiPsController::class, 'bulkWorkflowAction'])->name('reboisasi-ps.bulk-workflow-action');
     Route::resource('reboisasi-ps', ReboisasiPsController::class)->parameters(['reboisasi-ps' => 'reboisasi_ps']);
-    Route::post('/reboisasi-ps/{reboisasi_ps}/submit', [ReboisasiPsController::class, 'submit'])->name('reboisasi-ps.submit');
-    Route::post('/reboisasi-ps/{reboisasi_ps}/approve', [ReboisasiPsController::class, 'approve'])->name('reboisasi-ps.approve');
-    Route::post('/reboisasi-ps/{reboisasi_ps}/reject', [ReboisasiPsController::class, 'reject'])->name('reboisasi-ps.reject');
+    Route::post('/reboisasi-ps/{reboisasi_ps}/single-workflow-action', [ReboisasiPsController::class, 'singleWorkflowAction'])->name('reboisasi-ps.single-workflow-action');
 
 
     // Pengunjung Objek Wisata
@@ -123,9 +114,7 @@ Route::middleware('auth')->group(function () {
     Route::post('pengunjung-wisata/import', [PengunjungWisataController::class, 'import'])->name('pengunjung-wisata.import');
     Route::post('pengunjung-wisata/bulk-workflow-action', [PengunjungWisataController::class, 'bulkWorkflowAction'])->name('pengunjung-wisata.bulk-workflow-action');
     Route::resource('pengunjung-wisata', PengunjungWisataController::class)->parameters(['pengunjung-wisata' => 'pengunjung_wisata']);
-    Route::post('/pengunjung-wisata/{pengunjung_wisata}/submit', [PengunjungWisataController::class, 'submit'])->name('pengunjung-wisata.submit');
-    Route::post('/pengunjung-wisata/{pengunjung_wisata}/approve', [PengunjungWisataController::class, 'approve'])->name('pengunjung-wisata.approve');
-    Route::post('/pengunjung-wisata/{pengunjung_wisata}/reject', [PengunjungWisataController::class, 'reject'])->name('pengunjung-wisata.reject');
+    Route::post('/pengunjung-wisata/{pengunjung_wisata}/single-workflow-action', [PengunjungWisataController::class, 'singleWorkflowAction'])->name('pengunjung-wisata.single-workflow-action');
 
     // Kebakaran Hutan
     Route::get('kebakaran-hutan/export', [KebakaranHutanController::class, 'export'])->name('kebakaran-hutan.export');
@@ -133,11 +122,7 @@ Route::middleware('auth')->group(function () {
     Route::post('kebakaran-hutan/import', [KebakaranHutanController::class, 'import'])->name('kebakaran-hutan.import');
     Route::post('kebakaran-hutan/bulk-workflow-action', [KebakaranHutanController::class, 'bulkWorkflowAction'])->name('kebakaran-hutan.bulk-workflow-action');
     Route::resource('kebakaran-hutan', KebakaranHutanController::class)->parameters(['kebakaran-hutan' => 'kebakaran_hutan']);
-    Route::post('/kebakaran-hutan/{kebakaran_hutan}/submit', [KebakaranHutanController::class, 'submit'])->name('kebakaran-hutan.submit');
-    Route::post('/kebakaran-hutan/{kebakaran_hutan}/approve', [KebakaranHutanController::class, 'approve'])->name('kebakaran-hutan.approve');
-    Route::post('/kebakaran-hutan/{kebakaran_hutan}/reject', [KebakaranHutanController::class, 'reject'])->name('kebakaran-hutan.reject');
-
-    Route::resource('rehab-manggrove', RehabManggroveController::class);
+    Route::post('/kebakaran-hutan/{kebakaran_hutan}/single-workflow-action', [KebakaranHutanController::class, 'singleWorkflowAction'])->name('kebakaran-hutan.single-workflow-action');
 
     // Hasil Hutan Kayu
     Route::get('hasil-hutan-kayu/export', [HasilHutanKayuController::class, 'export'])->name('hasil-hutan-kayu.export');
@@ -145,9 +130,7 @@ Route::middleware('auth')->group(function () {
     Route::post('hasil-hutan-kayu/import', [HasilHutanKayuController::class, 'import'])->name('hasil-hutan-kayu.import');
     Route::post('hasil-hutan-kayu/bulk-workflow-action', [HasilHutanKayuController::class, 'bulkWorkflowAction'])->name('hasil-hutan-kayu.bulk-workflow-action');
     Route::resource('hasil-hutan-kayu', HasilHutanKayuController::class)->parameters(['hasil-hutan-kayu' => 'hasil_hutan_kayu']);
-    Route::post('/hasil-hutan-kayu/{hasil_hutan_kayu}/submit', [HasilHutanKayuController::class, 'submit'])->name('hasil-hutan-kayu.submit');
-    Route::post('/hasil-hutan-kayu/{hasil_hutan_kayu}/approve', [HasilHutanKayuController::class, 'approve'])->name('hasil-hutan-kayu.approve');
-    Route::post('/hasil-hutan-kayu/{hasil_hutan_kayu}/reject', [HasilHutanKayuController::class, 'reject'])->name('hasil-hutan-kayu.reject');
+    Route::post('/hasil-hutan-kayu/{hasil_hutan_kayu}/single-workflow-action', [HasilHutanKayuController::class, 'singleWorkflowAction'])->name('hasil-hutan-kayu.single-workflow-action');
 
     // Hasil Hutan Bukan Kayu
     Route::get('hasil-hutan-bukan-kayu/export', [HasilHutanBukanKayuController::class, 'export'])->name('hasil-hutan-bukan-kayu.export');
@@ -155,9 +138,8 @@ Route::middleware('auth')->group(function () {
     Route::post('hasil-hutan-bukan-kayu/import', [HasilHutanBukanKayuController::class, 'import'])->name('hasil-hutan-bukan-kayu.import');
     Route::post('hasil-hutan-bukan-kayu/bulk-workflow-action', [HasilHutanBukanKayuController::class, 'bulkWorkflowAction'])->name('hasil-hutan-bukan-kayu.bulk-workflow-action');
     Route::resource('hasil-hutan-bukan-kayu', HasilHutanBukanKayuController::class)->parameters(['hasil-hutan-bukan-kayu' => 'hasil_hutan_bukan_kayu']);
-    Route::post('/hasil-hutan-bukan-kayu/{hasil_hutan_bukan_kayu}/submit', [HasilHutanBukanKayuController::class, 'submit'])->name('hasil-hutan-bukan-kayu.submit');
-    Route::post('/hasil-hutan-bukan-kayu/{hasil_hutan_bukan_kayu}/approve', [HasilHutanBukanKayuController::class, 'approve'])->name('hasil-hutan-bukan-kayu.approve');
-    Route::post('/hasil-hutan-bukan-kayu/{hasil_hutan_bukan_kayu}/reject', [HasilHutanBukanKayuController::class, 'reject'])->name('hasil-hutan-bukan-kayu.reject');
+    Route::post('/hasil-hutan-bukan-kayu/{hasil_hutan_bukan_kayu}/single-workflow-action', [HasilHutanBukanKayuController::class, 'singleWorkflowAction'])->name('hasil-hutan-bukan-kayu.single-workflow-action');
+
 
     // PBPHH
     Route::get('pbphh/export', [PbphhController::class, 'export'])->name('pbphh.export');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BangunanKta;
 use App\Models\RhlTeknis;
+use App\Actions\SingleWorkflowAction;
 use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
 use Illuminate\Validation\Rule;
@@ -222,47 +223,45 @@ class RhlTeknisController extends Controller
     return redirect()->route('rhl-teknis.index')->with('success', 'Data Berhasil Dihapus');
   }
 
-  public function submit(RhlTeknis $rhl_teknis)
-  {
-    $rhl_teknis->update(['status' => 'waiting_kasi']);
-    return redirect()->back()->with('success', 'Laporan berhasil diajukan untuk verifikasi Kasi.');
-  }
-
-  public function approve(RhlTeknis $rhl_teknis)
-  {
-    $user = auth()->user();
-
-    if (($user->hasRole('kasi') || $user->hasRole('admin')) && $rhl_teknis->status === 'waiting_kasi') {
-      $rhl_teknis->update([
-        'status' => 'waiting_cdk',
-        'approved_by_kasi_at' => now(),
-      ]);
-      return redirect()->back()->with('success', 'Laporan disetujui and diteruskan ke KaCDK.');
-    }
-
-    if (($user->hasRole('kacdk') || $user->hasRole('admin')) && $rhl_teknis->status === 'waiting_cdk') {
-      $rhl_teknis->update([
-        'status' => 'final',
-        'approved_by_cdk_at' => now(),
-      ]);
-      return redirect()->back()->with('success', 'Laporan telah disetujui secara final.');
-    }
-
-    return redirect()->back()->with('error', 'Aksi tidak diijinkan.');
-  }
-
-  public function reject(Request $request, RhlTeknis $rhl_teknis)
+  /**
+   * Single workflow action.
+   */
+  public function singleWorkflowAction(Request $request, RhlTeknis $rhlTeknis, SingleWorkflowAction $action)
   {
     $request->validate([
-      'rejection_note' => 'required|string|max:255',
+      'action' => ['required', Rule::enum(WorkflowAction::class)],
+      'rejection_note' => 'nullable|string|max:255',
     ]);
 
-    $rhl_teknis->update([
-      'status' => 'rejected',
-      'rejection_note' => $request->rejection_note,
-    ]);
+    $workflowAction = WorkflowAction::from($request->action);
 
-    return redirect()->back()->with('success', 'Laporan telah ditolak dengan catatan.');
+    if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
+      return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');
+    }
+
+    $extraData = [];
+    if ($request->filled('rejection_note')) {
+      $extraData['rejection_note'] = $request->rejection_note;
+    }
+
+    $success = $action->execute(
+      model: $rhlTeknis,
+      action: $workflowAction,
+      user: auth()->user(),
+      extraData: $extraData
+    );
+
+    if ($success) {
+      $message = match ($workflowAction) {
+        WorkflowAction::DELETE => 'dihapus',
+        WorkflowAction::SUBMIT => 'diajukan untuk verifikasi',
+        WorkflowAction::APPROVE => 'disetujui',
+        WorkflowAction::REJECT => 'ditolak',
+      };
+      return redirect()->back()->with('success', "Laporan berhasil {$message}.");
+    }
+
+    return redirect()->back()->with('error', 'Gagal memproses laporan atau status tidak sesuai.');
   }
 
   public function export(Request $request)

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\SingleWorkflowAction;
 use App\Models\RehabLahan;
 use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
@@ -221,55 +222,44 @@ class RehabLahanController extends Controller
     }
 
     /**
-     * Submit the report for verification.
+     * Single workflow action.
      */
-    public function submit(RehabLahan $rehabLahan)
-    {
-        $rehabLahan->update(['status' => 'waiting_kasi']);
-        return redirect()->back()->with('success', 'Laporan berhasil diajukan untuk verifikasi Kasi.');
-    }
-
-    /**
-     * Approve the report.
-     */
-    public function approve(RehabLahan $rehabLahan)
-    {
-        $user = auth()->user();
-
-        if (($user->hasRole('kasi') || $user->hasRole('admin')) && $rehabLahan->status === 'waiting_kasi') {
-            $rehabLahan->update([
-                'status' => 'waiting_cdk',
-                'approved_by_kasi_at' => now(),
-            ]);
-            return redirect()->back()->with('success', 'Laporan disetujui dan diteruskan ke KaCDK.');
-        }
-
-        if (($user->hasRole('kacdk') || $user->hasRole('admin')) && $rehabLahan->status === 'waiting_cdk') {
-            $rehabLahan->update([
-                'status' => 'final',
-                'approved_by_cdk_at' => now(),
-            ]);
-            return redirect()->back()->with('success', 'Laporan telah disetujui secara final.');
-        }
-
-        return redirect()->back()->with('error', 'Aksi tidak diijinkan.');
-    }
-
-    /**
-     * Reject the report.
-     */
-    public function reject(Request $request, RehabLahan $rehabLahan)
+    public function singleWorkflowAction(Request $request, RehabLahan $rehabLahan, SingleWorkflowAction $action)
     {
         $request->validate([
-            'rejection_note' => 'required|string|max:255',
+            'action' => ['required', Rule::enum(WorkflowAction::class)],
+            'rejection_note' => 'nullable|string|max:255',
         ]);
 
-        $rehabLahan->update([
-            'status' => 'rejected',
-            'rejection_note' => $request->rejection_note,
-        ]);
+        $workflowAction = WorkflowAction::from($request->action);
 
-        return redirect()->back()->with('success', 'Laporan telah ditolak dengan catatan.');
+        if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
+            return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');
+        }
+
+        $extraData = [];
+        if ($request->filled('rejection_note')) {
+            $extraData['rejection_note'] = $request->rejection_note;
+        }
+
+        $success = $action->execute(
+            model: $rehabLahan,
+            action: $workflowAction,
+            user: auth()->user(),
+            extraData: $extraData
+        );
+
+        if ($success) {
+            $message = match ($workflowAction) {
+                WorkflowAction::DELETE => 'dihapus',
+                WorkflowAction::SUBMIT => 'diajukan untuk verifikasi',
+                WorkflowAction::APPROVE => 'disetujui',
+                WorkflowAction::REJECT => 'ditolak',
+            };
+            return redirect()->back()->with('success', "Laporan berhasil {$message}.");
+        }
+
+        return redirect()->back()->with('error', 'Gagal memproses laporan atau status tidak sesuai.');
     }
 
     /**
