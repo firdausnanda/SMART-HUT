@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
+use Illuminate\Validation\Rule;
 use App\Models\ReboisasiPS;
 use App\Models\SumberDana;
 use Illuminate\Http\Request;
@@ -286,86 +287,44 @@ class ReboisasiPsController extends Controller
   /**
    * Bulk delete records.
    */
-  public function bulkDestroy(Request $request)
-  {
-    $request->validate([
-      'ids' => 'required|array|min:1',
-      'ids.*' => 'integer',
-    ]);
-
-    $count = app(BulkWorkflowAction::class)->execute(
-      ReboisasiPS::class,
-      WorkflowAction::DELETE,
-      $request->ids,
-      auth()->user()
-    );
-
-    if ($count === 0) {
-      return back()->with('error', 'Tidak ada data yang dapat dihapus atau Anda tidak memiliki hak akses.');
-    }
-
-    return back()->with('success', "{$count} data berhasil dihapus.");
-  }
-
   /**
-   * Bulk submit records.
+   * Bulk workflow action.
    */
-  public function bulkSubmit(Request $request)
+  public function bulkWorkflowAction(Request $request, BulkWorkflowAction $action)
   {
     $request->validate([
       'ids' => 'required|array',
       'ids.*' => 'exists:reboisasi_ps,id',
+      'action' => ['required', Rule::enum(WorkflowAction::class)],
+      'rejection_note' => 'nullable|string|max:255',
     ]);
 
-    $count = app(BulkWorkflowAction::class)->execute(
-      ReboisasiPS::class,
-      WorkflowAction::SUBMIT,
-      $request->ids,
-      auth()->user()
+    $workflowAction = WorkflowAction::from($request->action);
+
+    if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
+      return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');
+    }
+
+    $extraData = [];
+    if ($request->filled('rejection_note')) {
+      $extraData['rejection_note'] = $request->rejection_note;
+    }
+
+    $count = $action->execute(
+      model: ReboisasiPS::class,
+      action: $workflowAction,
+      ids: $request->ids,
+      user: auth()->user(),
+      extraData: $extraData
     );
 
-    return redirect()->back()->with('success', $count . ' laporan berhasil diajukan.');
-  }
+    $message = match ($workflowAction) {
+      WorkflowAction::DELETE => 'dihapus',
+      WorkflowAction::SUBMIT => 'diajukan',
+      WorkflowAction::APPROVE => 'disetujui',
+      WorkflowAction::REJECT => 'ditolak',
+    };
 
-  /**
-   * Bulk approve records.
-   */
-  public function bulkApprove(Request $request)
-  {
-    $request->validate([
-      'ids' => 'required|array|min:1',
-      'ids.*' => 'integer',
-    ]);
-
-    $count = app(BulkWorkflowAction::class)->execute(
-      ReboisasiPS::class,
-      WorkflowAction::APPROVE,
-      $request->ids,
-      auth()->user()
-    );
-
-    return back()->with('success', "{$count} laporan berhasil disetujui.");
-  }
-
-  /**
-   * Bulk reject records.
-   */
-  public function bulkReject(Request $request)
-  {
-    $request->validate([
-      'ids' => 'required|array|min:1',
-      'ids.*' => 'integer',
-      'rejection_note' => 'required|string|max:255',
-    ]);
-
-    $count = app(BulkWorkflowAction::class)->execute(
-      ReboisasiPS::class,
-      WorkflowAction::REJECT,
-      $request->ids,
-      auth()->user(),
-      ['rejection_note' => $request->rejection_note]
-    );
-
-    return back()->with('success', "{$count} laporan berhasil ditolak.");
+    return redirect()->back()->with('success', "{$count} data berhasil {$message}.");
   }
 }

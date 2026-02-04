@@ -18,7 +18,7 @@ import BulkActionToolbar from '@/Components/BulkActionToolbar';
 const MySwal = withReactContent(Swal);
 
 export default function Index({ auth, datas, stats, filters, availableYears }) {
-  const { flash } = usePage().props;
+  const { flash, errors } = usePage().props;
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memproses...');
   const formatNumber = (num) => new Intl.NumberFormat('id-ID').format(num);
@@ -111,7 +111,7 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
     if (selectedIds.length === 0) return;
 
     let title = '';
-    let routeName = '';
+    const routeName = 'pengunjung-wisata.bulk-workflow-action';
     let confirmText = '';
     let color = '#3085d6';
     let showInput = false;
@@ -120,25 +120,21 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
       case 'delete':
         title = 'Hapus Data Terpilih?';
         confirmText = 'Ya, Hapus!';
-        routeName = 'pengunjung-wisata.bulk-delete';
         color = '#d33';
         break;
       case 'submit':
         title = 'Ajukan Data Terpilih?';
         confirmText = 'Ya, Ajukan!';
-        routeName = 'pengunjung-wisata.bulk-submit';
         color = '#15803d';
         break;
       case 'approve':
         title = 'Setujui Data Terpilih?';
         confirmText = 'Ya, Setujui!';
-        routeName = 'pengunjung-wisata.bulk-approve';
         color = '#15803d';
         break;
       case 'reject':
         title = 'Tolak Data Terpilih?';
         confirmText = 'Ya, Tolak!';
-        routeName = 'pengunjung-wisata.bulk-reject';
         color = '#d33';
         showInput = true;
         break;
@@ -168,6 +164,7 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
         setIsLoading(true);
         router.post(route(routeName), {
           ids: selectedIds,
+          action: action,
           rejection_note: showInput ? result.value : undefined
         }, {
           preserveScroll: true,
@@ -214,6 +211,9 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
         showConfirmButton: false,
       });
     }
+    if (flash?.error) {
+      MySwal.fire({ title: 'Gagal', text: flash.error, icon: 'error', confirmButtonText: 'Tutup', confirmButtonColor: '#d33' });
+    }
     if (flash?.import_errors) {
       const errorList = flash.import_errors.map(f => `Baris ${f.row}: ${Array.isArray(f.errors) ? f.errors.join(', ') : f.errors}`).join('<br>');
       MySwal.fire({
@@ -223,7 +223,15 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
         confirmButtonColor: '#dc2626',
       });
     }
-  }, [flash]);
+    if (Object.keys(errors).length > 0) {
+      let errorHtml = '<div class="text-left text-sm space-y-1">';
+      Object.keys(errors).forEach(key => {
+        errorHtml += `<div class="text-red-600 font-medium">• ${errors[key]}</div>`;
+      });
+      errorHtml += '</div>';
+      MySwal.fire({ title: 'Terjadi Kesalahan', html: errorHtml, icon: 'error', confirmButtonText: 'Tutup', confirmButtonColor: '#d33' });
+    }
+  }, [flash, errors]);
 
   const handleImportSubmit = (e) => {
     e.preventDefault();
@@ -656,7 +664,14 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <StatusBadge status={item.status} />
+                        <div className="flex flex-col items-center gap-1">
+                          <StatusBadge status={item.status} />
+                          {item.status === 'rejected' && item.rejection_note && (
+                            <div className="text-[10px] text-rose-600 font-medium italic mt-1 max-w-[150px] leading-tight" title={item.rejection_note}>
+                              "{item.rejection_note.length > 50 ? item.rejection_note.substring(0, 50) + '...' : item.rejection_note}"
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className="flex justify-center gap-2">

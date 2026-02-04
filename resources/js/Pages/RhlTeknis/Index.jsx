@@ -131,7 +131,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
     if (selectedIds.length === 0) return;
 
     let title = '';
-    let routeName = '';
+    const routeName = 'rhl-teknis.bulk-workflow-action';
     let confirmText = '';
     let color = '#3085d6';
     let showInput = false;
@@ -140,25 +140,21 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
       case 'delete':
         title = 'Hapus Data Terpilih?';
         confirmText = 'Ya, Hapus!';
-        routeName = 'rhl-teknis.bulk-delete';
         color = '#d33';
         break;
       case 'submit':
         title = 'Ajukan Data Terpilih?';
         confirmText = 'Ya, Ajukan!';
-        routeName = 'rhl-teknis.bulk-submit';
         color = '#15803d';
         break;
       case 'approve':
         title = 'Setujui Data Terpilih?';
         confirmText = 'Ya, Setujui!';
-        routeName = 'rhl-teknis.bulk-approve';
         color = '#15803d';
         break;
       case 'reject':
         title = 'Tolak Data Terpilih?';
         confirmText = 'Ya, Tolak!';
-        routeName = 'rhl-teknis.bulk-reject';
         color = '#d33';
         showInput = true;
         break;
@@ -188,6 +184,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
         setIsLoading(true);
         router.post(route(routeName), {
           ids: selectedIds,
+          action: action,
           rejection_note: showInput ? result.value : undefined
         }, {
           preserveScroll: true,
