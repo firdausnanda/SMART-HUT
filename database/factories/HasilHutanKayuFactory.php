@@ -50,7 +50,7 @@ class HasilHutanKayuFactory extends Factory
       'pengelola_hutan_id' => $pengelola->id,
       'forest_type' => fake()->randomElement(['Hutan Rakyat', 'Hutan Negara']),
       'volume_target' => fake()->randomFloat(2, 50, 2000),
-      'status' => 'final',
+      'status' => fake()->randomElement(['draft', 'waiting_kasi', 'waiting_cdk', 'final', 'rejected']),
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
       'created_by' => $user->id,

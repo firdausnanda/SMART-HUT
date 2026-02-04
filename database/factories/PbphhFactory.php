@@ -43,7 +43,7 @@ class PbphhFactory extends Factory
       'investment_value' => fake()->numberBetween(1000000, 1000000000),
       'number_of_workers' => fake()->numberBetween(10, 500),
       'present_condition' => fake()->boolean(),
-      'status' => 'final',
+      'status' => fake()->randomElement(['draft', 'waiting_kasi', 'waiting_cdk', 'final', 'rejected']),
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
       'created_by' => $user->id,

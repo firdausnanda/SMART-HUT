@@ -43,7 +43,7 @@ class RealisasiPnbpFactory extends Factory
       'id_pengelola_wisata' => $pengelola_wisata->id,
       'pnbp_target' => fake()->numberBetween(1000000, 100000000),
       'pnbp_realization' => fake()->numberBetween(100000, 10000000),
-      'status' => 'final',
+      'status' => fake()->randomElement(['draft', 'waiting_kasi', 'waiting_cdk', 'final', 'rejected']),
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
       'created_by' => $user->id,

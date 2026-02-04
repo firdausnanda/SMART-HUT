@@ -27,7 +27,7 @@ class PengunjungWisataFactory extends Factory
       'id_pengelola_wisata' => $pengelola->id ?? 1,
       'number_of_visitors' => fake()->numberBetween(100, 5000),
       'gross_income' => fake()->numberBetween(1000000, 50000000),
-      'status' => 'final',
+      'status' => fake()->randomElement(['draft', 'waiting_kasi', 'waiting_cdk', 'final', 'rejected']),
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
       'created_by' => $user->id,

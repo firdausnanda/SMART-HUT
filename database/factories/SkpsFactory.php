@@ -41,7 +41,7 @@ class SkpsFactory extends Factory
       'potential' => fake()->word(),
       'ps_area' => fake()->randomFloat(2, 1, 500),
       'number_of_kk' => fake()->numberBetween(10, 200),
-      'status' => 'final',
+      'status' => fake()->randomElement(['draft', 'waiting_kasi', 'waiting_cdk', 'final', 'rejected']),
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
       'created_by' => $user->id,

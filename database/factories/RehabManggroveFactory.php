@@ -46,7 +46,7 @@ class RehabManggroveFactory extends Factory
       'coordinates' => fake()->latitude() . ',' . fake()->longitude(),
       'created_by' => $user->id,
       'updated_by' => $user->id,
-      'status' => 'final',
+      'status' => fake()->randomElement(['draft', 'waiting_kasi', 'waiting_cdk', 'final', 'rejected']),
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now()
     ];

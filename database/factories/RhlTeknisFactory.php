@@ -31,7 +31,7 @@ class RhlTeknisFactory extends Factory
       'regency_id' => $village?->district?->regency_id,
       'district_id' => $village?->district_id,
       'village_id' => $village?->id,
-      'status' => 'final',
+      'status' => fake()->randomElement(['draft', 'waiting_kasi', 'waiting_cdk', 'final', 'rejected']),
       'created_by' => $user->id,
       'updated_by' => $user->id,
       'approved_by_kasi_at' => now(),

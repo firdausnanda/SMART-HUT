@@ -38,7 +38,7 @@ class KupsFactory extends Factory
       'nama_kups' => 'KUPS ' . fake()->company(),
       'category' => fake()->randomElement(['Blue', 'Silver', 'Gold', 'Platinum']),
       'commodity' => fake()->randomElement(['Kopi', 'Madu', 'Aren', 'Wisata', 'Bambu']),
-      'status' => 'final',
+      'status' => fake()->randomElement(['draft', 'waiting_kasi', 'waiting_cdk', 'final', 'rejected']),
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
       'created_by' => $user->id,

@@ -45,7 +45,7 @@ class KebakaranHutanFactory extends Factory
       'area_function' => fake()->randomElement(['Hutan Lindung', 'Hutan Produksi', 'Areal Penggunaan Lain']),
       'number_of_fires' => fake()->numberBetween(0, 5),
       'fire_area' => fake()->randomFloat(2, 0.1, 100),
-      'status' => 'final',
+      'status' => fake()->randomElement(['draft', 'waiting_kasi', 'waiting_cdk', 'final', 'rejected']),
       'approved_by_kasi_at' => now(),
       'approved_by_cdk_at' => now(),
       'created_by' => $user->id,
