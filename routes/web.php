@@ -140,7 +140,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('hasil-hutan-bukan-kayu', HasilHutanBukanKayuController::class)->parameters(['hasil-hutan-bukan-kayu' => 'hasil_hutan_bukan_kayu']);
     Route::post('/hasil-hutan-bukan-kayu/{hasil_hutan_bukan_kayu}/single-workflow-action', [HasilHutanBukanKayuController::class, 'singleWorkflowAction'])->name('hasil-hutan-bukan-kayu.single-workflow-action');
 
-
     // PBPHH
     Route::get('pbphh/export', [PbphhController::class, 'export'])->name('pbphh.export');
     Route::get('pbphh/template', [PbphhController::class, 'template'])->name('pbphh.template');
