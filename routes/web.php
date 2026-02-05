@@ -218,6 +218,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('jenis-produksi', JenisProduksiController::class);
     Route::resource('pengelola-wisata', PengelolaWisataController::class);
     Route::resource('skema-perhutanan-sosial', SkemaPerhutananSosialController::class);
+
+    Route::get('clear-cache', function () {
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+        Artisan::call('view:clear');
+        return redirect()->back()->with('success', 'Cache cleared successfully!');
+    })->name('clear-cache');
 });
 
 require __DIR__ . '/auth.php';
