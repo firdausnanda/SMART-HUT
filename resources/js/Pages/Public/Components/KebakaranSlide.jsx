@@ -61,6 +61,8 @@ const KebakaranSlide = ({ stats, currentYear, commonOptions }) => {
         type: 'linear',
         display: true,
         position: 'left',
+        beginAtZero: true,
+        min: 0,
         title: { display: true, text: 'Kejadian', font: { size: 10, weight: 'bold' } },
         grid: { display: false }
       },
@@ -68,6 +70,8 @@ const KebakaranSlide = ({ stats, currentYear, commonOptions }) => {
         type: 'linear',
         display: true,
         position: 'right',
+        beginAtZero: true,
+        min: 0,
         title: { display: true, text: 'Luas (Ha)', font: { size: 10, weight: 'bold' } },
         grid: { drawOnChartArea: false }
       },

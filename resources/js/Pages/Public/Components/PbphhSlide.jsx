@@ -97,8 +97,8 @@ const PbphhSlide = ({ stats, commonOptions }) => {
         boxPadding: 6,
         callbacks: {
           label: (ctx) => {
-            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-            const percentage = ((ctx.raw / total) * 100).toFixed(1);
+            const total = ctx.dataset.data.reduce((a, b) => Number(a) + Number(b), 0);
+            const percentage = total > 0 ? ((Number(ctx.raw) / total) * 100).toFixed(1) : 0;
             return ` ${ctx.label}: ${ctx.raw} Unit (${percentage}%)`;
           },
           labelColor: (ctx) => {

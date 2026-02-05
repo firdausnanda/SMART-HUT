@@ -42,11 +42,11 @@ const KelembagaanPsSlide = ({ stats, commonOptions }) => {
       ctx.save();
       const text = stats?.kelembagaan_ps?.kelompok_count || 0;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.font = '900 64px Inter, sans-serif'; ctx.fillStyle = '#1e293b';
-      ctx.fillText(text, left + width / 2, top + height / 2 - 12);
+      ctx.font = '900 48px Inter, sans-serif'; ctx.fillStyle = '#1e293b';
+      ctx.fillText(text, left + width / 2, top + height / 2 - 8);
       ctx.font = 'bold 11px Inter, sans-serif'; ctx.fillStyle = '#64748b';
       ctx.letterSpacing = '1px';
-      ctx.fillText('TOTAL KELOMPOK', left + width / 2, top + height / 2 + 20); ctx.restore();
+      ctx.fillText('TOTAL KELOMPOK', left + width / 2, top + height / 2 + 18); ctx.restore();
     }
   }], [stats?.kelembagaan_ps?.kelompok_count]);
 
@@ -75,8 +75,8 @@ const KelembagaanPsSlide = ({ stats, commonOptions }) => {
         boxPadding: 6,
         callbacks: {
           label: (ctx) => {
-            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-            const percentage = ((ctx.raw / total) * 100).toFixed(1);
+            const total = ctx.dataset.data.reduce((a, b) => Number(a) + Number(b), 0);
+            const percentage = total > 0 ? ((Number(ctx.raw) / total) * 100).toFixed(1) : 0;
             return ` ${ctx.label}: ${ctx.raw} Kelompok (${percentage}%)`;
           },
           labelColor: function (context) {

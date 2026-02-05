@@ -38,7 +38,7 @@ const ProductionSlide = ({ source, stats, currentYear, commonOptions }) => {
       labels,
       datasets: [
         {
-          label: 'Bukan Kayu (Kg/Liter)',
+          label: 'Bukan Kayu (Kg)',
           data: months.map(m => stats?.bina_usaha[source.key]?.bukan_kayu_monthly?.[m] || 0),
           borderColor: '#f59e0b',
           backgroundColor: '#f59e0b20',
@@ -78,7 +78,20 @@ const ProductionSlide = ({ source, stats, currentYear, commonOptions }) => {
     ...commonOptions,
     indexAxis: 'y',
     maintainAspectRatio: false,
-    plugins: { ...commonOptions.plugins, legend: { display: false } },
+    plugins: {
+      ...commonOptions.plugins,
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const total = ctx.dataset.data.reduce((a, b) => Number(a) + Number(b), 0);
+            const percentage = total > 0 ? ((Number(ctx.raw) / total) * 100).toFixed(1) : 0;
+            const unit = ctx.dataset.label.includes('Volume') ? 'M³' : 'Kg';
+            return ` ${ctx.label}: ${formatNumber(ctx.raw)} ${unit} (${percentage}%)`;
+          }
+        }
+      }
+    },
     scales: { y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }, x: { grid: { display: false } } }
   }), [commonOptions]);
 
@@ -133,7 +146,7 @@ const ProductionSlide = ({ source, stats, currentYear, commonOptions }) => {
                       <h3 className="text-3xl font-black text-gray-900 leading-none mb-1 tabular-nums tracking-tight">
                         {formatNumber(stats?.bina_usaha[source.key]?.bukan_kayu_total || 0)}
                       </h3>
-                      <span className="text-xs font-bold text-amber-600 px-2 py-0.5 rounded-md bg-amber-50">Kg/Liter</span>
+                      <span className="text-xs font-bold text-amber-600 px-2 py-0.5 rounded-md bg-amber-50">Kg</span>
                     </div>
                   </div>
 
