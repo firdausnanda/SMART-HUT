@@ -565,12 +565,11 @@ class DashboardController extends Controller
         return Cache::remember("kelembagaan_hr_stats_{$currentYear}", 600, function () use ($currentYear) {
             // --- 5. Kelembagaan Hutan Rakyat ---
             return [
-                'kelompok_count' => PerkembanganKth::where('year', $currentYear)->where('status', 'final')->count(),
-                'area_total' => (float) PerkembanganKth::where('year', $currentYear)->where('status', 'final')->sum('luas_kelola'),
-                'anggota_total' => (int) PerkembanganKth::where('year', $currentYear)->where('status', 'final')->sum('jumlah_anggota'),
+                'kelompok_count' => PerkembanganKth::where('status', 'final')->count(),
+                'area_total' => (float) PerkembanganKth::where('status', 'final')->sum('luas_kelola'),
+                'anggota_total' => (int) PerkembanganKth::where('status', 'final')->sum('jumlah_anggota'),
                 'nte_total' => (float) NilaiTransaksiEkonomi::where('year', $currentYear)->where('status', 'final')->sum('total_nilai_transaksi'),
-                'class_distribution' => PerkembanganKth::where('year', $currentYear)
-                    ->where('status', 'final')
+                'class_distribution' => PerkembanganKth::where('status', 'final')
                     ->selectRaw('kelas_kelembagaan as class_name, count(*) as count')
                     ->groupBy('kelas_kelembagaan')
                     ->get(),

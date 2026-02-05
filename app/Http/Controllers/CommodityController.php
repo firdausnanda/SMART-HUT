@@ -31,7 +31,14 @@ class CommodityController extends Controller
             'type' => 'nullable|string',
         ]);
 
-        Commodity::create($request->all());
+        $commodity = Commodity::create($request->all());
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'commodity' => $commodity,
+            ]);
+        }
 
         return redirect()->route('commodities.index')->with('success', 'Komoditas berhasil ditambahkan');
     }

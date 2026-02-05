@@ -98,11 +98,16 @@ export default function Create({ auth, commodities }) {
     setIsSavingCommodity(true);
     axios.post(route('commodities.store'), { name: newCommodityName })
       .then(res => {
-        setLocalCommodities([...localCommodities, res.data.commodity]);
-        setIsModalOpen(false);
-        setNewCommodityName('');
+        if (res.data.commodity) {
+          setLocalCommodities(prev => [...prev, res.data.commodity]);
+          setIsModalOpen(false);
+          setNewCommodityName('');
+        }
       })
-      .catch(err => console.error(err))
+      .catch(err => {
+        console.error('Error saving commodity:', err);
+        alert('Gagal menyimpan komoditas. Silakan coba lagi.');
+      })
       .finally(() => setIsSavingCommodity(false));
   };
 
