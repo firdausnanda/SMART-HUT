@@ -173,6 +173,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/kups/{kups}/single-workflow-action', [KupsController::class, 'singleWorkflowAction'])->name('kups.single-workflow-action');
 
     // Nilai Ekonomi (NEKON)
+    Route::get('nilai-ekonomi/export', [NilaiEkonomiController::class, 'export'])->name('nilai-ekonomi.export');
+    Route::get('nilai-ekonomi/template', [NilaiEkonomiController::class, 'template'])->name('nilai-ekonomi.template');
+    Route::post('nilai-ekonomi/import', [NilaiEkonomiController::class, 'import'])->name('nilai-ekonomi.import');
     Route::post('nilai-ekonomi/bulk-workflow-action', [NilaiEkonomiController::class, 'bulkWorkflowAction'])->name('nilai-ekonomi.bulk-workflow-action');
     Route::resource('nilai-ekonomi', NilaiEkonomiController::class);
     Route::post('/nilai-ekonomi/{nilai_ekonomi}/single-workflow-action', [NilaiEkonomiController::class, 'singleWorkflowAction'])->name('nilai-ekonomi.single-workflow-action');

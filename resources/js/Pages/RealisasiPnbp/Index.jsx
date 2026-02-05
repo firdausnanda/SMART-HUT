@@ -569,35 +569,17 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
                       onClick={() => handleSort('pengelola')}
                     >
                       <div className="flex items-center gap-1">
-                        Pengelola
+                        Pengelola & Produk
                         <SortIcon field="pengelola" />
                       </div>
                     </th>
                     <th
-                      className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group"
-                      onClick={() => handleSort('forest_product')}
-                    >
-                      <div className="flex items-center gap-1">
-                        Jenis Hasil Hutan
-                        <SortIcon field="forest_product" />
-                      </div>
-                    </th>
-                    <th
-                      className="px-6 py-4 text-right cursor-pointer hover:bg-gray-100 transition-colors group"
+                      className="px-6 py-4 text-center cursor-pointer hover:bg-gray-100 transition-colors group"
                       onClick={() => handleSort('target')}
                     >
-                      <div className="flex items-center justify-end gap-1">
-                        Target PNBP
+                      <div className="flex items-center justify-center gap-1">
+                        Target & Realisasi
                         <SortIcon field="target" />
-                      </div>
-                    </th>
-                    <th
-                      className="px-6 py-4 text-right cursor-pointer hover:bg-gray-100 transition-colors group"
-                      onClick={() => handleSort('realization')}
-                    >
-                      <div className="flex items-center justify-end gap-1">
-                        Realisasi PNBP
-                        <SortIcon field="realization" />
                       </div>
                     </th>
 
@@ -626,22 +608,37 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
                           />
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex flex-col">
+                          <div className="flex flex-col gap-1">
                             <span className="font-bold text-gray-900">
                               {new Date(0, item.month - 1).toLocaleString('id-ID', { month: 'long' })} {item.year}
                             </span>
-                            <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500">
-                              {item.regency?.name && <span>{item.regency.name}</span>}
+                            <div className="flex flex-col text-[10px] text-gray-500">
+                              <span className="font-medium text-emerald-600">{item.regency?.name || '-'}</span>
+                              <div className="mt-1 pt-1 border-t border-gray-100/50">
+                                <span className="font-bold text-gray-400 uppercase tracking-tight">Oleh: </span>
+                                <span className="text-gray-600 font-medium truncate max-w-[120px] inline-block align-bottom" title={item.creator?.name}>{item.creator?.name || '-'}</span>
+                              </div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{item.pengelola_wisata?.name}</td>
-                        <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{item.types_of_forest_products}</td>
-                        <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-right">
-                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.pnbp_target)}
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col gap-1">
+                            <span className="font-bold text-gray-900 truncate max-w-[150px]" title={item.pengelola_wisata?.name}>{item.pengelola_wisata?.name}</span>
+                            <span className="text-[10px] text-gray-500 italic block truncate max-w-[150px]" title={item.types_of_forest_products}>{item.types_of_forest_products}</span>
+                          </div>
                         </td>
-                        <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-right">
-                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.pnbp_realization)}
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col items-center gap-1.5 p-2 rounded-lg bg-gray-50/50 border border-gray-100/50">
+                            <div className="flex justify-between w-full gap-4">
+                              <span className="text-[10px] uppercase font-bold text-gray-400">Target:</span>
+                              <span className="text-xs font-bold text-gray-700"> {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.pnbp_target)}</span>
+                            </div>
+                            <div className="w-full h-px bg-gray-100"></div>
+                            <div className="flex justify-between w-full gap-4">
+                              <span className="text-[10px] uppercase font-bold text-emerald-500">Real:</span>
+                              <span className="text-xs font-bold text-emerald-700"> {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.pnbp_realization)}</span>
+                            </div>
+                          </div>
                         </td>
 
                         <td className="px-6 py-4">
@@ -715,7 +712,7 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="8" className="px-6 py-12 text-center text-gray-500 bg-gray-50/20 italic">
+                      <td colSpan="6" className="px-6 py-12 text-center text-gray-500 bg-gray-50/20 italic">
                         Belum ada data PNBP yang ditemukan.
                       </td>
                     </tr>

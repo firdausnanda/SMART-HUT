@@ -10,6 +10,8 @@ import TextInput from '@/Components/TextInput';
 import StatusBadge from '@/Components/StatusBadge';
 import LoadingOverlay from '@/Components/LoadingOverlay';
 import BulkActionToolbar from '@/Components/BulkActionToolbar';
+import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
 
 const MySwal = withReactContent(Swal);
 
@@ -21,6 +23,8 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
   const [loadingText, setLoadingText] = useState('Memproses...');
   const [selectedIds, setSelectedIds] = useState([]);
   const [params, setParams] = useState({ ...filters, per_page: filters.per_page || 10 });
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importFile, setImportFile] = useState(null);
 
   const SortIcon = ({ field }) => {
     return (
@@ -177,6 +181,14 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
     if (flash?.error) {
       MySwal.fire({ title: 'Gagal', text: flash.error, icon: 'error' });
     }
+    if (flash?.import_errors) {
+      let errorHtml = '<div class="text-left max-h-60 overflow-y-auto text-sm space-y-2">';
+      flash.import_errors.forEach(fail => {
+        errorHtml += `<div class="p-2 bg-red-50 rounded border border-red-100"><span class="font-bold text-red-700">Baris ${fail.row}:</span> <span class="text-gray-600">${fail.errors.join(', ')}</span></div>`;
+      });
+      errorHtml += '</div>';
+      MySwal.fire({ title: 'Import Gagal Sebagian', html: errorHtml, icon: 'error', confirmButtonText: 'Tutup', confirmButtonColor: '#d33', width: '600px' });
+    }
   }, [flash]);
 
   const formatRupiah = (number) => {
@@ -277,36 +289,45 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
         confirmButton: 'rounded-xl font-bold px-6 py-2.5',
         cancelButton: 'rounded-xl font-bold px-6 py-2.5'
       }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setLoadingText(loadingMsg);
-        setIsLoading(true);
+    });
+  };
 
-        const data = {
-          action: action
-        };
-        if (showInput) {
-          data.rejection_note = result.value;
-        }
+  const handleImportSubmit = (e) => {
+    e.preventDefault();
+    if (!importFile) return;
 
-        router.post(route('nilai-ekonomi.single-workflow-action', id), data, {
-          preserveScroll: true,
-          onSuccess: () => {
-            if (action === 'delete') {
-              MySwal.fire({
-                title: 'Terhapus!',
-                text: 'Data berhasil dihapus.',
-                icon: 'success',
-                confirmButtonColor: '#15803d',
-                timer: 2000,
-                showConfirmButton: false,
-              });
-            }
-            setIsLoading(false);
-          },
-          onError: () => setIsLoading(false),
-          onFinish: () => setIsLoading(false)
+    setLoadingText('Mengimport Data...');
+    setIsLoading(true);
+    setShowImportModal(false);
+
+    const formData = new FormData();
+    formData.append('file', importFile);
+
+    router.post(route('nilai-ekonomi.import'), formData, {
+      forceFormData: true,
+      preserveScroll: true,
+      onSuccess: () => {
+        MySwal.fire({
+          title: 'Berhasil!',
+          text: 'Data berhasil diimport.',
+          icon: 'success',
+          confirmButtonColor: '#15803d',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
         });
+      },
+      onError: (errors) => {
+        MySwal.fire({
+          title: 'Gagal!',
+          text: errors.file || 'Terjadi kesalahan saat import.',
+          icon: 'error',
+          confirmButtonColor: '#15803d',
+        });
+      },
+      onFinish: () => {
+        setIsLoading(false);
+        setImportFile(null);
       }
     });
   };
@@ -343,6 +364,24 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
             </div>
             {canCreate && (
               <div className="flex gap-2">
+                <button
+                  onClick={() => window.location.href = route('nilai-ekonomi.export', { year: params.year })}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Export
+                </button>
+                <button
+                  onClick={() => setShowImportModal(true)}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  Import
+                </button>
                 <Link href={route('nilai-ekonomi.create')}>
                   <button className="flex items-center gap-2 px-5 py-2.5 bg-white text-primary-700 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-50 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -666,6 +705,59 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
         canDelete={canDelete}
         isAdmin={isAdmin}
       />
+
+      <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
+        <form onSubmit={handleImportSubmit} className="p-0 overflow-hidden">
+          <div className="p-6 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-900">Import Data</h2>
+            <button type="button" onClick={() => setShowImportModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          <div className="p-6 space-y-8">
+            <div className="flex gap-4 items-start">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">1</div>
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-gray-900 mb-1">Unduh Template</h3>
+                <p className="text-xs text-gray-500 mb-3 leading-relaxed">Gunakan template yang telah disediakan untuk memastikan format data sesuai.</p>
+                <button type="button" onClick={() => window.location.href = route('nilai-ekonomi.template')} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  Download Template Excel
+                </button>
+              </div>
+            </div>
+            <div className="border-t border-gray-100"></div>
+            <div className="flex gap-4 items-start">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">2</div>
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-gray-900 mb-1">Upload Data</h3>
+                <p className="text-xs text-gray-500 mb-3 leading-relaxed">Pilih file yang telah diisi sesuai template (.xlsx, .xls, .csv).</p>
+                <div className={`relative border-2 border-dashed rounded-xl p-6 transition-all duration-200 text-center cursor-pointer ${importFile ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200 hover:border-emerald-300 hover:bg-gray-50'}`}>
+                  <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setImportFile(e.target.files[0])} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                  <div className="space-y-2 pointer-events-none">
+                    <div className={`mx-auto h-12 w-12 rounded-full flex items-center justify-center transition-colors ${importFile ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
+                      {importFile ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                      )}
+                    </div>
+                    {importFile ? (
+                      <div><p className="text-sm font-bold text-emerald-800">{importFile.name}</p><p className="text-xs text-emerald-600 mt-1">{(importFile.size / 1024).toFixed(1)} KB</p></div>
+                    ) : (
+                      <p className="text-sm font-medium text-gray-500">Klik untuk pilih file atau drag & drop</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 bg-gray-50 flex justify-end gap-3 border-t border-gray-100">
+            <SecondaryButton onClick={() => setShowImportModal(false)}>Batal</SecondaryButton>
+            <button type="submit" className="px-6 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all shadow-md shadow-emerald-200 disabled:opacity-50 disabled:shadow-none" disabled={!importFile}>Proses Import</button>
+          </div>
+        </form>
+      </Modal>
     </AuthenticatedLayout>
   );
 }

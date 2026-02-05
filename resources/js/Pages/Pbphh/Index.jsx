@@ -630,7 +630,7 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                       onClick={() => handleSort('investment')}
                     >
                       <div className="flex items-center justify-center gap-1">
-                        Kinerja (Investasi / TK)
+                        Kinerja
                         <SortIcon field="investment" />
                       </div>
                     </th>
@@ -679,32 +679,32 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col gap-1.5">
-                            <div className="flex items-center gap-1.5" title="Nilai Investasi">
-                              <div className="p-1 rounded bg-emerald-50 text-emerald-600">
+                            <div className="flex items-center gap-2 group/inv">
+                              <div className="p-1 rounded bg-emerald-50 text-emerald-600 group-hover/inv:bg-emerald-100 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                               </div>
-                              <span className="font-bold text-gray-700 text-xs">{formatCurrency(item.investment_value)}</span>
+                              <span className="font-bold text-gray-700 text-[11px] tabular-nums">{formatCurrency(item.investment_value)}</span>
                             </div>
-                            <div className="flex items-center gap-1.5" title="Tenaga Kerja">
-                              <div className="p-1 rounded bg-blue-50 text-blue-600">
+                            <div className="flex items-center gap-2 group/tk">
+                              <div className="p-1 rounded bg-blue-50 text-blue-600 group-hover/tk:bg-blue-100 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                               </div>
-                              <span className="font-bold text-gray-700 text-xs">{item.number_of_workers} Orang</span>
+                              <span className="font-bold text-gray-700 text-[11px] tabular-nums">{item.number_of_workers} <span className="text-[9px] font-medium text-gray-400 uppercase">Orang</span></span>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 text-center">
                           {item.present_condition ? (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 uppercase tracking-tighter shadow-sm">
                               Beroperasi
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 border border-red-100">
-                              Tidak Beroperasi
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold bg-slate-50 text-slate-500 border border-slate-100 uppercase tracking-tighter">
+                              Non-Aktif
                             </span>
                           )}
                         </td>
@@ -719,9 +719,9 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                                     </svg>
                                   </div>
                                   <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-gray-800 leading-tight">{jp.name}</span>
+                                    <span className="text-xs font-bold text-gray-800 leading-tight truncate max-w-[120px] inline-block" title={jp.name}>{jp.name}</span>
                                     <div className="flex items-center gap-1 mt-0.5">
-                                      <span className="text-[10px] uppercase font-semibold text-orange-600/80 tracking-wide">Kapasitas:</span>
+                                      <span className="text-[10px] uppercase font-semibold text-orange-600/80 tracking-wide font-display">Kapasitas:</span>
                                       <span className="text-[10px] font-medium text-gray-600 bg-white px-1.5 py-0.5 rounded border border-orange-100">
                                         {jp.pivot?.kapasitas_ijin || '-'}
                                       </span>
@@ -735,10 +735,14 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <div className="flex flex-col items-center gap-1">
+                          <div className="flex flex-col items-center gap-2">
                             <StatusBadge status={item.status} />
+                            <div className="flex flex-col items-center pt-1 border-t border-gray-100/50 w-full">
+                              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter line-clamp-1">Input Oleh</span>
+                              <span className="text-[10px] font-semibold text-gray-600 truncate max-w-[100px]" title={item.creator?.name}>{item.creator?.name || '-'}</span>
+                            </div>
                             {item.status === 'rejected' && item.rejection_note && (
-                              <div className="text-[10px] text-rose-600 font-medium italic mt-1 max-w-[150px] leading-tight" title={item.rejection_note}>
+                              <div className="text-[10px] text-rose-600 font-medium italic mt-0.5 max-w-[150px] leading-tight" title={item.rejection_note}>
                                 "{item.rejection_note.length > 50 ? item.rejection_note.substring(0, 50) + '...' : item.rejection_note}"
                               </div>
                             )}
