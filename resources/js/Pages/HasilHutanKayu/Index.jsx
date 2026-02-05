@@ -683,9 +683,9 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
                     </td>
                     <td className="px-6 py-4">
                       <div className="font-medium text-gray-800">
-                        {item.details && item.details.length > 0 ? (
+                        {item.details && item.details.filter(d => parseFloat(d.volume_realization || 0) > 0).length > 0 ? (
                           <div className="flex flex-col gap-1">
-                            {item.details.map((detail, idx) => (
+                            {item.details.filter(d => parseFloat(d.volume_realization || 0) > 0).map((detail, idx) => (
                               <span key={idx} className="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-100 w-fit">
                                 {detail.kayu?.name}
                               </span>
