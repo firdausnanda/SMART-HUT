@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\HasilHutanKayu;
+use App\Models\HasilHutanKayuDetail;
 use App\Models\Kayu;
 use App\Traits\HandlesImportFailures;
 use Illuminate\Http\Request;
@@ -117,14 +118,12 @@ class HasilHutanKayuController extends Controller
           ->where('status', 'final')
           ->whereNull('deleted_at')
           ->sum('volume_target'),
-        'total_volume_realization' => HasilHutanKayu::where('forest_type', $forestType)
-          ->where('year', $selectedYear)
-          ->where('status', 'final')
-          ->whereNull('deleted_at')
-          ->whereHas('details')
-          ->withSum('details', 'volume_realization')
-          ->get()
-          ->sum('details_sum_volume_realization'),
+        'total_volume_realization' => (float) HasilHutanKayuDetail::whereHas('hasilHutanKayu', function ($q) use ($forestType, $selectedYear) {
+          $q->where('forest_type', $forestType)
+            ->where('year', $selectedYear)
+            ->where('status', 'final')
+            ->whereNull('deleted_at');
+        })->sum('volume_realization'),
         'verified_count' => HasilHutanKayu::where('forest_type', $forestType)
           ->where('year', $selectedYear)
           ->where('status', 'final')

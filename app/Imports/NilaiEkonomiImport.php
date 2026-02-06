@@ -25,9 +25,9 @@ class NilaiEkonomiImport implements ToModel, WithHeadingRow, WithValidation, Ski
       'nama_kecamatan' => 'required|string',
       'nama_kelompok' => 'required|string',
       'komoditas' => 'required|string',
-      'volume_produksi' => 'required|numeric',
+      'volume_produksi' => 'required|string',
       'satuan' => 'required|string',
-      'nilai_transaksi_rp' => 'required|numeric',
+      'nilai_transaksi_rp' => 'required|string',
     ];
   }
 
@@ -40,6 +40,10 @@ class NilaiEkonomiImport implements ToModel, WithHeadingRow, WithValidation, Ski
     $kabupatenInfo = $row['nama_kabupaten'] ?? null;
     $kecamatanInfo = $row['nama_kecamatan'] ?? null;
     $bulanInfo = $row['bulan_1_12'] ?? null;
+
+    if (!$kabupatenInfo || !$kecamatanInfo || !$bulanInfo) {
+      return null;
+    }
 
     // 1. Lookup Location IDs
     $regency = DB::table('m_regencies')
@@ -83,29 +87,59 @@ class NilaiEkonomiImport implements ToModel, WithHeadingRow, WithValidation, Ski
       'total_transaction_value' => 0,
     ]);
 
-    // 3. Find or Create Commodity
-    $commodityName = trim($row['komoditas']);
-    // For Nilai Ekonomi, we want commodities marked for it, or we create them and mark them
-    $commodity = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')->firstOrCreate(
-      ['name' => $commodityName],
-      ['is_nilai_transaksi_ekonomi' => true]
-    );
+    // 3. Parse Multi-input details
+    $commodities = array_map('trim', explode(',', (string) $row['komoditas']));
+    $volumes = array_map('trim', explode(',', (string) $row['volume_produksi']));
+    $satuans = array_map('trim', explode(',', (string) $row['satuan']));
+    $nilais = array_map('trim', explode(',', (string) $row['nilai_transaksi_rp']));
 
-    // 4. Create Detail
-    $nilai = $row['nilai_transaksi_rp'] ?? 0;
+    $count = count($commodities);
 
-    $transaction->details()->create([
-      'commodity_id' => $commodity->id,
-      'production_volume' => $row['volume_produksi'],
-      'satuan' => $row['satuan'],
-      'transaction_value' => $nilai,
-    ]);
+    for ($i = 0; $i < $count; $i++) {
+      $commodityName = $commodities[$i] ?? null;
+      if (!$commodityName)
+        continue;
 
-    // 5. Update Total on Parent
-    $transaction->increment('total_transaction_value', $nilai);
+      $volumeStr = $volumes[$i] ?? '0';
+      if ($volumeStr !== '') {
+        $volumeStr = str_replace([' ', "\r", "\n"], '', $volumeStr);
+        $volume = (float) str_replace(',', '.', $volumeStr);
+      } else {
+        $volume = 0;
+      }
+
+      $nilaiStr = $nilais[$i] ?? '0';
+      if ($nilaiStr !== '') {
+        $nilaiStr = str_replace([' ', "\r", "\n", '.'], '', $nilaiStr);
+        $nilaiStr = str_replace(',', '.', $nilaiStr);
+        $nilai = (float) $nilaiStr;
+      } else {
+        $nilai = 0;
+      }
+
+      $satuan = $satuans[$i] ?? '-';
+
+      // Find or Create Commodity
+      $commodity = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')->firstOrCreate(
+        ['name' => $commodityName],
+        ['is_nilai_transaksi_ekonomi' => true]
+      );
+
+      // Create Detail
+      $transaction->details()->create([
+        'commodity_id' => $commodity->id,
+        'production_volume' => $volume,
+        'satuan' => $satuan,
+        'transaction_value' => $nilai,
+      ]);
+
+      // Update Total on Parent
+      $transaction->increment('total_transaction_value', $nilai);
+    }
 
     return $transaction;
   }
+
 
   private $rowNumber = 1;
 

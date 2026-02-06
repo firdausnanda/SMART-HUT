@@ -71,8 +71,12 @@ class NilaiTransaksiEkonomiTemplateExport implements WithHeadings, ShouldAutoSiz
         $sheet->getComment('D1')->getText()->createTextRun('Isi dengan Nama Kecamatan (e.g. TRENGGALEK)');
         $sheet->getComment('E1')->getText()->createTextRun('Isi dengan Nama Desa (e.g. KELUTAN)');
         $sheet->getComment('F1')->getText()->createTextRun('Isi dengan Nama KTH yang sesuai');
-        $sheet->getComment('G1')->getText()->createTextRun('Contoh: Kopi, Madu, Getah Pinus, dll');
-        $sheet->getComment('I1')->getText()->createTextRun('Contoh: Kg, Liter, Batang, Ton, M3');
+        $sheet->getComment('G1')->getText()->createTextRun('Bisa diisi lebih dari satu (pisahkan dengan koma). Contoh: Kopi, Madu, Getah Pinus');
+        $sheet->getComment('H1')->getText()->createTextRun('Bisa diisi lebih dari satu (pisahkan dengan koma). Sesuaikan urutan dengan kolom Komoditas. Gunakan TITIK (.) untuk desimal. Contoh: 10, 5, 20.5');
+        $sheet->getComment('I1')->getText()->createTextRun('Bisa diisi lebih dari satu (pisahkan dengan koma). Contoh: Kg, Liter, Kg');
+        $sheet->getComment('J1')->getText()->createTextRun('Bisa diisi lebih dari satu (pisahkan dengan koma). Gunakan TITIK (.) untuk desimal atau ribuan tanpa pemisah. Contoh: 100000, 50000, 200000');
+
+
       },
     ];
   }

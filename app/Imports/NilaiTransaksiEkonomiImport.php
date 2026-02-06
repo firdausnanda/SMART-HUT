@@ -26,9 +26,9 @@ class NilaiTransaksiEkonomiImport implements ToModel, WithHeadingRow, WithValida
       'nama_kecamatan' => 'required|string', // Matches template: Nama Kecamatan
       'nama_desa' => 'required|string',      // Matches template: Nama Desa
       'komoditas' => 'required|string',
-      'volume_produksi' => 'required|numeric',
+      'volume_produksi' => 'required|string',
       'satuan' => 'required|string',
-      'nilai_transaksi_rp' => 'required|numeric',
+      'nilai_transaksi_rp' => 'required|string',
     ];
   }
 
@@ -57,11 +57,10 @@ class NilaiTransaksiEkonomiImport implements ToModel, WithHeadingRow, WithValida
     $bulanInfo = $row['bulan_1_12'] ?? $row['bulan'] ?? null;
 
     if (!$kabupatenInfo || !$kecamatanInfo || !$desaInfo || !$bulanInfo) {
-      // Should have been caught by validation, but if keys mismatch validation might behave oddly or we need manual check
       return null;
     }
 
-    // 1. Lookup Location IDs using DB facade for performance
+    // 1. Lookup Location IDs
     $regency = DB::table('m_regencies')
       ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($kabupatenInfo)) . '%'])
       ->first();
@@ -118,25 +117,66 @@ class NilaiTransaksiEkonomiImport implements ToModel, WithHeadingRow, WithValida
       'total_nilai_transaksi' => 0,
     ]);
 
-    // 3. Find or Create Commodity
-    $commodityName = trim($row['komoditas']);
-    $commodity = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')->firstOrCreate(
-      ['name' => $commodityName],
-      ['is_nilai_transaksi_ekonomi' => true]
-    );
+    // 3. Parse Multi-input details
+    $commodities = array_map('trim', explode(',', (string) $row['komoditas']));
+    $volumes = array_map('trim', explode(',', (string) $row['volume_produksi']));
+    $satuans = array_map('trim', explode(',', (string) $row['satuan']));
+    $nilais = array_map('trim', explode(',', (string) $row['nilai_transaksi_rp']));
 
-    // 4. Create Detail
-    $nilai = $row['nilai_transaksi_rp'] ?? 0;
+    // Use the count of commodities as the baseline
+    $count = count($commodities);
 
-    $transaction->details()->create([
-      'commodity_id' => $commodity->id,
-      'volume_produksi' => $row['volume_produksi'],
-      'satuan' => $row['satuan'],
-      'nilai_transaksi' => $nilai,
-    ]);
+    for ($i = 0; $i < $count; $i++) {
+      $commodityName = $commodities[$i] ?? null;
+      if (!$commodityName)
+        continue;
 
-    // 5. Update Total on Parent
-    $transaction->increment('total_nilai_transaksi', $nilai);
+      // Handle numeric formatting for volume and value
+      // Since comma is the multi-item separator, we advise users to use DOT for decimals.
+      // We still handle Indonesian format (1.000,50) if it's a SINGLE value, 
+      // but in a multi-value list, commas will be split first.
+      $volumeStr = $volumes[$i] ?? '0';
+      if ($volumeStr !== '') {
+        // If there is a dot AND it looks like a thousands separator (e.g. 1.000)
+        // But wait, if they follow the rule "use dot for decimal", then 1.000 is 1.0
+        // For now, let's just clean it up moderately.
+        $volumeStr = str_replace([' ', "\r", "\n"], '', $volumeStr);
+        // If it's a single value with no commas but has dot, we trust it's a decimal or just a number.
+        // If it has a comma, it was likely NOT split by the top-level explode (which shouldn't happen).
+        $volume = (float) str_replace(',', '.', $volumeStr);
+      } else {
+        $volume = 0;
+      }
+
+      $nilaiStr = $nilais[$i] ?? '0';
+      if ($nilaiStr !== '') {
+        $nilaiStr = str_replace([' ', "\r", "\n", '.'], '', $nilaiStr); // Remove dots (thousands)
+        $nilaiStr = str_replace(',', '.', $nilaiStr); // Replace comma (decimal)
+        $nilai = (float) $nilaiStr;
+      } else {
+        $nilai = 0;
+      }
+
+
+      $satuan = $satuans[$i] ?? '-';
+
+      // Find or Create Commodity
+      $commodity = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')->firstOrCreate(
+        ['name' => $commodityName],
+        ['is_nilai_transaksi_ekonomi' => true]
+      );
+
+      // Create Detail
+      $transaction->details()->create([
+        'commodity_id' => $commodity->id,
+        'volume_produksi' => $volume,
+        'satuan' => $satuan,
+        'nilai_transaksi' => $nilai,
+      ]);
+
+      // Update Total on Parent
+      $transaction->increment('total_nilai_transaksi', $nilai);
+    }
 
     return $transaction;
   }
