@@ -890,7 +890,15 @@ export default function Authenticated({ user, header, children }) {
                                             { name: 'Data Provinsi', route: route('provinces.index'), pattern: 'provinces.*' },
                                             { name: 'Data Kabupaten/Kota', route: route('regencies.index'), pattern: 'regencies.*' },
                                             { name: 'Data Kecamatan', route: route('districts.index'), pattern: 'districts.*' },
-                                            { name: 'Data Desa/Kelurahan', route: route('villages.index'), pattern: 'villages.*' }
+                                            { name: 'Data Desa/Kelurahan', route: route('villages.index'), pattern: 'villages.*' },
+                                            { name: 'Data Bangunan KTA', route: route('bangunan-kta.index'), pattern: 'bangunan-kta.*' },
+                                            { name: 'Data Sumber Dana', route: route('sumber-dana.index'), pattern: 'sumber-dana.*' },
+                                            { name: 'Data Komoditas', route: route('commodities.index'), pattern: 'commodities.*' },
+                                            { name: 'Data Bukan Kayu', route: route('bukan-kayu.index'), pattern: 'bukan-kayu.*' },
+                                            { name: 'Data Kayu', route: route('kayu.index'), pattern: 'kayu.*' },
+                                            { name: 'Data Jenis Produksi', route: route('jenis-produksi.index'), pattern: 'jenis-produksi.*' },
+                                            { name: 'Data Pengelola Wisata', route: route('pengelola-wisata.index'), pattern: 'pengelola-wisata.*' },
+                                            { name: 'Data Skema Perf. Sosial', route: route('skema-perhutanan-sosial.index'), pattern: 'skema-perhutanan-sosial.*' }
                                         ].map((item) => (
                                             <Link
                                                 key={item.name}
