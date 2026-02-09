@@ -117,6 +117,10 @@ class NilaiTransaksiEkonomiImport implements ToModel, WithHeadingRow, WithValida
       'total_nilai_transaksi' => 0,
     ]);
 
+    if (!$transaction->wasRecentlyCreated) {
+      $transaction->update(['status' => 'draft']);
+    }
+
     // 3. Parse Multi-input details
     $commodities = array_map('trim', explode(',', (string) $row['komoditas']));
     $volumes = array_map('trim', explode(',', (string) $row['volume_produksi']));
