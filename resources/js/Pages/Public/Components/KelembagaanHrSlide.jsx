@@ -8,7 +8,7 @@ const KelembagaanHrSlide = ({ stats, commonOptions }) => {
       labels: stats?.kelembagaan_hr?.class_distribution ? stats.kelembagaan_hr.class_distribution.map(d => d.class_name) : [],
       datasets: [{
         data: stats?.kelembagaan_hr?.class_distribution ? stats.kelembagaan_hr.class_distribution.map(d => d.count) : [],
-        backgroundColor: ['#4d7c0f', '#65a30d', '#84cc16', '#a3e635'],
+        backgroundColor: ['#166534', '#d97706', '#0284c7', '#e11d48'],
         borderWidth: 2,
         borderColor: '#ffffff',
         hoverOffset: 10,
@@ -99,7 +99,30 @@ const KelembagaanHrSlide = ({ stats, commonOptions }) => {
     ...commonOptions,
     maintainAspectRatio: false,
     indexAxis: 'y',
-    plugins: { ...commonOptions.plugins, legend: { display: false } }
+    plugins: { ...commonOptions.plugins, legend: { display: false } },
+    scales: {
+      ...commonOptions.scales,
+      y: {
+        ...commonOptions.scales?.y,
+        ticks: {
+          ...commonOptions.scales?.y?.ticks,
+          font: { size: 9, family: "'Inter', sans-serif" },
+          color: '#64748b',
+          callback: function (value) {
+            const label = this.getLabelForValue(value);
+            return label.length > 18 ? label.substring(0, 18) + '…' : label;
+          }
+        }
+      },
+      x: {
+        ...commonOptions.scales?.x,
+        ticks: {
+          ...commonOptions.scales?.x?.ticks,
+          font: { size: 9, family: "'Inter', sans-serif" },
+          color: '#64748b',
+        }
+      }
+    }
   }), [commonOptions]);
 
   const topCommoditiesOptions = useMemo(() => ({
