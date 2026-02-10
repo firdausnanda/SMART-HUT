@@ -1,4 +1,4 @@
-# KDA - Sistem Informasi Data Kehutanan
+# SMART - HUT - Sistem Informasi Data Kehutanan
 
 Aplikasi **KDA** adalah sistem informasi berbasis web yang dibangun untuk mengelola dan memonitor data kehutanan secara terintegrasi. Sistem ini mencakup berbagai modul mulai dari rehabilitasi lahan, perhutanan sosial, hasil hutan, hingga nilai transaksi ekonomi.
 
