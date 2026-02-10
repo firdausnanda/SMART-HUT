@@ -1,59 +1,118 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# KDA - Sistem Informasi Data Kehutanan
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi **KDA** adalah sistem informasi berbasis web yang dibangun untuk mengelola dan memonitor data kehutanan secara terintegrasi. Sistem ini mencakup berbagai modul mulai dari rehabilitasi lahan, perhutanan sosial, hasil hutan, hingga nilai transaksi ekonomi.
 
-## About Laravel
+Dibangun dengan teknologi modern menggunakan **Laravel 10** dan **Inertia.js (React)** untuk memberikan pengalaman pengguna yang responsif dan interaktif.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Teknologi yang Digunakan
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Backend:** [Laravel 10](https://laravel.com)
+- **Frontend:** [Inertia.js](https://inertiajs.com) dengan [React](https://react.dev)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com)
+- **Database:** MySQL
+- **Charts:** Chart.js (React Chartjs 2)
+- **Excel:** Maatwebsite Laravel Excel
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🔥 Fitur Utama
 
-## Learning Laravel
+Sistem ini memiliki berbagai modul pengelolaan data, antara lain:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 1. Rehabilitasi & Lingkungan
+- **Rehabilitasi Lahan (RHL):** Monitoring kegiatan rehabilitasi lahan kritis.
+- **Penghijauan Lingkungan:** Data kegiatan penghijauan di lingkungan masyarakat.
+- **Rehabilitasi Mangrove:** Program pemulihan ekosistem mangrove.
+- **RHL Teknis & Reboisasi PS:** Pengelolaan teknis dan reboisasi di area Perhutanan Sosial.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Perhutanan Sosial & Kelompok Tani
+- **Perkembangan KTH:** Data Kelompok Tani Hutan.
+- **Perkembangan KUPS:** Monitoring Kelompok Usaha Perhutanan Sosial.
+- **SK Perhutanan Sosial (SKPS):** Administrasi SK Perhutanan Sosial.
 
-## Laravel Sponsors
+### 3. Hasil Hutan & Ekonomi
+- **Hasil Hutan Kayu & Bukan Kayu:** Pencatatan produksi hasil hutan.
+- **Nilai Ekonomi (NEKON):** Analisis nilai ekonomi sumber daya hutan.
+- **Nilai Transaksi Ekonomi:** Monitoring transaksi ekonomi dari produk kehutanan.
+- **Realisasi PNBP:** Penerimaan Negara Bukan Pajak sektor kehutanan.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 4. Lainnya
+- **Kebakaran Hutan:** Data kejadian dan penanganan kebakaran hutan.
+- **Pengunjung Wisata:** Data kunjungan ke objek wisata alam.
+- **Master Data:** Pengelolaan data wilayah, komoditas, sumber dana, dll.
 
-### Premium Partners
+### 5. Utilitas
+- **Dashboard Interaktif:** Statistik visual (Grafik & Peta).
+- **Import/Export Excel:** Kemudahan input dan laporan data massal.
+- **Manajemen User:** Role-based access control.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🛠️ Instalasi
 
-## Contributing
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi di lingkungan lokal Anda (disarankan menggunakan **Laragon** atau **Laravel Herd** di Windows).
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Prasyarat
+- PHP >= 8.1
+- Composer
+- Node.js & NPM
+- MySQL
 
-## Code of Conduct
+### Langkah-langkah
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/username/kda.git
+   cd kda
+   ```
 
-## Security Vulnerabilities
+2. **Install Dependencies PHP**
+   ```bash
+   composer install
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+3. **Install Dependencies JavaScript**
+   ```bash
+   npm install
+   ```
 
-## License
+4. **Konfigurasi Environment**
+   Salin file `.env.example` menjadi `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+   Atur konfigurasi database di file `.env`:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=nama_database_kda
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+5. **Generate Application Key**
+   ```bash
+   php artisan key:generate
+   ```
+
+6. **Migrasi Database**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+7. **Jalankan Aplikasi**
+   Buka dua terminal berbeda untuk menjalankan server PHP dan Vite:
+
+   *Terminal 1 (Laravel Server):*
+   ```bash
+   php artisan serve
+   ```
+
+   *Terminal 2 (Vite Dev Server):*
+   ```bash
+   npm run dev
+   ```
+
+8. **Akses Aplikasi**
+   Buka browser dan kunjungi `http://localhost:8000`.
+
+## 📄 Lisensi
+
+Aplikasi ini adalah perangkat lunak propertari. Hak cipta dilindungi undang-undang.
