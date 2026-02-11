@@ -22,7 +22,23 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
   public function __construct($forestType)
   {
     $this->forestType = $forestType;
-    $this->commodities = BukanKayu::all();
+    $orderedNames = [
+      'Bambu',
+      'Getah Pinus',
+      'Daun Kayu Putih',
+      'Porang',
+      'Kopi',
+      'Madu',
+      'Durian',
+      'Alpukat',
+      'Jahe',
+      'Kunyit'
+    ];
+    $all = BukanKayu::all();
+    $this->commodities = $all->sortBy(function ($model) use ($orderedNames) {
+      $index = array_search($model->name, $orderedNames);
+      return $index === false ? 9999 + $model->id : $index;
+    })->values();
   }
 
   public function rules(): array
