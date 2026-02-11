@@ -331,7 +331,16 @@ export default function Edit({ auth, data: item, pengelolaWisata }) {
                     styles={selectStyles}
                     menuPlacement="top"
                     isClearable
-                    value={pengelolaWisata.find(pw => pw.id === data.id_pengelola_wisata) ? { value: data.id_pengelola_wisata, label: pengelolaWisata.find(pw => pw.id === data.id_pengelola_wisata).name } : null}
+                    value={(() => {
+                      const id = data.id_pengelola_wisata;
+                      const found = pengelolaWisata.find(pw => pw.id == id);
+                      if (found) return { value: found.id, label: found.name };
+                      if (id == item.id_pengelola_wisata) {
+                        const rel = item.pengelolaWisata || item.pengelola_wisata;
+                        if (rel) return { value: rel.id, label: rel.name };
+                      }
+                      return null;
+                    })()}
                   />
                   <InputError message={errors.id_pengelola_wisata} className="mt-2" />
                 </div>

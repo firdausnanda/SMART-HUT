@@ -182,7 +182,7 @@ export default function Edit({ auth, data: transactionData, commodities }) {
                   placeholder="Pilih Kabupaten..."
                   styles={selectStyles}
                   isClearable
-                  value={regencies.find(r => r.value === data.regency_id) || null}
+                  value={regencies.find(r => r.value === data.regency_id) || (data.regency_id === transactionData.regency_id && transactionData.regency_rel ? { value: transactionData.regency_rel.id, label: formatLabel(transactionData.regency_rel.name) } : null)}
                   menuPortalTarget={document.body}
                   menuPosition="fixed"
                 />
@@ -198,7 +198,7 @@ export default function Edit({ auth, data: transactionData, commodities }) {
                   placeholder="Pilih Kecamatan..."
                   styles={selectStyles}
                   isClearable
-                  value={districts.find(d => d.value === data.district_id) || null}
+                  value={districts.find(d => d.value === data.district_id) || (data.district_id === transactionData.district_id && transactionData.district_rel ? { value: transactionData.district_rel.id, label: formatLabel(transactionData.district_rel.name) } : null)}
                   menuPortalTarget={document.body}
                   menuPosition="fixed"
                 />
@@ -214,7 +214,7 @@ export default function Edit({ auth, data: transactionData, commodities }) {
                   placeholder="Pilih Desa..."
                   styles={selectStyles}
                   isClearable
-                  value={villages.find(v => v.value === data.village_id) || null}
+                  value={villages.find(v => v.value === data.village_id) || (data.village_id === transactionData.village_id && transactionData.village_rel ? { value: transactionData.village_rel.id, label: formatLabel(transactionData.village_rel.name) } : null)}
                   menuPortalTarget={document.body}
                   menuPosition="fixed"
                 />
@@ -278,7 +278,7 @@ export default function Edit({ auth, data: transactionData, commodities }) {
                       <label className="block md:hidden text-xs font-bold text-gray-500 uppercase mb-1">Satuan</label>
                       <Select
                         options={satuanOptions}
-                        value={satuanOptions.find(s => s.value === detail.satuan)}
+                        value={satuanOptions.find(s => s.value === detail.satuan) || (detail.satuan ? { value: detail.satuan, label: detail.satuan } : null)}
                         onChange={(opt) => updateDetail(index, 'satuan', opt?.value)}
                         styles={selectStyles}
                         menuPortalTarget={document.body}

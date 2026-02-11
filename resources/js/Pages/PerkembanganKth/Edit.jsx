@@ -255,7 +255,7 @@ export default function Edit({ auth, data: kthData }) {
                     placeholder="Pilih Kabupaten..."
                     styles={selectStyles}
                     isClearable
-                    value={regencies.find(r => r.value === data.regency_id) || null}
+                    value={regencies.find(r => r.value === data.regency_id) || (data.regency_id === kthData.regency_id && kthData.regency_rel ? { value: kthData.regency_rel.id, label: formatLabel(kthData.regency_rel.name) } : null)}
                   />
                   <InputError message={errors.regency_id} className="mt-2" />
                 </div>
@@ -276,7 +276,7 @@ export default function Edit({ auth, data: kthData }) {
                     placeholder="Pilih Kecamatan..."
                     styles={selectStyles}
                     isClearable
-                    value={districts.find(d => d.value === data.district_id) || null}
+                    value={districts.find(d => d.value === data.district_id) || (data.district_id === kthData.district_id && kthData.district_rel ? { value: kthData.district_rel.id, label: formatLabel(kthData.district_rel.name) } : null)}
                   />
                   <InputError message={errors.district_id} className="mt-2" />
                 </div>
@@ -291,7 +291,7 @@ export default function Edit({ auth, data: kthData }) {
                     placeholder="Pilih Desa..."
                     styles={selectStyles}
                     isClearable
-                    value={villages.find(v => v.value === data.village_id) || null}
+                    value={villages.find(v => v.value === data.village_id) || (data.village_id === kthData.village_id && kthData.village_rel ? { value: kthData.village_rel.id, label: formatLabel(kthData.village_rel.name) } : null)}
                   />
                   <InputError message={errors.village_id} className="mt-2" />
                 </div>
