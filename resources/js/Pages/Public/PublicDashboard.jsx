@@ -66,6 +66,21 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
     return () => clearInterval(interval);
   }, []);
 
+  // Auto-reload data every 5 minutes
+  useEffect(() => {
+    const reloadInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        router.reload({
+          only: ['stats'],
+          preserveScroll: true,
+          preserveState: true,
+        });
+      }
+    }, 1 * 60 * 1000); // 1 minutes
+
+    return () => clearInterval(reloadInterval);
+  }, []);
+
   const handleYearChange = (selectedOption) => {
     router.get(route('public.dashboard'), { year: selectedOption.value }, {
       preserveScroll: true,
