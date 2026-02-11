@@ -58,16 +58,25 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
 
     router.get(route('nilai-ekonomi.index'), newParams, {
       preserveState: true,
-      preserveScroll: true
+      preserveScroll: true,
+      onStart: () => {
+        setLoadingText('Mengurutkan Data...');
+        setIsLoading(true);
+      },
+      onFinish: () => setIsLoading(false)
     });
   };
 
   const handlePerPageChange = (perPage) => {
     const newParams = { ...params, per_page: perPage };
     setParams(newParams);
+    setLoadingText('Memuat Ulang...');
+    setIsLoading(true);
     router.get(route('nilai-ekonomi.index'), newParams, {
       preserveState: true,
-      preserveScroll: true
+      preserveScroll: true,
+      onStart: () => setIsLoading(true),
+      onFinish: () => setIsLoading(false)
     });
   };
 
@@ -76,7 +85,12 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
     setParams(newParams);
     router.get(route('nilai-ekonomi.index'), newParams, {
       preserveState: true,
-      preserveScroll: true
+      preserveScroll: true,
+      onStart: () => {
+        setLoadingText('Memuat Data Tahun ' + year + '...');
+        setIsLoading(true);
+      },
+      onFinish: () => setIsLoading(false)
     });
   };
 

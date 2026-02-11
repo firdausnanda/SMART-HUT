@@ -78,7 +78,15 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
     const year = option.value;
     const newParams = { ...params, year };
     setParams(newParams);
-    router.get(route('nilai-transaksi-ekonomi.index'), newParams, { preserveState: true, preserveScroll: true });
+    router.get(route('nilai-transaksi-ekonomi.index'), newParams, {
+      preserveState: true,
+      preserveScroll: true,
+      onStart: () => {
+        setLoadingText('Memuat Data Tahun ' + year + '...');
+        setIsLoading(true);
+      },
+      onFinish: () => setIsLoading(false)
+    });
   };
 
   const yearOptions = availableYears.map(year => ({ value: year, label: `Tahun ${year}` }));
@@ -93,7 +101,12 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
 
     router.get(route('nilai-transaksi-ekonomi.index'), newParams, {
       preserveState: true,
-      preserveScroll: true
+      preserveScroll: true,
+      onStart: () => {
+        setLoadingText('Mengurutkan Data...');
+        setIsLoading(true);
+      },
+      onFinish: () => setIsLoading(false)
     });
   };
 
@@ -108,6 +121,7 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
       {
         preserveState: true,
         preserveScroll: true,
+        onStart: () => setIsLoading(true),
         onFinish: () => setIsLoading(false)
       }
     );

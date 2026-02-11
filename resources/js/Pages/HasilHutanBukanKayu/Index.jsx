@@ -67,10 +67,13 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
       {
         preserveState: true,
         preserveScroll: true,
-        replace: true
+        replace: true,
+        onStart: () => {
+          setLoadingText('Mengurutkan Data...');
+          setIsLoading(true);
+        },
+        onFinish: () => setIsLoading(false)
       }
-
-
     );
   };
 
@@ -91,6 +94,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
         preserveState: true,
         preserveScroll: true,
         replace: true,
+        onStart: () => setIsLoading(true),
         onFinish: () => setIsLoading(false)
       }
     );
@@ -266,6 +270,11 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
     }, {
       preserveState: true,
       preserveScroll: true,
+      onStart: () => {
+        setLoadingText('Memuat Data Tahun ' + selectedYear + '...');
+        setIsLoading(true);
+      },
+      onFinish: () => setIsLoading(false)
     });
   };
 
