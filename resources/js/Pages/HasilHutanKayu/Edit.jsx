@@ -393,7 +393,7 @@ export default function Edit({ auth, data: item, kayu_list, pengelola_hutan_list
                               onChange={(opt) => updateDetail(index, 'kayu_id', opt?.value)}
                               placeholder="Pilih Jenis Kayu..."
                               styles={selectStyles}
-                              menuPlacement="auto"
+                              menuPlacement="top"
                             />
                             <InputError message={errors[`details.${index}.kayu_id`]} className="mt-1" />
                           </div>

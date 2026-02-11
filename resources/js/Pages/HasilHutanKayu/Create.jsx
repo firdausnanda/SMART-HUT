@@ -406,7 +406,7 @@ export default function Create({ auth, kayu_list, forest_type, pengelola_hutan_l
                               onChange={(opt) => updateDetail(index, 'kayu_id', opt?.value)}
                               placeholder="Pilih Jenis Kayu..."
                               styles={selectStyles}
-                              menuPlacement="auto"
+                              menuPlacement="top"
                             />
                             <InputError message={errors[`details.${index}.kayu_id`]} className="mt-1" />
                           </div>

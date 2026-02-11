@@ -397,7 +397,7 @@ export default function Edit({ auth, data: data_item, bukan_kayu_list = [], peng
                               onChange={(opt) => updateDetail(index, 'bukan_kayu_id', opt?.value || '')}
                               placeholder="Pilih Bukan Kayu..."
                               styles={selectStyles}
-                              menuPlacement="auto"
+                              menuPlacement="top"
                               isClearable
                               value={bukan_kayu_list?.find(k => k.id === detail.bukan_kayu_id) ? { value: detail.bukan_kayu_id, label: bukan_kayu_list.find(k => k.id === detail.bukan_kayu_id).name } : null}
                             />
@@ -423,7 +423,7 @@ export default function Edit({ auth, data: data_item, bukan_kayu_list = [], peng
                               onChange={(opt) => updateDetail(index, 'unit', opt?.value || 'Kg')}
                               placeholder="Pilih Satuan..."
                               styles={selectStyles}
-                              menuPlacement="auto"
+                              menuPlacement="top"
                               isClearable={false}
                             />
                             {errors[`details.${index}.unit`] && <InputError message="Wajib diisi." className="mt-1" />}
