@@ -111,7 +111,24 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
 
     // Build Details array from dynamic columns
     $detailsData = [];
-    $allKayu = Kayu::all();
+
+    $orderedNames = [
+      'Jati',
+      'Sengon',
+      'Mahoni',
+      'Gmelina',
+      'Sonokeling',
+      'Pinus',
+      'Akasia',
+      'Mindi',
+      'Balsa',
+      'Jabon',
+      'Kayu Lainnya'
+    ];
+    $allKayu = Kayu::all()->sortBy(function ($model) use ($orderedNames) {
+      $index = array_search($model->name, $orderedNames);
+      return $index === false ? 9999 + $model->id : $index;
+    })->values();
 
     foreach ($allKayu as $kayu) {
       $slugName = \Illuminate\Support\Str::slug($kayu->name, '_');

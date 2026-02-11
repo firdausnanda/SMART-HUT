@@ -20,7 +20,23 @@ class HasilHutanKayuTemplateExport implements WithHeadings, ShouldAutoSize, With
 
   public function __construct($forestType = 'Hutan Negara')
   {
-    $this->kayus = Kayu::all();
+    $orderedNames = [
+      'Jati',
+      'Sengon',
+      'Mahoni',
+      'Gmelina',
+      'Sonokeling',
+      'Pinus',
+      'Akasia',
+      'Mindi',
+      'Balsa',
+      'Jabon',
+      'Kayu Lainnya'
+    ];
+    $this->kayus = Kayu::all()->sortBy(function ($model) use ($orderedNames) {
+      $index = array_search($model->name, $orderedNames);
+      return $index === false ? 9999 + $model->id : $index;
+    })->values();
     $this->forestType = $forestType;
   }
 
