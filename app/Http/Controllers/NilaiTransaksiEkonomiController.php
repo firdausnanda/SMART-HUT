@@ -8,6 +8,7 @@ use App\Models\NilaiTransaksiEkonomiDetail;
 use App\Actions\BulkWorkflowAction;
 use App\Actions\SingleWorkflowAction;
 use App\Enums\WorkflowAction;
+use App\Enums\Satuan;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -178,6 +179,7 @@ class NilaiTransaksiEkonomiController extends Controller
       'commodities' => Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
         ->where('is_nilai_transaksi_ekonomi', true)
         ->get(),
+      'satuanOptions' => collect(Satuan::cases())->map(fn($s) => ['value' => $s->value, 'label' => $s->label()]),
     ]);
   }
 
@@ -232,6 +234,7 @@ class NilaiTransaksiEkonomiController extends Controller
       'commodities' => Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
         ->where('is_nilai_transaksi_ekonomi', true)
         ->get(),
+      'satuanOptions' => collect(Satuan::cases())->map(fn($s) => ['value' => $s->value, 'label' => $s->label()]),
     ]);
   }
 

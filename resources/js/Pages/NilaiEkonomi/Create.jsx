@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
 
-export default function Create({ auth, commodities }) {
+export default function Create({ auth, commodities, satuanOptions }) {
   const { data, setData, post, processing, errors } = useForm({
     nama_kelompok: '',
     year: new Date().getFullYear(),
@@ -68,16 +68,7 @@ export default function Create({ auth, commodities }) {
   const commodityOptions = localCommodities.map(c => ({ value: c.id, label: c.name }));
   const monthOptions = Array.from({ length: 12 }, (_, i) => ({ value: i + 1, label: new Date(0, i).toLocaleString('id-ID', { month: 'long' }) }));
   const yearOptions = Array.from({ length: 5 }, (_, i) => ({ value: new Date().getFullYear() - i, label: (new Date().getFullYear() - i).toString() }));
-  const satuanOptions = [
-    { value: 'Kg', label: 'Kilogram (Kg)' },
-    { value: 'Ton', label: 'Ton' },
-    { value: 'M3', label: 'Meter Kubik (M³)' },
-    { value: 'Liter', label: 'Liter' },
-    { value: 'Batang', label: 'Batang' },
-    { value: 'Pengunjung', label: 'Pengunjung' },
-    { value: 'Kendaraan', label: 'Kendaraan' },
-    { value: 'Butir', label: 'Butir' },
-  ];
+
 
   const submit = (e) => {
     e.preventDefault();
@@ -346,6 +337,7 @@ export default function Create({ auth, commodities }) {
                         onChange={(opt) => updateDetail(index, 'satuan', opt?.value)}
                         styles={selectStyles}
                         menuPortalTarget={document.body}
+                        menuPlacement="top"
                         menuPosition="fixed"
                       />
                       <InputError message={errors[`details.${index}.satuan`]} className="mt-1" />

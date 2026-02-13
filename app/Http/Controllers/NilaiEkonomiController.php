@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use App\Actions\BulkWorkflowAction;
 use App\Actions\SingleWorkflowAction;
 use App\Enums\WorkflowAction;
+use App\Enums\Satuan;
 use Illuminate\Validation\Rule;
 
 class NilaiEkonomiController extends Controller
@@ -136,6 +137,7 @@ class NilaiEkonomiController extends Controller
 
         return Inertia::render('NilaiEkonomi/Create', [
             'commodities' => $commodities,
+            'satuanOptions' => collect(Satuan::cases())->map(fn($s) => ['value' => $s->value, 'label' => $s->label()]),
         ]);
     }
 
@@ -197,6 +199,7 @@ class NilaiEkonomiController extends Controller
         return Inertia::render('NilaiEkonomi/Edit', [
             'nilaiEkonomi' => $nilaiEkonomi,
             'commodities' => $commodities,
+            'satuanOptions' => collect(Satuan::cases())->map(fn($s) => ['value' => $s->value, 'label' => $s->label()]),
         ]);
     }
 

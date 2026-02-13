@@ -10,7 +10,7 @@ import axios from 'axios';
 import Modal from '@/Components/Modal';
 import CurrencyInput from '@/Components/CurrencyInput';
 
-export default function Edit({ auth, data: transactionData, commodities }) {
+export default function Edit({ auth, data: transactionData, commodities, satuanOptions }) {
   const { data, setData, put, processing, errors } = useForm({
     year: transactionData.year || new Date().getFullYear(),
     month: transactionData.month || new Date().getMonth() + 1,
@@ -118,13 +118,7 @@ export default function Edit({ auth, data: transactionData, commodities }) {
 
   const commodityOptions = localCommodities.map(c => ({ value: c.id, label: c.name }));
 
-  const satuanOptions = [
-    { value: 'Kg', label: 'Kilogram (Kg)' },
-    { value: 'Ton', label: 'Ton' },
-    { value: 'M3', label: 'Meter Kubik (M³)' },
-    { value: 'Liter', label: 'Liter' },
-    { value: 'Batang', label: 'Batang' },
-  ];
+
 
   const selectStyles = {
     control: (base, state) => ({ ...base, borderRadius: '0.75rem', padding: '2px', backgroundColor: state.isDisabled ? '#f3f4f6' : '#f9fafb', borderColor: state.isDisabled ? '#f3f4f6' : '#e5e7eb', boxShadow: state.isFocused ? '0 0 0 1px #16a34a' : 'none', '&:hover': { borderColor: state.isDisabled ? '#f3f4f6' : '#16a34a' }, cursor: state.isDisabled ? 'not-allowed' : 'default' }),
@@ -282,6 +276,7 @@ export default function Edit({ auth, data: transactionData, commodities }) {
                         onChange={(opt) => updateDetail(index, 'satuan', opt?.value)}
                         styles={selectStyles}
                         menuPortalTarget={document.body}
+                        menuPlacement="top"
                         menuPosition="fixed"
                       />
                       <InputError message={errors[`details.${index}.satuan`]} className="mt-1" />
