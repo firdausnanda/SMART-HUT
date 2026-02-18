@@ -16,6 +16,7 @@ use App\Http\Controllers\NilaiEkonomiController;
 use App\Http\Controllers\NilaiTransaksiEkonomiController;
 use App\Http\Controllers\PbphhController;
 use App\Http\Controllers\PengelolaWisataController;
+use App\Http\Controllers\PengelolaPsController;
 use App\Http\Controllers\PengunjungWisataController;
 use App\Http\Controllers\PerkembanganKthController;
 use App\Http\Controllers\ProfileController;
@@ -220,6 +221,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('kayu', KayuController::class);
     Route::resource('jenis-produksi', JenisProduksiController::class);
     Route::resource('pengelola-wisata', PengelolaWisataController::class);
+    Route::resource('pengelola-ps', PengelolaPsController::class);
     Route::resource('skema-perhutanan-sosial', SkemaPerhutananSosialController::class);
 
     Route::get('clear-cache', function () {

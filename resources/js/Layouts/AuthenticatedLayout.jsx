@@ -29,8 +29,8 @@ export default function Authenticated({ user, header, children }) {
         kelembagaan_perhutanan_sosial_mobile: route().current('skps.*') || route().current('kups.*') || route().current('nilai-ekonomi.*'),
         kelembagaan_hutan_rakyat: route().current('perkembangan-kth.*') || route().current('nilai-transaksi-ekonomi.*'),
         kelembagaan_hutan_rakyat_mobile: route().current('perkembangan-kth.*') || route().current('nilai-transaksi-ekonomi.*'),
-        data_master: route().current('provinces.*') || route().current('regencies.*') || route().current('districts.*') || route().current('villages.*') || route().current('bangunan-kta.*') || route().current('sumber-dana.*') || route().current('commodities.*') || route().current('bukan-kayu.*') || route().current('kayu.*') || route().current('jenis-produksi.*') || route().current('pengelola-wisata.*') || route().current('skema-perhutanan-sosial.*'),
-        data_master_mobile: route().current('provinces.*') || route().current('regencies.*') || route().current('districts.*') || route().current('villages.*') || route().current('bangunan-kta.*') || route().current('sumber-dana.*') || route().current('commodities.*') || route().current('bukan-kayu.*') || route().current('kayu.*') || route().current('jenis-produksi.*') || route().current('pengelola-wisata.*') || route().current('skema-perhutanan-sosial.*')
+        data_master: route().current('provinces.*') || route().current('regencies.*') || route().current('districts.*') || route().current('villages.*') || route().current('bangunan-kta.*') || route().current('sumber-dana.*') || route().current('commodities.*') || route().current('bukan-kayu.*') || route().current('kayu.*') || route().current('jenis-produksi.*') || route().current('pengelola-wisata.*') || route().current('pengelola-ps.*') || route().current('skema-perhutanan-sosial.*'),
+        data_master_mobile: route().current('provinces.*') || route().current('regencies.*') || route().current('districts.*') || route().current('villages.*') || route().current('bangunan-kta.*') || route().current('sumber-dana.*') || route().current('commodities.*') || route().current('bukan-kayu.*') || route().current('kayu.*') || route().current('jenis-produksi.*') || route().current('pengelola-wisata.*') || route().current('pengelola-ps.*') || route().current('skema-perhutanan-sosial.*')
     });
 
     const { flash, auth } = usePage().props;
@@ -454,6 +454,7 @@ export default function Authenticated({ user, header, children }) {
                                             { name: 'Data Kayu', route: route('kayu.index'), pattern: 'kayu.*' },
                                             { name: 'Data Jenis Produksi', route: route('jenis-produksi.index'), pattern: 'jenis-produksi.*' },
                                             { name: 'Data Pengelola Wisata', route: route('pengelola-wisata.index'), pattern: 'pengelola-wisata.*' },
+                                            { name: 'Data Pengelola PS', route: route('pengelola-ps.index'), pattern: 'pengelola-ps.*' },
                                             { name: 'Data Skema Perf. Sosial', route: route('skema-perhutanan-sosial.index'), pattern: 'skema-perhutanan-sosial.*' }
                                         ].map((item) => (
                                             <Link
@@ -913,6 +914,7 @@ export default function Authenticated({ user, header, children }) {
                                             { name: 'Data Kayu', route: route('kayu.index'), pattern: 'kayu.*' },
                                             { name: 'Data Jenis Produksi', route: route('jenis-produksi.index'), pattern: 'jenis-produksi.*' },
                                             { name: 'Data Pengelola Wisata', route: route('pengelola-wisata.index'), pattern: 'pengelola-wisata.*' },
+                                            { name: 'Data Pengelola PS', route: route('pengelola-ps.index'), pattern: 'pengelola-ps.*' },
                                             { name: 'Data Skema Perf. Sosial', route: route('skema-perhutanan-sosial.index'), pattern: 'skema-perhutanan-sosial.*' }
                                         ].map((item) => (
                                             <Link
