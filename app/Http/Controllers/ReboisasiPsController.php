@@ -7,6 +7,7 @@ use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
 use Illuminate\Validation\Rule;
 use App\Models\ReboisasiPS;
+use App\Models\PengelolaPS;
 use App\Models\SumberDana;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -38,6 +39,7 @@ class ReboisasiPsController extends Controller
         'reboisasi_ps.regency_id',
         'reboisasi_ps.district_id',
         'reboisasi_ps.village_id',
+        'reboisasi_ps.pengelola_id',
         'reboisasi_ps.fund_source',
         'reboisasi_ps.target_annual',
         'reboisasi_ps.realization',
@@ -51,6 +53,7 @@ class ReboisasiPsController extends Controller
         'regency_rel:id,name',
         'district_rel:id,name',
         'village_rel:id,name',
+        'pengelola:id,name',
       ])
       ->where('year', $selectedYear)
 
@@ -133,7 +136,8 @@ class ReboisasiPsController extends Controller
   public function create()
   {
     return Inertia::render('ReboisasiPs/Create', [
-      'sumberDana' => SumberDana::all()
+      'sumberDana' => SumberDana::all(),
+      'pengelolaList' => PengelolaPS::select('id', 'name')->orderBy('name')->get(),
     ]);
   }
 
@@ -149,6 +153,7 @@ class ReboisasiPsController extends Controller
       'regency_id' => 'nullable|exists:m_regencies,id',
       'district_id' => 'nullable|exists:m_districts,id',
       'village_id' => 'nullable|exists:m_villages,id',
+      'pengelola_id' => 'required|exists:m_pengelola_ps,id',
       'target_annual' => 'required|numeric',
       'realization' => 'required|numeric',
       'fund_source' => 'required|string',
@@ -176,8 +181,9 @@ class ReboisasiPsController extends Controller
   public function edit(ReboisasiPS $reboisasiPs)
   {
     return Inertia::render('ReboisasiPs/Edit', [
-      'data' => $reboisasiPs->load(['regency_rel', 'district_rel', 'village_rel']),
-      'sumberDana' => SumberDana::all()
+      'data' => $reboisasiPs->load(['regency_rel', 'district_rel', 'village_rel', 'pengelola']),
+      'sumberDana' => SumberDana::all(),
+      'pengelolaList' => PengelolaPS::select('id', 'name')->orderBy('name')->get(),
     ]);
   }
 
@@ -193,6 +199,7 @@ class ReboisasiPsController extends Controller
       'regency_id' => 'nullable|exists:m_regencies,id',
       'district_id' => 'nullable|exists:m_districts,id',
       'village_id' => 'nullable|exists:m_villages,id',
+      'pengelola_id' => 'required|exists:m_pengelola_ps,id',
       'target_annual' => 'required|numeric',
       'realization' => 'required|numeric',
       'fund_source' => 'required|string',

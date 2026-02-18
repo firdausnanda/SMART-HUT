@@ -21,7 +21,7 @@ class ReboisasiPsExport implements FromQuery, WithHeadings, WithMapping, ShouldA
   public function query()
   {
     return ReboisasiPS::query()
-      ->with(['province_rel', 'regency_rel', 'district_rel', 'village_rel', 'creator'])
+      ->with(['province_rel', 'regency_rel', 'district_rel', 'village_rel', 'pengelola', 'creator'])
       ->where('status', 'final')
       ->when($this->year, fn($q) => $q->where('year', $this->year))
       ->orderBy('year', 'desc')
@@ -30,7 +30,7 @@ class ReboisasiPsExport implements FromQuery, WithHeadings, WithMapping, ShouldA
 
   public function headings(): array
   {
-    return ['No', 'Tahun', 'Bulan', 'Provinsi', 'Kabupaten/Kota', 'Kecamatan', 'Desa/Kelurahan', 'Target Tahunan (Ha)', 'Realisasi (Ha)', 'Sumber Dana', 'Status', 'Diinput Oleh', 'Tanggal Input'];
+    return ['No', 'Tahun', 'Bulan', 'Provinsi', 'Kabupaten/Kota', 'Kecamatan', 'Desa/Kelurahan', 'Target Tahunan (Ha)', 'Realisasi (Ha)', 'Sumber Dana', 'Pengelola', 'Status', 'Diinput Oleh', 'Tanggal Input'];
   }
 
   public function map($row): array
@@ -51,6 +51,7 @@ class ReboisasiPsExport implements FromQuery, WithHeadings, WithMapping, ShouldA
       number_format($row->target_annual, 2, ',', '.'),
       number_format($row->realization, 2, ',', '.'),
       $fundSourceLabels[$row->fund_source] ?? $row->fund_source,
+      $row->pengelola->name ?? '-',
       ucfirst($row->status),
       $row->creator->name ?? 'Unknown',
       $row->created_at->format('d-m-Y H:i'),

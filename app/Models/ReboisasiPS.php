@@ -26,6 +26,7 @@ class ReboisasiPS extends Model implements Workflowable
         'regency_id',
         'district_id',
         'village_id',
+        'pengelola_id',
         'coordinates',
         'status',
         'approved_by_kasi_at',
@@ -51,6 +52,11 @@ class ReboisasiPS extends Model implements Workflowable
     public function village_rel()
     {
         return $this->belongsTo(Villages::class, 'village_id');
+    }
+
+    public function pengelola()
+    {
+        return $this->belongsTo(PengelolaPS::class, 'pengelola_id');
     }
 
     public function creator()

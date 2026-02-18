@@ -12,7 +12,7 @@ import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
-export default function Create({ auth, sumberDana }) {
+export default function Create({ auth, sumberDana, pengelolaList }) {
   const { flash } = usePage().props;
   const { data, setData, post, processing, errors } = useForm({
     year: new Date().getFullYear(),
@@ -21,6 +21,7 @@ export default function Create({ auth, sumberDana }) {
     regency_id: '',
     district_id: '',
     village_id: '',
+    pengelola_id: '',
     target_annual: '',
     realization: '',
     fund_source: '',
@@ -382,6 +383,22 @@ export default function Create({ auth, sumberDana }) {
                     placeholder=""
                   />
                   <InputError message={errors.coordinates} className="mt-2" />
+                </div>
+
+                <div>
+                  <InputLabel htmlFor="pengelola_id" value="Pengelola" className="text-gray-700 font-bold mb-2" />
+                  <Select
+                    options={pengelolaList.map(p => ({ value: p.id, label: p.name }))}
+                    onChange={(opt) => setData('pengelola_id', opt?.value || '')}
+                    placeholder="Pilih Pengelola..."
+                    styles={selectStyles}
+                    isClearable
+                    menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                    menuPosition={'fixed'}
+                    menuPlacement="top"
+                    value={data.pengelola_id ? pengelolaList.filter(p => p.id === data.pengelola_id).map(p => ({ value: p.id, label: p.name }))[0] || null : null}
+                  />
+                  <InputError message={errors.pengelola_id} className="mt-2" />
                 </div>
               </div>
 

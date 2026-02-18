@@ -77,6 +77,18 @@ const PembinaanSlide = ({ section, currentYear, commonOptions }) => {
     };
   }, [section.regency, section.types, section.color]);
 
+  const pengelolaChartData = useMemo(() => {
+    const dataObj = section.pengelola || {};
+    return {
+      labels: Object.keys(dataObj),
+      datasets: [{
+        data: Object.values(dataObj),
+        backgroundColor: section.color + 'AA',
+        borderRadius: 6
+      }]
+    };
+  }, [section.pengelola, section.color]);
+
   const totalFundReports = useMemo(() => {
     return Object.values(section.fund || {}).reduce((a, b) => a + (parseInt(b) || 0), 0);
   }, [section.fund]);
@@ -84,6 +96,10 @@ const PembinaanSlide = ({ section, currentYear, commonOptions }) => {
   const totalRegencyItems = useMemo(() => {
     return Object.keys(section.regency || section.types || {}).length;
   }, [section.regency, section.types]);
+
+  const totalPengelola = useMemo(() => {
+    return Object.keys(section.pengelola || {}).length;
+  }, [section.pengelola]);
 
   return (
     <div className="min-w-full px-4">
@@ -140,7 +156,7 @@ const PembinaanSlide = ({ section, currentYear, commonOptions }) => {
               </div>
             </div>
 
-            {/* Bottom Charts: Fund & Regency (Pemberdayaan Style) */}
+            {/* Bottom Charts: Fund, Regency & Pengelola */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
               {/* Fund Source Card */}
@@ -248,6 +264,55 @@ const PembinaanSlide = ({ section, currentYear, commonOptions }) => {
                 </div>
               </div>
             </div>
+
+            {/* Pengelola Card (Optional) */}
+            {section.pengelola && (
+              <div className={`bg-white rounded-3xl p-6 shadow-sm border flex flex-col h-full`} style={{ borderColor: section.color + '30' }}>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className={`p-3 rounded-2xl`} style={{ backgroundColor: section.color + '15', color: section.color }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">Pengelola</h3>
+                    <p className="text-xs text-gray-500">Distribusi Pengelola</p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-6 flex-1">
+                  <div className={`flex flex-col items-center justify-center p-4 rounded-2xl border`} style={{ backgroundColor: section.color + '05', borderColor: section.color + '20' }}>
+                    <span className={`text-[10px] font-bold uppercase tracking-widest mb-1`} style={{ color: section.color }}>Total Pengelola</span>
+                    <span className="text-4xl font-black text-gray-900">
+                      {formatNumber(totalPengelola)}
+                    </span>
+                    <span className="text-xs font-medium text-gray-400 mt-1">Pengelola Terdaftar</span>
+                  </div>
+                  <div className="w-full h-[180px]">
+                    <Bar
+                      data={pengelolaChartData}
+                      options={{
+                        ...commonOptions,
+                        indexAxis: 'y',
+                        maintainAspectRatio: false,
+                        plugins: {
+                          ...commonOptions.plugins,
+                          legend: { display: false },
+                          tooltip: {
+                            callbacks: {
+                              label: (context) => ` Jumlah: ${context.raw} Laporan`
+                            }
+                          }
+                        },
+                        scales: {
+                          x: { grid: { display: false }, ticks: { display: false } },
+                          y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

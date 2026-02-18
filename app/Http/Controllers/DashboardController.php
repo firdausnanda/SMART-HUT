@@ -253,6 +253,14 @@ class DashboardController extends Controller
             // 1.3 Reboisasi PS
             $reboisasiStats = $getStats(ReboisasiPS::class, 'reboisasi_ps');
 
+            // Add Pengelola Stats for Reboisasi PS
+            $reboisasiStats['pengelola'] = ReboisasiPS::join('m_pengelola_ps', 'reboisasi_ps.pengelola_id', '=', 'm_pengelola_ps.id')
+                ->where('reboisasi_ps.year', $currentYear)
+                ->where('reboisasi_ps.status', 'final')
+                ->selectRaw('m_pengelola_ps.name as pengelola, count(reboisasi_ps.id) as total')
+                ->groupBy('m_pengelola_ps.name')
+                ->pluck('total', 'pengelola');
+
             // 1.4 RHL Teknis (Optimized with SQL joins)
             $rhlBase = RhlTeknis::where('year', $currentYear)->where('status', 'final');
 
@@ -326,6 +334,7 @@ class DashboardController extends Controller
                 'reboisasi_target_chart' => $reboisasiStats['target_chart'],
                 'reboisasi_fund' => $reboisasiStats['fund'],
                 'reboisasi_regency' => $reboisasiStats['regency'],
+                'reboisasi_pengelola' => $reboisasiStats['pengelola'],
 
                 'rhl_teknis_total' => (float) $rhlTeknisTotal,
                 'rhl_teknis_target_total' => (float) $rhlTeknisTargetTotal,

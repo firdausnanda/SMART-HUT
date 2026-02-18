@@ -15,7 +15,7 @@ class ReboisasiPsTemplateExport implements WithHeadings, ShouldAutoSize, WithTit
 {
   public function headings(): array
   {
-    return ['Tahun', 'Bulan (Angka)', 'Nama Kabupaten', 'Nama Kecamatan', 'Nama Desa', 'Target Tahunan (Ha)', 'Realisasi (Ha)', 'Sumber Dana'];
+    return ['Tahun', 'Bulan (Angka)', 'Nama Kabupaten', 'Nama Kecamatan', 'Nama Desa', 'Target Tahunan (Ha)', 'Realisasi (Ha)', 'Sumber Dana', 'Pengelola'];
   }
 
   public function title(): string
@@ -39,6 +39,7 @@ class ReboisasiPsTemplateExport implements WithHeadings, ShouldAutoSize, WithTit
           $sheet->getCell("B$i")->setDataValidation(clone $validation);
         }
         $sheet->getComment('H1')->getText()->createTextRun('Isi dengan: apbn, apbd, swasta, swadaya, other');
+        $sheet->getComment('I1')->getText()->createTextRun('Opsional. Isi sesuai nama Pengelola yang terdaftar.');
       },
     ];
   }

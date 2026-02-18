@@ -12,7 +12,7 @@ import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
-export default function Edit({ auth, data: item, sumberDana }) {
+export default function Edit({ auth, data: item, sumberDana, pengelolaList }) {
   const { flash } = usePage().props;
   const { data, setData, patch, processing, errors } = useForm({
     year: item.year || new Date().getFullYear(),
@@ -21,6 +21,7 @@ export default function Edit({ auth, data: item, sumberDana }) {
     regency_id: item.regency_id || '',
     district_id: item.district_id || '',
     village_id: item.village_id || '',
+    pengelola_id: item.pengelola_id || '',
     target_annual: item.target_annual || '',
     realization: item.realization || '',
     fund_source: item.fund_source || '',
@@ -383,6 +384,22 @@ export default function Edit({ auth, data: item, sumberDana }) {
                     placeholder=""
                   />
                   <InputError message={errors.coordinates} className="mt-2" />
+                </div>
+
+                <div>
+                  <InputLabel htmlFor="pengelola_id" value="Pengelola" className="text-gray-700 font-bold mb-2" />
+                  <Select
+                    options={pengelolaList.map(p => ({ value: p.id, label: p.name }))}
+                    onChange={(opt) => setData('pengelola_id', opt?.value || '')}
+                    placeholder="Pilih Pengelola..."
+                    styles={selectStyles}
+                    isClearable
+                    menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                    menuPosition={'fixed'}
+                    menuPlacement="top"
+                    value={data.pengelola_id ? pengelolaList.filter(p => p.id == data.pengelola_id).map(p => ({ value: p.id, label: p.name }))[0] || (item.pengelola ? { value: item.pengelola.id, label: item.pengelola.name } : null) : null}
+                  />
+                  <InputError message={errors.pengelola_id} className="mt-2" />
                 </div>
               </div>
 

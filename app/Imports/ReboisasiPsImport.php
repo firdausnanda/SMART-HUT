@@ -34,6 +34,7 @@ class ReboisasiPsImport implements ToModel, WithHeadingRow, WithValidation, Skip
       'target_tahunan_ha' => 'required|numeric',
       'realisasi_ha' => 'required|numeric',
       'sumber_dana' => ['required', 'exists:m_sumber_dana,name'],
+      'pengelola' => 'required|exists:m_pengelola_ps,name',
     ];
   }
 
@@ -43,6 +44,7 @@ class ReboisasiPsImport implements ToModel, WithHeadingRow, WithValidation, Skip
       'nama_kabupaten.exists' => 'Kabupaten tidak ditemukan.',
       'nama_kecamatan.exists' => 'Kecamatan tidak ditemukan.',
       'sumber_dana.exists' => 'Sumber Dana tidak ditemukan di data referensi (Master Sumber Dana).',
+      'pengelola.exists' => 'Pengelola tidak ditemukan di data referensi (Master Pengelola PS).',
     ];
   }
 
@@ -66,6 +68,11 @@ class ReboisasiPsImport implements ToModel, WithHeadingRow, WithValidation, Skip
       $village = DB::table('m_villages')->where('district_id', $district->id)->where('name', 'like', '%' . $row['nama_desa'] . '%')->first();
     }
 
+    $pengelola = null;
+    if (!empty($row['pengelola'])) {
+      $pengelola = DB::table('m_pengelola_ps')->where('name', 'like', '%' . trim($row['pengelola']) . '%')->first();
+    }
+
     return new ReboisasiPS([
       'year' => $row['tahun'],
       'month' => $row['bulan_angka'],
@@ -73,6 +80,7 @@ class ReboisasiPsImport implements ToModel, WithHeadingRow, WithValidation, Skip
       'regency_id' => $regency->id,
       'district_id' => $district->id,
       'village_id' => $village?->id,
+      'pengelola_id' => $pengelola?->id,
       'target_annual' => $row['target_tahunan_ha'] ?? 0,
       'realization' => $row['realisasi_ha'] ?? 0,
       'fund_source' => $row['sumber_dana'] ?? 'other',
