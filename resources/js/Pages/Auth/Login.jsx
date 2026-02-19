@@ -117,7 +117,7 @@ export default function Login({ status, canResetPassword }) {
                         Masuk Dashboard
                     </PrimaryButton>
 
-                    <div className="relative my-6">
+                    {/* <div className="relative my-6">
                         <div className="absolute inset-0 flex items-center">
                             <div className="w-full border-t border-gray-300"></div>
                         </div>
@@ -149,7 +149,7 @@ export default function Login({ status, canResetPassword }) {
                             />
                         </svg>
                         Sign in with Google
-                    </a>
+                    </a> */}
                 </div>
             </form>
         </GuestLayout>
