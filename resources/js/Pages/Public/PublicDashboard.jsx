@@ -61,10 +61,10 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + modules.length) % modules.length);
 
   // Auto-slide effect
-  // useEffect(() => {
-  //   const interval = setInterval(nextSlide, 25000);
-  //   return () => clearInterval(interval);
-  // }, []);
+  useEffect(() => {
+    const interval = setInterval(nextSlide, 25000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Auto-reload data every 5 minutes
   useEffect(() => {
