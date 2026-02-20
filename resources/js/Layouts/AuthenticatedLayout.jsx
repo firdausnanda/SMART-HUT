@@ -523,6 +523,21 @@ export default function Authenticated({ user, header, children }) {
                                             </svg>
                                             {!isSidebarCollapsed && <span className="text-sm font-semibold">System Logs</span>}
                                         </a>
+
+                                        <Link
+                                            href={route('backups.index')}
+                                            className={`group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${isSidebarCollapsed ? 'justify-center px-0' : 'px-4'
+                                                } ${route().current('backups.*')
+                                                    ? 'bg-white/10 border-white/20 text-white shadow-lg'
+                                                    : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white'
+                                                }`}
+                                            title={isSidebarCollapsed ? 'Backup' : ''}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className={`flex-shrink-0 h-5 w-5 transition-colors ${isSidebarCollapsed ? 'mx-auto' : 'mr-3'} ${route().current('backups.*') ? 'text-white' : 'text-primary-300 group-hover:text-white'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                                            </svg>
+                                            {!isSidebarCollapsed && <span className="text-sm font-semibold">Backup</span>}
+                                        </Link>
                                     </>
                                 )}
                             </>
@@ -955,19 +970,35 @@ export default function Authenticated({ user, header, children }) {
                                 </Link>
 
                                 {user.roles.includes('admin') && (
-                                    <Link
-                                        href={route('activity-log.index')}
-                                        onClick={() => setShowingNavigationDropdown(false)}
-                                        className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${route().current('activity-log.*')
-                                            ? 'bg-white/10 border-white/20 text-white'
-                                            : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
-                                            }`}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Log Aktivitas
-                                    </Link>
+                                    <>
+                                        <Link
+                                            href={route('activity-log.index')}
+                                            onClick={() => setShowingNavigationDropdown(false)}
+                                            className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${route().current('activity-log.*')
+                                                ? 'bg-white/10 border-white/20 text-white'
+                                                : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
+                                                }`}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Log Aktivitas
+                                        </Link>
+
+                                        <Link
+                                            href={route('backups.index')}
+                                            onClick={() => setShowingNavigationDropdown(false)}
+                                            className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${route().current('backups.*')
+                                                ? 'bg-white/10 border-white/20 text-white'
+                                                : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
+                                                }`}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                                            </svg>
+                                            Backup
+                                        </Link>
+                                    </>
                                 )}
                             </>
                         )}

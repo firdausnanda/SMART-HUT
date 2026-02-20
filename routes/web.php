@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\BangunanKtaController;
 use App\Http\Controllers\BukanKayuController;
 use App\Http\Controllers\CommodityController;
@@ -231,6 +232,12 @@ Route::middleware('auth')->group(function () {
         Artisan::call('view:clear');
         return redirect()->back()->with('success', 'Cache cleared successfully!');
     })->name('clear-cache');
+
+    // Backup Management
+    Route::get('backups', [BackupController::class, 'index'])->name('backups.index');
+    Route::post('backups', [BackupController::class, 'create'])->name('backups.create');
+    Route::get('backups/{filename}/download', [BackupController::class, 'download'])->name('backups.download')->where('filename', '.*');
+    Route::delete('backups/{filename}', [BackupController::class, 'destroy'])->name('backups.destroy')->where('filename', '.*');
 });
 
 require __DIR__ . '/auth.php';
