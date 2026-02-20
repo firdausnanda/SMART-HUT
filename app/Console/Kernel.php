@@ -12,8 +12,17 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Auto backup database setiap 5 menit
-        $schedule->command('backup:run', ['--only-db'])->dailyAt('02:00');
+        // Auto backup database harian jam 02:00
+        $schedule->call(function () {
+            $backupName = config('backup.backup.name');
+            try {
+                \Illuminate\Support\Facades\Storage::disk('google')->makeDirectory($backupName);
+            } catch (\Exception $e) {
+                // Folder mungkin sudah ada, abaikan
+            }
+
+            \Illuminate\Support\Facades\Artisan::call('backup:run', ['--only-db' => true]);
+        })->dailyAt('02:00');
     }
 
     /**

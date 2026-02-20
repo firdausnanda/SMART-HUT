@@ -63,6 +63,15 @@ class BackupController extends Controller
     $this->authorizeAdmin();
 
     try {
+      $backupName = config('backup.backup.name');
+      $disk = Storage::disk('google');
+
+      try {
+        $disk->makeDirectory($backupName);
+      } catch (\Exception $e) {
+        // Folder mungkin sudah ada, abaikan error
+      }
+
       // Run backup (database only, to google drive)
       $exitCode = Artisan::call('backup:run', [
         '--only-db' => true,
