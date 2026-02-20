@@ -64,7 +64,7 @@ class BackupController extends Controller
 
     try {
       // Run backup (database only, to google drive)
-      Artisan::call('backup:run', [
+      $exitCode = Artisan::call('backup:run', [
         '--only-db' => true,
         '--only-to-disk' => 'google',
         '--disable-notifications' => true,
@@ -72,9 +72,22 @@ class BackupController extends Controller
 
       $output = Artisan::output();
 
+      // Log output untuk debugging
+      \Illuminate\Support\Facades\Log::info('Backup output:', [
+        'exit_code' => $exitCode,
+        'output' => $output,
+      ]);
+
+      // Cek exit code DAN output untuk memastikan backup benar-benar berhasil
+      if ($exitCode !== 0 || str_contains($output, 'Backup failed')) {
+        return redirect()->route('backups.index')
+          ->with('error', 'Backup gagal. Detail: ' . $this->extractErrorMessage($output));
+      }
+
       return redirect()->route('backups.index')
         ->with('success', 'Backup database berhasil dibuat dan disimpan ke Google Drive.');
     } catch (\Exception $e) {
+      \Illuminate\Support\Facades\Log::error('Backup exception: ' . $e->getMessage());
       return redirect()->route('backups.index')
         ->with('error', 'Gagal membuat backup: ' . $e->getMessage());
     }
@@ -183,5 +196,24 @@ class BackupController extends Controller
     $bytes /= pow(1024, $pow);
 
     return round($bytes, $precision) . ' ' . $units[$pow];
+  }
+
+  /**
+   * Extract readable error message from backup output.
+   */
+  private function extractErrorMessage($output)
+  {
+    // Cari pesan error yang relevan dari output
+    if (preg_match('/Backup failed because:\s*(.+?)(?:\.|$)/s', $output, $matches)) {
+      return trim($matches[1]);
+    }
+
+    if (preg_match('/Error Output\s*=+\s*(.+?)(?:\.|$)/s', $output, $matches)) {
+      return trim($matches[1]);
+    }
+
+    // Fallback: ambil 200 karakter pertama dari output
+    $clean = trim(strip_tags($output));
+    return $clean ? substr($clean, 0, 200) : 'Cek log aplikasi untuk detail error.';
   }
 }
