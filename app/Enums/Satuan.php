@@ -12,6 +12,7 @@ enum Satuan: string
   case EKOR = 'ekor';
   case BUAH = 'buah';
   case PCS = 'pcs';
+  case IKAT = 'ikat';
 
   public function label(): string
   {
@@ -24,6 +25,7 @@ enum Satuan: string
       self::EKOR => 'Ekor',
       self::BUAH => 'Buah',
       self::PCS => 'Pcs',
+      self::IKAT => 'Ikat'
     };
   }
 }
