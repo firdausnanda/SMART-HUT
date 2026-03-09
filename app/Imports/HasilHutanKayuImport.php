@@ -33,7 +33,7 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     ];
 
     if ($this->forestType === 'Hutan Rakyat') {
-      $rules['nama_kecamatan'] = 'required|exists:m_districts,name';
+      $rules['nama_kecamatan'] = 'exists:m_districts,name';
     }
 
     if ($this->forestType === 'Perhutanan Sosial') {
@@ -48,7 +48,6 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     return [
       'nama_kabupaten.exists' => 'Kabupaten tidak ditemukan.',
       'nama_kecamatan.exists' => 'Kecamatan tidak ditemukan.',
-      'nama_kecamatan.required' => 'Kecamatan wajib diisi untuk jenis hutan ini.',
       'nama_pengelola_wisata.exists' => 'Pengelola Wisata tidak ditemukan.',
       'nama_pengelola_wisata.required' => 'Pengelola Wisata wajib diisi untuk jenis hutan ini.',
       'bulan_angka.min' => 'Bulan harus 1-12.',

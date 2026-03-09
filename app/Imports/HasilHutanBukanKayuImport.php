@@ -67,7 +67,7 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       'tahun' => 'required|numeric',
       'bulan_angka' => 'required|numeric|min:1|max:12',
       'nama_kabupaten' => 'required|exists:m_regencies,name',
-      'nama_kecamatan' => 'required|exists:m_districts,name',
+      'nama_kecamatan' => 'exists:m_districts,name',
       'total_target' => 'required|numeric|min:0',
     ];
   }
