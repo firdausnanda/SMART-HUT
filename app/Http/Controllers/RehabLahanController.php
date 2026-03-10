@@ -97,7 +97,7 @@ class RehabLahanController extends Controller
             "rehab-lahan-stats-{$selectedYear}",
             300,
             fn() => [
-                'total_target' => RehabLahan::where('year', $selectedYear)->where('status', 'final')->sum('target_annual'),
+                'total_target' => RehabLahan::where('year', $selectedYear)->sum('target_annual'),
                 'total_realization' => RehabLahan::where('year', $selectedYear)->where('status', 'final')->sum('realization'),
                 'total_count' => RehabLahan::where('year', $selectedYear)->where('status', 'final')->count(),
             ]
