@@ -33,7 +33,7 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     ];
 
     if ($this->forestType === 'Hutan Rakyat') {
-      $rules['nama_kecamatan'] = 'exists:m_districts,name';
+      $rules['nama_kecamatan'] = 'nullable|exists:m_districts,name';
     }
 
     if ($this->forestType === 'Perhutanan Sosial') {
@@ -72,22 +72,21 @@ class HasilHutanKayuImport implements ToModel, WithHeadingRow, WithValidation, S
     $districtId = null;
 
     if ($this->forestType === 'Hutan Rakyat') {
-      if (empty($row['nama_kecamatan'])) {
-        return null;
-      }
-      $district = DB::table('m_districts')
-        ->where('regency_id', $regency->id)
-        ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
-        ->first();
-
-      if (!$district) {
+      if (!empty($row['nama_kecamatan'])) {
         $district = DB::table('m_districts')
+          ->where('regency_id', $regency->id)
           ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
           ->first();
+
+        if (!$district) {
+          $district = DB::table('m_districts')
+            ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
+            ->first();
+        }
+        if ($district) {
+          $districtId = $district->id;
+        }
       }
-      if (!$district)
-        return null;
-      $districtId = $district->id;
     }
 
     // Resolve Pengelola Wisata
