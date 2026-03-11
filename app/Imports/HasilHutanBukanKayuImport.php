@@ -67,7 +67,7 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       'tahun' => 'required|numeric',
       'bulan_angka' => 'required|numeric|min:1|max:12',
       'nama_kabupaten' => 'required|exists:m_regencies,name',
-      'nama_kecamatan' => 'exists:m_districts,name',
+      'nama_kecamatan' => 'nullable|exists:m_districts,name',
       'total_target' => 'required|numeric|min:0',
     ];
   }
@@ -114,9 +114,6 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       }
       $districtId = $district?->id;
     }
-
-    if ($this->forestType === 'Hutan Rakyat' && !$districtId)
-      return null;
 
     // 2.5 Lookup Pengelola ID (only for Hutan Negara)
     $pengelolaId = null;
