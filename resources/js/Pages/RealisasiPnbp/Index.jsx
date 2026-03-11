@@ -14,6 +14,7 @@ import TextInput from '@/Components/TextInput';
 import StatusBadge from '@/Components/StatusBadge';
 import LoadingOverlay from '@/Components/LoadingOverlay';
 import BulkActionToolbar from '@/Components/BulkActionToolbar';
+import Select from 'react-select';
 
 export default function Index({ auth, datas, filters, stats, available_years }) {
   const { flash } = usePage().props;
@@ -99,7 +100,8 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
         search: searchTerm,
         year: filters.year,
         sort: field,
-        direction: newDirection
+        direction: newDirection,
+        per_page: filters.per_page
       },
       {
         preserveState: true,
@@ -204,6 +206,22 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memproses...');
 
+  const handlePerPageChange = (value) => {
+    setLoadingText('Memperbarui Data...');
+    setIsLoading(true);
+    router.get(route('realisasi-pnbp.index'), {
+      year: year,
+      search: searchTerm,
+      sort: filters.sort,
+      direction: filters.direction,
+      per_page: value
+    }, {
+      preserveState: true,
+      preserveScroll: true,
+      onFinish: () => setIsLoading(false)
+    });
+  };
+
   const handleYearChange = (e) => {
     const newYear = e.target.value;
     setYear(newYear);
@@ -213,7 +231,8 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
       year: newYear,
       search: searchTerm,
       sort: filters.sort,
-      direction: filters.direction
+      direction: filters.direction,
+      per_page: filters.per_page
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -249,7 +268,8 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
           year: year,
           search: value,
           sort: filters.sort,
-          direction: filters.direction
+          direction: filters.direction,
+          per_page: filters.per_page
         },
         {
           preserveState: true,
@@ -468,54 +488,6 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
               </div>
             </div>
 
-            <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 relative z-10 w-full">
-              {/* Year Filter */}
-              <div className="relative group shrink-0 w-full sm:w-48">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-20">
-                  <svg className="h-5 w-5 text-emerald-100 group-hover:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <select
-                  value={year}
-                  onChange={handleYearChange}
-                  className="w-full pl-11 pr-10 py-3 bg-white/10 backdrop-blur-md text-white text-sm rounded-xl border border-white/20 focus:ring-2 focus:ring-white/30 focus:border-white/30 font-medium shadow-sm transition-all hover:bg-white/20 cursor-pointer appearance-none outline-none"
-                >
-                  {yearOptions.map((y) => (
-                    <option key={y} value={y} className="text-gray-900 bg-white">{y}</option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none z-20">
-                  <svg className="h-4 w-4 text-emerald-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-
-              {/* Search Input */}
-              <div className="relative w-full sm:max-w-md group">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-20">
-                  <svg className="h-5 w-5 text-emerald-100 group-focus-within:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  className="w-full pl-11 pr-10 py-3 bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-emerald-100/70 focus:ring-2 focus:ring-white/30 focus:border-white/30 rounded-xl shadow-sm transition-all hover:bg-white/20"
-                  placeholder="Cari Hasil Hutan, Lokasi..."
-                  value={searchTerm}
-                  onChange={onSearchChange}
-                />
-                {isSearching && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
           {/* Stats Section */}
@@ -543,6 +515,194 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
 
           {/* Data Table */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-white">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
+                {/* Search Input */}
+                <div className="relative w-full sm:max-w-md group">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-20">
+                    <svg className="h-4 w-4 text-emerald-600 group-focus-within:text-emerald-700 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    className="w-full pl-10 pr-10 py-1.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 focus:bg-white rounded-lg shadow-sm transition-all text-sm"
+                    placeholder="Cari Hasil Hutan, Lokasi..."
+                    value={searchTerm}
+                    onChange={onSearchChange}
+                  />
+                  {isSearching && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <svg className="animate-spin h-4 w-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </div>
+                  )}
+                </div>
+
+                {/* Year Filter */}
+                <div className="relative group shrink-0 w-full sm:w-32 items-center z-20">
+                  <Select
+                    value={{ value: year, label: year }}
+                    onChange={(selectedOption) => handleYearChange({ target: { value: selectedOption.value } })}
+                    options={yearOptions.map(y => ({ value: y, label: y }))}
+                    styles={{
+                      control: (base, state) => ({
+                        ...base,
+                        minHeight: '38px',
+                        height: '38px',
+                        backgroundColor: '#f9fafb',
+                        borderColor: state.isFocused ? '#10b981' : '#e5e7eb',
+                        boxShadow: state.isFocused ? '0 0 0 2px rgba(16, 185, 129, 0.3)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                        borderRadius: '0.5rem',
+                        '&:hover': {
+                          borderColor: '#10b981'
+                        },
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        color: '#111827',
+                        paddingLeft: '24px'
+                      }),
+                      valueContainer: (base) => ({
+                        ...base,
+                        padding: '0 8px',
+                      }),
+                      input: (base) => ({
+                        ...base,
+                        margin: 0,
+                        padding: 0,
+                      }),
+                      placeholder: (base) => ({
+                        ...base,
+                        color: '#9ca3af',
+                      }),
+                      singleValue: (base) => ({
+                        ...base,
+                        color: '#111827',
+                      }),
+                      menu: (base) => ({
+                        ...base,
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        overflow: 'hidden',
+                        zIndex: 50,
+                      }),
+                      option: (base, state) => ({
+                        ...base,
+                        backgroundColor: state.isSelected ? '#10b981' : state.isFocused ? '#d1fae5' : 'white',
+                        color: state.isSelected ? 'white' : '#111827',
+                        fontSize: '0.875rem',
+                        cursor: 'pointer',
+                        '&:active': {
+                          backgroundColor: '#059669',
+                          color: 'white',
+                        }
+                      }),
+                      dropdownIndicator: (base) => ({
+                        ...base,
+                        color: '#059669',
+                        padding: '4px',
+                        '&:hover': {
+                          color: '#047857'
+                        }
+                      }),
+                      indicatorSeparator: () => ({
+                        display: 'none',
+                      }),
+                    }}
+                    isSearchable={false}
+                  />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-30">
+                    <svg className="h-4 w-4 text-emerald-600 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 w-full md:w-auto z-20">
+                <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
+                <div className="w-24">
+                  <Select
+                    value={{ value: filters.per_page || 10, label: filters.per_page || 10 }}
+                    onChange={(selectedOption) => handlePerPageChange(selectedOption.value)}
+                    options={[
+                      { value: 10, label: '10' },
+                      { value: 25, label: '25' },
+                      { value: 50, label: '50' },
+                      { value: 100, label: '100' },
+                    ]}
+                    styles={{
+                      control: (base, state) => ({
+                        ...base,
+                        minHeight: '34px',
+                        height: '34px',
+                        backgroundColor: 'white',
+                        borderColor: state.isFocused ? '#10b981' : '#e5e7eb',
+                        boxShadow: state.isFocused ? '0 0 0 2px rgba(16, 185, 129, 0.3)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                        borderRadius: '0.5rem',
+                        '&:hover': {
+                          borderColor: '#10b981'
+                        },
+                        fontSize: '0.875rem',
+                        fontWeight: '700',
+                        color: '#4b5563',
+                        cursor: 'pointer'
+                      }),
+                      valueContainer: (base) => ({
+                        ...base,
+                        padding: '0 8px',
+                      }),
+                      input: (base) => ({
+                        ...base,
+                        margin: 0,
+                        padding: 0,
+                      }),
+                      singleValue: (base) => ({
+                        ...base,
+                        color: '#4b5563',
+                      }),
+                      menu: (base) => ({
+                        ...base,
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        overflow: 'hidden',
+                        zIndex: 50,
+                        width: 'auto',
+                        minWidth: '100%',
+                        right: 0
+                      }),
+                      option: (base, state) => ({
+                        ...base,
+                        backgroundColor: state.isSelected ? '#10b981' : state.isFocused ? '#d1fae5' : 'white',
+                        color: state.isSelected ? 'white' : '#4b5563',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        '&:active': {
+                          backgroundColor: '#059669',
+                          color: 'white',
+                        }
+                      }),
+                      dropdownIndicator: (base) => ({
+                        ...base,
+                        color: '#059669',
+                        padding: '4px',
+                        '&:hover': {
+                          color: '#047857'
+                        }
+                      }),
+                      indicatorSeparator: () => ({
+                        display: 'none',
+                      }),
+                    }}
+                    isSearchable={false}
+                  />
+                </div>
+              </div>
+            </div>
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full min-w-[1200px] text-sm text-left">
                 <thead className="text-xs text-gray-500 uppercase bg-gray-50/50 border-b border-gray-100">
