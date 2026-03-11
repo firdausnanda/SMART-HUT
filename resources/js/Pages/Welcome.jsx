@@ -101,7 +101,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion, totalData = 
                                     Platform terintegrasi untuk monitoring, pengelolaan, dan pelaporan data statistik kehutanan secara akurat dan realtime.
                                 </p>
 
-                                <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                                <div className="flex flex-col sm:flex-row flex-wrap gap-4 pt-2">
                                     <Link
                                         href={auth.user ? route('dashboard') : route('login')}
                                         className="px-6 py-3 rounded-full bg-primary-700 text-white font-semibold text-sm hover:bg-primary-800 shadow-lg shadow-primary-700/20 transition-all duration-300 transform hover:-translate-y-0.5 text-center"
@@ -112,7 +112,13 @@ export default function Welcome({ auth, laravelVersion, phpVersion, totalData = 
                                         href={route('public.dashboard')}
                                         className="px-6 py-3 rounded-full bg-white text-primary-700 border border-primary-200 font-semibold text-sm hover:bg-primary-50 transition-all duration-300 transform hover:-translate-y-0.5 text-center"
                                     >
-                                        Dashboard Infografis
+                                        Dashboard Infografis Tahun Berjalan
+                                    </Link>
+                                    <Link
+                                        href={route('public.dashboard')}
+                                        className="px-6 py-3 rounded-full bg-yellow-400 text-yellow-900 font-semibold text-sm hover:bg-yellow-500 shadow-lg shadow-yellow-400/20 transition-all duration-300 transform hover:-translate-y-0.5 text-center"
+                                    >
+                                        Dashboard Infografis Year-over-Year
                                     </Link>
                                 </div>
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HasilHutanBukanKayuDetail;
 use App\Models\HasilHutanKayu;
 use App\Models\Kups;
 use App\Models\NilaiEkonomi;
@@ -87,6 +88,40 @@ class DashboardController extends Controller
             // --- KUPS Stats (New) ---
             $kupsTotal = Kups::where('status', 'final')->count();
 
+            // --- NTE Stats (New) ---
+            $nteCurrent = NilaiTransaksiEkonomi::where('year', $chartYear)->where('status', 'final')->sum('total_nilai_transaksi');
+            $ntePrev = NilaiTransaksiEkonomi::where('year', $chartYear - 1)->where('status', 'final')->sum('total_nilai_transaksi');
+            $nteGrowth = $ntePrev > 0 ? (($nteCurrent - $ntePrev) / $ntePrev) * 100 : ($nteCurrent > 0 ? 100 : 0);
+
+            // --- Nekon Stats (New) ---
+            $nekonCurrent = NilaiEkonomi::where('year', $chartYear)->where('status', 'final')->sum('total_transaction_value');
+            $nekonPrev = NilaiEkonomi::where('year', $chartYear - 1)->where('status', 'final')->sum('total_transaction_value');
+            $nekonGrowth = $nekonPrev > 0 ? (($nekonCurrent - $nekonPrev) / $nekonPrev) * 100 : ($nekonCurrent > 0 ? 100 : 0);
+
+            // --- Jasa Lingkungan Stats (New) ---
+            $jasaLingkunganCurrent = PengunjungWisata::where('year', $chartYear)->where('status', 'final')->sum('gross_income');
+            $jasaLingkunganPrev = PengunjungWisata::where('year', $chartYear - 1)->where('status', 'final')->sum('gross_income');
+            $jasaLingkunganGrowth = $jasaLingkunganPrev > 0 ? (($jasaLingkunganCurrent - $jasaLingkunganPrev) / $jasaLingkunganPrev) * 100 : ($jasaLingkunganCurrent > 0 ? 100 : 0);
+
+            // --- Penghijauan Lingkungan Stats (New) ---
+            $penghijauanCurrent = PenghijauanLingkungan::where('year', $chartYear)->where('status', 'final')->sum('realization');
+            $penghijauanPrev = PenghijauanLingkungan::where('year', $chartYear - 1)->where('status', 'final')->sum('realization');
+            $penghijauanGrowth = $penghijauanPrev > 0 ? (($penghijauanCurrent - $penghijauanPrev) / $penghijauanPrev) * 100 : ($penghijauanCurrent > 0 ? 100 : 0);
+
+            // --- Produksi HHBK Stats (New) ---
+            $hhbkCurrent = HasilHutanBukanKayuDetail::join('hasil_hutan_bukan_kayu', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id', '=', 'hasil_hutan_bukan_kayu.id')
+                ->where('hasil_hutan_bukan_kayu.year', $chartYear)->where('hasil_hutan_bukan_kayu.status', 'final')
+                ->whereNull('hasil_hutan_bukan_kayu.deleted_at')->sum('hasil_hutan_bukan_kayu_details.annual_volume_realization');
+            $hhbkPrev = HasilHutanBukanKayuDetail::join('hasil_hutan_bukan_kayu', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id', '=', 'hasil_hutan_bukan_kayu.id')
+                ->where('hasil_hutan_bukan_kayu.year', $chartYear - 1)->where('hasil_hutan_bukan_kayu.status', 'final')
+                ->whereNull('hasil_hutan_bukan_kayu.deleted_at')->sum('hasil_hutan_bukan_kayu_details.annual_volume_realization');
+            $hhbkGrowth = $hhbkPrev > 0 ? (($hhbkCurrent - $hhbkPrev) / $hhbkPrev) * 100 : ($hhbkCurrent > 0 ? 100 : 0);
+
+            // --- Reboisasi PS Stats (New) ---
+            $reboisasiPsCurrent = ReboisasiPS::where('year', $chartYear)->where('status', 'final')->sum('realization');
+            $reboisasiPsPrev = ReboisasiPS::where('year', $chartYear - 1)->where('status', 'final')->sum('realization');
+            $reboisasiPsGrowth = $reboisasiPsPrev > 0 ? (($reboisasiPsCurrent - $reboisasiPsPrev) / $reboisasiPsPrev) * 100 : ($reboisasiPsCurrent > 0 ? 100 : 0);
+
             // --- Charts Data (Rehab Lahan) ---
             $monthlyData = RehabLahan::selectRaw('month, SUM(realization) as total')
                 ->where('year', $chartYear)
@@ -128,6 +163,30 @@ class DashboardController extends Controller
                     ],
                     'kups' => [
                         'total' => $kupsTotal,
+                    ],
+                    'nte' => [
+                        'total' => $nteCurrent,
+                        'growth' => round($nteGrowth, 1),
+                    ],
+                    'nekon' => [
+                        'total' => $nekonCurrent,
+                        'growth' => round($nekonGrowth, 1),
+                    ],
+                    'jasa_lingkungan' => [
+                        'total' => $jasaLingkunganCurrent,
+                        'growth' => round($jasaLingkunganGrowth, 1),
+                    ],
+                    'penghijauan_lingkungan' => [
+                        'total' => $penghijauanCurrent,
+                        'growth' => round($penghijauanGrowth, 1),
+                    ],
+                    'produksi_hhbk' => [
+                        'total' => $hhbkCurrent,
+                        'growth' => round($hhbkGrowth, 1),
+                    ],
+                    'reboisasi_ps' => [
+                        'total' => $reboisasiPsCurrent,
+                        'growth' => round($reboisasiPsGrowth, 1),
                     ]
                 ],
                 'chartData' => $chartData,
