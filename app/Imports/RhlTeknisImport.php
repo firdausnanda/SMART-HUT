@@ -36,7 +36,7 @@ class RhlTeknisImport implements OnEachRow, WithHeadingRow, WithValidation, Skip
       'kecamatan' => 'required|string|exists:m_districts,name',
       'desa' => 'required|string|exists:m_villages,name',
       'jenis_bangunan' => 'required|string',
-      'jumlah_unit' => 'required|string',
+      'jumlah_unit' => 'required',
     ];
   }
 
