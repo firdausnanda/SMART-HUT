@@ -363,7 +363,7 @@ export default function Dashboard({ auth, stats, filters, availableYears, recent
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Hutan Kemasyarakatan</p>
                                 <p className="text-lg font-bold text-gray-900 mt-1">
-                                    {formatNumber(stats.hkm?.total || 0)} <span className="text-xs font-normal text-gray-400">Klp</span>
+                                    {formatNumber(stats.hkm?.total || 0)} <span className="text-xs font-normal text-gray-400">Kelompok</span>
                                 </p>
                             </div>
                             <div className="p-3 bg-indigo-50 rounded-lg text-indigo-600 shrink-0">
@@ -373,7 +373,7 @@ export default function Dashboard({ auth, stats, filters, availableYears, recent
                             </div>
                         </div>
                         <div className="mt-4 flex items-center text-xs text-indigo-600">
-                            <span className="font-semibold">{stats.hkm?.percentage || 0}% dari total SKPS</span>
+                            <span className="font-semibold">{stats.hkm?.percentage || 0}% dari total {stats.hkm?.skps_total || 0} SKPS</span>
                         </div>
                     </div>
 

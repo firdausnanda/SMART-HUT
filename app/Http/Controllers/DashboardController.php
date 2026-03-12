@@ -41,7 +41,7 @@ class DashboardController extends Controller
         $cacheKey = "dashboard_stats_v2_{$chartYear}";
 
         // Cache the heavy statistics and chart data for 10 minutes (600 seconds)
-        $dashboardData = Cache::remember($cacheKey, 600, function () use ($chartYear) {
+        $dashboardData = Cache::remember($cacheKey, 300, function () use ($chartYear) {
             // --- Rehab Lahan Stats (Existing) ---
             $totalRehabCurrent = RehabLahan::where('year', $chartYear)->where('status', 'final')->sum('realization');
             $totalRehabPrev = RehabLahan::where('year', $chartYear - 1)->where('status', 'final')->sum('realization');
@@ -73,11 +73,11 @@ class DashboardController extends Controller
             // Optimized: Use raw SQL for cleaning and summing instead of loading all records
             $pnbpCurrent = RealisasiPnbp::where('year', $chartYear)
                 ->where('status', 'final')
-                ->sum(DB::raw("CAST(REPLACE(REPLACE(REPLACE(pnbp_realization, 'Rp', ''), '.', ''), ' ', '') AS UNSIGNED)"));
+                ->sum("pnbp_target");
 
             $pnbpPrev = RealisasiPnbp::where('year', $chartYear - 1)
                 ->where('status', 'final')
-                ->sum(DB::raw("CAST(REPLACE(REPLACE(REPLACE(pnbp_realization, 'Rp', ''), '.', ''), ' ', '') AS UNSIGNED)"));
+                ->sum("pnbp_target");
 
             $pnbpGrowth = 0;
             if ($pnbpPrev > 0) {
@@ -126,10 +126,7 @@ class DashboardController extends Controller
             // --- HKm Stats (New) ---
             $skpsTotal = Skps::where('status', 'final')->count();
             $hkmTotal = Skps::where('status', 'final')
-                ->whereHas('skema', function ($query) {
-                    $query->where('name', 'Hutan Kemasyarakatan');
-                })->count();
-
+                ->where('id_skema_perhutanan_sosial', 2)->count();
             $hkmPercentage = $skpsTotal > 0 ? ($hkmTotal / $skpsTotal) * 100 : 0;
 
             // --- Kebakaran Hutan Stats (New) ---
@@ -206,6 +203,7 @@ class DashboardController extends Controller
                     'hkm' => [
                         'total' => $hkmTotal,
                         'percentage' => round($hkmPercentage, 1),
+                        'skps_total' => $skpsTotal,
                     ],
                     'fires' => [
                         'total' => $firesCurrent,
@@ -297,7 +295,7 @@ class DashboardController extends Controller
 
     private function getPembinaanStats($currentYear)
     {
-        return Cache::remember("pembinaan_stats_{$currentYear}", 600, function () use ($currentYear) {
+        return Cache::remember("pembinaan_stats_{$currentYear}", 300, function () use ($currentYear) {
             // Helper for standard rehab stats
             $getStats = function ($modelClass, $tableName) use ($currentYear) {
                 $baseQuery = $modelClass::where('year', $currentYear)->where('status', 'final');
@@ -430,7 +428,7 @@ class DashboardController extends Controller
 
     private function getPerlindunganStats($currentYear)
     {
-        return Cache::remember("perlindungan_stats_{$currentYear}", 600, function () use ($currentYear) {
+        return Cache::remember("perlindungan_stats_{$currentYear}", 300, function () use ($currentYear) {
             // --- 2. Perlindungan Hutan ---
             // Kebakaran
             $kebakaranStats = KebakaranHutan::where('year', $currentYear)
@@ -507,7 +505,7 @@ class DashboardController extends Controller
 
     private function getBinaUsahaStats($currentYear)
     {
-        return Cache::remember("bina_usaha_stats_{$currentYear}", 600, function () use ($currentYear) {
+        return Cache::remember("bina_usaha_stats_{$currentYear}", 300, function () use ($currentYear) {
             // --- 3. Bina Usaha (Split into 5 categories) ---
             $forestTypes = ['Hutan Negara', 'Perhutanan Sosial', 'Hutan Rakyat'];
             $binaUsahaData = [];
@@ -706,7 +704,7 @@ class DashboardController extends Controller
 
     private function getKelembagaanPsStats($currentYear)
     {
-        return Cache::remember("kelembagaan_ps_stats_{$currentYear}", 600, function () use ($currentYear) {
+        return Cache::remember("kelembagaan_ps_stats_{$currentYear}", 300, function () use ($currentYear) {
             // --- 4. Kelembagaan Perhutanan Sosial ---
             return [
                 'kelompok_count' => Skps::where('status', 'final')->count(),
@@ -739,7 +737,7 @@ class DashboardController extends Controller
 
     private function getKelembagaanHrStats($currentYear)
     {
-        return Cache::remember("kelembagaan_hr_stats_{$currentYear}", 600, function () use ($currentYear) {
+        return Cache::remember("kelembagaan_hr_stats_{$currentYear}", 300, function () use ($currentYear) {
             // --- 5. Kelembagaan Hutan Rakyat ---
             return [
                 'kelompok_count' => PerkembanganKth::where('status', 'final')->count(),
