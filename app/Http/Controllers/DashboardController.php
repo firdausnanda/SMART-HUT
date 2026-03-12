@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HasilHutanBukanKayu;
 use App\Models\HasilHutanBukanKayuDetail;
 use App\Models\HasilHutanKayu;
 use App\Models\Kups;
@@ -122,6 +123,20 @@ class DashboardController extends Controller
             $reboisasiPsPrev = ReboisasiPS::where('year', $chartYear - 1)->where('status', 'final')->sum('realization');
             $reboisasiPsGrowth = $reboisasiPsPrev > 0 ? (($reboisasiPsCurrent - $reboisasiPsPrev) / $reboisasiPsPrev) * 100 : ($reboisasiPsCurrent > 0 ? 100 : 0);
 
+            // --- HKm Stats (New) ---
+            $skpsTotal = Skps::where('status', 'final')->count();
+            $hkmTotal = Skps::where('status', 'final')
+                ->whereHas('skema', function ($query) {
+                    $query->where('name', 'Hutan Kemasyarakatan');
+                })->count();
+
+            $hkmPercentage = $skpsTotal > 0 ? ($hkmTotal / $skpsTotal) * 100 : 0;
+
+            // --- Kebakaran Hutan Stats (New) ---
+            $firesCurrent = KebakaranHutan::where('year', $chartYear)->where('status', 'final')->sum('number_of_fires');
+            $firesPrev = KebakaranHutan::where('year', $chartYear - 1)->where('status', 'final')->sum('number_of_fires');
+            $firesGrowth = $firesPrev > 0 ? (($firesCurrent - $firesPrev) / $firesPrev) * 100 : ($firesCurrent > 0 ? 100 : 0);
+
             // --- Charts Data (Rehab Lahan) ---
             $monthlyData = RehabLahan::selectRaw('month, SUM(realization) as total')
                 ->where('year', $chartYear)
@@ -187,6 +202,14 @@ class DashboardController extends Controller
                     'reboisasi_ps' => [
                         'total' => $reboisasiPsCurrent,
                         'growth' => round($reboisasiPsGrowth, 1),
+                    ],
+                    'hkm' => [
+                        'total' => $hkmTotal,
+                        'percentage' => round($hkmPercentage, 1),
+                    ],
+                    'fires' => [
+                        'total' => $firesCurrent,
+                        'growth' => round($firesGrowth, 1),
                     ]
                 ],
                 'chartData' => $chartData,
@@ -502,12 +525,12 @@ class DashboardController extends Controller
                 ->get()
                 ->groupBy('forest_type');
 
-            $bukanKayuTotals = \App\Models\HasilHutanBukanKayu::where('year', $currentYear)
+            $bukanKayuTotals = HasilHutanBukanKayu::where('year', $currentYear)
                 ->where('status', 'final')
                 ->groupBy('forest_type')
                 ->pluck(DB::raw('sum(volume_target)'), 'forest_type');
 
-            $bukanKayuMonthlyByForestType = \App\Models\HasilHutanBukanKayu::where('year', $currentYear)
+            $bukanKayuMonthlyByForestType = HasilHutanBukanKayu::where('year', $currentYear)
                 ->where('status', 'final')
                 ->selectRaw('forest_type, month, sum(volume_target) as total')
                 ->groupBy('forest_type', 'month')
@@ -554,14 +577,14 @@ class DashboardController extends Controller
                     ->pluck('total', 'commodity');
 
                 // Bukan Kayu Target (Excluding Bambu)
-                $bukanKayuTarget = \App\Models\HasilHutanBukanKayu::where('year', $currentYear)
+                $bukanKayuTarget = HasilHutanBukanKayu::where('year', $currentYear)
                     ->where('status', 'final')
                     ->where('forest_type', $type)
                     ->whereHas('details.bukanKayu', fn($q) => $q->where('name', '!=', 'Bambu'))
                     ->sum('volume_target');
 
                 // Bukan Kayu Realization
-                $bukanKayuRealization = (float) \App\Models\HasilHutanBukanKayuDetail::join('hasil_hutan_bukan_kayu', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id', '=', 'hasil_hutan_bukan_kayu.id')
+                $bukanKayuRealization = (float) HasilHutanBukanKayuDetail::join('hasil_hutan_bukan_kayu', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id', '=', 'hasil_hutan_bukan_kayu.id')
                     ->join('m_bukan_kayu', 'hasil_hutan_bukan_kayu_details.bukan_kayu_id', '=', 'm_bukan_kayu.id')
                     ->where('hasil_hutan_bukan_kayu.year', $currentYear)
                     ->where('hasil_hutan_bukan_kayu.status', 'final')
@@ -574,14 +597,14 @@ class DashboardController extends Controller
                 $binaUsahaData[$key]['bukan_kayu_target'] = (float) $bukanKayuTarget;
 
                 // Bambu Target
-                $bambuTarget = \App\Models\HasilHutanBukanKayu::where('year', $currentYear)
+                $bambuTarget = HasilHutanBukanKayu::where('year', $currentYear)
                     ->where('status', 'final')
                     ->where('forest_type', $type)
                     ->whereHas('details.bukanKayu', fn($q) => $q->where('name', 'Bambu'))
                     ->sum('volume_target');
 
                 // Bambu Realization
-                $bambuRealization = (float) \App\Models\HasilHutanBukanKayuDetail::join('hasil_hutan_bukan_kayu', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id', '=', 'hasil_hutan_bukan_kayu.id')
+                $bambuRealization = (float) HasilHutanBukanKayuDetail::join('hasil_hutan_bukan_kayu', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id', '=', 'hasil_hutan_bukan_kayu.id')
                     ->join('m_bukan_kayu', 'hasil_hutan_bukan_kayu_details.bukan_kayu_id', '=', 'm_bukan_kayu.id')
                     ->where('hasil_hutan_bukan_kayu.year', $currentYear)
                     ->where('hasil_hutan_bukan_kayu.status', 'final')
@@ -599,7 +622,7 @@ class DashboardController extends Controller
                     : []
                 );
 
-                $binaUsahaData[$key]['bukan_kayu_commodity'] = \App\Models\HasilHutanBukanKayu::join('hasil_hutan_bukan_kayu_details', 'hasil_hutan_bukan_kayu.id', '=', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id')
+                $binaUsahaData[$key]['bukan_kayu_commodity'] = HasilHutanBukanKayu::join('hasil_hutan_bukan_kayu_details', 'hasil_hutan_bukan_kayu.id', '=', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id')
                     ->join('m_bukan_kayu', 'hasil_hutan_bukan_kayu_details.bukan_kayu_id', '=', 'm_bukan_kayu.id')
                     ->where('hasil_hutan_bukan_kayu.year', $currentYear)
                     ->where('hasil_hutan_bukan_kayu.status', 'final')
