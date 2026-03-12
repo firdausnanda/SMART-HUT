@@ -5,13 +5,19 @@ import { debounce } from 'lodash';
 import Pagination from '@/Components/Pagination';
 
 export default function Index({ auth, activities, filters }) {
+  const [params, setParams] = useState({
+    search: filters.search || '',
+    per_page: filters.per_page || 10,
+    sort: filters.sort || '',
+    direction: filters.direction || 'desc'
+  });
   const [searchQuery, setSearchQuery] = useState(filters.search || '');
 
   const handleSearch = useCallback(
     debounce((query) => {
       router.get(
         route('activity-log.index'),
-        { search: query },
+        { ...params, search: query },
         {
           preserveState: true,
           preserveScroll: true,
@@ -19,13 +25,65 @@ export default function Index({ auth, activities, filters }) {
         }
       );
     }, 500),
-    []
+    [params]
   );
 
   const onSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
+    setParams(prev => ({ ...prev, search: query }));
     handleSearch(query);
+  };
+
+  const handlePerPageChange = (perPage) => {
+    const newParams = { ...params, per_page: perPage };
+    setParams(newParams);
+    router.get(
+      route('activity-log.index'),
+      newParams,
+      {
+        preserveState: true,
+        preserveScroll: true,
+      }
+    );
+  };
+
+  const handleSort = (field) => {
+    let direction = 'desc';
+    if (params.sort === field && params.direction === 'desc') {
+      direction = 'asc';
+    } else if (params.sort === field && params.direction === 'asc') {
+      direction = 'desc';
+    }
+    const newParams = { ...params, sort: field, direction };
+    setParams(newParams);
+
+    router.get(route('activity-log.index'), newParams, {
+      preserveState: true,
+      preserveScroll: true,
+    });
+  };
+
+  const SortIcon = ({ field }) => {
+    return (
+      <div className="w-4 h-4 ml-1 text-gray-500">
+        {params.sort === field ? (
+          params.direction === 'asc' ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          )
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+          </svg>
+        )}
+      </div>
+    );
   };
 
   const formatDate = (dateString) => {
@@ -69,19 +127,35 @@ export default function Index({ auth, activities, filters }) {
             </div>
 
             {/* Search Input */}
-            <div className="relative w-full md:w-64">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                </svg>
+            <div className="flex flex-wrap items-center gap-4 flex-1 justify-end">
+              <div className="relative w-full md:w-64">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-all"
+                  placeholder="Cari aktivitas..."
+                  value={searchQuery}
+                  onChange={onSearchChange}
+                />
               </div>
-              <input
-                type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-all"
-                placeholder="Cari aktivitas..."
-                value={searchQuery}
-                onChange={onSearchChange}
-              />
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
+                <select
+                  className="text-sm font-bold border-gray-200 rounded-lg focus:ring-primary-500 focus:border-primary-500 py-1"
+                  value={params.per_page || 10}
+                  onChange={(e) => handlePerPageChange(e.target.value)}
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -89,10 +163,26 @@ export default function Index({ auth, activities, filters }) {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Waktu</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">User</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Aktivitas</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Subjek</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('created_at')}>
+                    <div className="flex items-center gap-1">
+                      Waktu <SortIcon field="created_at" />
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('causer_id')}>
+                    <div className="flex items-center gap-1">
+                      User <SortIcon field="causer_id" />
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('description')}>
+                    <div className="flex items-center gap-1">
+                      Aktivitas <SortIcon field="description" />
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group" onClick={() => handleSort('subject_type')}>
+                    <div className="flex items-center gap-1">
+                      Subjek <SortIcon field="subject_type" />
+                    </div>
+                  </th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Perubahan</th>
                 </tr>
               </thead>
@@ -145,8 +235,13 @@ export default function Index({ auth, activities, filters }) {
             </table>
           </div>
 
-          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+          <div className="px-6 py-4 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4 bg-gray-50/50">
             <Pagination links={activities.links} />
+            {activities.total > 0 && (
+              <div className="text-sm text-gray-500 text-center md:text-right">
+                Menampilkan <span className="font-bold text-gray-900">{activities.from}</span> sampai <span className="font-bold text-gray-900">{activities.to}</span> dari <span className="font-bold text-gray-900">{activities.total}</span> data
+              </div>
+            )}
           </div>
         </div>
       </div>

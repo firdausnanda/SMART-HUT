@@ -55,14 +55,15 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
 
   const formatNumber = (num) => new Intl.NumberFormat('id-ID').format(num);
 
+  const [searchQuery, setSearchQuery] = useState(filters.search || '');
+
   const handleSearch = useCallback(
-    debounce((value) => {
-      const newParams = { ...params, search: value };
-      setParams(newParams);
+    debounce((query) => {
       setIsSearching(true);
-      router.get(route('nilai-transaksi-ekonomi.index'), newParams, {
+      router.get(route('nilai-transaksi-ekonomi.index'), { ...params, search: query }, {
         preserveState: true,
         preserveScroll: true,
+        replace: true,
         onFinish: () => setIsSearching(false)
       });
     }, 500),
@@ -70,8 +71,9 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
   );
 
   const onSearchChange = (e) => {
-    const value = e.target.value;
-    handleSearch(value);
+    const query = e.target.value;
+    setSearchQuery(query);
+    handleSearch(query);
   };
 
   const handleYearChange = (option) => {
@@ -487,7 +489,7 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                   />
                 </div>
                 <div className="w-full md:w-64 relative">
-                  <TextInput className="w-full text-sm pl-10 bg-gray-50 border-gray-200 focus:bg-white transition-colors rounded-xl" placeholder="Cari KTH, Komoditas..." value={params.search} onChange={onSearchChange} />
+                  <TextInput className="w-full text-sm pl-10 bg-gray-50 border-gray-200 focus:bg-white transition-colors rounded-xl" placeholder="Cari KTH, Komoditas..." value={searchQuery} onChange={onSearchChange} />
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
                     <svg className="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                       <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />

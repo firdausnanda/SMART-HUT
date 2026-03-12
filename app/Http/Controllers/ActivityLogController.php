@@ -12,22 +12,35 @@ class ActivityLogController extends Controller
   {
     abort_unless($request->user()->hasRole('admin'), 403);
 
-    $query = Activity::query()
-      ->with('causer')
-      ->orderBy('created_at', 'desc');
+    $query = Activity::query()->with('causer');
 
-    if ($request->search) {
-      $query->where('description', 'like', '%' . $request->search . '%')
-        ->orWhereHas('causer', function ($q) use ($request) {
-          $q->where('name', 'like', '%' . $request->search . '%');
-        });
+    if ($request->sort) {
+      if ($request->sort === 'causer_id') {
+        // Sorting by user id
+        $query->orderBy('causer_id', $request->direction ?? 'asc');
+      } else {
+        $query->orderBy($request->sort, $request->direction ?? 'asc');
+      }
+    } else {
+      $query->orderBy('created_at', 'desc');
     }
 
-    $activities = $query->paginate(10)->withQueryString();
+    if ($request->search) {
+      $query->where(function ($q) use ($request) {
+        $q->where('description', 'like', '%' . $request->search . '%')
+          ->orWhere('subject_type', 'like', '%' . $request->search . '%')
+          ->orWhereHas('causer', function ($qCAuser) use ($request) {
+            $qCAuser->where('name', 'like', '%' . $request->search . '%');
+          });
+      });
+    }
+
+    $perPage = $request->per_page ? $request->per_page : 10;
+    $activities = $query->paginate($perPage)->withQueryString();
 
     return Inertia::render('ActivityLog/Index', [
       'activities' => $activities,
-      'filters' => $request->only(['search']),
+      'filters' => $request->only(['search', 'per_page']),
     ]);
   }
 }
