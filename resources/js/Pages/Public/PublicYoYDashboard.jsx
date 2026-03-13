@@ -1,60 +1,53 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import Select from 'react-select';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler } from 'chart.js';
-import LoadingOverlay from '@/Components/LoadingOverlay';
 
-// Imported Slide Components
-import PembinaanSlide from './Components/PembinaanSlide';
-import KebakaranSlide from './Components/KebakaranSlide';
-import JasaLingkunganSlide from './Components/JasaLingkunganSlide';
-import ProductionSlide from './Components/ProductionSlide';
-import PbphhSlide from './Components/PbphhSlide';
-import PnbpSlide from './Components/PnbpSlide';
-import KelembagaanPsSlide from './Components/KelembagaanPsSlide';
-import KelembagaanHrSlide from './Components/KelembagaanHrSlide';
+// Imported YoY Slide Components
+import YoYPembinaanSlide from './Components/YoYPembinaanSlide';
+import YoYKebakaranSlide from './Components/YoYKebakaranSlide';
+import YoYJasaLingkunganSlide from './Components/YoYJasaLingkunganSlide';
+import YoYProductionSlide from './Components/YoYProductionSlide';
+import YoYPnbpSlide from './Components/YoYPnbpSlide';
+import YoYKelembagaanSlide from './Components/YoYKelembagaanSlide';
 
 // Utils
 import { truncateName } from './Components/utils';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler);
 
-export default function PublicDashboard({ currentYear, availableYears, stats }) {
+export default function PublicYoYDashboard({ years, stats }) {
   const { auth } = usePage().props;
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingText, setLoadingText] = useState('Memuat Data...');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const modules = useMemo(() => [
-    { id: 0, title: 'Rehabilitasi Lahan', color: 'bg-emerald-600', text: 'text-emerald-600' },
-    { id: 1, title: 'Penghijauan Lingkungan', color: 'bg-teal-600', text: 'text-teal-600' },
-    { id: 2, title: 'Rehabilitasi Mangrove', color: 'bg-cyan-600', text: 'text-cyan-600' },
-    { id: 3, title: 'Bangunan Konservasi Tanah dan Air', color: 'bg-orange-600', text: 'text-orange-600' },
-    { id: 4, title: 'Reboisasi Area Perhutanan Sosial', color: 'bg-pink-600', text: 'text-pink-600' },
-    { id: 5, title: 'Kebakaran Hutan', color: 'bg-red-600', text: 'text-red-600' },
-    { id: 6, title: 'Jasa Lingkungan', color: 'bg-indigo-600', text: 'text-indigo-600' },
-    { id: 7, title: 'Produksi Hutan Negara', color: 'bg-blue-600', text: 'text-blue-600' },
-    { id: 8, title: 'Produksi Perhutanan Sosial', color: 'bg-sky-600', text: 'text-sky-600' },
-    { id: 9, title: 'Produksi Hutan Rakyat', color: 'bg-cyan-600', text: 'text-cyan-600' },
-    { id: 10, title: 'PBPHH', color: 'bg-slate-600', text: 'text-slate-600' },
-    { id: 11, title: 'Penerimaan Negara (PNBP)', color: 'bg-amber-600', text: 'text-amber-600' },
-    { id: 12, title: 'Kelembagaan Perhutanan Sosial', color: 'bg-emerald-600', text: 'text-emerald-600' },
-    { id: 13, title: 'Kelembagaan Hutan Rakyat', color: 'bg-lime-600', text: 'text-lime-600' },
+    { id: 0, title: 'Yoy: Rehabilitasi Lahan', color: 'bg-emerald-600', text: 'text-emerald-600' },
+    { id: 1, title: 'Yoy: Penghijauan Lingkungan', color: 'bg-teal-600', text: 'text-teal-600' },
+    { id: 2, title: 'Yoy: Rehabilitasi Mangrove', color: 'bg-cyan-600', text: 'text-cyan-600' },
+    { id: 3, title: 'Yoy: Bangunan Konservasi Tanah dan Air', color: 'bg-orange-600', text: 'text-orange-600' },
+    { id: 4, title: 'Yoy: Reboisasi Area Perhutanan Sosial', color: 'bg-pink-600', text: 'text-pink-600' },
+    { id: 5, title: 'Yoy: Kebakaran Hutan', color: 'bg-red-600', text: 'text-red-600' },
+    { id: 6, title: 'Yoy: Jasa Lingkungan', color: 'bg-indigo-600', text: 'text-indigo-600' },
+    { id: 7, title: 'Yoy: Produksi Hutan Negara', color: 'bg-blue-600', text: 'text-blue-600' },
+    { id: 8, title: 'Yoy: Produksi Perhutanan Sosial', color: 'bg-sky-600', text: 'text-sky-600' },
+    { id: 9, title: 'Yoy: Produksi Hutan Rakyat', color: 'bg-cyan-600', text: 'text-cyan-600' },
+    { id: 10, title: 'Yoy: PNBP', color: 'bg-amber-600', text: 'text-amber-600' },
+    { id: 11, title: 'Yoy: Kelembagaan Perhutanan Sosial', color: 'bg-emerald-600', text: 'text-emerald-600' },
+    { id: 12, title: 'Yoy: Kelembagaan Hutan Rakyat', color: 'bg-lime-600', text: 'text-lime-600' },
   ], []);
 
   const pembinaanSections = useMemo(() => [
-    { label: 'Rehabilitasi Lahan', total: stats?.pembinaan?.rehab_total, targetTotal: stats?.pembinaan?.rehab_target_total, chart: stats?.pembinaan?.rehab_chart, targetChart: stats?.pembinaan?.rehab_target_chart, fund: stats?.pembinaan?.rehab_fund, regency: stats?.pembinaan?.rehab_regency, color: '#10b981', unit: 'Ha' },
-    { label: 'Penghijauan Lingkungan', total: stats?.pembinaan?.penghijauan_total, targetTotal: stats?.pembinaan?.penghijauan_target_total, chart: stats?.pembinaan?.penghijauan_chart, targetChart: stats?.pembinaan?.penghijauan_target_chart, fund: stats?.pembinaan?.penghijauan_fund, regency: stats?.pembinaan?.penghijauan_regency, color: '#14b8a6', unit: 'Ha' },
-    { label: 'Rehabilitasi Mangrove', total: stats?.pembinaan?.manggrove_total, targetTotal: stats?.pembinaan?.manggrove_target_total, chart: stats?.pembinaan?.manggrove_chart, targetChart: stats?.pembinaan?.manggrove_target_chart, fund: stats?.pembinaan?.manggrove_fund, regency: stats?.pembinaan?.manggrove_regency, color: '#06b6d4', unit: 'Ha' },
-    { label: 'Bangunan Konservasi Tanah dan Air', total: stats?.pembinaan?.rhl_teknis_total, targetTotal: stats?.pembinaan?.rhl_teknis_target_total, chart: stats?.pembinaan?.rhl_teknis_chart, targetChart: stats?.pembinaan?.rhl_teknis_target_chart, fund: stats?.pembinaan?.rhl_teknis_fund, regency: null, types: stats?.pembinaan?.rhl_teknis_type, color: '#f97316', unit: 'Unit' },
-    { label: 'Reboisasi Area PS', total: stats?.pembinaan?.reboisasi_total, targetTotal: stats?.pembinaan?.reboisasi_target_total, chart: stats?.pembinaan?.reboisasi_chart, targetChart: stats?.pembinaan?.reboisasi_target_chart, fund: stats?.pembinaan?.reboisasi_fund, regency: stats?.pembinaan?.reboisasi_regency, pengelola: stats?.pembinaan?.reboisasi_pengelola, color: '#ec4899', unit: 'Ha' },
-  ], [stats?.pembinaan]);
+    { label: 'Rehabilitasi Lahan', key: 'rehab', color: '#10b981', unit: 'Ha' },
+    { label: 'Penghijauan Lingkungan', key: 'penghijauan', color: '#14b8a6', unit: 'Ha' },
+    { label: 'Rehabilitasi Mangrove', key: 'manggrove', color: '#06b6d4', unit: 'Ha' },
+    { label: 'Bangunan KTA', key: 'rhl_teknis', color: '#f97316', unit: 'Unit' },
+    { label: 'Reboisasi Area Perhutanan Sosial', key: 'reboisasi', color: '#ec4899', unit: 'Ha' },
+  ], []);
 
   const productionSources = useMemo(() => [
-    { key: 'hutan_negara', id: 7, title: 'Hutan Negara', color: '#2563eb', bg: 'bg-blue-600' },
-    { key: 'perhutanan_sosial', id: 8, title: 'Perhutanan Sosial', color: '#0ea5e9', bg: 'bg-sky-600' },
-    { key: 'hutan_rakyat', id: 9, title: 'Hutan Rakyat', color: '#0891b2', bg: 'bg-cyan-600' }
+    { key: 'hutan_negara', id: 6, title: 'Hutan Negara', color: '#2563eb' },
+    { key: 'perhutanan_sosial', id: 7, title: 'Perhutanan Sosial', color: '#0ea5e9' },
+    { key: 'hutan_rakyat', id: 8, title: 'Hutan Rakyat', color: '#0891b2' }
   ], []);
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % modules.length);
@@ -62,11 +55,16 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
 
   // Auto-slide effect
   useEffect(() => {
-    const interval = setInterval(nextSlide, 25000);
-    return () => clearInterval(interval);
-  }, []);
+    const slideInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        nextSlide();
+      }
+    }, 10000); // 10 seconds per slide
 
-  // Auto-reload data every 5 minutes
+    return () => clearInterval(slideInterval);
+  }, [modules.length]);
+
+  // Data reload effect
   useEffect(() => {
     const reloadInterval = setInterval(() => {
       if (document.visibilityState === 'visible') {
@@ -76,21 +74,10 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
           preserveState: true,
         });
       }
-    }, 1 * 60 * 1000); // 1 minutes
+    }, 1 * 60 * 1000); // 1 minute
 
     return () => clearInterval(reloadInterval);
   }, []);
-
-  const handleYearChange = (selectedOption) => {
-    router.get(route('public.dashboard'), { year: selectedOption.value }, {
-      preserveScroll: true,
-      onStart: () => {
-        setLoadingText('Mengambil Data Tahun ' + selectedOption.value + '...');
-        setIsLoading(true);
-      },
-      onFinish: () => setIsLoading(false),
-    });
-  };
 
   const commonOptions = useMemo(() => ({
     responsive: true,
@@ -100,10 +87,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans flex flex-col relative">
-      <Head title="Dashboard Monitoring Program Kehutanan" />
-
-      {/* Custom Loading Overlay */}
-      <LoadingOverlay isLoading={isLoading} text={loadingText} />
+      <Head title="Tren Infografis Multi-Year" />
 
       {/* Navbar */}
       <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
@@ -115,44 +99,18 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                   <img src="/img/logo.webp" alt="Logo" className="w-8 h-8 object-contain" />
                 </div>
                 <div className="hidden md:flex flex-col">
-                  <span className="font-display font-bold text-lg text-gray-900 leading-tight">Dashboard Monitoring</span>
+                  <span className="font-display font-bold text-lg text-gray-900 leading-tight">Dashboard Multi-Year</span>
                   <span className={`text-[10px] uppercase tracking-wider font-bold ${modules[currentSlide]?.text}`}>
                     CDK Wilayah Trenggalek
                   </span>
                 </div>
               </Link>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="w-32 sm:w-48">
-                <Select
-                  value={{ value: currentYear, label: `Tahun ${currentYear}` }}
-                  onChange={handleYearChange}
-                  options={availableYears ? availableYears.map(y => ({ value: y, label: `Tahun ${y}` })) : [{ value: currentYear, label: `Tahun ${currentYear}` }]}
-                  className="text-sm font-bold text-gray-700"
-                  placeholder="Pilih Tahun"
-                  styles={{
-                    control: (base, state) => ({
-                      ...base,
-                      borderRadius: '0.75rem', // rounded-xl
-                      padding: '0.125rem',
-                      borderColor: state.isFocused ? '#10b981' : '#e5e7eb', // emerald-500 or gray-200
-                      boxShadow: state.isFocused ? '0 0 0 2px rgba(16, 185, 129, 0.2)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                      '&:hover': {
-                        borderColor: '#d1d5db' // gray-300
-                      }
-                    }),
-                    option: (base, state) => ({
-                      ...base,
-                      backgroundColor: state.isSelected ? '#10b981' : state.isFocused ? '#d1fae5' : null, // emerald-500 : emerald-50
-                      color: state.isSelected ? 'white' : '#374151',
-                      cursor: 'pointer'
-                    }),
-                    singleValue: (base) => ({
-                      ...base,
-                      color: '#374151'
-                    })
-                  }}
-                />
+
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100">
+                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Periode:</span>
+                <span className="text-xs font-bold text-emerald-700">{years[years.length - 1]} - {years[0]}</span>
               </div>
 
               {/* Profile Dropdown */}
@@ -195,13 +153,11 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
                       )}
 
                       <Link
-                        href={route('public.dashboard-yoy')}
+                        href={route('public.dashboard')}
                         className="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors hover:text-emerald-600"
                       >
-                        <svg className="w-5 h-5 text-gray-500 group-hover/item:text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                        Infografis Performa YoY
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                        Infografis Tren Tahunan
                       </Link>
 
                       <Link
@@ -233,16 +189,15 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
             </button>
 
             <div className="text-center">
-              <h2 className={`text-4xl font-bold mb-2 transition-colors duration-500 ${modules[currentSlide]?.text}`}>
+              <h2 className={`text-4xl font-black mb-2 transition-colors duration-500 tracking-tight ${modules[currentSlide]?.text}`}>
                 {modules[currentSlide]?.title}
               </h2>
-              <div className="flex justify-center gap-2">
+              <div className="flex justify-center gap-2 mt-4">
                 {modules.map((m, i) => (
                   <button
                     key={m.id}
                     onClick={() => setCurrentSlide(i)}
                     className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === i ? `w-8 ${m.color}` : 'w-2 bg-gray-300'}`}
-                    aria-label={`Go to slide ${i + 1}`}
                   />
                 ))}
               </div>
@@ -254,68 +209,69 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
           </div>
 
           {/* Slides Content (Sliding Track) */}
-          <div className="relative overflow-hidden min-h-[550px]">
+          <div className="relative overflow-hidden min-h-[600px]">
             <div
               className="flex transition-transform duration-700 ease-in-out will-change-transform"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
-
-              {/* Slides 0-4: Specific Pembinaan Sections */}
-              {pembinaanSections.map((section, idx) => (
-                <PembinaanSlide
+              {/* Slides 0-4: Pembinaan Sections Multi-Year */}
+              {pembinaanSections.map((sec, idx) => (
+                <YoYPembinaanSlide
                   key={`pembinaan-${idx}`}
-                  section={section}
-                  currentYear={currentYear}
+                  label={sec.label}
+                  secKey={sec.key}
+                  years={years}
+                  stats={stats}
+                  color={sec.color}
+                  unit={sec.unit}
                   commonOptions={commonOptions}
                 />
               ))}
 
-              {/* Slide 5: Kebakaran Hutan */}
-              <KebakaranSlide
+              {/* Slide 5: Kebakaran Hutan Multi-Year */}
+              <YoYKebakaranSlide
+                years={years}
                 stats={stats}
-                currentYear={currentYear}
                 commonOptions={commonOptions}
               />
 
-              {/* Slide 6: Jasa Lingkungan */}
-              <JasaLingkunganSlide
+              {/* Slide 6: Jasa Lingkungan Multi-Year */}
+              <YoYJasaLingkunganSlide
+                years={years}
                 stats={stats}
-                currentYear={currentYear}
                 commonOptions={commonOptions}
               />
 
-              {/* Slides 7-9: Production Source Breakdown */}
+              {/* Slides 7-9: Production Multi-Year */}
               {productionSources.map((source) => (
-                <ProductionSlide
+                <YoYProductionSlide
                   key={source.key}
                   source={source}
+                  years={years}
                   stats={stats}
-                  currentYear={currentYear}
                   commonOptions={commonOptions}
                 />
               ))}
 
-              {/* Slide 10: PBPHH */}
-              <PbphhSlide
+              {/* Slide 9: PNBP Multi-Year */}
+              <YoYPnbpSlide
+                years={years}
                 stats={stats}
                 commonOptions={commonOptions}
               />
 
-              {/* Slide 11: PNBP */}
-              <PnbpSlide
-                stats={stats}
-                currentYear={currentYear}
-                commonOptions={commonOptions}
-              />
-
-              {/* Slide 12: Kelembagaan Perhutanan Sosial */}
-              <KelembagaanPsSlide
+              {/* Slide 10: Kelembagaan PS Multi-Year */}
+              <YoYKelembagaanSlide
+                type="ps"
+                years={years}
                 stats={stats}
                 commonOptions={commonOptions}
               />
 
-              {/* Slide 13: Kelembagaan Hutan Rakyat */}
-              <KelembagaanHrSlide
+              {/* Slide 11: Kelembagaan HR Multi-Year */}
+              <YoYKelembagaanSlide
+                type="hr"
+                years={years}
                 stats={stats}
                 commonOptions={commonOptions}
               />

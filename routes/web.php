@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
 
     // Public Dashboard Routes (Accessible by all authed users)
     Route::get('/public/dashboard', [DashboardController::class, 'publicDashboard'])->name('public.dashboard');
+    Route::get('/public/dashboard-yoy', [DashboardController::class, 'publicYoYDashboard'])->name('public.dashboard-yoy');
     // Dashboard Export
     Route::get('/dashboard/export-rehab-lahan', [DashboardController::class, 'exportRehabLahan'])->name('dashboard.export-rehab-lahan');
 

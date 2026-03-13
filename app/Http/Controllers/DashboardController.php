@@ -293,6 +293,28 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function publicYoYDashboard(Request $request)
+    {
+        $thisYear = (int) date('Y');
+        $years = range($thisYear, 2021);
+
+        $stats = [];
+        foreach ($years as $year) {
+            $stats[$year] = [
+                'pembinaan' => $this->getPembinaanStats($year),
+                'perlindungan' => $this->getPerlindunganStats($year),
+                'bina_usaha' => $this->getBinaUsahaStats($year),
+                'kelembagaan_ps' => $this->getKelembagaanPsStats($year),
+                'kelembagaan_hr' => $this->getKelembagaanHrStats($year),
+            ];
+        }
+
+        return Inertia::render('Public/PublicYoYDashboard', [
+            'years' => $years,
+            'stats' => $stats
+        ]);
+    }
+
     private function getPembinaanStats($currentYear)
     {
         return Cache::remember("pembinaan_stats_{$currentYear}", 300, function () use ($currentYear) {

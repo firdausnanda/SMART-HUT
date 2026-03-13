@@ -115,7 +115,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion, totalData = 
                                         Dashboard Infografis Tahun Berjalan
                                     </Link>
                                     <Link
-                                        href={route('public.dashboard')}
+                                        href={route('public.dashboard-yoy')}
                                         className="px-6 py-3 rounded-full bg-yellow-400 text-yellow-900 font-semibold text-sm hover:bg-yellow-500 shadow-lg shadow-yellow-400/20 transition-all duration-300 transform hover:-translate-y-0.5 text-center"
                                     >
                                         Dashboard Infografis Year-on-Year

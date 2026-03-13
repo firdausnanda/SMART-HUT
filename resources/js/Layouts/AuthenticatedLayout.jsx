@@ -1119,8 +1119,22 @@ export default function Authenticated({ user, header, children }) {
                                                         </svg>
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-bold text-gray-700 group-hover/item:text-primary-700 whitespace-nowrap">Dashboard Infografis</span>
-                                                        <span className="text-[10px] text-gray-400">Halaman Depan</span>
+                                                        <span className="text-sm font-bold text-gray-700 group-hover/item:text-primary-700 whitespace-nowrap">Infografis Tren Tahunan</span>
+                                                        <span className="text-[10px] text-gray-400">Statistik Tahunan</span>
+                                                    </div>
+                                                </div>
+                                            </Dropdown.Link>
+
+                                            <Dropdown.Link href={route('public.dashboard-yoy')} className="rounded-xl !hover:bg-primary-50 hover:text-primary-700 transition-all duration-200 group/item py-2.5">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center group-hover/item:bg-white transition-colors border border-transparent group-hover/item:border-primary-100">
+                                                        <svg className="w-5 h-5 text-gray-500 group-hover/item:text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-bold text-gray-700 group-hover/item:text-primary-700 whitespace-nowrap">Infografis Performa YoY</span>
+                                                        <span className="text-[10px] text-gray-400">Tren Multi-Tahun</span>
                                                     </div>
                                                 </div>
                                             </Dropdown.Link>
