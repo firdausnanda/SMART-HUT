@@ -45,6 +45,9 @@ class NilaiTransaksiEkonomiController extends Controller
         'details.commodity' => fn($q) => $q->withoutGlobalScope('not_nilai_transaksi_ekonomi')->select('id', 'name'),
       ])
       ->where('year', $selectedYear)
+      ->when($request->only_mine === 'true' || $request->only_mine === true, function ($q) {
+        $q->where('created_by', auth()->id());
+      })
 
       ->when($request->search, function ($q, $search) {
         $q->where('nama_kth', 'like', "{$search}%")
@@ -127,6 +130,7 @@ class NilaiTransaksiEkonomiController extends Controller
         'sort' => $sort,
         'direction' => $direction,
         'per_page' => (int) $request->query('per_page', 10),
+        'only_mine' => $request->boolean('only_mine'),
       ],
       'availableYears' => $availableYears,
     ]);

@@ -1,29 +1,89 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { debounce } from 'lodash';
 import Pagination from '@/Components/Pagination';
+import Select from 'react-select';
 
-export default function Index({ auth, activities, filters }) {
+export default function Index({ auth, activities, filters, options }) {
   const [params, setParams] = useState({
     search: filters.search || '',
     per_page: filters.per_page || 10,
     sort: filters.sort || '',
-    direction: filters.direction || 'desc'
+    direction: filters.direction || 'desc',
+    user_id: filters.user_id || '',
+    action: filters.action || '',
+    subject_type: filters.subject_type || '',
+    subject_id: filters.subject_id || '',
+    date_start: filters.date_start || '',
+    date_end: filters.date_end || '',
   });
   const [searchQuery, setSearchQuery] = useState(filters.search || '');
+  const [showAdvanced, setShowAdvanced] = useState(
+    !!(filters.user_id || filters.action || filters.subject_type || filters.subject_id || filters.date_start || filters.date_end)
+  );
+
+  // Transform options for react-select
+  const userOptions = useMemo(() => [
+    { value: '', label: 'Semua User' },
+    ...options.users.map(user => ({ value: user.id.toString(), label: user.name }))
+  ], [options.users]);
+
+  const actionOptions = useMemo(() => [
+    { value: '', label: 'Semua Aksi' },
+    ...options.actions.map(action => ({ value: action, label: action.charAt(0).toUpperCase() + action.slice(1) }))
+  ], [options.actions]);
+
+  const subjectTypeOptions = useMemo(() => [
+    { value: '', label: 'Semua Model' },
+    ...options.subject_types.map(type => ({ value: type.value, label: type.label }))
+  ], [options.subject_types]);
+
+  // React-select custom styles
+  const customSelectStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      borderRadius: '0.75rem',
+      borderColor: state.isFocused ? '#10b981' : '#e5e7eb',
+      boxShadow: state.isFocused ? '0 0 0 2px rgba(16, 185, 129, 0.2)' : 'none',
+      '&:hover': {
+        borderColor: state.isFocused ? '#10b981' : '#d1d5db',
+      },
+      minHeight: '38px',
+      fontSize: '0.875rem',
+      backgroundColor: 'white',
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected ? '#10b981' : state.isFocused ? '#ecfdf5' : 'white',
+      color: state.isSelected ? 'white' : '#374151',
+      fontSize: '0.875rem',
+      cursor: 'pointer',
+      '&:active': {
+        backgroundColor: '#10b981',
+      },
+    }),
+    placeholder: (provided) => ({ ...provided, color: '#9ca3af' }),
+    singleValue: (provided) => ({ ...provided, color: '#374151' }),
+  };
+
+  const applyFilters = (newParams) => {
+    router.get(
+      route('activity-log.index'),
+      newParams,
+      {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+      }
+    );
+  };
 
   const handleSearch = useCallback(
     debounce((query) => {
-      router.get(
-        route('activity-log.index'),
-        { ...params, search: query },
-        {
-          preserveState: true,
-          preserveScroll: true,
-          replace: true,
-        }
-      );
+      const newParams = { ...params, search: query };
+      setParams(newParams);
+      applyFilters(newParams);
     }, 500),
     [params]
   );
@@ -31,21 +91,35 @@ export default function Index({ auth, activities, filters }) {
   const onSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    setParams(prev => ({ ...prev, search: query }));
     handleSearch(query);
   };
 
-  const handlePerPageChange = (perPage) => {
-    const newParams = { ...params, per_page: perPage };
+  const handleFilterChange = (key, value) => {
+    const newParams = { ...params, [key]: value };
     setParams(newParams);
-    router.get(
-      route('activity-log.index'),
-      newParams,
-      {
-        preserveState: true,
-        preserveScroll: true,
-      }
-    );
+    applyFilters(newParams);
+  };
+
+  const resetFilters = () => {
+    const defaultParams = {
+      search: '',
+      per_page: 10,
+      sort: '',
+      direction: 'desc',
+      user_id: '',
+      action: '',
+      subject_type: '',
+      subject_id: '',
+      date_start: '',
+      date_end: '',
+    };
+    setParams(defaultParams);
+    setSearchQuery('');
+    applyFilters(defaultParams);
+  };
+
+  const handlePerPageChange = (perPage) => {
+    handleFilterChange('per_page', perPage);
   };
 
   const handleSort = (field) => {
@@ -57,11 +131,7 @@ export default function Index({ auth, activities, filters }) {
     }
     const newParams = { ...params, sort: field, direction };
     setParams(newParams);
-
-    router.get(route('activity-log.index'), newParams, {
-      preserveState: true,
-      preserveScroll: true,
-    });
+    applyFilters(newParams);
   };
 
   const SortIcon = ({ field }) => {
@@ -126,7 +196,7 @@ export default function Index({ auth, activities, filters }) {
               </div>
             </div>
 
-            {/* Search Input */}
+            {/* Search Input and Advanced Toggle */}
             <div className="flex flex-wrap items-center gap-4 flex-1 justify-end">
               <div className="relative w-full md:w-64">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -143,6 +213,17 @@ export default function Index({ auth, activities, filters }) {
                 />
               </div>
 
+              <button
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all border
+                                    ${showAdvanced ? 'bg-primary-50 border-primary-100 text-primary-600' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Advanced Filter
+              </button>
+
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
                 <select
@@ -158,6 +239,92 @@ export default function Index({ auth, activities, filters }) {
               </div>
             </div>
           </div>
+
+          {/* Advanced Filter Panel */}
+          {showAdvanced && (
+            <div className="px-6 py-6 bg-gray-50/50 border-b border-gray-100 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">User</label>
+                  <Select
+                    options={userOptions}
+                    styles={customSelectStyles}
+                    value={userOptions.find(opt => opt.value === params.user_id.toString())}
+                    onChange={(opt) => handleFilterChange('user_id', opt ? opt.value : '')}
+                    placeholder="Pilih User"
+                    isSearchable
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Aksi</label>
+                  <Select
+                    options={actionOptions}
+                    styles={customSelectStyles}
+                    value={actionOptions.find(opt => opt.value === params.action)}
+                    onChange={(opt) => handleFilterChange('action', opt ? opt.value : '')}
+                    placeholder="Pilih Aksi"
+                    isSearchable
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Tipe Model</label>
+                  <Select
+                    options={subjectTypeOptions}
+                    styles={customSelectStyles}
+                    value={subjectTypeOptions.find(opt => opt.value === params.subject_type)}
+                    onChange={(opt) => handleFilterChange('subject_type', opt ? opt.value : '')}
+                    placeholder="Pilih Model"
+                    isSearchable
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Subject ID</label>
+                  <input
+                    type="number"
+                    className="block w-full text-sm border-gray-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 bg-white px-3 py-[7px]"
+                    placeholder="Contoh: 123"
+                    value={params.subject_id}
+                    onChange={(e) => handleFilterChange('subject_id', e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Dari Tanggal</label>
+                  <input
+                    type="date"
+                    className="block w-full text-sm border-gray-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 bg-white px-3 py-1.5"
+                    value={params.date_start}
+                    onChange={(e) => handleFilterChange('date_start', e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Sampai Tanggal</label>
+                  <input
+                    type="date"
+                    className="block w-full text-sm border-gray-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 bg-white px-3 py-1.5"
+                    value={params.date_end}
+                    onChange={(e) => handleFilterChange('date_end', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={resetFilters}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Reset Filter
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
