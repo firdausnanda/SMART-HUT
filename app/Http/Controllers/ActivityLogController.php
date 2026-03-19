@@ -16,7 +16,6 @@ class ActivityLogController extends Controller
 
     if ($request->sort) {
       if ($request->sort === 'causer_id') {
-        // Sorting by user id
         $query->orderBy('causer_id', $request->direction ?? 'asc');
       } else {
         $query->orderBy($request->sort, $request->direction ?? 'asc');

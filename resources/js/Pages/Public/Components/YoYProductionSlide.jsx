@@ -6,30 +6,30 @@ import { formatNumber } from './utils';
 const YoYProductionSlide = ({ source, years, stats, commonOptions }) => {
   const chronologicalYears = useMemo(() => [...years].reverse(), [years]);
 
-  const trendData = useMemo(() => {
-    return {
-      labels: chronologicalYears.map(y => `Thn ${y}`),
-      datasets: [
-        {
-          label: 'Kayu (m³)',
-          data: chronologicalYears.map(y => stats[y].bina_usaha?.[source.key]?.kayu_total || 0),
-          borderColor: source.color,
-          backgroundColor: source.color + '20',
-          fill: true,
-          tension: 0.4,
-        },
-        {
-          label: 'HHBK (Satuan)',
-          data: chronologicalYears.map(y => stats[y].bina_usaha?.[source.key]?.bukan_kayu_total || 0),
-          borderColor: '#0ea5e9',
-          backgroundColor: '#0ea5e920',
-          fill: true,
-          tension: 0.4,
-          borderDash: [5, 5],
-        }
-      ]
-    };
-  }, [chronologicalYears, stats, source]);
+  const kayuTrendData = useMemo(() => ({
+    labels: chronologicalYears.map(y => `Thn ${y}`),
+    datasets: [{
+      label: 'Kayu (m³)',
+      data: chronologicalYears.map(y => stats[y].bina_usaha?.[source.key]?.kayu_total || 0),
+      borderColor: source.color,
+      backgroundColor: source.color + '20',
+      fill: true,
+      tension: 0.4,
+    }]
+  }), [chronologicalYears, stats, source]);
+
+  const hhbkTrendData = useMemo(() => ({
+    labels: chronologicalYears.map(y => `Thn ${y}`),
+    datasets: [{
+      label: 'HHBK (Satuan)',
+      data: chronologicalYears.map(y => stats[y].bina_usaha?.[source.key]?.bukan_kayu_total || 0),
+      borderColor: '#0ea5e9',
+      backgroundColor: '#0ea5e920',
+      fill: true,
+      tension: 0.4,
+      borderDash: [5, 5],
+    }]
+  }), [chronologicalYears, stats, source]);
 
   let yearsCount = years.length;
 
@@ -58,14 +58,18 @@ const YoYProductionSlide = ({ source, years, stats, commonOptions }) => {
             />
           </div>
 
-          <div className="md:col-span-3 space-y-6">
+          <div className="lg:col-span-3 space-y-8">
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
-              <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Tren Produksi {yearsCount} Tahun Terakhir - {source.title}</h4>
-              <div className="flex-1 min-h-[400px]">
-                <Line
-                  data={trendData}
-                  options={commonOptions}
-                />
+              <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Tren Produksi Kayu {yearsCount} Tahun Terakhir - {source.title}</h4>
+              <div className="h-full">
+                <Line data={kayuTrendData} options={commonOptions} />
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
+              <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Tren Produksi HHBK {yearsCount} Tahun Terakhir - {source.title}</h4>
+              <div className="h-full">
+                <Line data={hhbkTrendData} options={commonOptions} />
               </div>
             </div>
           </div>
