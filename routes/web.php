@@ -35,6 +35,9 @@ use App\Http\Controllers\SkpsController;
 use App\Http\Controllers\SumberDanaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VillageController;
+use App\Http\Controllers\DemografiPegawaiController;
+use App\Http\Controllers\BezettingJabatanController;
+use App\Http\Controllers\ProyeksiGajiController;
 use App\Http\Middleware\CheckDashboardAccess;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -225,6 +228,18 @@ Route::middleware('auth')->group(function () {
     Route::resource('pengelola-wisata', PengelolaWisataController::class);
     Route::resource('pengelola-ps', PengelolaPsController::class);
     Route::resource('skema-perhutanan-sosial', SkemaPerhutananSosialController::class);
+
+    // Kepegawaian
+    Route::get('demografi-pegawai/export', [DemografiPegawaiController::class, 'export'])->name('demografi-pegawai.export');
+    Route::get('demografi-pegawai/template', [DemografiPegawaiController::class, 'template'])->name('demografi-pegawai.template');
+    Route::post('demografi-pegawai/import', [DemografiPegawaiController::class, 'import'])->name('demografi-pegawai.import');
+    Route::post('demografi-pegawai/{demografi_pegawai}/single-workflow-action', [DemografiPegawaiController::class, 'singleWorkflowAction'])->name('demografi-pegawai.single-workflow-action');
+    Route::post('demografi-pegawai/bulk-workflow-action', [DemografiPegawaiController::class, 'bulkWorkflowAction'])->name('demografi-pegawai.bulk-workflow-action');
+    Route::resource('demografi-pegawai', DemografiPegawaiController::class);
+    Route::post('bezetting-jabatan/{bezetting_jabatan}/single-workflow-action', [BezettingJabatanController::class, 'singleWorkflowAction'])->name('bezetting-jabatan.single-workflow-action');
+    Route::post('bezetting-jabatan/bulk-workflow-action', [BezettingJabatanController::class, 'bulkWorkflowAction'])->name('bezetting-jabatan.bulk-workflow-action');
+    Route::resource('bezetting-jabatan', BezettingJabatanController::class)->parameters(['bezetting-jabatan' => 'bezetting_jabatan']);
+    Route::get('proyeksi-gaji', [ProyeksiGajiController::class, 'index'])->name('proyeksi-gaji.index');
 
     Route::get('clear-cache', function () {
         Artisan::call('cache:clear');

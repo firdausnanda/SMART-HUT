@@ -30,7 +30,9 @@ export default function Authenticated({ user, header, children }) {
         kelembagaan_hutan_rakyat: route().current('perkembangan-kth.*') || route().current('nilai-transaksi-ekonomi.*'),
         kelembagaan_hutan_rakyat_mobile: route().current('perkembangan-kth.*') || route().current('nilai-transaksi-ekonomi.*'),
         data_master: route().current('provinces.*') || route().current('regencies.*') || route().current('districts.*') || route().current('villages.*') || route().current('bangunan-kta.*') || route().current('sumber-dana.*') || route().current('commodities.*') || route().current('bukan-kayu.*') || route().current('kayu.*') || route().current('jenis-produksi.*') || route().current('pengelola-wisata.*') || route().current('pengelola-ps.*') || route().current('skema-perhutanan-sosial.*'),
-        data_master_mobile: route().current('provinces.*') || route().current('regencies.*') || route().current('districts.*') || route().current('villages.*') || route().current('bangunan-kta.*') || route().current('sumber-dana.*') || route().current('commodities.*') || route().current('bukan-kayu.*') || route().current('kayu.*') || route().current('jenis-produksi.*') || route().current('pengelola-wisata.*') || route().current('pengelola-ps.*') || route().current('skema-perhutanan-sosial.*')
+        data_master_mobile: route().current('provinces.*') || route().current('regencies.*') || route().current('districts.*') || route().current('villages.*') || route().current('bangunan-kta.*') || route().current('sumber-dana.*') || route().current('commodities.*') || route().current('bukan-kayu.*') || route().current('kayu.*') || route().current('jenis-produksi.*') || route().current('pengelola-wisata.*') || route().current('pengelola-ps.*') || route().current('skema-perhutanan-sosial.*'),
+        kepegawaian: route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*'),
+        kepegawaian_mobile: route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*')
     });
 
     const { flash, auth } = usePage().props;
@@ -415,6 +417,51 @@ export default function Authenticated({ user, header, children }) {
                                 )}
                             </div>
                         )}
+
+                        {/* Kepegawaian */}
+                        <div className="space-y-1">
+                            <button
+                                onClick={() => toggleMenu('kepegawaian')}
+                                className={`w-full group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${isSidebarCollapsed ? 'justify-center px-0' : 'px-4'
+                                    } ${openMenus['kepegawaian'] || route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*')
+                                        ? 'bg-white/10 border-white/20 text-white shadow-sm'
+                                        : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white'
+                                    }`}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className={`flex-shrink-0 h-5 w-5 transition-colors ${isSidebarCollapsed ? 'mx-auto' : 'mr-3'} ${openMenus['kepegawaian'] ? 'text-white' : 'text-primary-300 group-hover:text-white'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                {!isSidebarCollapsed && (
+                                    <>
+                                        <span className="text-sm font-semibold flex-1 text-left">Kepegawaian</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform duration-200 ${openMenus['kepegawaian'] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </>
+                                )}
+                            </button>
+
+                            {!isSidebarCollapsed && openMenus['kepegawaian'] && (
+                                <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
+                                    {[
+                                        { name: 'Demografi Pegawai', route: route('demografi-pegawai.index'), pattern: 'demografi-pegawai.*' },
+                                        { name: 'Bezetting Jabatan', route: route('bezetting-jabatan.index'), pattern: 'bezetting-jabatan.*' },
+                                        { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*' }
+                                    ].map((item) => (
+                                        <Link
+                                            key={item.name}
+                                            href={item.route}
+                                            className={`block py-2 text-xs font-medium transition-colors ${route().current(item.pattern)
+                                                ? 'text-white font-bold'
+                                                : 'text-primary-200 hover:text-white'
+                                                }`}
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
                         {/* Data Master */}
                         {user.roles.includes('admin') && (
@@ -896,6 +943,46 @@ export default function Authenticated({ user, header, children }) {
                                 )}
                             </div>
                         )}
+
+                        {/* Kepegawaian Mobile */}
+                        <div className="space-y-1">
+                            <button
+                                onClick={() => toggleMenu('kepegawaian_mobile')}
+                                className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${openMenus['kepegawaian_mobile'] || route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*')
+                                    ? 'bg-white/10 border-white/20 text-white'
+                                    : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
+                                    }`}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span className="flex-1 text-left">Kepegawaian</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${openMenus['kepegawaian_mobile'] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            {openMenus['kepegawaian_mobile'] && (
+                                <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
+                                    {[
+                                        { name: 'Demografi Pegawai', route: route('demografi-pegawai.index'), pattern: 'demografi-pegawai.*' },
+                                        { name: 'Bezetting Jabatan', route: route('bezetting-jabatan.index'), pattern: 'bezetting-jabatan.*' },
+                                        { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*' }
+                                    ].map((item) => (
+                                        <Link
+                                            key={item.name}
+                                            href={item.route}
+                                            onClick={() => setShowingNavigationDropdown(false)}
+                                            className={`block py-2 text-[13px] font-medium transition-colors ${route().current(item.pattern)
+                                                ? 'text-white font-bold'
+                                                : 'text-primary-300 hover:text-white'
+                                                }`}
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
                         {/* Data Master Mobile */}
                         {user.roles.includes('admin') && (
