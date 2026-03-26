@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
-import { 
-    Calendar, 
-    ChevronDown, 
-    Filter, 
-    Download, 
-    Search, 
-    User, 
-    Building2, 
-    BadgeCheck, 
-    AlertCircle, 
+import {
+    Calendar,
+    ChevronDown,
+    Filter,
+    Download,
+    Search,
+    User,
+    Building2,
+    BadgeCheck,
+    AlertCircle,
     Clock,
     UserMinus,
     TrendingUp,
@@ -18,30 +18,32 @@ import {
 } from 'lucide-react';
 import TextInput from '@/Components/TextInput';
 import Select from 'react-select';
+import LoadingOverlay from '@/Components/LoadingOverlay';
 
 export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }) {
     const [activeTab, setActiveTab] = useState('kgb');
     const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const months = [
         { value: 'all', label: 'Semua Bulan' },
-        { value: '1', label: 'Januari' },
-        { value: '2', label: 'Februari' },
-        { value: '3', label: 'Maret' },
-        { value: '4', label: 'April' },
-        { value: '5', label: 'Mei' },
-        { value: '6', label: 'Juni' },
-        { value: '7', label: 'Juli' },
-        { value: '8', label: 'Agustus' },
-        { value: '9', label: 'September' },
-        { value: '10', label: 'Oktober' },
-        { value: '11', label: 'November' },
-        { value: '12', label: 'Desember' },
+        { value: 1, label: 'Januari' },
+        { value: 2, label: 'Februari' },
+        { value: 3, label: 'Maret' },
+        { value: 4, label: 'April' },
+        { value: 5, label: 'Mei' },
+        { value: 6, label: 'Juni' },
+        { value: 7, label: 'Juli' },
+        { value: 8, label: 'Agustus' },
+        { value: 9, label: 'September' },
+        { value: 10, label: 'Oktober' },
+        { value: 11, label: 'November' },
+        { value: 12, label: 'Desember' },
     ];
 
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 11 }, (_, i) => currentYear - 2 + i).map(y => ({ value: y, label: y.toString() }));
-    
+
     const unitOptions = [
         { value: '', label: 'Semua Unit Kerja' },
         ...filters.unit_kerja.map(unit => ({ value: unit, label: unit }))
@@ -54,7 +56,19 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
         }, {
             preserveState: true,
             preserveScroll: true,
+            onStart: () => setIsLoading(true),
+            onFinish: () => setIsLoading(false),
         });
+    };
+
+    const handleExport = () => {
+        const queryParams = new URLSearchParams({
+            year: filters.year,
+            month: filters.month,
+            unit_kerja: filters.selected_unit || '',
+        }).toString();
+
+        window.location.href = route('proyeksi-gaji.export') + '?' + queryParams;
     };
 
     const selectStyles = {
@@ -105,8 +119,8 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
         }
     };
 
-    const filteredData = (activeTab === 'kgb' ? proyeksiKgb : proyeksiPensiun).filter(item => 
-        item.nama?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const filteredData = (activeTab === 'kgb' ? proyeksiKgb : proyeksiPensiun).filter(item =>
+        item.nama?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.nip?.includes(searchTerm)
     );
 
@@ -116,10 +130,11 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Proyeksi Gaji Berkala dan Pensiun</h2>}
         >
             <Head title="Proyeksi Gaji Berkala dan Pensiun" />
+            <LoadingOverlay isLoading={isLoading} />
 
             <div className="py-6 space-y-6">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    
+
                     {/* Modern Header Section */}
                     <div className="bg-gradient-to-r from-primary-800 to-primary-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
                         <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5 transform skew-x-12 shrink-0"></div>
@@ -132,7 +147,7 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
                             </div>
                             <div className="flex gap-2">
                                 <button
-                                    onClick={() => {}}
+                                    onClick={handleExport}
                                     className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
                                 >
                                     <Download className="w-4 h-4" />
@@ -188,7 +203,7 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
                     </div>
 
                     {/* Table Section Card */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
                         {/* Table Tool Bar with React Select */}
                         <div className="p-6 border-b border-gray-100 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
                             <div className="flex flex-col md:flex-row md:items-center gap-4 flex-1">
@@ -196,7 +211,7 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
                                     <h3 className="font-bold text-gray-800 whitespace-nowrap">Daftar Proyeksi</h3>
                                     <div className="h-6 w-px bg-gray-200 hidden md:block"></div>
                                 </div>
-                                
+
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
                                     <div className="flex flex-col gap-1.5 min-w-[120px]">
                                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Tahun</span>
@@ -213,7 +228,7 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
                                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Bulan</span>
                                         <Select
                                             options={months}
-                                            value={months.find(m => m.value === filters.month)}
+                                            value={months.find(m => m.value.toString() === filters.month.toString())}
                                             onChange={(opt) => handleFilterChange('month', opt?.value)}
                                             styles={selectStyles}
                                             isSearchable={false}
@@ -253,33 +268,29 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
                         <div className="flex px-6 pt-6 gap-4 border-b border-gray-50 flex-none pb-4 overflow-x-auto no-scrollbar">
                             <button
                                 onClick={() => setActiveTab('kgb')}
-                                className={`flex items-center space-x-2 pb-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap px-1 ${
-                                    activeTab === 'kgb' 
-                                    ? 'text-primary-700 border-primary-600 font-black' 
+                                className={`flex items-center space-x-2 pb-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap px-1 ${activeTab === 'kgb'
+                                    ? 'text-primary-700 border-primary-600 font-black'
                                     : 'text-gray-400 border-transparent hover:text-gray-600'
-                                }`}
+                                    }`}
                             >
                                 <BadgeCheck className={`w-4 h-4 ${activeTab === 'kgb' ? 'text-primary-600' : ''}`} />
                                 <span>Proyeksi KGB</span>
-                                <span className={`ml-2 px-2 py-0.5 rounded-lg text-[10px] font-black ${
-                                    activeTab === 'kgb' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-400'
-                                }`}>
+                                <span className={`ml-2 px-2 py-0.5 rounded-lg text-[10px] font-black ${activeTab === 'kgb' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-400'
+                                    }`}>
                                     {proyeksiKgb.length}
                                 </span>
                             </button>
                             <button
                                 onClick={() => setActiveTab('pensiun')}
-                                className={`flex items-center space-x-2 pb-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap px-1 ${
-                                    activeTab === 'pensiun' 
-                                    ? 'text-primary-700 border-primary-600 font-black' 
+                                className={`flex items-center space-x-2 pb-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap px-1 ${activeTab === 'pensiun'
+                                    ? 'text-primary-700 border-primary-600 font-black'
                                     : 'text-gray-400 border-transparent hover:text-gray-600'
-                                }`}
+                                    }`}
                             >
                                 <UserMinus className={`w-4 h-4 ${activeTab === 'pensiun' ? 'text-primary-600' : ''}`} />
                                 <span>Proyeksi Pensiun</span>
-                                <span className={`ml-2 px-2 py-0.5 rounded-lg text-[10px] font-black ${
-                                    activeTab === 'pensiun' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-400'
-                                }`}>
+                                <span className={`ml-2 px-2 py-0.5 rounded-lg text-[10px] font-black ${activeTab === 'pensiun' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-400'
+                                    }`}>
                                     {proyeksiPensiun.length}
                                 </span>
                             </button>

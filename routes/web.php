@@ -239,6 +239,7 @@ Route::middleware('auth')->group(function () {
     Route::post('bezetting-jabatan/{bezetting_jabatan}/single-workflow-action', [BezettingJabatanController::class, 'singleWorkflowAction'])->name('bezetting-jabatan.single-workflow-action');
     Route::post('bezetting-jabatan/bulk-workflow-action', [BezettingJabatanController::class, 'bulkWorkflowAction'])->name('bezetting-jabatan.bulk-workflow-action');
     Route::resource('bezetting-jabatan', BezettingJabatanController::class)->parameters(['bezetting-jabatan' => 'bezetting_jabatan']);
+    Route::get('proyeksi-gaji/export', [ProyeksiGajiController::class, 'export'])->name('proyeksi-gaji.export');
     Route::get('proyeksi-gaji', [ProyeksiGajiController::class, 'index'])->name('proyeksi-gaji.index');
 
     Route::get('clear-cache', function () {
