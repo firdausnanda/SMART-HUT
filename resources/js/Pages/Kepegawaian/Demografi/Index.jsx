@@ -69,10 +69,12 @@ export default function DemografiIndex({ auth, pegawais, filters }) {
     const userPermissions = auth.user.permissions || [];
     
     // Default to true if permissions are not strictly seeded yet, ensuring functionality
-    const canCreate = userPermissions.includes('pegawai.create') || isAdmin || true;
-    const canEdit = userPermissions.includes('pegawai.edit') || isAdmin || true;
-    const canDelete = userPermissions.includes('pegawai.delete') || isAdmin || true;
-    const canApprove = userPermissions.includes('pegawai.approve') || isAdmin || true;
+    const canCreate = userPermissions.includes('kepegawaian.create') || isAdmin;
+    const canEdit = userPermissions.includes('kepegawaian.edit') || isAdmin;
+    const canDelete = userPermissions.includes('kepegawaian.delete') || isAdmin;
+    const canApprove = userPermissions.includes('kepegawaian.approve') || isAdmin;
+    const canExport = userPermissions.includes('kepegawaian.export') || isAdmin;
+    const canImport = userPermissions.includes('kepegawaian.import') || isAdmin;
 
     const performQuery = (query, field = sortField, dir = sortDir, limit = perPage) => {
         router.get(
@@ -232,34 +234,40 @@ export default function DemografiIndex({ auth, pegawais, filters }) {
                         </div>
                         <div className="flex gap-2">
                             {/* Export Button */}
-                            <button
-                                onClick={() => window.location.href = route('demografi-pegawai.export')}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                </svg>
-                                Export
-                            </button>
-                            {/* Import Button */}
-                            <button
-                                onClick={() => setShowImportModal(true)}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                </svg>
-                                Import
-                            </button>
-                            {/* Add Button */}
-                            <Link href={route('demografi-pegawai.create')} className="shrink-0">
-                                <button className="flex items-center gap-2 px-5 py-2.5 bg-white text-primary-700 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-50 transition-colors">
+                            {canExport && (
+                                <button
+                                    onClick={() => window.location.href = route('demografi-pegawai.export')}
+                                    className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
+                                >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                     </svg>
-                                    Tambah Pegawai
+                                    Export
                                 </button>
-                            </Link>
+                            )}
+                            {/* Import Button */}
+                            {canImport && (
+                                <button
+                                    onClick={() => setShowImportModal(true)}
+                                    className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                    Import
+                                </button>
+                            )}
+                            {/* Add Button */}
+                            {canCreate && (
+                                <Link href={route('demografi-pegawai.create')} className="shrink-0">
+                                    <button className="flex items-center gap-2 px-5 py-2.5 bg-white text-primary-700 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-50 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Tambah Pegawai
+                                    </button>
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>

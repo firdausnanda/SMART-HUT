@@ -49,6 +49,10 @@ class RoleSeeder extends Seeder
             ], [
                 'description' => $role['description'],
             ]);
+
+            if ($createdRole->name === 'admin') {
+                $createdRole->syncPermissions(\Spatie\Permission\Models\Permission::all());
+            }
         }
     }
 }

@@ -23,6 +23,14 @@ use App\Traits\HandlesImportFailures;
 class DemografiPegawaiController extends Controller
 {
     use HandlesImportFailures;
+    public function __construct()
+    {
+        $this->middleware('permission:kepegawaian.view')->only(['index', 'show']);
+        $this->middleware('permission:kepegawaian.create')->only(['create', 'store', 'template', 'import']);
+        $this->middleware('permission:kepegawaian.edit')->only(['edit', 'update']);
+        $this->middleware('permission:kepegawaian.delete')->only(['destroy']);
+        $this->middleware('permission:kepegawaian.export')->only(['export']);
+    }
     public function index(Request $request)
     {
         $query = Pegawai::with('bezetting', 'creator');
@@ -188,6 +196,12 @@ class DemografiPegawaiController extends Controller
 
         $workflowAction = WorkflowAction::from($request->action);
 
+        match ($workflowAction) {
+            WorkflowAction::SUBMIT => $this->authorize('kepegawaian.edit'),
+            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kepegawaian.approve'),
+            WorkflowAction::DELETE => $this->authorize('kepegawaian.delete'),
+        };
+
         if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
             return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');
         }
@@ -227,6 +241,12 @@ class DemografiPegawaiController extends Controller
         ]);
 
         $workflowAction = WorkflowAction::from($request->action);
+
+        match ($workflowAction) {
+            WorkflowAction::SUBMIT => $this->authorize('kepegawaian.edit'),
+            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kepegawaian.approve'),
+            WorkflowAction::DELETE => $this->authorize('kepegawaian.delete'),
+        };
 
         if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
             return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');

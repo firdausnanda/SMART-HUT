@@ -50,6 +50,7 @@ class BezettingSeeder extends Seeder
         // Menyisipkan timestamps
         $insertData = array_map(function ($item) use ($now) {
             return array_merge($item, [
+            'status' => 'final',
             'created_at' => $now,
             'updated_at' => $now,
             ]);

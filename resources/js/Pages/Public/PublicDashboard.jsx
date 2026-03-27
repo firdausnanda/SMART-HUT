@@ -13,6 +13,7 @@ import PbphhSlide from './Components/PbphhSlide';
 import PnbpSlide from './Components/PnbpSlide';
 import KelembagaanPsSlide from './Components/KelembagaanPsSlide';
 import KelembagaanHrSlide from './Components/KelembagaanHrSlide';
+import KepegawaianSlide from './Components/KepegawaianSlide';
 
 // Utils
 import { truncateName } from './Components/utils';
@@ -41,6 +42,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
     { id: 11, title: 'Penerimaan Negara (PNBP)', color: 'bg-amber-600', text: 'text-amber-600' },
     { id: 12, title: 'Kelembagaan Perhutanan Sosial', color: 'bg-emerald-600', text: 'text-emerald-600' },
     { id: 13, title: 'Kelembagaan Hutan Rakyat', color: 'bg-lime-600', text: 'text-lime-600' },
+    { id: 14, title: 'Kepegawaian', color: 'bg-indigo-600', text: 'text-indigo-600' },
   ], []);
 
   const pembinaanSections = useMemo(() => [
@@ -317,6 +319,13 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
               {/* Slide 13: Kelembagaan Hutan Rakyat */}
               <KelembagaanHrSlide
                 stats={stats}
+                commonOptions={commonOptions}
+              />
+
+              {/* Slide 14: Kepegawaian */}
+              <KepegawaianSlide
+                stats={stats}
+                currentYear={currentYear}
                 commonOptions={commonOptions}
               />
 

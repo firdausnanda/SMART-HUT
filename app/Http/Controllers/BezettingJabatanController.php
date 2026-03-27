@@ -12,6 +12,13 @@ use Illuminate\Validation\Rule;
 
 class BezettingJabatanController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:kepegawaian.view')->only(['index', 'show']);
+        $this->middleware('permission:kepegawaian.create')->only(['store']); // Bezetting uses store for creating from modal
+        $this->middleware('permission:kepegawaian.edit')->only(['update']);
+        $this->middleware('permission:kepegawaian.delete')->only(['destroy']);
+    }
     public function index(Request $request)
     {
         $query = Bezetting::with('creator')->withCount(['pegawais as realitas' => function ($q) {
@@ -91,6 +98,12 @@ class BezettingJabatanController extends Controller
 
         $workflowAction = WorkflowAction::from($request->action);
 
+        match ($workflowAction) {
+            WorkflowAction::SUBMIT => $this->authorize('kepegawaian.edit'),
+            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kepegawaian.approve'),
+            WorkflowAction::DELETE => $this->authorize('kepegawaian.delete'),
+        };
+
         if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
             return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');
         }
@@ -131,6 +144,12 @@ class BezettingJabatanController extends Controller
         ]);
 
         $workflowAction = WorkflowAction::from($request->action);
+
+        match ($workflowAction) {
+            WorkflowAction::SUBMIT => $this->authorize('kepegawaian.edit'),
+            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kepegawaian.approve'),
+            WorkflowAction::DELETE => $this->authorize('kepegawaian.delete'),
+        };
 
         if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
             return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');

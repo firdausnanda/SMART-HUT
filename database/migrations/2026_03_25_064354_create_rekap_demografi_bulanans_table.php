@@ -22,6 +22,7 @@ return new class extends Migration
             $table->json('statistik_jenis_kelamin'); // {"L": 30, "P": 20}
             $table->json('statistik_generasi')->nullable(); // Contoh isi: {"Gen X": 10, "Milenial": 25, "Gen Z": 5}
             $table->json('statistik_status_pernikahan')->nullable(); // Contoh isi: {"Kawin": 10, "Belum Kawin": 25, "Cerai": 5}
+            $table->json('statistik_bezetting')->nullable(); // Snapshot Bezetting Jabatan
 
             $table->timestamps();
 

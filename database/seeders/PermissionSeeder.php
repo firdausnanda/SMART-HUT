@@ -23,6 +23,7 @@ class PermissionSeeder extends Seeder
       'pemberdayaan' => 'Pemberdayaan Masyarakat',
       'bina-usaha' => 'Bina Usaha',
       'penghijauan' => 'Penghijauan Lingkungan',
+      'kepegawaian' => 'Kepegawaian',
     ];
 
     $actions = [
@@ -31,6 +32,8 @@ class PermissionSeeder extends Seeder
       'edit' => 'Mengubah',
       'delete' => 'Menghapus',
       'approve' => 'Menyetujui',
+      'export' => 'Export',
+      'import' => 'Import',
     ];
 
     foreach ($modules as $moduleKey => $moduleName) {

@@ -9,6 +9,7 @@ import YoYJasaLingkunganSlide from './Components/YoYJasaLingkunganSlide';
 import YoYProductionSlide from './Components/YoYProductionSlide';
 import YoYPnbpSlide from './Components/YoYPnbpSlide';
 import YoYKelembagaanSlide from './Components/YoYKelembagaanSlide';
+import YoYKepegawaianSlide from './Components/YoYKepegawaianSlide';
 
 // Utils
 import { truncateName } from './Components/utils';
@@ -21,19 +22,20 @@ export default function PublicYoYDashboard({ years, stats }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const modules = useMemo(() => [
-    { id: 0, title: 'Yoy: Rehabilitasi Lahan', color: 'bg-emerald-600', text: 'text-emerald-600' },
-    { id: 1, title: 'Yoy: Penghijauan Lingkungan', color: 'bg-teal-600', text: 'text-teal-600' },
-    { id: 2, title: 'Yoy: Rehabilitasi Mangrove', color: 'bg-cyan-600', text: 'text-cyan-600' },
-    { id: 3, title: 'Yoy: Bangunan Konservasi Tanah dan Air', color: 'bg-orange-600', text: 'text-orange-600' },
-    { id: 4, title: 'Yoy: Reboisasi Area Perhutanan Sosial', color: 'bg-pink-600', text: 'text-pink-600' },
-    { id: 5, title: 'Yoy: Kebakaran Hutan', color: 'bg-red-600', text: 'text-red-600' },
-    { id: 6, title: 'Yoy: Jasa Lingkungan', color: 'bg-indigo-600', text: 'text-indigo-600' },
-    { id: 7, title: 'Yoy: Produksi Hutan Negara', color: 'bg-blue-600', text: 'text-blue-600' },
-    { id: 8, title: 'Yoy: Produksi Perhutanan Sosial', color: 'bg-sky-600', text: 'text-sky-600' },
-    { id: 9, title: 'Yoy: Produksi Hutan Rakyat', color: 'bg-cyan-600', text: 'text-cyan-600' },
-    { id: 10, title: 'Yoy: PNBP', color: 'bg-amber-600', text: 'text-amber-600' },
-    { id: 11, title: 'Yoy: Kelembagaan Perhutanan Sosial', color: 'bg-emerald-600', text: 'text-emerald-600' },
-    { id: 12, title: 'Yoy: Kelembagaan Hutan Rakyat', color: 'bg-lime-600', text: 'text-lime-600' },
+    { id: 0, title: 'YoY: Rehabilitasi Lahan', color: 'bg-emerald-600', text: 'text-emerald-600' },
+    { id: 1, title: 'YoY: Penghijauan Lingkungan', color: 'bg-teal-600', text: 'text-teal-600' },
+    { id: 2, title: 'YoY: Rehabilitasi Mangrove', color: 'bg-cyan-600', text: 'text-cyan-600' },
+    { id: 3, title: 'YoY: Bangunan Konservasi Tanah dan Air', color: 'bg-orange-600', text: 'text-orange-600' },
+    { id: 4, title: 'YoY: Reboisasi Area Perhutanan Sosial', color: 'bg-pink-600', text: 'text-pink-600' },
+    { id: 5, title: 'YoY: Kebakaran Hutan', color: 'bg-red-600', text: 'text-red-600' },
+    { id: 6, title: 'YoY: Jasa Lingkungan', color: 'bg-indigo-600', text: 'text-indigo-600' },
+    { id: 7, title: 'YoY: Produksi Hutan Negara', color: 'bg-blue-600', text: 'text-blue-600' },
+    { id: 8, title: 'YoY: Produksi Perhutanan Sosial', color: 'bg-sky-600', text: 'text-sky-600' },
+    { id: 9, title: 'YoY: Produksi Hutan Rakyat', color: 'bg-cyan-600', text: 'text-cyan-600' },
+    { id: 10, title: 'YoY: PNBP', color: 'bg-amber-600', text: 'text-amber-600' },
+    { id: 11, title: 'YoY: Kelembagaan Perhutanan Sosial', color: 'bg-emerald-600', text: 'text-emerald-600' },
+    { id: 12, title: 'YoY: Kelembagaan Hutan Rakyat', color: 'bg-lime-600', text: 'text-lime-600' },
+    { id: 13, title: 'YoY: Kepegawaian', color: 'bg-indigo-600', text: 'text-indigo-600' },
   ], []);
 
   const pembinaanSections = useMemo(() => [
@@ -271,6 +273,13 @@ export default function PublicYoYDashboard({ years, stats }) {
               {/* Slide 11: Kelembagaan HR Multi-Year */}
               <YoYKelembagaanSlide
                 type="hr"
+                years={years}
+                stats={stats}
+                commonOptions={commonOptions}
+              />
+
+              {/* Slide 13: Kepegawaian Multi-Year */}
+              <YoYKepegawaianSlide
                 years={years}
                 stats={stats}
                 commonOptions={commonOptions}

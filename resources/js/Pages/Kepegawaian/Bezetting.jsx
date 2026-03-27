@@ -71,10 +71,10 @@ export default function Bezetting({ auth, bezettings, filters }) {
     const isKaCdk = auth.user.roles.includes('kacdk');
     const userPermissions = auth.user.permissions || [];
 
-    const canCreate = userPermissions.includes('bezetting.create') || isAdmin || true;
-    const canEdit = userPermissions.includes('bezetting.edit') || isAdmin || true;
-    const canDelete = userPermissions.includes('bezetting.delete') || isAdmin || true;
-    const canApprove = userPermissions.includes('bezetting.approve') || isAdmin || true;
+    const canCreate = userPermissions.includes('kepegawaian.create') || isAdmin;
+    const canEdit = userPermissions.includes('kepegawaian.edit') || isAdmin;
+    const canDelete = userPermissions.includes('kepegawaian.delete') || isAdmin;
+    const canApprove = userPermissions.includes('kepegawaian.approve') || isAdmin;
 
     const performQuery = (query, field = sortField, dir = sortDir, limit = perPage) => {
         router.get(
@@ -253,15 +253,17 @@ export default function Bezetting({ auth, bezettings, filters }) {
                             </p>
                         </div>
                         <div className="flex gap-2">
-                            <button
-                                onClick={openCreateModal}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-white text-primary-700 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-50 transition-colors"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                </svg>
-                                Tambah Jabatan
-                            </button>
+                            {canCreate && (
+                                <button
+                                    onClick={openCreateModal}
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-white text-primary-700 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-50 transition-colors"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Tambah Jabatan
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

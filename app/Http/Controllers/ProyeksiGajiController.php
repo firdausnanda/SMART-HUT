@@ -10,6 +10,11 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ProyeksiGajiController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:kepegawaian.view')->only(['index']);
+        $this->middleware('permission:kepegawaian.export')->only(['export']);
+    }
     public function index(Request $request)
     {
         $year = (int)$request->input('year', now()->year);

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use App\Models\Pegawai;
+use App\Models\Bezetting;
 use Carbon\Carbon;
 
 class GenerateRekapBulanan extends Command
@@ -29,7 +30,7 @@ class GenerateRekapBulanan extends Command
             return;
         }
 
-        // Proses agregasi data
+        // Proses agregasi data demografi
         $statistikStatus = $pegawais->groupBy('status_pegawai')->map->count();
         $statistikPendidikan = $pegawais->groupBy('pendidikan_terakhir')->map->count();
         $statistikGolongan = $pegawais->groupBy('pangkat_golongan')->map->count();
@@ -37,20 +38,56 @@ class GenerateRekapBulanan extends Command
         $statistikGenerasi = $pegawais->groupBy('generasi')->map->count();
         $statistikStatusPernikahan = $pegawais->groupBy('status_pernikahan')->map->count();
 
-        // Simpan ke tabel rekap (Gunakan updateOrCreate agar jika dijalankan ulang tidak duplikat)
-        DB::table('rekap_demografi_bulanans')->updateOrCreate(
-        ['periode_tahun' => $tahun, 'periode_bulan' => $bulan],
-        [
-            'total_pegawai_aktif' => $pegawais->count(),
-            'statistik_status_pegawai' => $statistikStatus->toJson(),
-            'statistik_pendidikan' => $statistikPendidikan->toJson(),
-            'statistik_golongan' => $statistikGolongan->toJson(),
-            'statistik_jenis_kelamin' => $statistikJK->toJson(),
-            'statistik_generasi' => $statistikGenerasi->toJson(),
-            'statistik_status_pernikahan' => $statistikStatusPernikahan->toJson(),
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]
+        // Agregasi Data Bezetting
+        $bezettingData = Bezetting::where('status', 'final')
+            ->withCount(['pegawais' => function ($query) {
+                $query->where('status', 'final')
+                    ->where('status_kedudukan', 'Aktif');
+            }])
+            ->get();
+
+        $statistikBezetting = [
+            'total_kebutuhan' => $bezettingData->sum('kebutuhan'),
+            'total_eksisting' => $bezettingData->sum('pegawais_count'),
+            'details' => $bezettingData->map(function ($item) {
+                return [
+                    'name' => $item->nama_jabatan,
+                    'kebutuhan' => $item->kebutuhan,
+                    'eksisting' => $item->pegawais_count
+                ];
+            })
+        ];
+
+        // Simpan ke tabel rekap (Gunakan upsert agar jika dijalankan ulang tidak duplikat)
+        DB::table('rekap_demografi_bulanans')->upsert(
+            [
+                [
+                    'periode_tahun' => $tahun,
+                    'periode_bulan' => $bulan,
+                    'total_pegawai_aktif' => $pegawais->count(),
+                    'statistik_status_pegawai' => $statistikStatus->toJson(),
+                    'statistik_pendidikan' => $statistikPendidikan->toJson(),
+                    'statistik_golongan' => $statistikGolongan->toJson(),
+                    'statistik_jenis_kelamin' => $statistikJK->toJson(),
+                    'statistik_generasi' => $statistikGenerasi->toJson(),
+                    'statistik_status_pernikahan' => $statistikStatusPernikahan->toJson(),
+                    'statistik_bezetting' => json_encode($statistikBezetting),
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]
+            ],
+            ['periode_tahun', 'periode_bulan'],
+            [
+                'total_pegawai_aktif',
+                'statistik_status_pegawai',
+                'statistik_pendidikan',
+                'statistik_golongan',
+                'statistik_jenis_kelamin',
+                'statistik_generasi',
+                'statistik_status_pernikahan',
+                'statistik_bezetting',
+                'updated_at',
+            ]
         );
 
         $this->info("Rekap demografi bulan {$bulan} tahun {$tahun} berhasil digenerate!");

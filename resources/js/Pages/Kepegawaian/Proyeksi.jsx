@@ -25,6 +25,10 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    const isAdmin = auth.user.roles.includes('admin');
+    const userPermissions = auth.user.permissions || [];
+    const canExport = userPermissions.includes('kepegawaian.export') || isAdmin;
+
     const months = [
         { value: 'all', label: 'Semua Bulan' },
         { value: 1, label: 'Januari' },
@@ -146,13 +150,15 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
                                 </p>
                             </div>
                             <div className="flex gap-2">
-                                <button
-                                    onClick={handleExport}
-                                    className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
-                                >
-                                    <Download className="w-4 h-4" />
-                                    Export Laporan
-                                </button>
+                                {canExport && (
+                                    <button
+                                        onClick={handleExport}
+                                        className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
+                                    >
+                                        <Download className="w-4 h-4" />
+                                        Export Laporan
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
