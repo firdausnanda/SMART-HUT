@@ -432,7 +432,7 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
               {canCreate && (
                 <div className="flex gap-2">
                   <button
-                    onClick={() => window.location.href = route('nilai-transaksi-ekonomi.export', { year: selectedYear })}
+                    onClick={() => window.location.href = route('nilai-transaksi-ekonomi.export', { year: params.year })}
                     className="flex items-center gap-2 px-4 py-3 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
