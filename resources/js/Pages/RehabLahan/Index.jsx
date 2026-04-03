@@ -33,6 +33,8 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
     const canEdit = userPermissions.includes('rehab.edit') || isAdmin;
     const canDelete = userPermissions.includes('rehab.delete') || isAdmin;
     const canApprove = userPermissions.includes('rehab.approve') || isAdmin;
+    const canExport = userPermissions.includes('rehab.export') || isAdmin;
+    const canImport = userPermissions.includes('rehab.import') || isAdmin;
 
     useEffect(() => {
         if (flash?.import_errors) {
@@ -427,36 +429,36 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
                                     Kelola dan pantau capaian target tahunan rehabilitasi lahan di wilayah CDK Trenggalek.
                                 </p>
                             </div>
-                            {canCreate && (
-                                <div className="flex gap-2">
+                            <div className="flex gap-2">
+                                {canExport && (
                                     <button
                                         onClick={() => window.location.href = route('rehab-lahan.export', { year: filters.year })}
-                                        className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
+                                        className="flex items-center gap-2 px-4 py-3 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                         </svg>
                                         Export
                                     </button>
+                                )}
+                                {canImport && (
                                     <button
                                         onClick={() => setShowImportModal(true)}
-                                        className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
+                                        className="flex items-center gap-2 px-4 py-3 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                         </svg>
                                         Import
                                     </button>
-                                    <Link href={route('rehab-lahan.create')} className="shrink-0">
-                                        <button className="flex items-center gap-2 px-5 py-2.5 bg-white text-primary-700 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-50 transition-colors">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                            </svg>
-                                            Input Data Baru
-                                        </button>
+                                )}
+                                {canCreate && (
+                                    <Link href={route('rehab-lahan.create')} className="flex items-center gap-2 px-6 py-3 bg-white text-emerald-700 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-50 transition-all transform active:scale-95">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                                        Input Data Baru
                                     </Link>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
                     </div>
 

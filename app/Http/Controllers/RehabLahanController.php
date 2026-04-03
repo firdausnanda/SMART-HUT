@@ -21,6 +21,8 @@ class RehabLahanController extends Controller
         $this->middleware('permission:rehab.create')->only(['create', 'store']);
         $this->middleware('permission:rehab.edit')->only(['edit', 'update']);
         $this->middleware('permission:rehab.delete')->only(['destroy']);
+        $this->middleware('permission:rehab.export')->only(['export']);
+        $this->middleware('permission:rehab.import')->only(['import']);
     }
 
     public function index(Request $request)

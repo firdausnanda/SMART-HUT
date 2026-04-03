@@ -21,6 +21,8 @@ class PenghijauanLingkunganController extends Controller
     $this->middleware('permission:penghijauan.create')->only(['create', 'store']);
     $this->middleware('permission:penghijauan.edit')->only(['edit', 'update']);
     $this->middleware('permission:penghijauan.delete')->only(['destroy']);
+    $this->middleware('permission:penghijauan.export')->only(['export']);
+    $this->middleware('permission:penghijauan.import')->only(['import']);
   }
 
   public function index(Request $request)

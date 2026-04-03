@@ -20,6 +20,8 @@ class PerkembanganKthController extends Controller
     $this->middleware('permission:pemberdayaan.create')->only(['create', 'store']);
     $this->middleware('permission:pemberdayaan.edit')->only(['edit', 'update']);
     $this->middleware('permission:pemberdayaan.delete')->only(['destroy']);
+    $this->middleware('permission:pemberdayaan.export')->only(['export']);
+    $this->middleware('permission:pemberdayaan.import')->only(['import']);
   }
 
   public function index(Request $request)

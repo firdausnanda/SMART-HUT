@@ -42,6 +42,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
   const canEdit = userPermissions.includes('pemberdayaan.edit') || isAdmin;
   const canDelete = userPermissions.includes('pemberdayaan.delete') || isAdmin;
   const canApprove = userPermissions.includes('pemberdayaan.approve') || isAdmin;
+  const canExport = userPermissions.includes('pemberdayaan.export') || isAdmin;
+  const canImport = userPermissions.includes('pemberdayaan.import') || isAdmin;
 
   useEffect(() => {
     if (flash?.import_errors) {
@@ -373,8 +375,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                   Kelola dan pantau perkembangan Kelompok Tani Hutan di wilayah CDK Trenggalek.
                 </p>
               </div>
-              {canCreate && (
-                <div className="flex gap-2">
+              <div className="flex gap-2">
+                {canExport && (
                   <button
                     onClick={() => window.location.href = route('perkembangan-kth.export')}
                     className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
@@ -384,6 +386,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                     </svg>
                     Export
                   </button>
+                )}
+                {canImport && (
                   <button
                     onClick={() => setShowImportModal(true)}
                     className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
@@ -393,6 +397,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                     </svg>
                     Import
                   </button>
+                )}
+                {canCreate && (
                   <Link href={route('perkembangan-kth.create')} className="shrink-0">
                     <button className="flex items-center gap-2 px-5 py-2.5 bg-white text-primary-700 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-50 transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -401,8 +407,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                       Input Data Baru
                     </button>
                   </Link>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
 

@@ -413,6 +413,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
   const canEdit = user.permissions?.includes('pemberdayaan.edit') || canCreate || isAdmin;
   const canDelete = user.permissions?.includes('pemberdayaan.delete') || isAdmin;
   const canApprove = user.permissions?.includes('pemberdayaan.approve') || isAdmin;
+  const canExport = user.permissions?.includes('pemberdayaan.export') || isAdmin;
+  const canImport = user.permissions?.includes('pemberdayaan.import') || isAdmin;
 
   return (
     <AuthenticatedLayout user={user} header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Nilai Transaksi Ekonomi</h2>}>
@@ -429,8 +431,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                 <h3 className="text-2xl font-bold">Data Nilai Transaksi Ekonomi</h3>
                 <p className="mt-1 text-emerald-100 opacity-90 max-w-xl text-sm">Rekapitulasi nilai transaksi ekonomi Kelompok Tani Hutan (KTH).</p>
               </div>
-              {canCreate && (
-                <div className="flex gap-2">
+              <div className="flex gap-2">
+                {canExport && (
                   <button
                     onClick={() => window.location.href = route('nilai-transaksi-ekonomi.export', { year: params.year })}
                     className="flex items-center gap-2 px-4 py-3 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50"
@@ -440,6 +442,8 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                     </svg>
                     Export
                   </button>
+                )}
+                {canImport && (
                   <button
                     onClick={() => setShowImportModal(true)}
                     className="flex items-center gap-2 px-4 py-3 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50"
@@ -449,12 +453,14 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                     </svg>
                     Import
                   </button>
+                )}
+                {canCreate && (
                   <Link href={route('nilai-transaksi-ekonomi.create')} className="flex items-center gap-2 px-6 py-3 bg-white text-emerald-700 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-50 transition-all transform active:scale-95">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                     Input Data Baru
                   </Link>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
