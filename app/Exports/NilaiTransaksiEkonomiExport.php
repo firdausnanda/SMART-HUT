@@ -22,7 +22,12 @@ class NilaiTransaksiEkonomiExport implements FromCollection, WithHeadings, WithM
   {
     // We want to export details, so we load them
     $records = NilaiTransaksiEkonomi::query()
-      ->with(['regency_rel', 'district_rel', 'village_rel', 'details.commodity'])
+      ->with([
+        'regency_rel',
+        'district_rel',
+        'village_rel',
+        'details.commodity' => fn($q) => $q->withoutGlobalScope('not_nilai_transaksi_ekonomi')
+      ])
       ->when($this->year, fn($q) => $q->where('year', $this->year))
       ->where('status', 'final')
       ->get();

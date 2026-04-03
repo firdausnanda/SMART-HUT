@@ -21,7 +21,11 @@ class NilaiEkonomiExport implements FromCollection, WithHeadings, WithMapping, W
   public function collection()
   {
     $records = NilaiEkonomi::query()
-      ->with(['regency', 'district', 'details.commodity'])
+      ->with([
+        'regency',
+        'district',
+        'details.commodity' => fn($q) => $q->withoutGlobalScope('not_nilai_transaksi_ekonomi')
+      ])
       ->when($this->year, fn($q) => $q->where('year', $this->year))
       ->where('status', 'final')
       ->get();
