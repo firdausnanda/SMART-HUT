@@ -61,7 +61,7 @@ export default function PublicYoYDashboard({ years, stats }) {
       if (document.visibilityState === 'visible') {
         nextSlide();
       }
-    }, 10000); // 10 seconds per slide
+    }, 25000); // 10 seconds per slide
 
     return () => clearInterval(slideInterval);
   }, [modules.length]);
