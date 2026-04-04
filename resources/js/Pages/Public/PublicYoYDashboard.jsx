@@ -76,7 +76,7 @@ export default function PublicYoYDashboard({ years, stats }) {
           preserveState: true,
         });
       }
-    }, 1 * 60 * 1000); // 1 minute
+    }, 5 * 60 * 1000); // 1 minute
 
     return () => clearInterval(reloadInterval);
   }, []);

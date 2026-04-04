@@ -78,7 +78,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
           preserveState: true,
         });
       }
-    }, 1 * 60 * 1000); // 1 minutes
+    }, 5 * 60 * 1000); // 5 minutes
 
     return () => clearInterval(reloadInterval);
   }, []);
