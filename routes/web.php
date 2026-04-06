@@ -239,16 +239,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('backups/{filename}', [BackupController::class, 'destroy'])->name('backups.destroy')->where('filename', '.*');
 });
 
-Route::get('/permission', function () {
-    $roles = \Spatie\Permission\Models\Role::whereIn('name', ['pk', 'peh'])->get();
-    $permissions = \Spatie\Permission\Models\Permission::where('name', 'like', '%export%')
-        ->orWhere('name', 'like', '%import%')
-        ->get();
+// Route::get('/permission', function () {
+//     $roles = \Spatie\Permission\Models\Role::whereIn('name', ['pk', 'peh'])->get();
+//     $permissions = \Spatie\Permission\Models\Permission::where('name', 'like', '%export%')
+//         ->orWhere('name', 'like', '%import%')
+//         ->get();
 
-    foreach ($roles as $role) {
-        $role->syncPermissions($permissions);
-    }
-    return 'Sukses!';
-});
+//     foreach ($roles as $role) {
+//         $role->syncPermissions($permissions);
+//     }
+//     return 'Sukses!';
+// });
 
 require __DIR__ . '/auth.php';
