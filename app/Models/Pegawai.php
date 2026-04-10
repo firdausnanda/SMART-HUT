@@ -8,10 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Wildside\Userstamps\Userstamps;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-use App\Contracts\Workflowable;
-use Illuminate\Database\Eloquent\Builder;
 
-class Pegawai extends Model implements Workflowable
+class Pegawai extends Model
 {
     use HasFactory, SoftDeletes, Userstamps, LogsActivity;
 
@@ -81,16 +79,66 @@ class Pegawai extends Model implements Workflowable
      */
     public function getNextKgbDateAttribute()
     {
+        // 1. Cek riwayat KGB terakhir yang sudah final
         $latestKgb = $this->riwayatKgb()->where('status', 'final')->latest('tmt_kgb')->first();
-        
+
         if ($latestKgb && $latestKgb->tmt_kgb_berikutnya) {
-            return $latestKgb->tmt_kgb_berikutnya;
+            $baseDate = $latestKgb->tmt_kgb_berikutnya;
+        } else {
+            // 2. Jika belum ada riwayat, gunakan TMT CPNS atau PNS sebagai basis
+            $baseDate = $this->tmt_cpns ?? $this->tmt_pns;
+            
+            if (!$baseDate) {
+                return null;
+            }
+
+            // Basis pertama adalah 2 tahun setelah CPNS/PNS
+            $baseDate = $baseDate->copy()->addYears(2);
         }
 
-        // Jika belum ada riwayat, hitung dari TMT CPNS (biasanya 2 tahun setelah CPNS/PNS)
-        $baseDate = $this->tmt_cpns ?? $this->tmt_pns;
-        if ($baseDate) {
-            return $baseDate->copy()->addYears(2);
+        // 3. Hitung proyeksi terdekat atau yang sesuai dengan siklus 2 tahunan
+        // Jika basis sudah di masa depan, itu adalah proyeksi berikutnya
+        if ($baseDate->isFuture()) {
+            return $baseDate;
+        }
+
+        // Jika basis di masa lalu, hitung siklus 2 tahunan sampai mencapai setidaknya tahun ini
+        $now = now();
+        $yearsPassed = $baseDate->diffInYears($now);
+        $cycles = (int) ceil($yearsPassed / 2);
+        
+        // Selalu pastikan setidaknya 1 siklus jika basis sudah di masa lalu
+        if ($cycles < 1 && $baseDate->isPast()) {
+            $cycles = 1;
+        }
+
+        return $baseDate->copy()->addYears($cycles * 2);
+    }
+
+    /**
+     * Menghitung proyeksi KGB pada tahun tertentu (untuk analisa/proyeksi)
+     */
+    public function getKgbProjectionForYear($year)
+    {
+        $latestKgb = $this->riwayatKgb()->where('status', 'final')->latest('tmt_kgb')->first();
+
+        if ($latestKgb && $latestKgb->tmt_kgb_berikutnya) {
+            $baseDate = $latestKgb->tmt_kgb_berikutnya;
+        } else {
+            $baseDate = $this->tmt_cpns ?? $this->tmt_pns;
+            if (!$baseDate) return null;
+            $baseDate = $baseDate->copy()->addYears(2);
+        }
+
+        // Hitung selisih tahun antara basis dan target tahun
+        $diffYears = $year - $baseDate->year;
+        
+        // Jika target tahun di masa lalu dari basis
+        if ($diffYears < 0) return null;
+
+        // KGB terjadi setiap 2 tahun. Cek apakah target tahun masuk dalam siklus.
+        if ($diffYears % 2 === 0) {
+            return $baseDate->copy()->year($year);
         }
 
         return null;
@@ -101,12 +149,14 @@ class Pegawai extends Model implements Workflowable
      */
     public function getRetirementDateAttribute()
     {
-        if (!$this->tanggal_lahir || !$this->bup) {
+        if (!$this->tanggal_lahir) {
             return null;
         }
 
-        // Pensiun biasanya adalah awal bulan berikutnya setelah mencapai BUP
-        return $this->tanggal_lahir->copy()->addYears($this->bup)->addMonth(1)->startOfMonth();
+        $bup = (int) ($this->bup ?: 58);
+
+        // Selain tanggal 1, pensiun adalah awal bulan berikutnya setelah mencapai BUP
+        return $this->tanggal_lahir->copy()->addYears($bup)->endOfMonth()->addDay();
     }
 
     /**
@@ -122,13 +172,18 @@ class Pegawai extends Model implements Workflowable
      */
     public function getGenerasiAttribute()
     {
-        if (!$this->tanggal_lahir) return 'Unknown';
+        if (!$this->tanggal_lahir)
+            return 'Unknown';
         $year = $this->tanggal_lahir->year;
-        
-        if ($year >= 1997 && $year <= 2012) return 'Gen Z';
-        if ($year >= 1981 && $year <= 1996) return 'Milenial';
-        if ($year >= 1965 && $year <= 1980) return 'Gen X';
-        if ($year < 1965) return 'Baby Boomer';
+
+        if ($year >= 1997 && $year <= 2012)
+            return 'Gen Z';
+        if ($year >= 1981 && $year <= 1996)
+            return 'Milenial';
+        if ($year >= 1965 && $year <= 1980)
+            return 'Gen X';
+        if ($year < 1965)
+            return 'Baby Boomer';
         return 'Post-Gen Z';
     }
 
@@ -144,72 +199,7 @@ class Pegawai extends Model implements Workflowable
      */
     public function creator()
     {
-        return $this->belongsTo(User::class , 'created_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
-    public static function baseQuery(array $ids): Builder
-    {
-        return static::query()->whereIn('id', $ids);
-    }
-
-    public static function workflowMap(): array
-    {
-        return [
-            'submit' => [
-                'pelaksana' => [
-                    'from' => ['draft', 'rejected'],
-                    'to' => 'waiting_kasi',
-                ],
-                'pk' => [
-                    'from' => ['draft', 'rejected'],
-                    'to' => 'waiting_kasi',
-                ],
-                'peh' => [
-                    'from' => ['draft', 'rejected'],
-                    'to' => 'waiting_kasi',
-                ],
-            ],
-
-            'approve' => [
-                'kasi' => [
-                    'from' => 'waiting_kasi',
-                    'to' => 'waiting_cdk',
-                    'timestamp' => 'approved_by_kasi_at',
-                ],
-                'kacdk' => [
-                    'from' => 'waiting_cdk',
-                    'to' => 'final',
-                    'timestamp' => 'approved_by_cdk_at',
-                ],
-            ],
-
-            'reject' => [
-                'admin' => [],
-                'kasi' => [
-                    'from' => 'waiting_kasi',
-                ],
-                'kacdk' => [
-                    'from' => 'waiting_cdk',
-                ],
-            ],
-
-            'delete' => [
-                'admin' => [
-                    'delete' => true,
-                ],
-                'pelaksana' => [
-                    'from' => 'draft',
-                    'delete' => true,
-                ],
-                'pk' => [
-                    'from' => 'draft',
-                    'delete' => true,
-                ],
-                'peh' => [
-                    'from' => 'draft',
-                    'delete' => true,
-                ],
-            ],
-        ];
-    }
 }

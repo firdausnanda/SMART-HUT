@@ -6,9 +6,6 @@ use App\Models\Pegawai;
 use App\Models\Bezetting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Actions\SingleWorkflowAction;
-use App\Actions\BulkWorkflowAction;
-use App\Enums\WorkflowAction;
 use App\Enums\StatusPegawai;
 use App\Enums\StatusPernikahan;
 use App\Enums\Agama;
@@ -19,6 +16,8 @@ use App\Exports\PegawaiExport;
 use App\Exports\PegawaiTemplateExport;
 use App\Imports\PegawaiImport;
 use App\Traits\HandlesImportFailures;
+use App\Models\RiwayatKgb;
+use Carbon\Carbon;
 
 class DemografiPegawaiController extends Controller
 {
@@ -101,16 +100,36 @@ class DemografiPegawaiController extends Controller
             'tmt_cpns' => 'nullable|date',
             'bup' => 'required|integer',
             'status_kedudukan' => ['required', Rule::enum(StatusKedudukan::class)],
-            'status' => 'nullable|in:draft,waiting_kasi,waiting_cdk,final,rejected'
+            'kgb_no_sk' => 'nullable|string|max:255',
+            'kgb_tanggal_sk' => 'nullable|date',
+            'kgb_tmt' => 'nullable|date',
+            'kgb_gaji' => 'nullable|numeric|min:0',
         ]);
 
-        Pegawai::create($validated);
+        $validated['status'] = 'final';
 
-        return redirect()->route('demografi-pegawai.index')->with('success', 'Data Pegawai berhasil ditambahkan.');
+        $pegawai = Pegawai::create($validated);
+
+        if ($request->filled('kgb_no_sk')) {
+            RiwayatKgb::create([
+                'pegawai_id' => $pegawai->id,
+                'no_sk' => $request->kgb_no_sk,
+                'tanggal_sk' => $request->kgb_tanggal_sk,
+                'tmt_kgb' => $request->kgb_tmt,
+                'gaji_pokok_baru' => $request->kgb_gaji,
+                'tmt_kgb_berikutnya' => Carbon::parse($request->kgb_tmt)->addYears(2),
+                'status' => 'final',
+            ]);
+        }
+
+        return redirect()->route('demografi-pegawai.index')->with('success', 'Pegawai berhasil ditambahkan.');
     }
 
     public function edit(Pegawai $demografi_pegawai)
     {
+        $demografi_pegawai->load(['riwayatKgb' => function ($q) {
+            $q->orderBy('tmt_kgb', 'desc');
+        }]);
         $bezettings = Bezetting::all();
         return Inertia::render('Kepegawaian/Demografi/Edit', [
             'pegawai' => $demografi_pegawai,
@@ -144,9 +163,9 @@ class DemografiPegawaiController extends Controller
             'tmt_cpns' => 'nullable|date',
             'bup' => 'required|integer',
             'status_kedudukan' => ['required', Rule::enum(StatusKedudukan::class)],
-            'status' => 'nullable|in:draft,waiting_kasi,waiting_cdk,final,rejected'
         ]);
 
+        $validated['status'] = 'final';
         $demografi_pegawai->update($validated);
 
         return redirect()->route('demografi-pegawai.index')->with('success', 'Data Pegawai berhasil diperbarui.');
@@ -156,6 +175,20 @@ class DemografiPegawaiController extends Controller
     {
         $demografi_pegawai->delete();
         return redirect()->route('demografi-pegawai.index')->with('success', 'Data Pegawai berhasil dihapus.');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:pegawais,id',
+        ]);
+
+        $this->authorize('kepegawaian.delete');
+
+        Pegawai::whereIn('id', $request->ids)->delete();
+
+        return redirect()->back()->with('success', count($request->ids) . ' data berhasil dihapus.');
     }
 
     public function export()
@@ -187,91 +220,45 @@ class DemografiPegawaiController extends Controller
         return redirect()->back()->with('success', 'Data pegawai berhasil diimport.');
     }
 
-    public function singleWorkflowAction(Request $request, Pegawai $demografi_pegawai, SingleWorkflowAction $action)
+    public function storeKgb(Request $request, Pegawai $pegawai)
     {
-        $request->validate([
-            'action' => ['required', Rule::enum(WorkflowAction::class)],
-            'rejection_note' => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'no_sk' => 'required|string|max:255',
+            'tanggal_sk' => 'required|date',
+            'tmt_kgb' => 'required|date',
+            'gaji_pokok_baru' => 'required|numeric|min:0',
         ]);
 
-        $workflowAction = WorkflowAction::from($request->action);
+        $validated['pegawai_id'] = $pegawai->id;
+        $validated['tmt_kgb_berikutnya'] = Carbon::parse($validated['tmt_kgb'])->addYears(2);
+        $validated['status'] = 'final';
 
-        match ($workflowAction) {
-            WorkflowAction::SUBMIT => $this->authorize('kepegawaian.edit'),
-            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kepegawaian.approve'),
-            WorkflowAction::DELETE => $this->authorize('kepegawaian.delete'),
-        };
+        RiwayatKgb::create($validated);
 
-        if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
-            return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');
-        }
-
-        $extraData = [];
-        if ($request->filled('rejection_note')) {
-            $extraData['rejection_note'] = $request->rejection_note;
-        }
-
-        $success = $action->execute(
-            model: $demografi_pegawai,
-            action: $workflowAction,
-            user: auth()->user(),
-            extraData: $extraData
-        );
-
-        if ($success) {
-            $message = match ($workflowAction) {
-                WorkflowAction::DELETE => 'dihapus',
-                WorkflowAction::SUBMIT => 'diajukan untuk verifikasi',
-                WorkflowAction::APPROVE => 'disetujui',
-                WorkflowAction::REJECT => 'ditolak',
-            };
-            return redirect()->back()->with('success', "Data Pegawai berhasil {$message}.");
-        }
-
-        return redirect()->back()->with('error', 'Gagal memproses data atau status tidak sesuai.');
+        return redirect()->back()->with('success', 'Riwayat KGB berhasil ditambahkan.');
     }
 
-    public function bulkWorkflowAction(Request $request, BulkWorkflowAction $action)
+    public function updateKgb(Request $request, RiwayatKgb $riwayat_kgb)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:pegawais,id',
-            'action' => ['required', Rule::enum(WorkflowAction::class)],
-            'rejection_note' => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'no_sk' => 'required|string|max:255',
+            'tanggal_sk' => 'required|date',
+            'tmt_kgb' => 'required|date',
+            'gaji_pokok_baru' => 'required|numeric|min:0',
         ]);
 
-        $workflowAction = WorkflowAction::from($request->action);
+        $validated['tmt_kgb_berikutnya'] = Carbon::parse($validated['tmt_kgb'])->addYears(2);
+        $validated['status'] = 'final';
 
-        match ($workflowAction) {
-            WorkflowAction::SUBMIT => $this->authorize('kepegawaian.edit'),
-            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kepegawaian.approve'),
-            WorkflowAction::DELETE => $this->authorize('kepegawaian.delete'),
-        };
+        $riwayat_kgb->update($validated);
 
-        if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
-            return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');
-        }
-
-        $extraData = [];
-        if ($request->filled('rejection_note')) {
-            $extraData['rejection_note'] = $request->rejection_note;
-        }
-
-        $count = $action->execute(
-            model: Pegawai::class,
-            action: $workflowAction,
-            ids: $request->ids,
-            user: auth()->user(),
-            extraData: $extraData
-        );
-
-        $message = match ($workflowAction) {
-            WorkflowAction::DELETE => 'dihapus',
-            WorkflowAction::SUBMIT => 'diajukan',
-            WorkflowAction::APPROVE => 'disetujui',
-            WorkflowAction::REJECT => 'ditolak',
-        };
-
-        return redirect()->back()->with('success', "{$count} data berhasil {$message}.");
+        return redirect()->back()->with('success', 'Riwayat KGB berhasil diperbarui.');
     }
+
+    public function destroyKgb(RiwayatKgb $riwayat_kgb)
+    {
+        $riwayat_kgb->delete();
+        return redirect()->back()->with('success', 'Riwayat KGB berhasil dihapus.');
+    }
+
 }

@@ -101,7 +101,7 @@ class PegawaiImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnF
             'pangkat_golongan'   => !empty($row['pangkat_golongan']) ? trim($row['pangkat_golongan']) : null,
             'bup'                => (int) $row['bup_angka_tahun_misal_60'],
             'status_kedudukan'   => trim($row['status_kedudukan_aktifpenisunmutasimeninggal']),
-            'status'             => 'draft',
+            'status'             => 'final',
             'created_by'         => Auth::id(),
         ]);
     }

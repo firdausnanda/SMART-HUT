@@ -38,6 +38,7 @@ use App\Http\Controllers\VillageController;
 use App\Http\Controllers\DemografiPegawaiController;
 use App\Http\Controllers\BezettingJabatanController;
 use App\Http\Controllers\ProyeksiGajiController;
+use App\Http\Controllers\RekapBulananController;
 use App\Http\Middleware\CheckDashboardAccess;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -223,14 +224,30 @@ Route::middleware('auth')->group(function () {
     Route::get('demografi-pegawai/export', [DemografiPegawaiController::class, 'export'])->name('demografi-pegawai.export');
     Route::get('demografi-pegawai/template', [DemografiPegawaiController::class, 'template'])->name('demografi-pegawai.template');
     Route::post('demografi-pegawai/import', [DemografiPegawaiController::class, 'import'])->name('demografi-pegawai.import');
-    Route::post('demografi-pegawai/{demografi_pegawai}/single-workflow-action', [DemografiPegawaiController::class, 'singleWorkflowAction'])->name('demografi-pegawai.single-workflow-action');
-    Route::post('demografi-pegawai/bulk-workflow-action', [DemografiPegawaiController::class, 'bulkWorkflowAction'])->name('demografi-pegawai.bulk-workflow-action');
+    Route::post('demografi-pegawai/bulk-delete', [DemografiPegawaiController::class, 'bulkDelete'])->name('demografi-pegawai.bulk-delete');
     Route::resource('demografi-pegawai', DemografiPegawaiController::class);
+    Route::post('demografi-pegawai/{pegawai}/riwayat-kgb', [DemografiPegawaiController::class, 'storeKgb'])->name('demografi-pegawai.kgb.store');
+    Route::put('demografi-pegawai/riwayat-kgb/{riwayat_kgb}', [DemografiPegawaiController::class, 'updateKgb'])->name('demografi-pegawai.kgb.update');
+    Route::delete('demografi-pegawai/riwayat-kgb/{riwayat_kgb}', [DemografiPegawaiController::class, 'destroyKgb'])->name('demografi-pegawai.kgb.destroy');
     Route::post('bezetting-jabatan/{bezetting_jabatan}/single-workflow-action', [BezettingJabatanController::class, 'singleWorkflowAction'])->name('bezetting-jabatan.single-workflow-action');
     Route::post('bezetting-jabatan/bulk-workflow-action', [BezettingJabatanController::class, 'bulkWorkflowAction'])->name('bezetting-jabatan.bulk-workflow-action');
     Route::resource('bezetting-jabatan', BezettingJabatanController::class)->parameters(['bezetting-jabatan' => 'bezetting_jabatan']);
     Route::get('proyeksi-gaji/export', [ProyeksiGajiController::class, 'export'])->name('proyeksi-gaji.export');
     Route::get('proyeksi-gaji', [ProyeksiGajiController::class, 'index'])->name('proyeksi-gaji.index');
+
+    // Rekap Kepegawaian Bulanan
+    Route::prefix('rekap-bulanan')->name('rekap-bulanan.')->group(function () {
+        Route::get('/', [RekapBulananController::class, 'index'])->name('index');
+        Route::post('/generate', [RekapBulananController::class, 'generate'])->name('generate');
+        Route::get('/export/{year}/{month}', [RekapBulananController::class, 'export'])->name('export');
+        Route::get('/{year}/{month}', [RekapBulananController::class, 'show'])->name('show');
+        Route::get('/{year}/{month}/pegawai', [RekapBulananController::class, 'showPegawai'])->name('show-pegawai');
+
+        // Workflow Actions
+        Route::post('/{id}/single-workflow-action', [RekapBulananController::class, 'singleWorkflowAction'])->name('single-workflow-action');
+        Route::post('/bulk-workflow-action', [RekapBulananController::class, 'bulkWorkflowAction'])->name('bulk-workflow-action');
+        Route::delete('/{id}', [RekapBulananController::class, 'destroy'])->name('destroy');
+    });
 
     // Backup Management
     Route::get('backups', [BackupController::class, 'index'])->name('backups.index');

@@ -29,7 +29,10 @@ export default function DemografiCreate({ auth, bezettings, statusPegawaiOptions
     unit_kerja: '',
     skpd: '',
     status_kedudukan: 'Aktif',
-    status: 'draft',
+    kgb_no_sk: '',
+    kgb_tanggal_sk: '',
+    kgb_tmt: '',
+    kgb_gaji: '',
   });
 
   const submit = (e) => {
@@ -451,6 +454,112 @@ export default function DemografiCreate({ auth, bezettings, statusPegawaiOptions
                       styles={selectStyles}
                     />
                     <InputError message={errors.status_kedudukan} className="mt-2" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Informasi KGB Terakhir */}
+              <div className="pt-4">
+                <h4 className="flex items-center text-lg font-bold text-primary-700 mb-4 border-b pb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Informasi KGB Terakhir (Opsional)
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <InputLabel htmlFor="kgb_no_sk" value="Nomor SK KGB" className="text-gray-700 font-bold mb-2" />
+                    <TextInput
+                      id="kgb_no_sk"
+                      className="w-full"
+                      value={data.kgb_no_sk}
+                      onChange={(e) => setData('kgb_no_sk', e.target.value)}
+                      placeholder="Contoh: 821.2/123/2023"
+                    />
+                    <InputError message={errors.kgb_no_sk} className="mt-2" />
+                  </div>
+
+                  <div>
+                    <InputLabel htmlFor="kgb_gaji" value="Gaji Pokok Terakhir" className="text-gray-700 font-bold mb-2" />
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none font-bold text-gray-400 text-sm">Rp</div>
+                      <TextInput
+                        id="kgb_gaji"
+                        type="number"
+                        className="w-full pl-11"
+                        value={data.kgb_gaji}
+                        onChange={(e) => setData('kgb_gaji', e.target.value)}
+                        placeholder="0"
+                      />
+                    </div>
+                    <InputError message={errors.kgb_gaji} className="mt-2" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <InputLabel htmlFor="kgb_tanggal_sk" value="Tanggal SK" className="text-gray-700 font-bold mb-2" />
+                      <div className="relative">
+                        <DatePicker
+                          id="kgb_tanggal_sk"
+                          selected={data.kgb_tanggal_sk ? new Date(data.kgb_tanggal_sk) : null}
+                          onChange={(date) => {
+                            if (date) {
+                              const yyyy = date.getFullYear();
+                              const mm = String(date.getMonth() + 1).padStart(2, '0');
+                              const dd = String(date.getDate()).padStart(2, '0');
+                              setData('kgb_tanggal_sk', `${yyyy}-${mm}-${dd}`);
+                            } else {
+                              setData('kgb_tanggal_sk', '');
+                            }
+                          }}
+                          dateFormat="dd/MM/yyyy"
+                          showMonthDropdown
+                          showYearDropdown
+                          dropdownMode="select"
+                          className="w-full pl-11 pr-4 py-2.5 border-gray-200 focus:border-primary-500 focus:ring-primary-500 rounded-xl shadow-sm bg-gray-50/50 hover:bg-white focus:bg-white transition-all text-sm font-medium cursor-pointer"
+                          placeholderText="Pilih Tanggal SK"
+                          wrapperClassName="w-full"
+                        />
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-primary-600/70">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      </div>
+                      <InputError message={errors.kgb_tanggal_sk} className="mt-2" />
+                    </div>
+                    <div>
+                      <InputLabel htmlFor="kgb_tmt" value="TMT KGB" className="text-gray-700 font-bold mb-2" />
+                      <div className="relative">
+                        <DatePicker
+                          id="kgb_tmt"
+                          selected={data.kgb_tmt ? new Date(data.kgb_tmt) : null}
+                          onChange={(date) => {
+                            if (date) {
+                              const yyyy = date.getFullYear();
+                              const mm = String(date.getMonth() + 1).padStart(2, '0');
+                              const dd = String(date.getDate()).padStart(2, '0');
+                              setData('kgb_tmt', `${yyyy}-${mm}-${dd}`);
+                            } else {
+                              setData('kgb_tmt', '');
+                            }
+                          }}
+                          dateFormat="dd/MM/yyyy"
+                          showMonthDropdown
+                          showYearDropdown
+                          dropdownMode="select"
+                          className="w-full pl-11 pr-4 py-2.5 border-gray-200 focus:border-primary-500 focus:ring-primary-500 rounded-xl shadow-sm bg-gray-50/50 hover:bg-white focus:bg-white transition-all text-sm font-medium cursor-pointer"
+                          placeholderText="Pilih TMT KGB"
+                          wrapperClassName="w-full"
+                        />
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-primary-600/70">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      </div>
+                      <InputError message={errors.kgb_tmt} className="mt-2" />
+                    </div>
                   </div>
                 </div>
               </div>

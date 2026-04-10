@@ -18,7 +18,7 @@ class ProyeksiGajiController extends Controller
     public function index(Request $request)
     {
         $year = (int)$request->input('year', now()->year);
-        $month = $request->input('month', now()->month);
+        $month = $request->input('month', 'all');
         
         if ($month !== 'all') {
             $month = (int)$month;
@@ -39,8 +39,8 @@ class ProyeksiGajiController extends Controller
 
         // Calculate projections
         $proyeksiKgb = $pegawais->map(function ($pegawai) use ($year, $month) {
-            $nextDate = $pegawai->next_kgb_date;
-            if ($nextDate && ($nextDate->year == $year) && ($month === 'all' || $nextDate->month == $month)) {
+            $nextDate = $pegawai->getKgbProjectionForYear($year);
+            if ($nextDate && ($month === 'all' || $nextDate->month == $month)) {
                 return [
                     'id' => $pegawai->id,
                     'nip' => $pegawai->nip,
@@ -82,9 +82,9 @@ class ProyeksiGajiController extends Controller
             'filters' => [
                 'year' => (int)$year,
                 'month' => $month,
-                'unit_kerja' => $unitKerjaList,
-                'selected_unit' => $unitKerja,
-            ]
+                'unit_kerja' => $unitKerja,
+            ],
+            'unitList' => $unitKerjaList,
         ]);
     }
 
@@ -109,8 +109,8 @@ class ProyeksiGajiController extends Controller
         $pegawais = $query->get();
 
         $proyeksiKgb = $pegawais->map(function ($pegawai) use ($year, $month) {
-            $nextDate = $pegawai->next_kgb_date;
-            if ($nextDate && ($nextDate->year == $year) && ($month === 'all' || $nextDate->month == $month)) {
+            $nextDate = $pegawai->getKgbProjectionForYear($year);
+            if ($nextDate && ($month === 'all' || $nextDate->month == $month)) {
                 return [
                     'nip' => $pegawai->nip,
                     'nama' => $pegawai->nama_lengkap,

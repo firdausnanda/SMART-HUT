@@ -8,6 +8,12 @@ import { useState } from 'react';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 export default function DemografiEdit({ auth, pegawai, bezettings, statusPegawaiOptions, agamaOptions, statusKedudukanOptions, statusPernikahanOptions }) {
   const { data, setData, put, processing, errors } = useForm({
@@ -30,7 +36,17 @@ export default function DemografiEdit({ auth, pegawai, bezettings, statusPegawai
     unit_kerja: pegawai.unit_kerja || '',
     skpd: pegawai.skpd || '',
     status_kedudukan: pegawai.status_kedudukan || 'Aktif',
-    status: pegawai.status || 'draft',
+  });
+
+  const [activeTab, setActiveTab] = useState('profil');
+  const [showKgbModal, setShowKgbModal] = useState(false);
+  const [editingKgb, setEditingKgb] = useState(null);
+
+  const kgbForm = useForm({
+    no_sk: '',
+    tanggal_sk: '',
+    tmt_kgb: '',
+    gaji_pokok_baru: '',
   });
 
   const submit = (e) => {
@@ -97,6 +113,61 @@ export default function DemografiEdit({ auth, pegawai, bezettings, statusPegawai
     { value: 'P', label: 'Perempuan' }
   ];
 
+  const openKgbModal = (kgb = null) => {
+    setEditingKgb(kgb);
+    if (kgb) {
+      kgbForm.setData({
+        no_sk: kgb.no_sk,
+        tanggal_sk: kgb.tanggal_sk?.split('T')[0] || '',
+        tmt_kgb: kgb.tmt_kgb?.split('T')[0] || '',
+        gaji_pokok_baru: kgb.gaji_pokok_baru,
+      });
+    } else {
+      kgbForm.reset();
+    }
+    setShowKgbModal(true);
+  };
+
+  const submitKgb = (e) => {
+    e.preventDefault();
+    if (editingKgb) {
+      kgbForm.put(route('demografi-pegawai.kgb.update', editingKgb.id), {
+        onSuccess: () => {
+          setShowKgbModal(false);
+          kgbForm.reset();
+          MySwal.fire('Berhasil', 'Riwayat KGB berhasil diperbarui', 'success');
+        },
+      });
+    } else {
+      kgbForm.post(route('demografi-pegawai.kgb.store', pegawai.id), {
+        onSuccess: () => {
+          setShowKgbModal(false);
+          kgbForm.reset();
+          MySwal.fire('Berhasil', 'Riwayat KGB berhasil ditambahkan', 'success');
+        },
+      });
+    }
+  };
+
+  const deleteKgb = (id) => {
+    MySwal.fire({
+      title: 'Hapus Riwayat KGB?',
+      text: "Data yang dihapus tidak dapat dikembalikan!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        kgbForm.delete(route('demografi-pegawai.kgb.destroy', id), {
+          onSuccess: () => MySwal.fire('Terhapus!', 'Riwayat KGB telah dihapus.', 'success'),
+        });
+      }
+    });
+  };
+
 
 
   return (
@@ -117,16 +188,45 @@ export default function DemografiEdit({ auth, pegawai, bezettings, statusPegawai
           Kembali ke Daftar Pegawai
         </Link>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-8 border-b border-gray-100 bg-gray-50/50">
-            <h3 className="text-xl font-bold text-gray-900">Formulir Edit Data Demografi Pegawai</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Perbarui informasi pegawai <span className="font-semibold text-gray-700">{pegawai.nama_lengkap}</span>.
-            </p>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+          <div className="flex border-b border-gray-100">
+            <button
+              onClick={() => setActiveTab('profil')}
+              className={`flex-1 py-4 px-6 text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${activeTab === 'profil'
+                  ? 'text-primary-700 border-b-2 border-primary-600 bg-primary-50/30'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Profil Pegawai
+            </button>
+            <button
+              onClick={() => setActiveTab('kgb')}
+              className={`flex-1 py-4 px-6 text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${activeTab === 'kgb'
+                  ? 'text-primary-700 border-b-2 border-primary-600 bg-primary-50/30'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Riwayat KGB
+            </button>
           </div>
 
-          <div className="p-8">
-            <form onSubmit={submit} className="space-y-8">
+          {activeTab === 'profil' ? (
+            <>
+              <div className="p-8 border-b border-gray-100 bg-gray-50/50">
+                <h3 className="text-xl font-bold text-gray-900">Formulir Edit Data Demografi Pegawai</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Perbarui informasi pegawai <span className="font-semibold text-gray-700">{pegawai.nama_lengkap}</span>.
+                </p>
+              </div>
+
+              <div className="p-8">
+                <form onSubmit={submit} className="space-y-8">
               {/* Section 1: Profil Pegawai */}
               <div>
                 <h4 className="flex items-center text-lg font-bold text-primary-700 mb-4 border-b pb-2">
@@ -475,8 +575,225 @@ export default function DemografiEdit({ auth, pegawai, bezettings, statusPegawai
               </div>
             </form>
           </div>
+            </>
+          ) : (
+            <div className="p-8">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Riwayat Kenaikan Gaji Berkala</h3>
+                  <p className="text-sm text-gray-500">Kelola riwayat kenaikan gaji untuk {pegawai.nama_lengkap}</p>
+                </div>
+                <PrimaryButton onClick={() => openKgbModal()} className="bg-primary-600 hover:bg-primary-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Tambah KGB
+                </PrimaryButton>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-100">
+                      <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">No. SK & Tanggal</th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">TMT KGB</th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Gaji Pokok Baru</th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">TMT Berikutnya</th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {pegawai.riwayat_kgb && pegawai.riwayat_kgb.length > 0 ? (
+                      pegawai.riwayat_kgb.map((kgb) => (
+                        <tr key={kgb.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-gray-900 text-sm">{kgb.no_sk}</span>
+                              <span className="text-xs text-gray-500">
+                                {new Date(kgb.tanggal_sk).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm font-medium text-gray-700">
+                            {new Date(kgb.tmt_kgb).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          </td>
+                          <td className="px-6 py-4 text-sm font-bold text-emerald-700">
+                            Rp {new Intl.NumberFormat('id-ID').format(kgb.gaji_pokok_baru)}
+                          </td>
+                          <td className="px-6 py-4 text-sm font-medium text-blue-700 bg-blue-50/30">
+                            {kgb.tmt_kgb_berikutnya ? new Date(kgb.tmt_kgb_berikutnya).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex justify-center gap-2">
+                              <button onClick={() => openKgbModal(kgb)} className="p-1.5 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="Edit KGB">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                              </button>
+                              <button onClick={() => deleteKgb(kgb.id)} className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="Hapus KGB">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5" className="px-6 py-12 text-center">
+                          <div className="flex flex-col items-center">
+                            <div className="h-12 w-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <span className="text-sm font-medium text-gray-400">Belum ada riwayat KGB</span>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* KGB Modal */}
+      <Modal show={showKgbModal} onClose={() => setShowKgbModal(false)} maxWidth="lg">
+        <form onSubmit={submitKgb} className="p-6">
+          <div className="flex items-center justify-between mb-6 border-b pb-4">
+            <h2 className="text-lg font-bold text-gray-900">
+              {editingKgb ? 'Edit Riwayat KGB' : 'Tambah Riwayat KGB'}
+            </h2>
+            <button type="button" onClick={() => setShowKgbModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <InputLabel htmlFor="no_sk" value="Nomor SK" className="text-gray-700 font-bold mb-2" />
+              <TextInput
+                id="no_sk"
+                type="text"
+                className="w-full"
+                value={kgbForm.data.no_sk}
+                onChange={(e) => kgbForm.setData('no_sk', e.target.value)}
+                required
+                placeholder="Masukkan Nomor SK KGB"
+              />
+              <InputError message={kgbForm.errors.no_sk} className="mt-2" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <InputLabel htmlFor="tanggal_sk" value="Tanggal SK" className="text-gray-700 font-bold mb-2" />
+                <div className="relative">
+                  <DatePicker
+                    id="tanggal_sk"
+                    selected={kgbForm.data.tanggal_sk ? new Date(kgbForm.data.tanggal_sk) : null}
+                    onChange={(date) => {
+                      if (date) {
+                        const yyyy = date.getFullYear();
+                        const mm = String(date.getMonth() + 1).padStart(2, '0');
+                        const dd = String(date.getDate()).padStart(2, '0');
+                        kgbForm.setData('tanggal_sk', `${yyyy}-${mm}-${dd}`);
+                      } else {
+                        kgbForm.setData('tanggal_sk', '');
+                      }
+                    }}
+                    dateFormat="dd/MM/yyyy"
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                    className="w-full pl-11 pr-4 py-2.5 border-gray-200 focus:border-primary-500 focus:ring-primary-500 rounded-xl shadow-sm bg-gray-50/50 hover:bg-white focus:bg-white transition-all text-sm font-medium cursor-pointer"
+                    placeholderText="Pilih Tanggal SK"
+                    required
+                    wrapperClassName="w-full"
+                  />
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-primary-600/70">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                </div>
+                <InputError message={kgbForm.errors.tanggal_sk} className="mt-2" />
+              </div>
+
+              <div>
+                <InputLabel htmlFor="tmt_kgb" value="TMT KGB" className="text-gray-700 font-bold mb-2" />
+                <div className="relative">
+                  <DatePicker
+                    id="tmt_kgb"
+                    selected={kgbForm.data.tmt_kgb ? new Date(kgbForm.data.tmt_kgb) : null}
+                    onChange={(date) => {
+                      if (date) {
+                        const yyyy = date.getFullYear();
+                        const mm = String(date.getMonth() + 1).padStart(2, '0');
+                        const dd = String(date.getDate()).padStart(2, '0');
+                        kgbForm.setData('tmt_kgb', `${yyyy}-${mm}-${dd}`);
+                      } else {
+                        kgbForm.setData('tmt_kgb', '');
+                      }
+                    }}
+                    dateFormat="dd/MM/yyyy"
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                    className="w-full pl-11 pr-4 py-2.5 border-gray-200 focus:border-primary-500 focus:ring-primary-500 rounded-xl shadow-sm bg-gray-50/50 hover:bg-white focus:bg-white transition-all text-sm font-medium cursor-pointer"
+                    placeholderText="Pilih TMT KGB"
+                    required
+                    wrapperClassName="w-full"
+                  />
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-primary-600/70">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                </div>
+                <InputError message={kgbForm.errors.tmt_kgb} className="mt-2" />
+              </div>
+            </div>
+
+            <div>
+              <InputLabel htmlFor="gaji_pokok_baru" value="Gaji Pokok Baru" className="text-gray-700 font-bold mb-2" />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none font-bold text-gray-400">Rp</div>
+                <TextInput
+                  id="gaji_pokok_baru"
+                  type="number"
+                  className="w-full pl-11"
+                  value={kgbForm.data.gaji_pokok_baru}
+                  onChange={(e) => kgbForm.setData('gaji_pokok_baru', e.target.value)}
+                  required
+                  placeholder="0"
+                />
+              </div>
+              <InputError message={kgbForm.errors.gaji_pokok_baru} className="mt-2" />
+            </div>
+
+            <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+              <div className="flex gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="text-xs text-blue-800 leading-relaxed">
+                  <p className="font-bold mb-1 underline">Informasi Otomasi:</p>
+                  Status akan otomatis menjadi <span className="font-bold italic text-blue-900">"Final"</span> dan **TMT KGB Berikutnya** akan dihitung otomatis **2 tahun** dari TMT yang Anda pilih.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-end gap-3">
+            <SecondaryButton onClick={() => setShowKgbModal(false)} type="button">
+              Batal
+            </SecondaryButton>
+            <PrimaryButton className="bg-primary-600 hover:bg-primary-700" loading={kgbForm.processing}>
+              {editingKgb ? 'Simpan Perubahan' : 'Tambahkan KGB'}
+            </PrimaryButton>
+          </div>
+        </form>
+      </Modal>
     </AuthenticatedLayout>
   );
 }

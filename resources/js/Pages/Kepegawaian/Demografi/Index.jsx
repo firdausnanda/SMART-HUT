@@ -9,29 +9,8 @@ import BulkActionToolbar from '@/Components/BulkActionToolbar';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 
+
 const MySwal = withReactContent(Swal);
-
-const getStatusBadge = (status) => {
-    switch (status) {
-        case 'waiting_kasi': return 'bg-amber-50 text-amber-600 border-amber-200';
-        case 'waiting_cdk': return 'bg-blue-50 text-blue-600 border-blue-200';
-        case 'final': return 'bg-emerald-50 text-emerald-600 border-emerald-200';
-        case 'rejected': return 'bg-rose-50 text-rose-600 border-rose-200';
-        case 'draft':
-        default: return 'bg-gray-50 text-gray-600 border-gray-200';
-    }
-};
-
-const getStatusLabel = (status) => {
-    switch (status) {
-        case 'waiting_kasi': return 'Menunggu Kasi';
-        case 'waiting_cdk': return 'Menunggu K.CDK';
-        case 'final': return 'Disetujui';
-        case 'rejected': return 'Ditolak';
-        case 'draft':
-        default: return 'Draft';
-    }
-};
 
 export default function DemografiIndex({ auth, pegawais, filters }) {
     const { flash, errors } = usePage().props;
@@ -149,22 +128,19 @@ export default function DemografiIndex({ auth, pegawais, filters }) {
         let title = ''; let confirmText = ''; let color = '#3085d6'; let showInput = false;
         switch (action) {
             case 'delete': title = 'Hapus Data Terpilih?'; confirmText = 'Ya, Hapus!'; color = '#d33'; break;
-            case 'submit': title = 'Ajukan Data Terpilih?'; confirmText = 'Ya, Ajukan!'; color = '#15803d'; break;
-            case 'approve': title = 'Setujui Data Terpilih?'; confirmText = 'Ya, Setujui!'; color = '#15803d'; break;
-            case 'reject': title = 'Tolak Data Terpilih?'; confirmText = 'Ya, Tolak!'; color = '#d33'; showInput = true; break;
             default: return;
         }
 
         MySwal.fire({
-            title: title, text: showInput ? 'Berikan alasan penolakan:' : `${selectedIds.length} data terpilih akan diproses.`,
-            icon: 'warning', input: showInput ? 'textarea' : undefined,
+            title: title, text: `${selectedIds.length} data terpilih akan dihapus.`,
+            icon: 'warning',
             showCancelButton: true, confirmButtonColor: color, confirmButtonText: confirmText,
             cancelButtonText: 'Batal', borderRadius: '1.25rem',
         }).then((result) => {
             if (result.isConfirmed) {
-                setLoadingText('Memproses Aksi Massal...'); setIsLoading(true);
-                router.post(route('demografi-pegawai.bulk-workflow-action'), {
-                    ids: selectedIds, action: action, rejection_note: showInput ? result.value : undefined
+                setLoadingText('Menghapus Data Terpilih...'); setIsLoading(true);
+                router.post(route('demografi-pegawai.bulk-delete'), {
+                    ids: selectedIds
                 }, {
                     preserveScroll: true, onSuccess: () => setSelectedIds([]),
                     onFinish: () => setIsLoading(false)
@@ -177,24 +153,19 @@ export default function DemografiIndex({ auth, pegawais, filters }) {
         let title = ''; let text = ''; let icon = 'warning'; let confirmText = ''; let confirmColor = '#15803d'; let showInput = false; let loadingMsg = '';
         switch (action) {
             case 'delete': title = 'Hapus Data?'; text = "Data yang dihapus tidak bisa dikembalikan!"; confirmText = 'Ya, hapus!'; confirmColor = '#d33'; loadingMsg = 'Menghapus Data...'; break;
-            case 'submit': title = 'Ajukan Data?'; text = "Data akan dikirim ke Kasi untuk diverifikasi."; icon = 'question'; confirmText = 'Ya, Ajukan!'; loadingMsg = 'Mengajukan Laporan...'; break;
-            case 'approve': title = 'Setujui Data?'; text = "Apakah Anda yakin ingin menyetujui data ini?"; icon = 'check-circle'; confirmText = 'Ya, Setujui'; loadingMsg = 'Memverifikasi...'; break;
-            case 'reject': title = 'Tolak Data?'; text = "Berikan alasan penolakan:"; icon = 'warning'; confirmText = 'Ya, Tolak'; confirmColor = '#d33'; showInput = true; loadingMsg = 'Memproses Penolakan...'; break;
             default: return;
         }
 
         MySwal.fire({
             title: title, text: text, icon: icon,
             showCancelButton: true, confirmButtonColor: confirmColor, confirmButtonText: confirmText,
-            cancelButtonText: 'Batal', input: showInput ? 'textarea' : undefined,
+            cancelButtonText: 'Batal',
             borderRadius: '1.25rem',
             customClass: { title: 'font-bold text-gray-900', popup: 'rounded-3xl shadow-2xl border-none', confirmButton: 'rounded-xl font-bold px-6 py-2.5', cancelButton: 'rounded-xl font-bold px-6 py-2.5' }
         }).then((result) => {
             if (result.isConfirmed) {
                 setLoadingText(loadingMsg); setIsLoading(true);
-                const data = { action: action };
-                if (showInput) data.rejection_note = result.value;
-                router.post(route('demografi-pegawai.single-workflow-action', id), data, {
+                router.delete(route('demografi-pegawai.destroy', id), {
                     preserveScroll: true, onFinish: () => setIsLoading(false)
                 });
             }
@@ -328,9 +299,6 @@ export default function DemografiIndex({ auth, pegawais, filters }) {
                                     <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => handleSort('created_at')}>
                                         Input Oleh <SortIcon field="created_at" />
                                     </th>
-                                    <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider text-center cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => handleSort('status')}>
-                                        Status <SortIcon field="status" />
-                                    </th>
                                     <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -386,59 +354,15 @@ export default function DemografiIndex({ auth, pegawais, filters }) {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-5 text-center">
-                                            <div className="flex flex-col items-center gap-1">
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide border ${getStatusBadge(pegawai.status)}`}>
-                                                    {getStatusLabel(pegawai.status)}
-                                                </span>
-                                                {pegawai.status === 'rejected' && pegawai.rejection_note && (
-                                                    <div className="text-[10px] text-rose-600 font-medium italic mt-1 max-w-[150px] leading-tight" title={pegawai.rejection_note}>
-                                                        "{pegawai.rejection_note.length > 50 ? pegawai.rejection_note.substring(0, 50) + '...' : pegawai.rejection_note}"
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </td>
                                         <td className="px-6 py-5">
                                             <div className="flex items-center justify-center gap-2">
-                                                {(canEdit && (pegawai.status === 'draft' || pegawai.status === 'rejected')) && (
-                                                    <button onClick={() => handleSingleAction(pegawai.id, 'submit')} className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shadow-sm bg-blue-50" title="Ajukan Laporan">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 9l3 3m0 0l-3 3m3-3H9" /></svg>
+                                                <Link href={route('demografi-pegawai.edit', pegawai.id)} className="p-2 text-primary-600 hover:bg-primary-100 rounded-lg transition-colors shadow-sm bg-primary-50" title="Edit Pegawai">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                                </Link>
+                                                {(canDelete || isAdmin) && (
+                                                    <button onClick={() => handleSingleAction(pegawai.id, 'delete')} className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-red-50" title="Hapus Pegawai">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                                     </button>
-                                                )}
-
-                                                {(canApprove && (isKasi || isAdmin) && pegawai.status === 'waiting_kasi') && (
-                                                    <>
-                                                        <button onClick={() => handleSingleAction(pegawai.id, 'approve')} className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm bg-emerald-50" title="Setujui Laporan">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                                                        </button>
-                                                        <button onClick={() => handleSingleAction(pegawai.id, 'reject')} className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-red-50" title="Tolak Laporan">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                                                        </button>
-                                                    </>
-                                                )}
-
-                                                {(canApprove && (isKaCdk || isAdmin) && pegawai.status === 'waiting_cdk') && (
-                                                    <>
-                                                        <button onClick={() => handleSingleAction(pegawai.id, 'approve')} className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm bg-emerald-50" title="Setujui Laporan">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                        </button>
-                                                        <button onClick={() => handleSingleAction(pegawai.id, 'reject')} className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-red-50" title="Tolak Laporan">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                        </button>
-                                                    </>
-                                                )}
-
-                                                {((canEdit && (pegawai.status === 'draft' || pegawai.status === 'rejected')) || isAdmin) && (
-                                                    <>
-                                                        <Link href={route('demografi-pegawai.edit', pegawai.id)} className="p-2 text-primary-600 hover:bg-primary-100 rounded-lg transition-colors shadow-sm bg-primary-50" title="Edit Pegawai">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                                        </Link>
-                                                        {(canDelete || isAdmin) && (
-                                                            <button onClick={() => handleSingleAction(pegawai.id, 'delete')} className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-red-50" title="Hapus Pegawai">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                            </button>
-                                                        )}
-                                                    </>
                                                 )}
                                             </div>
                                         </td>

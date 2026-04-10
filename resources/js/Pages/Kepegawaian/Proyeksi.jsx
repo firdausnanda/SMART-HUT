@@ -20,7 +20,7 @@ import TextInput from '@/Components/TextInput';
 import Select from 'react-select';
 import LoadingOverlay from '@/Components/LoadingOverlay';
 
-export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }) {
+export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters, unitList }) {
     const [activeTab, setActiveTab] = useState('kgb');
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -50,14 +50,17 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
 
     const unitOptions = [
         { value: '', label: 'Semua Unit Kerja' },
-        ...filters.unit_kerja.map(unit => ({ value: unit, label: unit }))
+        ...(unitList || []).map(unit => ({ value: unit, label: unit }))
     ];
 
     const handleFilterChange = (key, value) => {
-        router.get(route('proyeksi-gaji.index'), {
-            ...filters,
-            [key]: value,
-        }, {
+        const newFilters = {
+            year: key === 'year' ? value : filters.year,
+            month: key === 'month' ? value : filters.month,
+            unit_kerja: key === 'unit_kerja' ? value : filters.unit_kerja,
+        };
+
+        router.get(route('proyeksi-gaji.index'), newFilters, {
             preserveState: true,
             preserveScroll: true,
             onStart: () => setIsLoading(true),
@@ -69,7 +72,7 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
         const queryParams = new URLSearchParams({
             year: filters.year,
             month: filters.month,
-            unit_kerja: filters.selected_unit || '',
+            unit_kerja: filters.unit_kerja || '',
         }).toString();
 
         window.location.href = route('proyeksi-gaji.export') + '?' + queryParams;
@@ -245,7 +248,7 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters }
                                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Unit Kerja</span>
                                         <Select
                                             options={unitOptions}
-                                            value={unitOptions.find(u => u.value === filters.selected_unit) || unitOptions[0]}
+                                            value={unitOptions.find(u => u.value === (filters.unit_kerja || '')) || unitOptions[0]}
                                             onChange={(opt) => handleFilterChange('unit_kerja', opt?.value)}
                                             styles={selectStyles}
                                             placeholder="Pilih Unit Kerja..."

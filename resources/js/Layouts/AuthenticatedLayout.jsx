@@ -31,8 +31,8 @@ export default function Authenticated({ user, header, children }) {
         kelembagaan_hutan_rakyat_mobile: route().current('perkembangan-kth.*') || route().current('nilai-transaksi-ekonomi.*'),
         data_master: route().current('provinces.*') || route().current('regencies.*') || route().current('districts.*') || route().current('villages.*') || route().current('bangunan-kta.*') || route().current('sumber-dana.*') || route().current('commodities.*') || route().current('bukan-kayu.*') || route().current('kayu.*') || route().current('jenis-produksi.*') || route().current('pengelola-wisata.*') || route().current('pengelola-ps.*') || route().current('skema-perhutanan-sosial.*'),
         data_master_mobile: route().current('provinces.*') || route().current('regencies.*') || route().current('districts.*') || route().current('villages.*') || route().current('bangunan-kta.*') || route().current('sumber-dana.*') || route().current('commodities.*') || route().current('bukan-kayu.*') || route().current('kayu.*') || route().current('jenis-produksi.*') || route().current('pengelola-wisata.*') || route().current('pengelola-ps.*') || route().current('skema-perhutanan-sosial.*'),
-        kepegawaian: route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*'),
-        kepegawaian_mobile: route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*')
+        kepegawaian: route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*') || route().current('rekap-bulanan.*'),
+        kepegawaian_mobile: route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*') || route().current('rekap-bulanan.*')
     });
 
     const { flash, auth } = usePage().props;
@@ -424,7 +424,7 @@ export default function Authenticated({ user, header, children }) {
                                 <button
                                     onClick={() => toggleMenu('kepegawaian')}
                                     className={`w-full group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${isSidebarCollapsed ? 'justify-center px-0' : 'px-4'
-                                        } ${openMenus['kepegawaian'] || route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*')
+                                        } ${openMenus['kepegawaian'] || route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*') || route().current('rekap-bulanan.*')
                                             ? 'bg-white/10 border-white/20 text-white shadow-sm'
                                             : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white'
                                         }`}
@@ -447,7 +447,8 @@ export default function Authenticated({ user, header, children }) {
                                         {[
                                             { name: 'Demografi Pegawai', route: route('demografi-pegawai.index'), pattern: 'demografi-pegawai.*' },
                                             { name: 'Bezetting Jabatan', route: route('bezetting-jabatan.index'), pattern: 'bezetting-jabatan.*' },
-                                            { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*' }
+                                            { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*' },
+                                            { name: 'Rekap Bulanan', route: route('rekap-bulanan.index'), pattern: 'rekap-bulanan.*' },
                                         ].map((item) => (
                                             <Link
                                                 key={item.name}
@@ -949,8 +950,7 @@ export default function Authenticated({ user, header, children }) {
                         {/* Kepegawaian Mobile */}
                         <div className="space-y-1">
                             <button
-                                onClick={() => toggleMenu('kepegawaian_mobile')}
-                                className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${openMenus['kepegawaian_mobile'] || route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*')
+                                className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${openMenus['kepegawaian_mobile'] || route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*') || route().current('rekap-bulanan.*')
                                     ? 'bg-white/10 border-white/20 text-white'
                                     : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
                                     }`}
@@ -968,7 +968,8 @@ export default function Authenticated({ user, header, children }) {
                                     {[
                                         { name: 'Demografi Pegawai', route: route('demografi-pegawai.index'), pattern: 'demografi-pegawai.*' },
                                         { name: 'Bezetting Jabatan', route: route('bezetting-jabatan.index'), pattern: 'bezetting-jabatan.*' },
-                                        { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*' }
+                                        { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*' },
+                                        { name: 'Rekap Bulanan', route: route('rekap-bulanan.index'), pattern: 'rekap-bulanan.*' },
                                     ].map((item) => (
                                         <Link
                                             key={item.name}
