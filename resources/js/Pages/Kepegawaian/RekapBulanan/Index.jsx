@@ -44,7 +44,7 @@ export default function Index({ auth, rekaps, filters }) {
 
     const years = [];
     const currentYear = new Date().getFullYear();
-    for (let i = currentYear; i >= 2024; i--) {
+    for (let i = currentYear; i >= 2021; i--) {
         years.push(i);
     }
 
@@ -66,7 +66,7 @@ export default function Index({ auth, rekaps, filters }) {
     const canApprove = userPermissions.includes('kepegawaian.approve') || isAdmin;
     const canEdit = userPermissions.includes('kepegawaian.edit') || isAdmin;
     const canDelete = userPermissions.includes('kepegawaian.delete') || isAdmin;
-    
+
     // Check if the selected month/year is already protected (has waiting or final status)
     const existingRekap = rekaps.find(r => r.periode_bulan === parseInt(data.month) && r.periode_tahun === parseInt(data.year));
     const isProtected = existingRekap && ['waiting_kasi', 'waiting_cdk', 'final'].includes(existingRekap.status);
@@ -294,7 +294,7 @@ export default function Index({ auth, rekaps, filters }) {
 
     const handleGenerate = (e) => {
         e.preventDefault();
-        
+
         if (isProtected) {
             MySwal.fire({
                 title: 'Data Dilindungi',
@@ -440,11 +440,10 @@ export default function Index({ auth, rekaps, filters }) {
                                         <button
                                             type="submit"
                                             disabled={processing || isProtected}
-                                            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white transition-colors ${
-                                                isProtected 
-                                                    ? 'bg-gray-400 cursor-not-allowed' 
+                                            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white transition-colors ${isProtected
+                                                    ? 'bg-gray-400 cursor-not-allowed'
                                                     : 'bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500'
-                                            } disabled:opacity-50`}
+                                                } disabled:opacity-50`}
                                             title={isProtected ? 'Status rekap saat ini tidak memungkinkan untuk generate ulang' : ''}
                                         >
                                             {processing ? (
