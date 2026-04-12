@@ -29,8 +29,8 @@ use Illuminate\Support\Facades\Cache;
 use Spatie\Activitylog\Models\Activity;
 use App\Exports\RehabLahanExport;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\Pegawai;
-use App\Models\Bezetting;
+use App\Models\RekapBulananPegawai;
+use App\Models\RekapStatistikBulanan;
 
 class DashboardController extends Controller
 {
@@ -301,6 +301,9 @@ class DashboardController extends Controller
         $thisYear = (int) date('Y');
         $years = range($thisYear, 2021);
 
+        // Ambil data kepegawaian YoY sekaligus (1 query)
+        $kepegawaianYoY = $this->getKepegawaianYoYStats($years);
+
         $stats = [];
         foreach ($years as $year) {
             $stats[$year] = [
@@ -309,7 +312,7 @@ class DashboardController extends Controller
                 'bina_usaha' => $this->getBinaUsahaStats($year),
                 'kelembagaan_ps' => $this->getKelembagaanPsStats($year),
                 'kelembagaan_hr' => $this->getKelembagaanHrStats($year),
-                'kepegawaian' => $this->getKepegawaianStats($year),
+                'kepegawaian' => $kepegawaianYoY[$year] ?? $this->getKepegawaianStats($year),
             ];
         }
 
@@ -764,140 +767,306 @@ class DashboardController extends Controller
     private function getKepegawaianStats($currentYear)
     {
         return Cache::remember("kepegawaian_stats_{$currentYear}", 300, function () use ($currentYear) {
-            // 1. Coba ambil dari tabel rekap_demografi_bulanans (Data Snapshot Bulanan)
-            // Ambil data terbaru untuk tahun yang dipilih berdasarkan bulan terakhir
-            $rekap = DB::table('rekap_demografi_bulanans')
-                ->where('periode_tahun', $currentYear)
+            // 1. Coba ambil dari tabel rekap_statistik_bulanan (Data Snapshot Bulanan)
+            // Ambil data terbaru untuk tahun yang dipilih berdasarkan bulan terakhir yang berstatus FINAL
+            $rekap = RekapStatistikBulanan::where('periode_tahun', $currentYear)
+                ->where('status', 'final')
                 ->orderByDesc('periode_bulan')
                 ->first();
 
             if ($rekap) {
-                $genderStats = json_decode($rekap->statistik_jenis_kelamin, true);
-                $statusStats = json_decode($rekap->statistik_status_pegawai, true);
-                $generations = json_decode($rekap->statistik_generasi, true);
-                $pendidikanStats = json_decode($rekap->statistik_pendidikan, true);
-                $golonganStats = json_decode($rekap->statistik_golongan, true);
-                $pernikahanStats = json_decode($rekap->statistik_status_pernikahan, true);
+                // Mapping Gender dari integer columns ke format label-count
+                $genderStats = [
+                    'Laki-laki' => $rekap->total_laki,
+                    'Perempuan' => $rekap->total_perempuan,
+                ];
+
+                $statusStats = $rekap->statistik_status_pegawai ?? [];
+                $generations = $rekap->statistik_generasi ?? [];
+                $pendidikanStats = $rekap->statistik_pendidikan ?? [];
+                $golonganStats = $rekap->statistik_golongan ?? [];
+                $pernikahanStats = $rekap->statistik_status_pernikahan ?? [];
                 $totalPegawai = $rekap->total_pegawai_aktif;
-                
-                // Ambil Bezetting dari Snapshot jika ada
-                if (isset($rekap->statistik_bezetting)) {
-                    $bezettingStats = json_decode($rekap->statistik_bezetting, true);
-                } else {
-                    // Fallback ke real-time jika kolom belum terisi (untuk data lama)
-                    $bezettingData = Bezetting::where('status', 'final')
-                        ->withCount(['pegawais' => function ($query) {
-                            $query->where('status', 'final')
-                                ->where('status_kedudukan', 'Aktif');
-                        }])
-                        ->get();
+                $rawBezetting = $rekap->statistik_bezetting ?? [];
+                if (!empty($rawBezetting) && !isset($rawBezetting['details'])) {
+                    $details = [];
+                    $totalKebutuhan = 0;
+                    $totalEksisting = 0;
+
+                    foreach ($rawBezetting as $name => $values) {
+                        $kebutuhan = $values['kebutuhan'] ?? 0;
+                        $eksisting = $values['terisi'] ?? ($values['eksisting'] ?? 0);
+                        
+                        $details[] = [
+                            'name' => $name,
+                            'kebutuhan' => (int)$kebutuhan,
+                            'eksisting' => (int)$eksisting,
+                        ];
+                        
+                        $totalKebutuhan += $kebutuhan;
+                        $totalEksisting += $eksisting;
+                    }
 
                     $bezettingStats = [
-                        'total_kebutuhan' => $bezettingData->sum('kebutuhan'),
-                        'total_eksisting' => $bezettingData->sum('pegawais_count'),
-                        'details' => $bezettingData->map(function ($item) {
-                            return [
-                                'name' => $item->nama_jabatan,
-                                'kebutuhan' => $item->kebutuhan,
-                                'eksisting' => $item->pegawais_count
-                            ];
-                        })
+                        'total_kebutuhan' => $totalKebutuhan,
+                        'total_eksisting' => $totalEksisting,
+                        'details' => $details,
+                    ];
+                } else {
+                    $bezettingStats = $rawBezetting ?: [
+                        'total_kebutuhan' => 0,
+                        'total_eksisting' => 0,
+                        'details' => []
                     ];
                 }
+
+                // Data Tren untuk chart tren12Bulan
+                $trenBulanan = RekapStatistikBulanan::tren12Bulan()->map(fn($r) => [
+                    'label' => \Carbon\Carbon::createFromDate($r->periode_tahun, $r->periode_bulan, 1)
+                        ->translatedFormat('M Y'),
+                    'total' => $r->total_pegawai_aktif,
+                ]);
+
+                // Sort working_years for consistency
+                $workingYearsStats = [
+                    '0-5 Tahun' => $rekap->statistik_masa_kerja['0-5 Tahun'] ?? 0,
+                    '6-10 Tahun' => $rekap->statistik_masa_kerja['6-10 Tahun'] ?? 0,
+                    '11-15 Tahun' => $rekap->statistik_masa_kerja['11-15 Tahun'] ?? 0,
+                    '16-20 Tahun' => $rekap->statistik_masa_kerja['16-20 Tahun'] ?? 0,
+                    '> 20 Tahun' => $rekap->statistik_masa_kerja['> 20 Tahun'] ?? 0,
+                ];
+
+                return [
+                    'total_pegawai' => $totalPegawai,
+                    'gender' => $genderStats,
+                    'status' => $statusStats,
+                    'generations' => $generations,
+                    'education' => $pendidikanStats,
+                    'rank' => $golonganStats,
+                    'marriage' => $pernikahanStats,
+                    'bezetting' => $bezettingStats,
+                    // Data Baru
+                    'total_pns' => $rekap->total_pns,
+                    'total_pppk' => $rekap->total_pppk,
+                    'total_honorer' => $rekap->total_honorer,
+                    'pensiun_tahun_ini' => $rekap->total_pensiun_tahun_ini,
+                    'pensiun_bulan_ini' => $rekap->total_pensiun_bulan_ini,
+                    'pensiun_6_bulan' => $rekap->total_pensiun_6_bulan,
+                    'kgb_bulan_ini' => $rekap->kgb_jatuh_bulan_ini,
+                    'kgb_3_bulan' => $rekap->kgb_jatuh_3_bulan,
+                    'periode_label' => $rekap->periode_bulan . '/' . $rekap->periode_tahun,
+                    'tren_bulanan' => $trenBulanan,
+                    'working_years' => $workingYearsStats,
+                ];
             } elseif ($currentYear == (int) date('Y')) {
-                // Fallback: Hitung on-the-fly HANYA jika tahun yang dipilih adalah TAHUN INI
-                // Demographics: Gender
-                $genderStats = Pegawai::where('status', 'final')
-                    ->where('status_kedudukan', 'Aktif')
-                    ->selectRaw('jenis_kelamin as gender, count(*) as count')
-                    ->groupBy('jenis_kelamin')
-                    ->pluck('count', 'gender');
-
-                // Demographics: Status Pegawai
-                $statusStats = Pegawai::where('status', 'final')
-                    ->where('status_kedudukan', 'Aktif')
-                    ->selectRaw('status_pegawai as status_name, count(*) as count')
-                    ->groupBy('status_pegawai')
-                    ->pluck('count', 'status_name');
-
-                // Demographics: Generations
-                $pegawais = Pegawai::where('status', 'final')
-                    ->where('status_kedudukan', 'Aktif')
-                    ->whereNotNull('tanggal_lahir')
-                    ->get();
-
-                $generations = [
-                    'Gen Z' => 0,
-                    'Milenial' => 0,
-                    'Gen X' => 0,
-                    'Baby Boomer' => 0,
-                    'Post-Gen Z' => 0,
-                ];
-
-                foreach ($pegawais as $pegawai) {
-                    $gen = $pegawai->generasi;
-                    if (isset($generations[$gen])) {
-                        $generations[$gen]++;
-                    } else {
-                        // Jika ada generasi lain yang tidak terdaftar di preset
-                        $generations[$gen] = 1;
-                    }
-                }
-
-                $totalPegawai = Pegawai::where('status', 'final')
-                    ->where('status_kedudukan', 'Aktif')
-                    ->count();
-
-                $pendidikanStats = [];
-                $golonganStats = [];
-                $pernikahanStats = [];
-
-                // Bezetting Stats (Fallback real-time untuk tahun berjalan)
-                $bezettingData = Bezetting::where('status', 'final')
-                    ->withCount(['pegawais' => function ($query) {
-                        $query->where('status', 'final')
-                            ->where('status_kedudukan', 'Aktif');
-                    }])
-                    ->get();
-
-                $bezettingStats = [
-                    'total_kebutuhan' => $bezettingData->sum('kebutuhan'),
-                    'total_eksisting' => $bezettingData->sum('pegawais_count'),
-                    'details' => $bezettingData->map(function ($item) {
-                        return [
-                            'name' => $item->nama_jabatan,
-                            'kebutuhan' => $item->kebutuhan,
-                            'eksisting' => $item->pegawais_count
-                        ];
-                    })
-                ];
-            } else {
-                // Jika tahun lalu dan tidak ada rekap, kembalikan data kosong
-                $genderStats = [];
-                $statusStats = [];
-                $generations = [];
-                $pendidikanStats = [];
-                $golonganStats = [];
-                $pernikahanStats = [];
-                $totalPegawai = 0;
-                $bezettingStats = [
-                    'total_kebutuhan' => 0,
-                    'total_eksisting' => 0,
-                    'details' => []
-                ];
+                return $this->getKepegawaianFallbackForYear($currentYear);
             }
 
             return [
-                'total_pegawai' => $totalPegawai,
-                'gender' => $genderStats,
-                'status' => $statusStats,
-                'generations' => $generations,
-                'education' => $pendidikanStats, // Tambahan sesuai migrasi
-                'rank' => $golonganStats, // Tambahan sesuai migrasi
-                'marriage' => $pernikahanStats, // Tambahan sesuai migrasi
-                'bezetting' => $bezettingStats,
+                'total_pegawai' => 0,
+                'gender' => [],
+                'status' => [],
+                'generations' => [],
+                'education' => [],
+                'rank' => [],
+                'marriage' => [],
+                'bezetting' => [
+                    'total_kebutuhan' => 0,
+                    'total_eksisting' => 0,
+                    'details' => []
+                ],
             ];
         });
+    }
+
+    private function getKepegawaianYoYStats(array $years): array
+    {
+        return Cache::remember('kepegawaian_yoy_stats_' . implode('_', $years), 300, function () use ($years) {
+            // 1. Ambil semua rekap dari RekapStatistikBulanan untuk semua tahun sekaligus
+            //    Ambil record terbaru (bulan terbesar) per tahun yang berstatus 'final'
+            $rekaps = RekapStatistikBulanan::whereIn('periode_tahun', $years)
+                ->where('status', 'final')
+                ->orderByDesc('periode_bulan')
+                ->get()
+                ->groupBy('periode_tahun')
+                ->map(fn($group) => $group->first());
+
+            $result = [];
+            foreach ($years as $year) {
+                $rekap = $rekaps->get($year);
+
+                if (!$rekap) {
+                    $result[$year] = $this->getKepegawaianFallbackForYear($year);
+                    continue;
+                }
+
+                // Normalisasi bezetting
+                $rawBezetting = $rekap->statistik_bezetting ?? [];
+                if (!empty($rawBezetting) && !isset($rawBezetting['details'])) {
+                    $details = [];
+                    $totalKebutuhan = 0;
+                    $totalEksisting = 0;
+                    foreach ($rawBezetting as $name => $values) {
+                        $kebutuhan = $values['kebutuhan'] ?? 0;
+                        $eksisting = $values['terisi'] ?? ($values['eksisting'] ?? 0);
+                        $details[] = ['name' => $name, 'kebutuhan' => (int) $kebutuhan, 'eksisting' => (int) $eksisting];
+                        $totalKebutuhan += $kebutuhan;
+                        $totalEksisting += $eksisting;
+                    }
+                    $bezettingStats = ['total_kebutuhan' => $totalKebutuhan, 'total_eksisting' => $totalEksisting, 'details' => $details];
+                } else {
+                    $bezettingStats = $rawBezetting ?: ['total_kebutuhan' => 0, 'total_eksisting' => 0, 'details' => []];
+                }
+
+                $result[$year] = [
+                    'total_pegawai' => $rekap->total_pegawai_aktif,
+                    'total_pns' => $rekap->total_pns,
+                    'total_pppk' => $rekap->total_pppk,
+                    'total_honorer' => $rekap->total_honorer,
+                    'gender' => ['Laki-laki' => $rekap->total_laki, 'Perempuan' => $rekap->total_perempuan],
+                    'status' => $rekap->statistik_status_pegawai ?? [],
+                    'generations' => $rekap->statistik_generasi ?? [],
+                    'education' => $rekap->statistik_pendidikan ?? [],
+                    'rank' => $rekap->statistik_golongan ?? [],
+                    'marriage' => $rekap->statistik_status_pernikahan ?? [],
+                    'working_years' => [
+                        '0-5 Tahun' => $rekap->statistik_masa_kerja['0-5 Tahun'] ?? 0,
+                        '6-10 Tahun' => $rekap->statistik_masa_kerja['6-10 Tahun'] ?? 0,
+                        '11-15 Tahun' => $rekap->statistik_masa_kerja['11-15 Tahun'] ?? 0,
+                        '16-20 Tahun' => $rekap->statistik_masa_kerja['16-20 Tahun'] ?? 0,
+                        '> 20 Tahun' => $rekap->statistik_masa_kerja['> 20 Tahun'] ?? 0,
+                    ],
+                    'bezetting' => $bezettingStats,
+                    'pensiun_tahun_ini' => $rekap->total_pensiun_tahun_ini,
+                    'pensiun_bulan_ini' => $rekap->total_pensiun_bulan_ini,
+                    'pensiun_6_bulan' => $rekap->total_pensiun_6_bulan,
+                    'kgb_bulan_ini' => $rekap->kgb_jatuh_bulan_ini,
+                    'kgb_3_bulan' => $rekap->kgb_jatuh_3_bulan,
+                    'periode_label' => $rekap->periode_bulan . '/' . $rekap->periode_tahun,
+                ];
+            }
+
+            return $result;
+        });
+    }
+
+    private function getKepegawaianFallbackForYear(int $year): array
+    {
+        // Fallback: Ambil dari RekapBulananPegawai (Snapshot per Row) jika statistik bulanan belum di-generate
+        $latestBulan = RekapBulananPegawai::where('periode_tahun', $year)
+            ->where('status', 'final')
+            ->orderByDesc('periode_bulan')
+            ->value('periode_bulan');
+
+        if (!$latestBulan) {
+            return [
+                'total_pegawai' => 0,
+                'gender' => [],
+                'status' => [],
+                'generations' => [],
+                'education' => [],
+                'rank' => [],
+                'marriage' => [],
+                'bezetting' => [
+                    'total_kebutuhan' => 0,
+                    'total_eksisting' => 0,
+                    'details' => []
+                ],
+                'total_pns' => 0,
+                'total_pppk' => 0,
+                'total_honorer' => 0,
+                'working_years' => [],
+            ];
+        }
+
+        $base = RekapBulananPegawai::where('periode_tahun', $year)
+            ->where('periode_bulan', $latestBulan)
+            ->where('status', 'final')
+            ->where('status_kedudukan', 'Aktif');
+
+        // 1. Total pegawai
+        $totalPegawai = (clone $base)->count();
+
+        // 2. Gender
+        $genderRaw = (clone $base)->selectRaw('jenis_kelamin, count(*) as count')
+            ->groupBy('jenis_kelamin')->pluck('count', 'jenis_kelamin');
+        $genderStats = [
+            'Laki-laki' => $genderRaw->get('Laki-laki', 0),
+            'Perempuan' => $genderRaw->get('Perempuan', 0),
+        ];
+
+        // 3. Status Pegawai
+        $statusStats = (clone $base)->selectRaw('status_pegawai, count(*) as count')
+            ->groupBy('status_pegawai')->pluck('count', 'status_pegawai');
+        $totalPns = $statusStats->get('PNS', 0);
+        $totalPppk = $statusStats->get('PPPK', 0);
+        $totalHonorer = $totalPegawai - $totalPns - $totalPppk;
+
+        // 4. Generasi
+        $generations = (clone $base)->selectRaw('generasi, count(*) as count')
+            ->groupBy('generasi')->pluck('count', 'generasi')->toArray();
+
+        // 5. Bezetting
+        $bezettingRaw = (clone $base)
+            ->join('bezettings', 'rekap_bulanan_pegawai.bezetting_id', '=', 'bezettings.id')
+            ->selectRaw('bezettings.nama_jabatan, bezettings.kebutuhan, count(rekap_bulanan_pegawai.id) as eksisting')
+            ->groupBy('bezettings.id', 'bezettings.nama_jabatan', 'bezettings.kebutuhan')
+            ->get();
+        $bezettingStats = [
+            'total_kebutuhan' => $bezettingRaw->sum('kebutuhan'),
+            'total_eksisting' => $bezettingRaw->sum('eksisting'),
+            'details' => $bezettingRaw->map(fn($r) => [
+                'name' => $r->nama_jabatan,
+                'kebutuhan' => $r->kebutuhan,
+                'eksisting' => $r->eksisting,
+            ])->values()->toArray(),
+        ];
+
+        // 6. Masa Kerja — ambil dari RekapStatistikBulanan (terbaru) jika ada
+        $rekapForMasaKerja = RekapStatistikBulanan::where('periode_tahun', $year)
+            ->orderByDesc('periode_bulan')
+            ->value('statistik_masa_kerja');
+        $workingYearsStats = !empty($rekapForMasaKerja) ? [
+            '0-5 Tahun' => $rekapForMasaKerja['0-5 Tahun'] ?? 0,
+            '6-10 Tahun' => $rekapForMasaKerja['6-10 Tahun'] ?? 0,
+            '11-15 Tahun' => $rekapForMasaKerja['11-15 Tahun'] ?? 0,
+            '16-20 Tahun' => $rekapForMasaKerja['16-20 Tahun'] ?? 0,
+            '> 20 Tahun' => $rekapForMasaKerja['> 20 Tahun'] ?? 0,
+        ] : [];
+
+        // 7. Pensiun & KGB
+        $pensiunStats = (clone $base)->selectRaw("
+                    SUM(CASE WHEN YEAR(proyeksi_pensiun) = ? THEN 1 ELSE 0 END) AS tahun_ini,
+                    SUM(CASE WHEN proyeksi_pensiun BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) AS bulan_ini,
+                    SUM(CASE WHEN proyeksi_pensiun BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 180 DAY) THEN 1 ELSE 0 END) AS enam_bulan
+                ", [$year])->first();
+
+        $kgbStats = (clone $base)->selectRaw("
+                    SUM(CASE WHEN tmt_kgb_berikutnya BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) AS bulan_ini,
+                    SUM(CASE WHEN tmt_kgb_berikutnya BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 90 DAY) THEN 1 ELSE 0 END) AS tiga_bulan
+                ")->first();
+
+        return [
+            'total_pegawai' => $totalPegawai,
+            'gender' => $genderStats,
+            'status' => $statusStats,
+            'generations' => $generations,
+            'education' => [],
+            'rank' => [],
+            'marriage' => [],
+            'bezetting' => $bezettingStats,
+            'total_pns' => $totalPns,
+            'total_pppk' => $totalPppk,
+            'total_honorer' => $totalHonorer,
+            'pensiun_tahun_ini' => (int) $pensiunStats->tahun_ini,
+            'pensiun_bulan_ini' => (int) $pensiunStats->bulan_ini,
+            'pensiun_6_bulan' => (int) $pensiunStats->enam_bulan,
+            'kgb_bulan_ini' => (int) $kgbStats->bulan_ini,
+            'kgb_3_bulan' => (int) $kgbStats->tiga_bulan,
+            'working_years' => $workingYearsStats,
+            'periode_label' => $latestBulan . '/' . $year,
+            'tren_bulanan' => [],
+        ];
     }
 
     private function getKelembagaanHrStats($currentYear)
