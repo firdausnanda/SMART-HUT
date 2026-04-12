@@ -80,12 +80,36 @@ class RekapKepegawaianService
     public function recalculateStatistik(int $year, int $month, string $sumber = 'manual'): void
     {
         $snapshots = RekapBulananPegawai::forPeriode($year, $month)->get();
-        $total = $snapshots->count();
+        if ($snapshots->isEmpty()) return;
 
-        if ($total === 0) return;
+        $stats = array_merge(
+            $this->getSummaryStats($snapshots, $year, $month),
+            $this->getCategoricalStats($snapshots),
+            $this->getRangeStats($snapshots),
+            ['statistik_bezetting' => $this->getBezettingStats($snapshots)]
+        );
 
-        $stats = [
-            'total_pegawai_aktif' => $total,
+        $key = ['periode_tahun' => $year, 'periode_bulan' => $month];
+        $rekapStats = RekapStatistikBulanan::withTrashed()->where($key)->first();
+
+        $data = array_merge($stats, [
+            'dihasilkan_dari' => $sumber,
+            'dihasilkan_pada' => now(),
+            'status' => $rekapStats?->status ?? 'draft',
+        ]);
+
+        if ($rekapStats) {
+            if ($rekapStats->trashed()) $rekapStats->restore();
+            $rekapStats->update($data);
+        } else {
+            RekapStatistikBulanan::create(array_merge($key, $data));
+        }
+    }
+
+    private function getSummaryStats($snapshots, int $year, int $month): array
+    {
+        return [
+            'total_pegawai_aktif' => $snapshots->count(),
             'total_pns' => $snapshots->where('status_pegawai', 'PNS')->count(),
             'total_pppk' => $snapshots->where('status_pegawai', 'PPPK')->count(),
             'total_honorer' => $snapshots->whereIn('status_pegawai', ['Honorer', 'Tenaga Kontrak', 'Lainnya'])->count(),
@@ -93,23 +117,35 @@ class RekapKepegawaianService
             'total_perempuan' => $snapshots->where('jenis_kelamin', 'P')->count(),
             
             // Pensiun
-            'total_pensiun_tahun_ini' => $snapshots->filter(fn($s) => $s->proyeksi_pensiun && $s->proyeksi_pensiun->year == $year)->count(),
-            'total_pensiun_bulan_ini' => $snapshots->filter(fn($s) => $s->proyeksi_pensiun && $s->proyeksi_pensiun->year == $year && $s->proyeksi_pensiun->month == $month)->count(),
+            'total_pensiun_tahun_ini' => $snapshots->filter(fn($s) => $s->proyeksi_pensiun?->year == $year)->count(),
+            'total_pensiun_bulan_ini' => $snapshots->filter(fn($s) => $s->proyeksi_pensiun?->year == $year && $s->proyeksi_pensiun?->month == $month)->count(),
             'total_pensiun_6_bulan' => $snapshots->whereBetween('bulan_pensiun_tersisa', [0, 6])->count(),
 
-            // JSON Stats
-            'statistik_status_pegawai' => $snapshots->groupBy('status_pegawai')->map(fn($g) => $g->count())->toArray(),
+            // KGB
+            'kgb_jatuh_bulan_ini' => $snapshots->filter(fn($s) => $s->tmt_kgb_berikutnya?->year == $year && $s->tmt_kgb_berikutnya?->month == $month)->count(),
+            'kgb_jatuh_3_bulan' => $snapshots->filter(fn($s) => $s->tmt_kgb_berikutnya && $s->tmt_kgb_berikutnya->isBetween(Carbon::create($year, $month, 1), Carbon::create($year, $month, 1)->addMonths(3)))->count(),
+        ];
+    }
+
+    private function getCategoricalStats($snapshots): array
+    {
+        return [
+            'statistik_status_pegawai' => $snapshots->groupBy('status_pegawai')->map->count()->toArray(),
             'statistik_pendidikan' => collect(\App\Enums\Pendidikan::cases())->mapWithKeys(fn($p) => [
                 $p->value => $snapshots->where('pendidikan_terakhir', $p->value)->count()
             ])->toArray(),
             'statistik_golongan' => collect(\App\Enums\Golongan::cases())->mapWithKeys(fn($g) => [
                 $g->value => $snapshots->where('pangkat_golongan', $g->value)->count()
             ])->toArray(),
-            'statistik_generasi' => $snapshots->groupBy('generasi')->map(fn($g) => $g->count())->toArray(),
-            'statistik_status_pernikahan' => $snapshots->groupBy('status_pernikahan')->map(fn($g) => $g->count())->toArray(),
-            'statistik_unit_kerja' => $snapshots->groupBy('unit_kerja')->map(fn($g) => $g->count())->toArray(),
-            
-            // Masa Kerja
+            'statistik_generasi' => $snapshots->groupBy('generasi')->map->count()->toArray(),
+            'statistik_status_pernikahan' => $snapshots->groupBy('status_pernikahan')->map->count()->toArray(),
+            'statistik_unit_kerja' => $snapshots->groupBy('unit_kerja')->map->count()->toArray(),
+        ];
+    }
+
+    private function getRangeStats($snapshots): array
+    {
+        return [
             'statistik_masa_kerja' => [
                 '0-5 Tahun' => $snapshots->whereBetween('masa_kerja_tahun', [0, 5])->count(),
                 '6-10 Tahun' => $snapshots->whereBetween('masa_kerja_tahun', [6, 10])->count(),
@@ -117,24 +153,19 @@ class RekapKepegawaianService
                 '16-20 Tahun' => $snapshots->whereBetween('masa_kerja_tahun', [16, 20])->count(),
                 '> 20 Tahun' => $snapshots->where('masa_kerja_tahun', '>', 20)->count(),
             ],
-
-            // Usia
             'statistik_usia' => [
                 '< 30 Tahun' => $snapshots->where('usia_per_periode', '<', 30)->count(),
                 '30-40 Tahun' => $snapshots->whereBetween('usia_per_periode', [30, 40])->count(),
                 '41-50 Tahun' => $snapshots->whereBetween('usia_per_periode', [41, 50])->count(),
                 '> 50 Tahun' => $snapshots->where('usia_per_periode', '>', 50)->count(),
             ],
-
-            // KGB
-            'kgb_jatuh_bulan_ini' => $snapshots->filter(fn($s) => $s->tmt_kgb_berikutnya && $s->tmt_kgb_berikutnya->year == $year && $s->tmt_kgb_berikutnya->month == $month)->count(),
-            'kgb_jatuh_3_bulan' => $snapshots->filter(fn($s) => $s->tmt_kgb_berikutnya && $s->tmt_kgb_berikutnya->isBetween(Carbon::create($year, $month, 1), Carbon::create($year, $month, 1)->addMonths(3)))->count(),
         ];
+    }
 
-        // Bezetting Stats
-        $bezettings = Bezetting::all();
+    private function getBezettingStats($snapshots): array
+    {
         $bezettingStats = [];
-        foreach ($bezettings as $bz) {
+        foreach (Bezetting::all() as $bz) {
             $isi = $snapshots->where('bezetting_id', $bz->id)->count();
             $bezettingStats[$bz->nama_jabatan] = [
                 'kebutuhan' => $bz->kebutuhan,
@@ -142,30 +173,6 @@ class RekapKepegawaianService
                 'selisih' => $bz->kebutuhan - $isi,
             ];
         }
-        $stats['statistik_bezetting'] = $bezettingStats;
-
-        $key = [
-            'periode_tahun' => $year,
-            'periode_bulan' => $month,
-        ];
-
-        $rekapStats = RekapStatistikBulanan::withTrashed()
-            ->where($key)
-            ->first();
-
-        $data = array_merge($stats, [
-            'dihasilkan_dari' => $sumber,
-            'dihasilkan_pada' => now(),
-            'status' => 'draft', // Reset to draft if recalculated? Or keep existing? 
-        ]);
-
-        if ($rekapStats) {
-            if ($rekapStats->trashed()) {
-                $rekapStats->restore();
-            }
-            $rekapStats->update($data);
-        } else {
-            RekapStatistikBulanan::create(array_merge($key, $data));
-        }
+        return $bezettingStats;
     }
 }
