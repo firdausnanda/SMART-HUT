@@ -59,14 +59,6 @@ class Pegawai extends Model
     }
 
     /**
-     * Relasi ke data pensiun
-     */
-    public function pensiun()
-    {
-        return $this->hasOne(Pensiun::class);
-    }
-
-    /**
      * Get latest KGB (regardless of status if it's final, or even just the latest record)
      */
     public function latestKgb()
@@ -87,7 +79,7 @@ class Pegawai extends Model
         } else {
             // 2. Jika belum ada riwayat, gunakan TMT CPNS atau PNS sebagai basis
             $baseDate = $this->tmt_cpns ?? $this->tmt_pns;
-            
+
             if (!$baseDate) {
                 return null;
             }
@@ -106,7 +98,7 @@ class Pegawai extends Model
         $now = now();
         $yearsPassed = $baseDate->diffInYears($now);
         $cycles = (int) ceil($yearsPassed / 2);
-        
+
         // Selalu pastikan setidaknya 1 siklus jika basis sudah di masa lalu
         if ($cycles < 1 && $baseDate->isPast()) {
             $cycles = 1;
@@ -126,15 +118,17 @@ class Pegawai extends Model
             $baseDate = $latestKgb->tmt_kgb_berikutnya;
         } else {
             $baseDate = $this->tmt_cpns ?? $this->tmt_pns;
-            if (!$baseDate) return null;
+            if (!$baseDate)
+                return null;
             $baseDate = $baseDate->copy()->addYears(2);
         }
 
         // Hitung selisih tahun antara basis dan target tahun
         $diffYears = $year - $baseDate->year;
-        
+
         // Jika target tahun di masa lalu dari basis
-        if ($diffYears < 0) return null;
+        if ($diffYears < 0)
+            return null;
 
         // KGB terjadi setiap 2 tahun. Cek apakah target tahun masuk dalam siklus.
         if ($diffYears % 2 === 0) {
@@ -228,10 +222,10 @@ class Pegawai extends Model
     public function scopeKgbJatuhPadaBulan($query, ?int $month = null, ?int $year = null)
     {
         $month = $month ?? now()->month;
-        $year  = $year  ?? now()->year;
+        $year = $year ?? now()->year;
         return $query->whereHas('latestKgb', function ($q) use ($month, $year) {
             $q->whereMonth('tmt_kgb_berikutnya', $month)
-              ->whereYear('tmt_kgb_berikutnya', $year);
+                ->whereYear('tmt_kgb_berikutnya', $year);
         });
     }
 

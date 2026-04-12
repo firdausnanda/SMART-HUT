@@ -61,26 +61,32 @@ class DemografiPegawaiController extends Controller
         // ===== BAGIAN BARU: Dashboard Hub Data =====
 
         // 1. KPI Cards — query live dari tabel pegawais
-        $totalAktif   = Pegawai::where('status_kedudukan', 'Aktif')->count();
-        $totalPns     = Pegawai::where('status_pegawai', 'PNS')->where('status_kedudukan', 'Aktif')->count();
-        $totalPppk    = Pegawai::where('status_pegawai', 'PPPK')->where('status_kedudukan', 'Aktif')->count();
+        $totalAktif = Pegawai::where('status_kedudukan', 'Aktif')->count();
+        $totalPns = Pegawai::where('status_pegawai', 'PNS')->where('status_kedudukan', 'Aktif')->count();
+        $totalPppk = Pegawai::where('status_pegawai', 'PPPK')->where('status_kedudukan', 'Aktif')->count();
         $pensiunCount = Pegawai::pensiunDalam(90)->count();
-        $kgbCount     = Pegawai::kgbJatuhPadaBulan()->count();
+        $kgbCount = Pegawai::kgbJatuhPadaBulan()->count();
         $kpi = [
-            'total_aktif'     => $totalAktif,
-            'total_pns'       => $totalPns,
-            'total_pppk'      => $totalPppk,
+            'total_aktif' => $totalAktif,
+            'total_pns' => $totalPns,
+            'total_pppk' => $totalPppk,
             'pensiun_90_hari' => $pensiunCount,
-            'kgb_bulan_ini'   => $kgbCount,
+            'kgb_bulan_ini' => $kgbCount,
         ];
 
         // 2. Rekap terakhir (untuk status chip + delta KPI)
         $rekapTerakhir = RekapStatistikBulanan::orderBy('periode_tahun', 'desc')
             ->orderBy('periode_bulan', 'desc')
             ->first([
-                'id', 'periode_bulan', 'periode_tahun', 'status',
-                'total_pegawai_aktif', 'total_pns', 'total_pppk',
-                'kgb_jatuh_bulan_ini', 'total_pensiun_tahun_ini',
+                'id',
+                'periode_bulan',
+                'periode_tahun',
+                'status',
+                'total_pegawai_aktif',
+                'total_pns',
+                'total_pppk',
+                'kgb_jatuh_bulan_ini',
+                'total_pensiun_tahun_ini',
             ]);
 
         // 3. Tren chart 12 bulan
@@ -92,9 +98,9 @@ class DemografiPegawaiController extends Controller
             ->limit(5)
             ->get()
             ->map(fn($p) => [
-                'id'               => $p->id,
-                'nama_lengkap'     => $p->nama_lengkap,
-                'nip'              => $p->nip,
+                'id' => $p->id,
+                'nama_lengkap' => $p->nama_lengkap,
+                'nip' => $p->nip,
                 'proyeksi_pensiun' => $p->retirement_date?->format('Y-m-d'),
             ]);
 
@@ -105,9 +111,9 @@ class DemografiPegawaiController extends Controller
             ->limit(5)
             ->get()
             ->map(fn($p) => [
-                'id'                 => $p->id,
-                'nama_lengkap'       => $p->nama_lengkap,
-                'nip'                => $p->nip,
+                'id' => $p->id,
+                'nama_lengkap' => $p->nama_lengkap,
+                'nip' => $p->nip,
                 'tmt_kgb_berikutnya' => $p->latestKgb?->tmt_kgb_berikutnya?->format('Y-m-d'),
             ]);
 
@@ -128,11 +134,12 @@ class DemografiPegawaiController extends Controller
             }
         }
 
-        $rekapPending = RekapStatistikBulanan::whereIn('status', $pendingStatuses)
+        $rekapTotal = RekapStatistikBulanan::whereIn('status', $pendingStatuses)
             ->orderBy('periode_tahun', 'desc')
             ->orderBy('periode_bulan', 'desc')
-            ->limit(3)
             ->get(['id', 'periode_bulan', 'periode_tahun', 'status', 'rejection_note']);
+
+        $rekapPending = $rekapTotal->take(3);
 
         // 7. Timeline rekap bulanan (horizontal strip)
         $timelineYear = $request->get('timeline_year');
@@ -153,7 +160,7 @@ class DemografiPegawaiController extends Controller
         }
 
         $rekapTimeline = $rekapTimelineQuery->get(['id', 'periode_bulan', 'periode_tahun', 'status']);
-        
+
         if (!$timelineYear) {
             $rekapTimeline = $rekapTimeline->reverse()->values();
         }
@@ -161,21 +168,22 @@ class DemografiPegawaiController extends Controller
         return Inertia::render('Kepegawaian/Demografi/Index', [
             // Existing
             'pegawais' => $pegawais,
-            'filters'  => [
-                'search'        => $request->search,
-                'sort'          => $sort,
-                'dir'           => $dir,
-                'per_page'      => $perPage,
-                'timeline_year' => $timelineYear ? (int)$timelineYear : null,
+            'filters' => [
+                'search' => $request->search,
+                'sort' => $sort,
+                'dir' => $dir,
+                'per_page' => $perPage,
+                'timeline_year' => $timelineYear ? (int) $timelineYear : null,
             ],
             // NEW — dashboard props
-            'kpi'             => $kpi,
-            'rekap_terakhir'  => $rekapTerakhir,
-            'tren_bulanan'    => $trenBulanan,
-            'alert_pensiun'   => $alertPensiun,
-            'alert_kgb'       => $alertKgb,
-            'rekap_pending'   => $rekapPending,
-            'rekap_timeline'  => $rekapTimeline,
+            'kpi' => $kpi,
+            'rekap_terakhir' => $rekapTerakhir,
+            'tren_bulanan' => $trenBulanan,
+            'alert_pensiun' => $alertPensiun,
+            'alert_kgb' => $alertKgb,
+            'rekap_total' => $rekapTotal,
+            'rekap_pending' => $rekapPending,
+            'rekap_timeline' => $rekapTimeline,
             'available_years' => $availableYears,
         ]);
     }
@@ -243,9 +251,11 @@ class DemografiPegawaiController extends Controller
 
     public function edit(Pegawai $demografi_pegawai)
     {
-        $demografi_pegawai->load(['riwayatKgb' => function ($q) {
-            $q->orderBy('tmt_kgb', 'desc');
-        }]);
+        $demografi_pegawai->load([
+            'riwayatKgb' => function ($q) {
+                $q->orderBy('tmt_kgb', 'desc');
+            }
+        ]);
         $bezettings = Bezetting::all();
         return Inertia::render('Kepegawaian/Demografi/Edit', [
             'pegawai' => $demografi_pegawai,

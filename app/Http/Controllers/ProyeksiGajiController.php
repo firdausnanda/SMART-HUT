@@ -17,13 +17,13 @@ class ProyeksiGajiController extends Controller
     }
     public function index(Request $request)
     {
-        $year = (int)$request->input('year', now()->year);
+        $year = (int) $request->input('year', now()->year);
         $month = $request->input('month', 'all');
-        
+
         if ($month !== 'all') {
-            $month = (int)$month;
+            $month = (int) $month;
         }
-        
+
         $unitKerja = $request->input('unit_kerja');
 
         // Fetch all active employees (Status: final in demografi)
@@ -49,7 +49,7 @@ class ProyeksiGajiController extends Controller
                     'unit_kerja' => $pegawai->unit_kerja,
                     'tmt_kgb_terakhir' => $pegawai->latestKgb?->tmt_kgb?->format('Y-m-d'),
                     'tmt_kgb_berikutnya' => $nextDate->format('Y-m-d'),
-                    'status' => $nextDate->isPast() ? 'Sudah Waktunya' : ($nextDate->isCurrentMonth() ? 'Bulan Ini' : 'Akan Datang'),
+                    'status' => $nextDate->isCurrentMonth() ? 'Bulan Ini' : ($nextDate->isPast() ? 'Sudah Terlewat' : 'Akan Datang'),
                 ];
             }
             return null;
@@ -67,7 +67,7 @@ class ProyeksiGajiController extends Controller
                     'tanggal_lahir' => $pegawai->tanggal_lahir?->format('Y-m-d'),
                     'bup' => $pegawai->bup,
                     'tmt_pensiun' => $retirementDate->format('Y-m-d'),
-                    'status' => $retirementDate->isPast() ? 'Waktunya Pensiun' : ($retirementDate->isCurrentMonth() ? 'Bulan Ini' : 'Akan Datang'),
+                    'status' => $retirementDate->isCurrentMonth() ? 'Bulan Ini' : ($retirementDate->isPast() ? 'Sudah Pensiun' : 'Akan Datang'),
                 ];
             }
             return null;
@@ -80,7 +80,7 @@ class ProyeksiGajiController extends Controller
             'proyeksiKgb' => $proyeksiKgb,
             'proyeksiPensiun' => $proyeksiPensiun,
             'filters' => [
-                'year' => (int)$year,
+                'year' => (int) $year,
                 'month' => $month,
                 'unit_kerja' => $unitKerja,
             ],
@@ -90,10 +90,10 @@ class ProyeksiGajiController extends Controller
 
     public function export(Request $request)
     {
-        $year = (int)$request->input('year', now()->year);
+        $year = (int) $request->input('year', now()->year);
         $month = $request->input('month', now()->month);
         if ($month !== 'all') {
-            $month = (int)$month;
+            $month = (int) $month;
         }
         $unitKerja = $request->input('unit_kerja');
 

@@ -11,7 +11,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import {
     Users, AlertTriangle, Bell, FileText,
     ArrowRight, Calendar, Activity,
-    Clock, ChevronRight, Plus, Download, Upload,
+    Clock, ChevronRight, ChevronDown, ChevronUp, Plus, Download, Upload,
     BarChart2, RefreshCcw, Send, ExternalLink, Eye
 } from 'lucide-react';
 import Select from 'react-select';
@@ -50,9 +50,11 @@ export default function DemografiIndex({
     kpi, rekap_terakhir,
     tren_bulanan, alert_pensiun,
     alert_kgb, rekap_pending,
-    rekap_timeline, available_years
+    rekap_total, rekap_timeline,
+    available_years
 }) {
     const { flash, errors } = usePage().props;
+    const [showAllPending, setShowAllPending] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('Memproses...');
@@ -347,10 +349,10 @@ export default function DemografiIndex({
                                         <FileText className="h-4 w-4 text-indigo-500" />
                                         <h4 className="font-bold text-indigo-800 text-sm">Rekap Perlu Tindakan</h4>
                                     </div>
-                                    <span className="text-[10px] font-black bg-indigo-500 text-white px-2 py-0.5 rounded-full">{rekap_pending.length}</span>
+                                    <span className="text-[10px] font-black bg-indigo-500 text-white px-2 py-0.5 rounded-full">{rekap_total.length}</span>
                                 </div>
-                                <div className="divide-y divide-gray-50">
-                                    {rekap_pending.map((r) => (
+                                <div className="divide-y divide-gray-50 max-h-[400px] overflow-y-auto custom-scrollbar">
+                                    {(showAllPending ? rekap_total : rekap_pending).map((r) => (
                                         <div key={r.id} className="px-5 py-3 hover:bg-indigo-50/30 transition-colors">
                                             <div className="flex items-center justify-between">
                                                 <p className="text-sm font-bold text-gray-800">{MONTHS[r.periode_bulan - 1]} {r.periode_tahun}</p>
@@ -368,6 +370,21 @@ export default function DemografiIndex({
                                         </div>
                                     ))}
                                 </div>
+
+                                {rekap_total.length > 3 && (
+                                    <div className="px-5 py-2 border-t border-indigo-50 bg-indigo-50/10">
+                                        <button
+                                            onClick={() => setShowAllPending(!showAllPending)}
+                                            className="w-full flex items-center justify-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
+                                        >
+                                            {showAllPending ? (
+                                                <><ChevronUp className="h-3 w-3" /> Sembunyikan</>
+                                            ) : (
+                                                <><ChevronDown className="h-3 w-3" /> Lihat Semua ({rekap_total.length})</>
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
                                 <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
                                     <Link href={route('rekap-bulanan.index')} className="text-xs text-indigo-600 font-bold flex items-center gap-1 hover:gap-2 transition-all">
                                         Kelola rekap <ArrowRight className="h-3 w-3" />

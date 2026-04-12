@@ -114,8 +114,8 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters, 
 
     const getStatusBadge = (status) => {
         switch (status) {
-            case 'Sudah Waktunya':
-            case 'Waktunya Pensiun':
+            case 'Sudah Terlewat':
+            case 'Sudah Pensiun':
                 return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-100 text-rose-700 border border-rose-200 shadow-sm"><AlertCircle className="w-3 h-3 mr-1" /> {status}</span>;
             case 'Bulan Ini':
                 return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 shadow-sm"><Clock className="w-3 h-3 mr-1" /> {status}</span>;
