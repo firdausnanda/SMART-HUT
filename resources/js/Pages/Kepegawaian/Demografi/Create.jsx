@@ -9,7 +9,7 @@ import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-export default function DemografiCreate({ auth, bezettings, statusPegawaiOptions, agamaOptions, statusKedudukanOptions, statusPernikahanOptions }) {
+export default function DemografiCreate({ auth, bezettings, statusPegawaiOptions, agamaOptions, statusKedudukanOptions, statusPernikahanOptions, pendidikanOptions, golonganOptions }) {
   const { data, setData, post, processing, errors } = useForm({
     nip: '',
     nik: '',
@@ -229,8 +229,8 @@ export default function DemografiCreate({ auth, bezettings, statusPegawaiOptions
                   <div>
                     <InputLabel htmlFor="jenis_kelamin" value="Jenis Kelamin" className="text-gray-700 font-bold mb-2" />
                     <Select
-                      options={jenisKelaminOptions}
-                      value={jenisKelaminOptions.find(j => j.value === data.jenis_kelamin)}
+                      options={jenisKelaminOptions || []}
+                      value={jenisKelaminOptions?.find(j => j.value === data.jenis_kelamin) || null}
                       onChange={(opt) => setData('jenis_kelamin', opt?.value || '')}
                       styles={selectStyles}
                     />
@@ -240,8 +240,8 @@ export default function DemografiCreate({ auth, bezettings, statusPegawaiOptions
                   <div>
                     <InputLabel htmlFor="agama" value="Agama" className="text-gray-700 font-bold mb-2" />
                     <Select
-                      options={agamaOptions}
-                      value={agamaOptions.find(a => a.value === data.agama)}
+                      options={agamaOptions || []}
+                      value={agamaOptions?.find(a => a.value === data.agama) || null}
                       onChange={(opt) => setData('agama', opt?.value || '')}
                       styles={selectStyles}
                     />
@@ -263,14 +263,13 @@ export default function DemografiCreate({ auth, bezettings, statusPegawaiOptions
 
                   <div>
                     <InputLabel htmlFor="pendidikan_terakhir" value="Pendidikan Terakhir" className="text-gray-700 font-bold mb-2" />
-                    <TextInput
-                      id="pendidikan_terakhir"
-                      type="text"
-                      className="w-full"
-                      value={data.pendidikan_terakhir}
-                      onChange={(e) => setData('pendidikan_terakhir', e.target.value)}
+                    <Select
+                      options={pendidikanOptions || []}
+                      value={pendidikanOptions?.find(p => p.value === data.pendidikan_terakhir) || null}
+                      onChange={(opt) => setData('pendidikan_terakhir', opt?.value || '')}
+                      styles={selectStyles}
+                      placeholder="Pilih Pendidikan Terakhir"
                       required
-                      placeholder="Contoh: S1 Kehutanan"
                     />
                     <InputError message={errors.pendidikan_terakhir} className="mt-2" />
                   </div>
@@ -313,7 +312,7 @@ export default function DemografiCreate({ auth, bezettings, statusPegawaiOptions
                   <div>
                     <InputLabel htmlFor="bezetting_id" value="Jabatan (Bezetting)" className="text-gray-700 font-bold mb-2" />
                     <Select
-                      options={bezettingOptions}
+                      options={bezettingOptions || []}
                       onChange={(opt) => setData('bezetting_id', opt?.value || '')}
                       placeholder="Cari dan pilih Jabatan..."
                       styles={selectStyles}
@@ -324,13 +323,13 @@ export default function DemografiCreate({ auth, bezettings, statusPegawaiOptions
 
                   <div>
                     <InputLabel htmlFor="pangkat_golongan" value="Pangkat / Golongan" className="text-gray-700 font-bold mb-2" />
-                    <TextInput
-                      id="pangkat_golongan"
-                      type="text"
-                      className="w-full"
-                      value={data.pangkat_golongan}
-                      onChange={(e) => setData('pangkat_golongan', e.target.value)}
-                      placeholder="Contoh: Penata Muda / III.a"
+                    <Select
+                      options={golonganOptions || []}
+                      value={golonganOptions?.find(g => g.value === data.pangkat_golongan) || null}
+                      onChange={(opt) => setData('pangkat_golongan', opt?.value || '')}
+                      styles={selectStyles}
+                      placeholder="Pilih Pangkat / Golongan"
+                      isClearable
                     />
                     <InputError message={errors.pangkat_golongan} className="mt-2" />
                   </div>
@@ -448,8 +447,8 @@ export default function DemografiCreate({ auth, bezettings, statusPegawaiOptions
                   <div>
                     <InputLabel htmlFor="status_kedudukan" value="Status Kedudukan" className="text-gray-700 font-bold mb-2" />
                     <Select
-                      options={statusKedudukanOptions}
-                      value={statusKedudukanOptions.find(s => s.value === data.status_kedudukan)}
+                      options={statusKedudukanOptions || []}
+                      value={statusKedudukanOptions?.find(s => s.value === data.status_kedudukan) || null}
                       onChange={(opt) => setData('status_kedudukan', opt?.value || '')}
                       styles={selectStyles}
                     />

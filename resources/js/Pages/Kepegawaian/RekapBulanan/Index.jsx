@@ -11,17 +11,21 @@ import {
     Send,
     CheckCircle2,
     XCircle,
-    Trash2
+    Trash2,
+    ArrowLeft
 } from 'lucide-react';
 import Select from 'react-select';
 import StatusBadge from '@/Components/StatusBadge';
+import LoadingOverlay from '@/Components/LoadingOverlay';
+import BulkActionToolbar from '@/Components/BulkActionToolbar';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
 export default function Index({ auth, rekaps, filters }) {
-    const [generating, setGenerating] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [loadingText, setLoadingText] = useState('Memproses...');
     const [selectedIds, setSelectedIds] = useState([]);
 
     const toggleSelectAll = () => {
@@ -60,7 +64,12 @@ export default function Index({ auth, rekaps, filters }) {
     const userPermissions = auth.user.permissions || [];
 
     const canApprove = userPermissions.includes('kepegawaian.approve') || isAdmin;
+    const canEdit = userPermissions.includes('kepegawaian.edit') || isAdmin;
     const canDelete = userPermissions.includes('kepegawaian.delete') || isAdmin;
+    
+    // Check if the selected month/year is already protected (has waiting or final status)
+    const existingRekap = rekaps.find(r => r.periode_bulan === parseInt(data.month) && r.periode_tahun === parseInt(data.year));
+    const isProtected = existingRekap && ['waiting_kasi', 'waiting_cdk', 'final'].includes(existingRekap.status);
 
     const handleSingleAction = (id, action) => {
         let title = '';
@@ -90,7 +99,7 @@ export default function Index({ auth, rekaps, filters }) {
             case 'approve':
                 title = 'Setujui Rekap?';
                 text = "Apakah Anda yakin ingin menyetujui rekap ini?";
-                icon = 'check-circle';
+                icon = 'success';
                 confirmText = 'Ya, Setujui';
                 loadingMsg = 'Memverifikasi...';
                 break;
@@ -141,6 +150,9 @@ export default function Index({ auth, rekaps, filters }) {
                     actionData.rejection_note = result.value;
                 }
 
+                setLoadingText(loadingMsg || 'Memproses...');
+                setIsLoading(true);
+
                 if (action === 'delete') {
                     router.delete(route('rekap-bulanan.destroy', id), {
                         preserveScroll: true,
@@ -154,7 +166,8 @@ export default function Index({ auth, rekaps, filters }) {
                                 timerProgressBar: true,
                                 showConfirmButton: false,
                             });
-                        }
+                        },
+                        onFinish: () => setIsLoading(false)
                     });
                 } else {
                     router.post(route('rekap-bulanan.single-workflow-action', id), actionData, {
@@ -169,7 +182,8 @@ export default function Index({ auth, rekaps, filters }) {
                                 timerProgressBar: true,
                                 showConfirmButton: false,
                             });
-                        }
+                        },
+                        onFinish: () => setIsLoading(false)
                     });
                 }
             }
@@ -192,9 +206,9 @@ export default function Index({ auth, rekaps, filters }) {
                 confirmText = 'Ya, Ajukan!';
                 break;
             case 'approve':
-                title = 'Setujui Rekap Terpilih?';
+                title = 'Setujui Rekap?';
                 text = `Apakah Anda yakin ingin menyetujui ${selectedIds.length} rekap ini secara massal?`;
-                icon = 'check-circle';
+                icon = 'success';
                 confirmText = 'Ya, Setujui';
                 break;
             case 'reject':
@@ -252,6 +266,10 @@ export default function Index({ auth, rekaps, filters }) {
                 }
 
                 const msg = action === 'delete' ? 'dihapus' : (action === 'submit' ? 'diajukan' : (action === 'approve' ? 'disetujui' : 'ditolak'));
+                const lMsg = action === 'delete' ? 'Menghapus Data...' : (action === 'submit' ? 'Mengajukan Rekap...' : (action === 'approve' ? 'Memverifikasi...' : 'Memproses Penolakan...'));
+
+                setLoadingText(lMsg);
+                setIsLoading(true);
 
                 router.post(route('rekap-bulanan.bulk-workflow-action'), actionData, {
                     preserveScroll: true,
@@ -267,7 +285,8 @@ export default function Index({ auth, rekaps, filters }) {
                             timerProgressBar: true,
                             showConfirmButton: false,
                         });
-                    }
+                    },
+                    onFinish: () => setIsLoading(false)
                 });
             }
         });
@@ -275,13 +294,29 @@ export default function Index({ auth, rekaps, filters }) {
 
     const handleGenerate = (e) => {
         e.preventDefault();
-        setGenerating(true);
+        
+        if (isProtected) {
+            MySwal.fire({
+                title: 'Data Dilindungi',
+                text: 'Data rekap untuk bulan ini sedang dalam proses persetujuan atau sudah selesai. Tidak dapat generate ulang.',
+                icon: 'error',
+                confirmButtonColor: '#258a55',
+                borderRadius: '1rem',
+            });
+            return;
+        }
+
+        setLoadingText('Sedang Menghasilkan Data Rekap...');
+        setIsLoading(true);
         post(route('rekap-bulanan.generate'), {
             onSuccess: () => {
-                setGenerating(false);
+                setIsLoading(false);
             },
             onError: () => {
-                setGenerating(false);
+                setIsLoading(false);
+            },
+            onFinish: () => {
+                setIsLoading(false);
             }
         });
     };
@@ -335,11 +370,26 @@ export default function Index({ auth, rekaps, filters }) {
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Rekap Kepegawaian Bulanan</h2>}
+            header={
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <Link
+                            href={route('demografi-pegawai.index')}
+                            className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all"
+                            title="Kembali ke Dashboard Kepegawaian"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </Link>
+                        <h2 className="font-semibold text-xl text-gray-800 leading-tight">Rekap Kepegawaian Bulanan</h2>
+                    </div>
+                </div>
+            }
         >
             <Head title="Rekap Kepegawaian Bulanan" />
 
-            <div className="py-12">
+            <LoadingOverlay isLoading={isLoading} text={loadingText} />
+
+            <div className={`py-12 transition-all duration-700 ease-in-out ${isLoading ? 'opacity-30 blur-md grayscale-[0.5] pointer-events-none' : 'opacity-100 blur-0'}`}>
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
                     {/* Filter & Action Card */}
@@ -389,11 +439,30 @@ export default function Index({ auth, rekaps, filters }) {
                                         </div>
                                         <button
                                             type="submit"
-                                            disabled={processing}
-                                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 transition-colors"
+                                            disabled={processing || isProtected}
+                                            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white transition-colors ${
+                                                isProtected 
+                                                    ? 'bg-gray-400 cursor-not-allowed' 
+                                                    : 'bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500'
+                                            } disabled:opacity-50`}
+                                            title={isProtected ? 'Status rekap saat ini tidak memungkinkan untuk generate ulang' : ''}
                                         >
-                                            {processing ? <RefreshCcw className="animate-spin h-5 w-5 mr-2" /> : <RefreshCcw className="h-5 w-5 mr-2" />}
-                                            Generate
+                                            {processing ? (
+                                                <>
+                                                    <RefreshCcw className="animate-spin h-5 w-5 mr-2" />
+                                                    Memproses...
+                                                </>
+                                            ) : isProtected ? (
+                                                <>
+                                                    <XCircle className="h-5 w-5 mr-2" />
+                                                    Sudah Ada
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <RefreshCcw className="h-5 w-5 mr-2" />
+                                                    Generate
+                                                </>
+                                            )}
                                         </button>
                                     </div>
                                 </div>
@@ -563,63 +632,15 @@ export default function Index({ auth, rekaps, filters }) {
             </div>
 
             {/* Floating Bulk Action Bar */}
-            {selectedIds.length > 0 && (
-                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
-                    <div className="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-8 min-w-[500px]">
-                        <div className="flex items-center gap-3 border-r border-slate-700 pr-8">
-                            <div className="bg-indigo-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
-                                {selectedIds.length}
-                            </div>
-                            <span className="text-sm font-semibold text-slate-300 whitespace-nowrap">Data terpilih</span>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => handleBulkAction('submit')}
-                                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all font-bold text-xs whitespace-nowrap active:scale-95"
-                            >
-                                <Send className="w-4 h-4" />
-                                Ajukan Massal
-                            </button>
-
-                            {canApprove && (
-                                <>
-                                    <button
-                                        onClick={() => handleBulkAction('approve')}
-                                        className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all font-bold text-xs whitespace-nowrap active:scale-95"
-                                    >
-                                        <CheckCircle2 className="w-4 h-4" />
-                                        Setujui
-                                    </button>
-                                    <button
-                                        onClick={() => handleBulkAction('reject')}
-                                        className="flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 rounded-xl transition-all font-bold text-xs whitespace-nowrap active:scale-95"
-                                    >
-                                        <XCircle className="w-4 h-4" />
-                                        Tolak
-                                    </button>
-                                </>
-                            )}
-
-                            <button
-                                onClick={() => handleBulkAction('delete')}
-                                className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-rose-600 rounded-xl transition-all font-bold text-xs whitespace-nowrap active:scale-95"
-                                title="Hapus Massal"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                                Hapus
-                            </button>
-                        </div>
-                        
-                        <button 
-                            onClick={() => setSelectedIds([])}
-                            className="ml-auto text-slate-400 hover:text-white transition-colors p-1"
-                        >
-                            <XCircle className="w-5 h-5" />
-                        </button>
-                    </div>
-                </div>
-            )}
+            <BulkActionToolbar
+                selectedIds={selectedIds}
+                setSelectedIds={setSelectedIds}
+                handleBulkAction={handleBulkAction}
+                canEdit={canEdit}
+                canApprove={canApprove}
+                canDelete={canDelete}
+                isAdmin={isAdmin}
+            />
         </AuthenticatedLayout>
     );
 }

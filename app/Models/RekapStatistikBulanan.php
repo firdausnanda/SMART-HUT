@@ -102,6 +102,10 @@ class RekapStatistikBulanan extends Model implements Workflowable
     {
         return [
             'submit' => [
+                'admin' => [
+                    'from' => ['draft', 'rejected'],
+                    'to' => 'waiting_kasi',
+                ],
                 'pelaksana' => [
                     'from' => ['draft', 'rejected'],
                     'to' => 'waiting_kasi',
@@ -158,4 +162,26 @@ class RekapStatistikBulanan extends Model implements Workflowable
             ],
         ];
     }
+
+    /**
+     * Ambil data 12 bulan terakhir untuk line chart tren
+     * Diurutkan ascending (lama→baru) agar chart terbaca natural
+     */
+    public static function tren12Bulan(): \Illuminate\Support\Collection
+    {
+        return static::orderBy('periode_tahun', 'desc')
+            ->orderBy('periode_bulan', 'desc')
+            ->take(12)
+            ->get([
+                'periode_tahun',
+                'periode_bulan',
+                'total_pegawai_aktif',
+                'total_pns',
+                'total_pppk',
+                'status',
+            ])
+            ->reverse()
+            ->values();
+    }
 }
+

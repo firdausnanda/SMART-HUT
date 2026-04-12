@@ -13,6 +13,7 @@ use App\Actions\SingleWorkflowAction;
 use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class RekapBulananController extends Controller
 {
@@ -23,15 +24,15 @@ class RekapBulananController extends Controller
         $this->service = $service;
         $this->middleware('permission:kepegawaian.view')->only(['index', 'show', 'showPegawai', 'export']);
         $this->middleware('permission:kepegawaian.create')->only(['generate', 'storePegawai']);
-        $this->middleware('permission:kepegawaian.edit')->only(['updatePegawai', 'singleWorkflowAction', 'bulkWorkflowAction']);
-        $this->middleware('permission:kepegawaian.approve')->only(['singleWorkflowAction', 'bulkWorkflowAction']);
-        $this->middleware('permission:kepegawaian.delete')->only(['destroyPegawai', 'destroy', 'bulkWorkflowAction']);
+        $this->middleware('permission:kepegawaian.edit|kepegawaian.approve')->only(['singleWorkflowAction']);
+        $this->middleware('permission:kepegawaian.edit|kepegawaian.approve|kepegawaian.delete')->only(['bulkWorkflowAction']);
+        $this->middleware('permission:kepegawaian.delete')->only(['destroyPegawai', 'destroy']);
     }
 
     public function index(Request $request)
     {
         $year = $request->get('year', now()->year);
-        
+
         $rekaps = RekapStatistikBulanan::forYear($year)
             ->orderBy('periode_bulan', 'desc')
             ->get();
@@ -39,7 +40,7 @@ class RekapBulananController extends Controller
         return Inertia::render('Kepegawaian/RekapBulanan/Index', [
             'rekaps' => $rekaps,
             'filters' => [
-                'year' => (int)$year,
+                'year' => (int) $year,
             ]
         ]);
     }
@@ -50,8 +51,26 @@ class RekapBulananController extends Controller
             ->where('periode_bulan', $month)
             ->firstOrFail();
 
+        // Hitung periode bulan sebelumnya untuk fitur perbandingan
+        $prevDate = Carbon::create($year, $month, 1)->subMonth();
+        $rekapSebelumnya = RekapStatistikBulanan::where('periode_tahun', $prevDate->year)
+            ->where('periode_bulan', $prevDate->month)
+            ->first([
+                'periode_bulan',
+                'periode_tahun',
+                'status',
+                'total_pegawai_aktif',
+                'total_pns',
+                'total_pppk',
+                'kgb_jatuh_bulan_ini',
+                'total_pensiun_tahun_ini',
+            ]);
+
         return Inertia::render('Kepegawaian/RekapBulanan/Show', [
             'rekap' => $rekap,
+            'rekap_sebelumnya' => $rekapSebelumnya,
+            'pendidikanLabels' => array_column(\App\Enums\Pendidikan::cases(), 'value'),
+            'golonganLabels' => array_column(\App\Enums\Golongan::cases(), 'value'),
         ]);
     }
 
@@ -77,8 +96,8 @@ class RekapBulananController extends Controller
             'pegawais' => $pegawais,
             'rekap' => $rekap,
             'periode' => [
-                'year' => (int)$year,
-                'month' => (int)$month,
+                'year' => (int) $year,
+                'month' => (int) $month,
             ],
             'filters' => $request->only(['search']),
         ]);
@@ -104,7 +123,8 @@ class RekapBulananController extends Controller
     public function searchPegawai(Request $request)
     {
         $search = $request->get('search');
-        if (strlen($search) < 3) return response()->json([]);
+        if (strlen($search) < 3)
+            return response()->json([]);
 
         $pegawais = \App\Models\Pegawai::where('status', 'final')
             ->where('status_kedudukan', 'Aktif')
@@ -125,14 +145,14 @@ class RekapBulananController extends Controller
         ]);
 
         $pegawai = \App\Models\Pegawai::with(['bezetting', 'latestKgb'])->findOrFail($request->pegawai_id);
-        
+
         // Cek if already exists in this rekap (including trashed)
         $existingRecord = RekapBulananPegawai::withTrashed()
             ->where('pegawai_id', $pegawai->id)
             ->where('periode_tahun', $year)
             ->where('periode_bulan', $month)
             ->first();
-        
+
         if ($existingRecord && !$existingRecord->trashed()) {
             return redirect()->back()->with('error', "Pegawai {$pegawai->nama_lengkap} sudah ada dalam rekap periode ini.");
         }
@@ -184,7 +204,7 @@ class RekapBulananController extends Controller
     public function updatePegawai(Request $request, $id)
     {
         $rekapPegawai = RekapBulananPegawai::findOrFail($id);
-        
+
         $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'status_pegawai' => 'required|string',
@@ -238,7 +258,7 @@ class RekapBulananController extends Controller
             'rejection_note' => 'nullable|string|max:255',
         ]);
 
-        $model = $request->model_type === 'statistik' 
+        $model = $request->model_type === 'statistik'
             ? RekapStatistikBulanan::findOrFail($id)
             : RekapBulananPegawai::findOrFail($id);
 
@@ -282,8 +302,8 @@ class RekapBulananController extends Controller
             'rejection_note' => 'nullable|string|max:255',
         ]);
 
-        $modelClass = $request->model_type === 'statistik' 
-            ? RekapStatistikBulanan::class 
+        $modelClass = $request->model_type === 'statistik'
+            ? RekapStatistikBulanan::class
             : RekapBulananPegawai::class;
 
         $workflowAction = WorkflowAction::from($request->action);

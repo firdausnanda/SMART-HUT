@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pegawai;
 use App\Models\Bezetting;
+use App\Models\RekapStatistikBulanan;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Enums\StatusPegawai;
@@ -30,8 +31,10 @@ class DemografiPegawaiController extends Controller
         $this->middleware('permission:kepegawaian.delete')->only(['destroy']);
         $this->middleware('permission:kepegawaian.export')->only(['export']);
     }
+
     public function index(Request $request)
     {
+        // ===== BAGIAN LAMA: Tabel Daftar Pegawai =====
         $query = Pegawai::with('bezetting', 'creator');
 
         if ($request->has('search')) {
@@ -55,14 +58,125 @@ class DemografiPegawaiController extends Controller
 
         $pegawais = $query->paginate($perPage)->withQueryString();
 
+        // ===== BAGIAN BARU: Dashboard Hub Data =====
+
+        // 1. KPI Cards — query live dari tabel pegawais
+        $totalAktif   = Pegawai::where('status_kedudukan', 'Aktif')->count();
+        $totalPns     = Pegawai::where('status_pegawai', 'PNS')->where('status_kedudukan', 'Aktif')->count();
+        $totalPppk    = Pegawai::where('status_pegawai', 'PPPK')->where('status_kedudukan', 'Aktif')->count();
+        $pensiunCount = Pegawai::pensiunDalam(90)->count();
+        $kgbCount     = Pegawai::kgbJatuhPadaBulan()->count();
+        $kpi = [
+            'total_aktif'     => $totalAktif,
+            'total_pns'       => $totalPns,
+            'total_pppk'      => $totalPppk,
+            'pensiun_90_hari' => $pensiunCount,
+            'kgb_bulan_ini'   => $kgbCount,
+        ];
+
+        // 2. Rekap terakhir (untuk status chip + delta KPI)
+        $rekapTerakhir = RekapStatistikBulanan::orderBy('periode_tahun', 'desc')
+            ->orderBy('periode_bulan', 'desc')
+            ->first([
+                'id', 'periode_bulan', 'periode_tahun', 'status',
+                'total_pegawai_aktif', 'total_pns', 'total_pppk',
+                'kgb_jatuh_bulan_ini', 'total_pensiun_tahun_ini',
+            ]);
+
+        // 3. Tren chart 12 bulan
+        $trenBulanan = RekapStatistikBulanan::tren12Bulan();
+
+        // 4. Alert: 5 pegawai pensiun terdekat
+        $alertPensiun = Pegawai::pensiunDalam(90)
+            ->select('id', 'nama_lengkap', 'nip', 'tanggal_lahir', 'bup')
+            ->limit(5)
+            ->get()
+            ->map(fn($p) => [
+                'id'               => $p->id,
+                'nama_lengkap'     => $p->nama_lengkap,
+                'nip'              => $p->nip,
+                'proyeksi_pensiun' => $p->retirement_date?->format('Y-m-d'),
+            ]);
+
+        // 5. Alert: 5 pegawai KGB bulan ini
+        $alertKgb = Pegawai::kgbJatuhPadaBulan()
+            ->with('latestKgb')
+            ->select('id', 'nama_lengkap', 'nip')
+            ->limit(5)
+            ->get()
+            ->map(fn($p) => [
+                'id'                 => $p->id,
+                'nama_lengkap'       => $p->nama_lengkap,
+                'nip'                => $p->nip,
+                'tmt_kgb_berikutnya' => $p->latestKgb?->tmt_kgb_berikutnya?->format('Y-m-d'),
+            ]);
+
+        // 6. Rekap pending (perlu tindakan) sesuai role
+        $user = $request->user();
+        $pendingStatuses = [];
+        if ($user->hasRole('admin')) {
+            $pendingStatuses = ['draft', 'waiting_kasi', 'waiting_cdk', 'rejected'];
+        } else {
+            if ($user->hasAnyRole(['pk', 'peh', 'pelaksana'])) {
+                $pendingStatuses = array_merge($pendingStatuses, ['draft', 'rejected']);
+            }
+            if ($user->hasRole('kasi')) {
+                $pendingStatuses[] = 'waiting_kasi';
+            }
+            if ($user->hasRole('kacdk')) {
+                $pendingStatuses[] = 'waiting_cdk';
+            }
+        }
+
+        $rekapPending = RekapStatistikBulanan::whereIn('status', $pendingStatuses)
+            ->orderBy('periode_tahun', 'desc')
+            ->orderBy('periode_bulan', 'desc')
+            ->limit(3)
+            ->get(['id', 'periode_bulan', 'periode_tahun', 'status', 'rejection_note']);
+
+        // 7. Timeline rekap bulanan (horizontal strip)
+        $timelineYear = $request->get('timeline_year');
+        $availableYears = RekapStatistikBulanan::distinct()
+            ->orderBy('periode_tahun', 'desc')
+            ->pluck('periode_tahun')
+            ->toArray();
+
+        $rekapTimelineQuery = RekapStatistikBulanan::query();
+
+        if ($timelineYear) {
+            $rekapTimelineQuery->where('periode_tahun', $timelineYear)
+                ->orderBy('periode_bulan', 'asc');
+        } else {
+            $rekapTimelineQuery->orderBy('periode_tahun', 'desc')
+                ->orderBy('periode_bulan', 'desc')
+                ->take(12);
+        }
+
+        $rekapTimeline = $rekapTimelineQuery->get(['id', 'periode_bulan', 'periode_tahun', 'status']);
+        
+        if (!$timelineYear) {
+            $rekapTimeline = $rekapTimeline->reverse()->values();
+        }
+
         return Inertia::render('Kepegawaian/Demografi/Index', [
+            // Existing
             'pegawais' => $pegawais,
-            'filters' => [
-                'search' => $request->search,
-                'sort' => $sort,
-                'dir' => $dir,
-                'per_page' => $perPage,
-            ]
+            'filters'  => [
+                'search'        => $request->search,
+                'sort'          => $sort,
+                'dir'           => $dir,
+                'per_page'      => $perPage,
+                'timeline_year' => $timelineYear ? (int)$timelineYear : null,
+            ],
+            // NEW — dashboard props
+            'kpi'             => $kpi,
+            'rekap_terakhir'  => $rekapTerakhir,
+            'tren_bulanan'    => $trenBulanan,
+            'alert_pensiun'   => $alertPensiun,
+            'alert_kgb'       => $alertKgb,
+            'rekap_pending'   => $rekapPending,
+            'rekap_timeline'  => $rekapTimeline,
+            'available_years' => $availableYears,
         ]);
     }
 
@@ -75,6 +189,8 @@ class DemografiPegawaiController extends Controller
             'statusPernikahanOptions' => StatusPernikahan::options(),
             'agamaOptions' => Agama::options(),
             'statusKedudukanOptions' => StatusKedudukan::options(),
+            'pendidikanOptions' => \App\Enums\Pendidikan::options(),
+            'golonganOptions' => \App\Enums\Golongan::options(),
         ]);
     }
 
@@ -138,6 +254,8 @@ class DemografiPegawaiController extends Controller
             'statusPernikahanOptions' => StatusPernikahan::options(),
             'agamaOptions' => Agama::options(),
             'statusKedudukanOptions' => StatusKedudukan::options(),
+            'pendidikanOptions' => \App\Enums\Pendidikan::options(),
+            'golonganOptions' => \App\Enums\Golongan::options(),
         ]);
     }
 

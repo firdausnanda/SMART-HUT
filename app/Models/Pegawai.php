@@ -202,4 +202,37 @@ class Pegawai extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    /**
+     * Scope: pegawai yang pensiun dalam N hari ke depan
+     * Dihitung dari tanggal_lahir + bup (Batas Usia Pensiun)
+     */
+    public function scopePensiunDalam($query, int $days)
+    {
+        $today = now()->format('Y-m-d');
+        $limit = now()->addDays($days)->format('Y-m-d');
+        return $query
+            ->whereNotNull('tanggal_lahir')
+            ->whereNotNull('bup')
+            ->where('status_kedudukan', 'Aktif')
+            ->whereRaw(
+                "DATE_ADD(tanggal_lahir, INTERVAL bup YEAR) BETWEEN ? AND ?",
+                [$today, $limit]
+            )
+            ->orderByRaw("DATE_ADD(tanggal_lahir, INTERVAL bup YEAR) ASC");
+    }
+
+    /**
+     * Scope: pegawai yang KGB-nya jatuh pada bulan & tahun tertentu
+     * Default: bulan & tahun saat ini
+     */
+    public function scopeKgbJatuhPadaBulan($query, ?int $month = null, ?int $year = null)
+    {
+        $month = $month ?? now()->month;
+        $year  = $year  ?? now()->year;
+        return $query->whereHas('latestKgb', function ($q) use ($month, $year) {
+            $q->whereMonth('tmt_kgb_berikutnya', $month)
+              ->whereYear('tmt_kgb_berikutnya', $year);
+        });
+    }
+
 }

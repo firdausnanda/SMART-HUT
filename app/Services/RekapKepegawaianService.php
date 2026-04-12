@@ -99,8 +99,12 @@ class RekapKepegawaianService
 
             // JSON Stats
             'statistik_status_pegawai' => $snapshots->groupBy('status_pegawai')->map(fn($g) => $g->count())->toArray(),
-            'statistik_pendidikan' => $snapshots->groupBy('pendidikan_terakhir')->map(fn($g) => $g->count())->toArray(),
-            'statistik_golongan' => $snapshots->groupBy('pangkat_golongan')->map(fn($g) => $g->count())->toArray(),
+            'statistik_pendidikan' => collect(\App\Enums\Pendidikan::cases())->mapWithKeys(fn($p) => [
+                $p->value => $snapshots->where('pendidikan_terakhir', $p->value)->count()
+            ])->toArray(),
+            'statistik_golongan' => collect(\App\Enums\Golongan::cases())->mapWithKeys(fn($g) => [
+                $g->value => $snapshots->where('pangkat_golongan', $g->value)->count()
+            ])->toArray(),
             'statistik_generasi' => $snapshots->groupBy('generasi')->map(fn($g) => $g->count())->toArray(),
             'statistik_status_pernikahan' => $snapshots->groupBy('status_pernikahan')->map(fn($g) => $g->count())->toArray(),
             'statistik_unit_kerja' => $snapshots->groupBy('unit_kerja')->map(fn($g) => $g->count())->toArray(),

@@ -110,6 +110,10 @@ class RekapBulananPegawai extends Model implements Workflowable
     {
         return [
             'submit' => [
+                'admin' => [
+                    'from' => ['draft', 'rejected'],
+                    'to' => 'waiting_kasi',
+                ],
                 'pelaksana' => [
                     'from' => ['draft', 'rejected'],
                     'to' => 'waiting_kasi',
