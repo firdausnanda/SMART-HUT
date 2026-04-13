@@ -361,8 +361,8 @@ export default function Show({ auth, rekap, rekap_sebelumnya, pendidikanLabels, 
                         </div>
                         <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500">
                             <div className="flex items-center justify-between">
-                                <div><p className="text-sm font-medium text-gray-500">PNS / PPPK</p><p className="text-2xl font-bold text-gray-900 mt-1">{rekap.total_pns} / {rekap.total_pppk}</p></div>
-                                <IdCard className="h-10 w-10 text-emerald-100" />
+                                <div><p className="text-sm font-medium text-gray-500">Jenis Kelamin (L/P)</p><p className="text-2xl font-bold text-gray-900 mt-1">{rekap.total_laki} / {rekap.total_perempuan}</p></div>
+                                <Users className="h-10 w-10 text-emerald-100" />
                             </div>
                         </div>
                         <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-orange-500">
