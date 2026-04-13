@@ -4,14 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Wildside\Userstamps\Userstamps;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class Pegawai extends Model
 {
-    use HasFactory, SoftDeletes, Userstamps, LogsActivity;
+    use HasFactory, Userstamps, LogsActivity;
 
     protected $fillable = [
         'nip',
@@ -39,7 +38,6 @@ class Pegawai extends Model
         'rejection_note',
         'created_by',
         'updated_by',
-        'deleted_by',
     ];
 
     protected $casts = [
