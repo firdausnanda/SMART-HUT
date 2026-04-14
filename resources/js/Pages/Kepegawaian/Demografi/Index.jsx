@@ -43,6 +43,41 @@ function StatusChip({ status, size = 'sm' }) {
     );
 }
 
+function AlertCard({ title, count, icon: Icon, colorClass, footerLink, children, footerComponent }) {
+    const colorStyles = {
+        rose: { bg: 'bg-rose-50', border: 'border-rose-100', text: 'text-rose-800', icon: 'text-rose-500', count: 'bg-rose-500', link: 'text-rose-600' },
+        amber: { bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-800', icon: 'text-amber-500', count: 'bg-amber-500', link: 'text-amber-600' },
+        indigo: { bg: 'bg-indigo-50', border: 'border-indigo-100', text: 'text-indigo-800', icon: 'text-indigo-500', count: 'bg-indigo-500', link: 'text-indigo-600' }
+    }[colorClass] || { bg: 'bg-indigo-50', border: 'border-indigo-100', text: 'text-indigo-800', icon: 'text-indigo-500', count: 'bg-indigo-500', link: 'text-indigo-600' };
+
+    return (
+        <div className={`bg-white rounded-2xl border ${colorStyles.border} shadow-sm overflow-hidden flex flex-col h-full transition-all hover:shadow-md`}>
+            <div className={`px-5 py-4 ${colorStyles.bg} border-b ${colorStyles.border} flex items-center justify-between`}>
+                <div className="flex items-center gap-2">
+                    <Icon className={`h-4 w-4 ${colorStyles.icon}`} />
+                    <h4 className={`font-bold ${colorStyles.text} text-sm`}>{title}</h4>
+                </div>
+                <span className={`text-[10px] font-black ${colorStyles.count} text-white px-2 py-0.5 rounded-full`}>{count}</span>
+            </div>
+            <div className="flex-1">
+                {children}
+            </div>
+            {footerComponent && (
+                <div className="px-5 py-2 border-t border-indigo-50 bg-indigo-50/10">
+                    {footerComponent}
+                </div>
+            )}
+            {footerLink && (
+                <div className="px-5 py-3 bg-gray-50 border-t border-gray-100 mt-auto">
+                    <Link href={footerLink.href} className={`text-xs ${colorStyles.link} font-bold flex items-center gap-1 hover:gap-2 transition-all`}>
+                        {footerLink.label} <ArrowRight className="h-3 w-3" />
+                    </Link>
+                </div>
+            )}
+        </div>
+    );
+}
+
 
 
 export default function DemografiIndex({
@@ -274,83 +309,30 @@ export default function DemografiIndex({
 
 
                 {/* ===== SECTION 2: ALERT ROW ===== */}
-                {((alert_pensiun?.length > 0 && (isAdmin || isStaff)) || (alert_kgb?.length > 0 && (isAdmin || isStaff)) || (rekap_pending?.length > 0)) && (
+                {((alert_pensiun?.length > 0) || (alert_kgb?.length > 0) || (rekap_pending?.length > 0)) && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-
-                        {/* Alert Pensiun */}
-                        {alert_pensiun?.length > 0 && (isAdmin || isStaff) && (
-                            <div className="bg-white rounded-2xl border border-rose-100 shadow-sm overflow-hidden">
-                                <div className="px-5 py-4 bg-rose-50 border-b border-rose-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <AlertTriangle className="h-4 w-4 text-rose-500" />
-                                        <h4 className="font-bold text-rose-800 text-sm">Pensiun dalam 90 Hari</h4>
-                                    </div>
-                                    <span className="text-[10px] font-black bg-rose-500 text-white px-2 py-0.5 rounded-full">{kpi?.pensiun_90_hari || alert_pensiun.length}</span>
-                                </div>
-                                <div className="divide-y divide-gray-50">
-                                    {alert_pensiun.map((p) => {
-                                        const days = getDaysUntil(p.proyeksi_pensiun);
-                                        return (
-                                            <div key={p.id} className="px-5 py-3 hover:bg-rose-50/50 transition-colors">
-                                                <p className="text-sm font-bold text-gray-800 truncate">{p.nama_lengkap}</p>
-                                                <div className="flex items-center justify-between mt-0.5">
-                                                    <p className="text-[10px] text-gray-400">NIP. {p.nip}</p>
-                                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${days <= 30 ? 'bg-rose-100 text-rose-700' : 'bg-amber-50 text-amber-700'}`}>
-                                                        {days !== null ? `${days} hari` : '-'}
-                                                    </span>
-                                                </div>
-                                                <p className="text-[10px] text-gray-500 mt-0.5">{formatDate(p.proyeksi_pensiun)}</p>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
-                                    <Link href={route('demografi-pegawai.index')} className="text-xs text-rose-600 font-bold flex items-center gap-1 hover:gap-2 transition-all">
-                                        Lihat semua <ArrowRight className="h-3 w-3" />
-                                    </Link>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Alert KGB */}
-                        {alert_kgb?.length > 0 && (isAdmin || isStaff) && (
-                            <div className="bg-white rounded-2xl border border-amber-100 shadow-sm overflow-hidden">
-                                <div className="px-5 py-4 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <Bell className="h-4 w-4 text-amber-500" />
-                                        <h4 className="font-bold text-amber-800 text-sm">KGB Bulan Ini</h4>
-                                    </div>
-                                    <span className="text-[10px] font-black bg-amber-500 text-white px-2 py-0.5 rounded-full">{kpi?.kgb_bulan_ini || alert_kgb.length}</span>
-                                </div>
-                                <div className="divide-y divide-gray-50">
-                                    {alert_kgb.map((p) => (
-                                        <div key={p.id} className="px-5 py-3 hover:bg-amber-50/30 transition-colors">
-                                            <p className="text-sm font-bold text-gray-800 truncate">{p.nama_lengkap}</p>
-                                            <p className="text-[10px] text-gray-400 mt-0.5">NIP. {p.nip}</p>
-                                            {p.tmt_kgb_berikutnya && (
-                                                <p className="text-[10px] text-amber-600 font-semibold mt-0.5">{formatDate(p.tmt_kgb_berikutnya)}</p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
-                                    <Link href={route('proyeksi-gaji.index')} className="text-xs text-amber-600 font-bold flex items-center gap-1 hover:gap-2 transition-all">
-                                        Lihat proyeksi gaji <ArrowRight className="h-3 w-3" />
-                                    </Link>
-                                </div>
-                            </div>
-                        )}
 
                         {/* Alert Rekap Pending */}
                         {rekap_pending?.length > 0 && (
-                            <div className="bg-white rounded-2xl border border-indigo-100 shadow-sm overflow-hidden">
-                                <div className="px-5 py-4 bg-indigo-50 border-b border-indigo-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <FileText className="h-4 w-4 text-indigo-500" />
-                                        <h4 className="font-bold text-indigo-800 text-sm">Rekap Perlu Tindakan</h4>
-                                    </div>
-                                    <span className="text-[10px] font-black bg-indigo-500 text-white px-2 py-0.5 rounded-full">{rekap_total.length}</span>
-                                </div>
+                            <AlertCard
+                                title="Rekap Perlu Tindakan"
+                                count={rekap_total.length}
+                                icon={FileText}
+                                colorClass="indigo"
+                                footerLink={{ href: route('rekap-bulanan.index'), label: 'Kelola rekap' }}
+                                footerComponent={rekap_total.length > 3 && (
+                                    <button
+                                        onClick={() => setShowAllPending(!showAllPending)}
+                                        className="w-full flex items-center justify-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
+                                    >
+                                        {showAllPending ? (
+                                            <><ChevronUp className="h-3 w-3" /> Sembunyikan</>
+                                        ) : (
+                                            <><ChevronDown className="h-3 w-3" /> Lihat Semua ({rekap_total.length})</>
+                                        )}
+                                    </button>
+                                )}
+                            >
                                 <div className="divide-y divide-gray-50 max-h-[400px] overflow-y-auto custom-scrollbar">
                                     {(showAllPending ? rekap_total : rekap_pending).map((r) => (
                                         <div key={r.id} className="px-5 py-3 hover:bg-indigo-50/30 transition-colors">
@@ -370,27 +352,59 @@ export default function DemografiIndex({
                                         </div>
                                     ))}
                                 </div>
+                            </AlertCard>
+                        )}
 
-                                {rekap_total.length > 3 && (
-                                    <div className="px-5 py-2 border-t border-indigo-50 bg-indigo-50/10">
-                                        <button
-                                            onClick={() => setShowAllPending(!showAllPending)}
-                                            className="w-full flex items-center justify-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
-                                        >
-                                            {showAllPending ? (
-                                                <><ChevronUp className="h-3 w-3" /> Sembunyikan</>
-                                            ) : (
-                                                <><ChevronDown className="h-3 w-3" /> Lihat Semua ({rekap_total.length})</>
-                                            )}
-                                        </button>
-                                    </div>
-                                )}
-                                <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
-                                    <Link href={route('rekap-bulanan.index')} className="text-xs text-indigo-600 font-bold flex items-center gap-1 hover:gap-2 transition-all">
-                                        Kelola rekap <ArrowRight className="h-3 w-3" />
-                                    </Link>
+                        {/* Alert Pensiun */}
+                        {alert_pensiun?.length > 0 && (
+                            <AlertCard
+                                title="Pensiun dalam 90 Hari"
+                                count={kpi?.pensiun_90_hari || alert_pensiun.length}
+                                icon={AlertTriangle}
+                                colorClass="rose"
+                                footerLink={{ href: route('demografi-pegawai.index'), label: 'Lihat semua' }}
+                            >
+                                <div className="divide-y divide-gray-50">
+                                    {alert_pensiun.map((p) => {
+                                        const days = getDaysUntil(p.proyeksi_pensiun);
+                                        return (
+                                            <div key={p.id} className="px-5 py-3 hover:bg-rose-50/50 transition-colors">
+                                                <p className="text-sm font-bold text-gray-800 truncate">{p.nama_lengkap}</p>
+                                                <div className="flex items-center justify-between mt-0.5">
+                                                    <p className="text-[10px] text-gray-400">NIP. {p.nip}</p>
+                                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${days <= 30 ? 'bg-rose-100 text-rose-700' : 'bg-amber-50 text-amber-700'}`}>
+                                                        {days !== null ? `${days} hari` : '-'}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[10px] text-gray-500 mt-0.5">{formatDate(p.proyeksi_pensiun)}</p>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                            </div>
+                            </AlertCard>
+                        )}
+
+                        {/* Alert KGB */}
+                        {alert_kgb?.length > 0 && (
+                            <AlertCard
+                                title="KGB Bulan Ini"
+                                count={kpi?.kgb_bulan_ini || alert_kgb.length}
+                                icon={Bell}
+                                colorClass="amber"
+                                footerLink={{ href: route('proyeksi-gaji.index'), label: 'Lihat proyeksi gaji' }}
+                            >
+                                <div className="divide-y divide-gray-50">
+                                    {alert_kgb.map((p) => (
+                                        <div key={p.id} className="px-5 py-3 hover:bg-amber-50/30 transition-colors">
+                                            <p className="text-sm font-bold text-gray-800 truncate">{p.nama_lengkap}</p>
+                                            <p className="text-[10px] text-gray-400 mt-0.5">NIP. {p.nip}</p>
+                                            {p.tmt_kgb_berikutnya && (
+                                                <p className="text-[10px] text-amber-600 font-semibold mt-0.5">{formatDate(p.tmt_kgb_berikutnya)}</p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </AlertCard>
                         )}
                     </div>
                 )}

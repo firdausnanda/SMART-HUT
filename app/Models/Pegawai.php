@@ -69,6 +69,16 @@ class Pegawai extends Model
      */
     public function getNextKgbDateAttribute()
     {
+        // 0. Cek apakah sudah pensiun atau tidak aktif
+        if ($this->status_kedudukan !== 'Aktif') {
+            return null;
+        }
+
+        $retirementDate = $this->retirement_date;
+        if ($retirementDate && $retirementDate->isPast()) {
+            return null;
+        }
+
         // 1. Cek riwayat KGB terakhir yang sudah final
         $latestKgb = $this->riwayatKgb()->where('status', 'final')->latest('tmt_kgb')->first();
 
@@ -89,20 +99,27 @@ class Pegawai extends Model
         // 3. Hitung proyeksi terdekat atau yang sesuai dengan siklus 2 tahunan
         // Jika basis sudah di masa depan, itu adalah proyeksi berikutnya
         if ($baseDate->isFuture()) {
-            return $baseDate;
+            $nextKgb = $baseDate;
+        } else {
+            // Jika basis di masa lalu, hitung siklus 2 tahunan sampai mencapai setidaknya tahun ini
+            $now = now();
+            $yearsPassed = $baseDate->diffInYears($now);
+            $cycles = (int) ceil($yearsPassed / 2);
+
+            // Selalu pastikan setidaknya 1 siklus jika basis sudah di masa lalu
+            if ($cycles < 1 && $baseDate->isPast()) {
+                $cycles = 1;
+            }
+
+            $nextKgb = $baseDate->copy()->addYears($cycles * 2);
         }
 
-        // Jika basis di masa lalu, hitung siklus 2 tahunan sampai mencapai setidaknya tahun ini
-        $now = now();
-        $yearsPassed = $baseDate->diffInYears($now);
-        $cycles = (int) ceil($yearsPassed / 2);
-
-        // Selalu pastikan setidaknya 1 siklus jika basis sudah di masa lalu
-        if ($cycles < 1 && $baseDate->isPast()) {
-            $cycles = 1;
+        // 4. Cek apakah tanggal KGB berikutnya melewati tanggal pensiun
+        if ($retirementDate && $nextKgb->greaterThan($retirementDate)) {
+            return null;
         }
 
-        return $baseDate->copy()->addYears($cycles * 2);
+        return $nextKgb;
     }
 
     /**
@@ -110,6 +127,16 @@ class Pegawai extends Model
      */
     public function getKgbProjectionForYear($year)
     {
+        // 0. Cek apakah sudah pensiun atau tidak aktif
+        if ($this->status_kedudukan !== 'Aktif') {
+            return null;
+        }
+
+        $retirementDate = $this->retirement_date;
+        if ($retirementDate && $retirementDate->year < $year) {
+            return null;
+        }
+
         $latestKgb = $this->riwayatKgb()->where('status', 'final')->latest('tmt_kgb')->first();
 
         if ($latestKgb && $latestKgb->tmt_kgb_berikutnya) {
@@ -130,7 +157,14 @@ class Pegawai extends Model
 
         // KGB terjadi setiap 2 tahun. Cek apakah target tahun masuk dalam siklus.
         if ($diffYears % 2 === 0) {
-            return $baseDate->copy()->year($year);
+            $projectedKgb = $baseDate->copy()->year($year);
+
+            // Cek apakah proyeksi melewati tanggal pensiun
+            if ($retirementDate && $projectedKgb->greaterThan($retirementDate)) {
+                return null;
+            }
+
+            return $projectedKgb;
         }
 
         return null;
@@ -221,10 +255,20 @@ class Pegawai extends Model
     {
         $month = $month ?? now()->month;
         $year = $year ?? now()->year;
-        return $query->whereHas('latestKgb', function ($q) use ($month, $year) {
-            $q->whereMonth('tmt_kgb_berikutnya', $month)
-                ->whereYear('tmt_kgb_berikutnya', $year);
-        });
+
+        return $query->where('status_kedudukan', 'Aktif')
+            ->whereHas('latestKgb', function ($q) use ($month, $year) {
+                $q->whereMonth('tmt_kgb_berikutnya', $month)
+                    ->whereYear('tmt_kgb_berikutnya', $year);
+            })
+            ->whereRaw(
+                "NOT EXISTS (
+                    SELECT 1 FROM pegawai p2 
+                    WHERE p2.id = pegawai.id 
+                    AND DATE_ADD(p2.tanggal_lahir, INTERVAL COALESCE(p2.bup, 58) YEAR) < STR_TO_DATE(?, '%Y-%m-%d')
+                )",
+                [Carbon\Carbon::createFromDate($year, $month, 1)->endOfMonth()->format('Y-m-d')]
+            );
     }
 
 }
