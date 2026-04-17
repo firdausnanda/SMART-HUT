@@ -12,13 +12,13 @@ class SocialiteController extends Controller
 {
   public function redirect($provider)
   {
-    return Socialite::driver($provider)->redirect();
+    return Socialite::driver($provider)->stateless()->redirect();
   }
 
   public function callback($provider)
   {
     try {
-      $socialUser = Socialite::driver($provider)->user();
+      $socialUser = Socialite::driver($provider)->stateless()->user();
 
       $user = User::where('google_id', $socialUser->getId())
         ->orWhere('email', $socialUser->getEmail())
