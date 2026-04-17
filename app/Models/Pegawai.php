@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Wildside\Userstamps\Userstamps;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Carbon\Carbon;
 
 class Pegawai extends Model
 {
@@ -47,6 +48,8 @@ class Pegawai extends Model
         'approved_by_kasi_at' => 'datetime',
         'approved_by_cdk_at' => 'datetime',
     ];
+
+    protected $table = 'pegawais';
 
     /**
      * Relasi ke riwayat KGB
@@ -263,11 +266,11 @@ class Pegawai extends Model
             })
             ->whereRaw(
                 "NOT EXISTS (
-                    SELECT 1 FROM pegawai p2 
-                    WHERE p2.id = pegawai.id 
+                    SELECT 1 FROM pegawais p2 
+                    WHERE p2.id = pegawais.id 
                     AND DATE_ADD(p2.tanggal_lahir, INTERVAL COALESCE(p2.bup, 58) YEAR) < STR_TO_DATE(?, '%Y-%m-%d')
                 )",
-                [Carbon\Carbon::createFromDate($year, $month, 1)->endOfMonth()->format('Y-m-d')]
+                [Carbon::createFromDate($year, $month, 1)->endOfMonth()->format('Y-m-d')]
             );
     }
 
