@@ -56,15 +56,15 @@ export default function PublicYoYDashboard({ years, stats }) {
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + modules.length) % modules.length);
 
   // Auto-slide effect
-  useEffect(() => {
-    const slideInterval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        nextSlide();
-      }
-    }, 25000); // 10 seconds per slide
+  // useEffect(() => {
+  //   const slideInterval = setInterval(() => {
+  //     if (document.visibilityState === 'visible') {
+  //       nextSlide();
+  //     }
+  //   }, 25000);
 
-    return () => clearInterval(slideInterval);
-  }, [modules.length]);
+  //   return () => clearInterval(slideInterval);
+  // }, [modules.length]);
 
   // Data reload effect
   useEffect(() => {
