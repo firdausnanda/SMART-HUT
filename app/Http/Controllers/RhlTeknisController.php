@@ -29,7 +29,7 @@ class RhlTeknisController extends Controller
 
   public function index(Request $request)
   {
-    $defaultYear = RhlTeknis::max('year') ?? now()->year;
+    $defaultYear = now()->year;
     $selectedYear = $request->integer('year', $defaultYear);
 
     $sortField = $request->query('sort', 'created_at');
@@ -114,7 +114,7 @@ class RhlTeknisController extends Controller
 
     $availableYears = cache()->remember('rhl-teknis-years', 3600, function () {
       $dbYears = RhlTeknis::distinct()->pluck('year')->toArray();
-      $fixedYears = range(2026, 2021);
+      $fixedYears = range(now()->year, 2021);
       $years = array_unique(array_merge($dbYears, $fixedYears));
       rsort($years);
       return $years;
