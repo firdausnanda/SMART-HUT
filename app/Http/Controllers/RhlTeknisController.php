@@ -114,7 +114,7 @@ class RhlTeknisController extends Controller
 
     $availableYears = cache()->remember('rhl-teknis-years', 3600, function () {
       $dbYears = RhlTeknis::distinct()->pluck('year')->toArray();
-      $fixedYears = range(2025, 2021);
+      $fixedYears = range(2026, 2021);
       $years = array_unique(array_merge($dbYears, $fixedYears));
       rsort($years);
       return $years;
