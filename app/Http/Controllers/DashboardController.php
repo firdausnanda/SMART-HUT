@@ -301,20 +301,26 @@ class DashboardController extends Controller
         $thisYear = (int) date('Y');
         $years = range($thisYear, 2021);
 
-        // Ambil data kepegawaian YoY sekaligus (1 query)
-        $kepegawaianYoY = $this->getKepegawaianYoYStats($years);
+        $cacheKey = 'public_yoy_dashboard_stats_' . $thisYear;
 
-        $stats = [];
-        foreach ($years as $year) {
-            $stats[$year] = [
-                'pembinaan' => $this->getPembinaanStats($year),
-                'perlindungan' => $this->getPerlindunganStats($year),
-                'bina_usaha' => $this->getBinaUsahaStats($year),
-                'kelembagaan_ps' => $this->getKelembagaanPsStats($year),
-                'kelembagaan_hr' => $this->getKelembagaanHrStats($year),
-                'kepegawaian' => $kepegawaianYoY[$year] ?? $this->getKepegawaianStats($year),
-            ];
-        }
+        // Cache the entire YoY stats for 10 minutes (600 seconds)
+        $stats = Cache::remember($cacheKey, 600, function () use ($years) {
+            // Ambil data kepegawaian YoY sekaligus (1 query)
+            $kepegawaianYoY = $this->getKepegawaianYoYStats($years);
+
+            $result = [];
+            foreach ($years as $year) {
+                $result[$year] = [
+                    'pembinaan' => $this->getPembinaanStats($year),
+                    'perlindungan' => $this->getPerlindunganStats($year),
+                    'bina_usaha' => $this->getBinaUsahaStats($year),
+                    'kelembagaan_ps' => $this->getKelembagaanPsStats($year),
+                    'kelembagaan_hr' => $this->getKelembagaanHrStats($year),
+                    'kepegawaian' => $kepegawaianYoY[$year] ?? [],
+                ];
+            }
+            return $result;
+        });
 
         return Inertia::render('Public/PublicYoYDashboard', [
             'years' => $years,
@@ -733,12 +739,18 @@ class DashboardController extends Controller
 
     private function getKelembagaanPsStats($currentYear)
     {
-        return Cache::remember("kelembagaan_ps_stats_{$currentYear}", 300, function () use ($currentYear) {
-            // --- 4. Kelembagaan Perhutanan Sosial ---
+        // Cache static data (not dependent on year) for 10 minutes (600 seconds)
+        $staticStats = Cache::remember('kelembagaan_ps_static_stats', 600, function () {
             return [
                 'kelompok_count' => Skps::where('status', 'final')->count(),
                 'area_total' => (float) Skps::where('status', 'final')->sum('ps_area'),
                 'kk_total' => (int) Skps::where('status', 'final')->sum('number_of_kk'),
+            ];
+        });
+
+        // Cache yearly data for 10 minutes (600 seconds)
+        $yearlyStats = Cache::remember("kelembagaan_ps_yearly_stats_{$currentYear}", 600, function () use ($currentYear) {
+            return [
                 'nekon_total' => (float) NilaiEkonomi::where('year', $currentYear)->where('status', 'final')->sum('total_transaction_value'),
                 'scheme_distribution' => SkemaPerhutananSosial::leftJoin('skps', function ($join) {
                     $join->on('m_skema_perhutanan_sosial.id', '=', 'skps.id_skema_perhutanan_sosial')
@@ -762,6 +774,8 @@ class DashboardController extends Controller
                     ->pluck('total', 'group_name')
             ];
         });
+
+        return array_merge($staticStats, $yearlyStats);
     }
     
     private function getKepegawaianStats($currentYear)
@@ -1071,12 +1085,18 @@ class DashboardController extends Controller
 
     private function getKelembagaanHrStats($currentYear)
     {
-        return Cache::remember("kelembagaan_hr_stats_{$currentYear}", 300, function () use ($currentYear) {
-            // --- 5. Kelembagaan Hutan Rakyat ---
+        // Cache static data (not dependent on year) for 10 minutes (600 seconds)
+        $staticStats = Cache::remember('kelembagaan_hr_static_stats', 600, function () {
             return [
                 'kelompok_count' => PerkembanganKth::where('status', 'final')->count(),
                 'area_total' => (float) PerkembanganKth::where('status', 'final')->sum('luas_kelola'),
                 'anggota_total' => (int) PerkembanganKth::where('status', 'final')->sum('jumlah_anggota'),
+            ];
+        });
+
+        // Cache yearly data for 10 minutes (600 seconds)
+        $yearlyStats = Cache::remember("kelembagaan_hr_yearly_stats_{$currentYear}", 600, function () use ($currentYear) {
+            return [
                 'nte_total' => (float) NilaiTransaksiEkonomi::where('year', $currentYear)->where('status', 'final')->sum('total_nilai_transaksi'),
                 'class_distribution' => PerkembanganKth::where('status', 'final')
                     ->selectRaw('kelas_kelembagaan as class_name, count(*) as count')
@@ -1106,6 +1126,8 @@ class DashboardController extends Controller
                     ->pluck('total', 'group_name')
             ];
         });
+
+        return array_merge($staticStats, $yearlyStats);
     }
 
 
