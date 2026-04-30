@@ -240,6 +240,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [RekapBulananController::class, 'index'])->name('index');
         Route::post('/generate', [RekapBulananController::class, 'generate'])->name('generate');
         Route::get('/export/{year}/{month}', [RekapBulananController::class, 'export'])->name('export');
+        Route::get('/export-bezetting/{year}/{month}', [RekapBulananController::class, 'exportBezetting'])->name('export-bezetting');
         Route::get('/{year}/{month}', [RekapBulananController::class, 'show'])->name('show');
         Route::get('/{year}/{month}/pegawai', [RekapBulananController::class, 'showPegawai'])->name('show-pegawai');
 

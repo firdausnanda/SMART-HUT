@@ -31,6 +31,7 @@ import {
     ExternalLink,
     Table2,
     GitCompare,
+    Download,
 } from 'lucide-react';
 import StatusBadge from '@/Components/StatusBadge';
 import LoadingOverlay from '@/Components/LoadingOverlay';
@@ -176,6 +177,13 @@ export default function Show({ auth, rekap, rekap_sebelumnya, pendidikanLabels, 
                     onFinish: () => setIsLoading(false)
                 });
             }
+        });
+    };
+
+    const exportBezettingToExcel = () => {
+        window.location.href = route('rekap-bulanan.export-bezetting', { 
+            year: rekap.periode_tahun, 
+            month: rekap.periode_bulan 
         });
     };
 
@@ -454,10 +462,20 @@ export default function Show({ auth, rekap, rekap_sebelumnya, pendidikanLabels, 
                                 <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-xl overflow-hidden relative">
                                     <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-indigo-500 opacity-10 rounded-full" />
                                     <div className="relative z-10">
-                                        <h3 className="text-base font-bold mb-5 flex items-center gap-2">
-                                            <BarChart3 className="h-5 w-5 text-indigo-400" />
-                                            Analisa Bezetting (Isi vs Kebutuhan)
-                                        </h3>
+                                        <div className="flex items-center justify-between mb-5">
+                                            <h3 className="text-base font-bold flex items-center gap-2">
+                                                <BarChart3 className="h-5 w-5 text-indigo-400" />
+                                                Analisa Bezetting (Isi vs Kebutuhan)
+                                            </h3>
+                                            <button
+                                                onClick={exportBezettingToExcel}
+                                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                                                title="Export ke Excel"
+                                            >
+                                                <Download className="h-3.5 w-3.5" />
+                                                Export Excel
+                                            </button>
+                                        </div>
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-sm">
                                                 <thead>

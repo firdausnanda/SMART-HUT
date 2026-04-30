@@ -22,7 +22,7 @@ class RekapBulananController extends Controller
     public function __construct(RekapKepegawaianService $service)
     {
         $this->service = $service;
-        $this->middleware('permission:kepegawaian.view')->only(['index', 'show', 'showPegawai', 'export']);
+        $this->middleware('permission:kepegawaian.view')->only(['index', 'show', 'showPegawai', 'export', 'exportBezetting']);
         $this->middleware('permission:kepegawaian.create')->only(['generate', 'storePegawai']);
         $this->middleware('permission:kepegawaian.edit|kepegawaian.approve')->only(['singleWorkflowAction']);
         $this->middleware('permission:kepegawaian.edit|kepegawaian.approve|kepegawaian.delete')->only(['bulkWorkflowAction']);
@@ -118,6 +118,11 @@ class RekapBulananController extends Controller
     public function export($year, $month)
     {
         return Excel::download(new RekapBulananExport($year, $month), "rekap-kepegawaian-{$year}-{$month}.xlsx");
+    }
+
+    public function exportBezetting($year, $month)
+    {
+        return Excel::download(new \App\Exports\BezettingExport($year, $month), "analisa-bezetting-{$year}-{$month}.xlsx");
     }
 
     public function searchPegawai(Request $request)
