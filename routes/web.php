@@ -225,6 +225,8 @@ Route::middleware('auth')->group(function () {
     Route::get('demografi-pegawai/template', [DemografiPegawaiController::class, 'template'])->name('demografi-pegawai.template');
     Route::post('demografi-pegawai/import', [DemografiPegawaiController::class, 'import'])->name('demografi-pegawai.import');
     Route::post('demografi-pegawai/bulk-delete', [DemografiPegawaiController::class, 'bulkDelete'])->name('demografi-pegawai.bulk-delete');
+    Route::post('demografi-pegawai/bulk-restore', [DemografiPegawaiController::class, 'bulkRestore'])->name('demografi-pegawai.bulk-restore');
+    Route::post('demografi-pegawai/{id}/restore', [DemografiPegawaiController::class, 'restore'])->name('demografi-pegawai.restore');
     Route::resource('demografi-pegawai', DemografiPegawaiController::class);
     Route::post('demografi-pegawai/{pegawai}/riwayat-kgb', [DemografiPegawaiController::class, 'storeKgb'])->name('demografi-pegawai.kgb.store');
     Route::put('demografi-pegawai/riwayat-kgb/{riwayat_kgb}', [DemografiPegawaiController::class, 'updateKgb'])->name('demografi-pegawai.kgb.update');

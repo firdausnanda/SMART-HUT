@@ -97,6 +97,7 @@ export default function DemografiIndex({
     const [sortField, setSortField] = useState(filters.sort || 'created_at');
     const [sortDir, setSortDir] = useState(filters.dir || 'desc');
     const [perPage, setPerPage] = useState(filters.per_page || 10);
+    const [isTrashed, setIsTrashed] = useState(filters.is_trashed || false);
     const [selectedIds, setSelectedIds] = useState([]);
     const [showImportModal, setShowImportModal] = useState(false);
     const [importFile, setImportFile] = useState(null);
@@ -132,21 +133,28 @@ export default function DemografiIndex({
     const canImport = userPermissions.includes('kepegawaian.import') || isAdmin;
     const canShowBulk = isAdmin || (!isKasi && !isKaCdk);
 
-    const performQuery = (query, field = sortField, dir = sortDir, limit = perPage) => {
-        router.get(route('demografi-pegawai.index'), { search: query, sort: field, dir, per_page: limit }, { preserveState: true, preserveScroll: true, replace: true });
+    const performQuery = (query, field = sortField, dir = sortDir, limit = perPage, trashed = isTrashed) => {
+        router.get(route('demografi-pegawai.index'), { search: query, sort: field, dir, per_page: limit, is_trashed: trashed }, { preserveState: true, preserveScroll: true, replace: true });
     };
 
-    const debouncedSearch = useCallback(debounce((query) => performQuery(query), 500), []);
-    const onSearchChange = (e) => { const q = e.target.value; setSearchQuery(q); debouncedSearch(q); };
+    const debouncedSearch = useCallback(debounce((query, field, dir, limit, trashed) => performQuery(query, field, dir, limit, trashed), 500), []);
+    const onSearchChange = (e) => { const q = e.target.value; setSearchQuery(q); debouncedSearch(q, sortField, sortDir, perPage, isTrashed); };
 
     const handleSort = (field) => {
         const isAsc = sortField === field && sortDir === 'asc';
         const newDir = isAsc ? 'desc' : 'asc';
         setSortField(field); setSortDir(newDir);
-        performQuery(searchQuery, field, newDir, perPage);
+        performQuery(searchQuery, field, newDir, perPage, isTrashed);
     };
 
-    const handlePerPageChange = (e) => { const v = e.target.value; setPerPage(v); performQuery(searchQuery, sortField, sortDir, v); };
+    const handlePerPageChange = (e) => { const v = e.target.value; setPerPage(v); performQuery(searchQuery, sortField, sortDir, v, isTrashed); };
+
+    const handleToggleTrashed = (e) => {
+        const newTrashed = e.target.checked;
+        setIsTrashed(newTrashed);
+        setSelectedIds([]);
+        performQuery(searchQuery, sortField, sortDir, perPage, newTrashed);
+    };
 
     const SortIcon = ({ field }) => {
         if (sortField !== field) return (<svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 ml-1 text-gray-300 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>);
@@ -160,6 +168,20 @@ export default function DemografiIndex({
 
     const handleBulkAction = (action) => {
         if (selectedIds.length === 0) return;
+        
+        if (action === 'restore') {
+            MySwal.fire({
+                title: 'Pulihkan Data Terpilih?', text: `${selectedIds.length} data terpilih akan dipulihkan.`,
+                icon: 'question', showCancelButton: true, confirmButtonColor: '#258a55', confirmButtonText: 'Ya, Pulihkan!', cancelButtonText: 'Batal', borderRadius: '1.25rem',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    setLoadingText('Memulihkan Data Terpilih...'); setIsLoading(true);
+                    router.post(route('demografi-pegawai.bulk-restore'), { ids: selectedIds }, { preserveScroll: true, onSuccess: () => setSelectedIds([]), onFinish: () => setIsLoading(false) });
+                }
+            });
+            return;
+        }
+
         MySwal.fire({
             title: 'Hapus Data Terpilih?', text: `${selectedIds.length} data terpilih akan dihapus.`,
             icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal', borderRadius: '1.25rem',
@@ -172,6 +194,20 @@ export default function DemografiIndex({
     };
 
     const handleSingleAction = (id, action) => {
+        if (action === 'restore') {
+            MySwal.fire({
+                title: 'Pulihkan Data?', text: 'Data akan dikembalikan ke daftar aktif!', icon: 'question',
+                showCancelButton: true, confirmButtonColor: '#258a55', confirmButtonText: 'Ya, pulihkan!', cancelButtonText: 'Batal', borderRadius: '1.25rem',
+                customClass: { title: 'font-bold text-gray-900', popup: 'rounded-3xl shadow-2xl border-none', confirmButton: 'rounded-xl font-bold px-6 py-2.5', cancelButton: 'rounded-xl font-bold px-6 py-2.5' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    setLoadingText('Memulihkan Data...'); setIsLoading(true);
+                    router.post(route('demografi-pegawai.restore', id), {}, { preserveScroll: true, onFinish: () => setIsLoading(false) });
+                }
+            });
+            return;
+        }
+
         MySwal.fire({
             title: 'Hapus Data?', text: 'Data yang dihapus tidak bisa dikembalikan!', icon: 'warning',
             showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, hapus!', cancelButtonText: 'Batal', borderRadius: '1.25rem',
@@ -251,6 +287,7 @@ export default function DemografiIndex({
                     canApprove={canApprove}
                     canDelete={canDelete}
                     isAdmin={isAdmin}
+                    isTrashed={isTrashed}
                 />
             )}
 
@@ -494,6 +531,15 @@ export default function DemografiIndex({
                                 <input type="text" className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-all"
                                     placeholder="Cari NIP, nama..." value={searchQuery} onChange={onSearchChange} />
                             </div>
+                            <div className="h-8 w-px bg-gray-200 hidden md:block" />
+                            <label className="flex items-center cursor-pointer gap-2 select-none group">
+                                <div className="relative">
+                                    <input type="checkbox" className="sr-only" checked={isTrashed} onChange={handleToggleTrashed} />
+                                    <div className={`block w-10 h-6 rounded-full transition-colors ${isTrashed ? 'bg-primary-500' : 'bg-gray-200 group-hover:bg-gray-300'}`}></div>
+                                    <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${isTrashed ? 'transform translate-x-4' : ''}`}></div>
+                                </div>
+                                <span className={`text-xs font-bold uppercase transition-colors ${isTrashed ? 'text-primary-600' : 'text-gray-500'}`}>Data Terhapus</span>
+                            </label>
                         </div>
                         <div className="flex items-center gap-3">
                             {canCreate && (
@@ -583,13 +629,21 @@ export default function DemografiIndex({
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="flex items-center justify-center gap-2">
-                                                <Link href={route('demografi-pegawai.edit', pegawai.id)} className="p-2 text-primary-600 hover:bg-primary-100 rounded-lg transition-colors shadow-sm bg-primary-50" title="Edit Pegawai">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                                </Link>
-                                                {(canDelete || isAdmin) && (
-                                                    <button onClick={() => handleSingleAction(pegawai.id, 'delete')} className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-red-50" title="Hapus Pegawai">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                {pegawai.deleted_at ? (
+                                                    <button onClick={() => handleSingleAction(pegawai.id, 'restore')} className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm bg-emerald-50" title="Pulihkan Pegawai">
+                                                        <RefreshCcw className="h-4 w-4" />
                                                     </button>
+                                                ) : (
+                                                    <>
+                                                        <Link href={route('demografi-pegawai.edit', pegawai.id)} className="p-2 text-primary-600 hover:bg-primary-100 rounded-lg transition-colors shadow-sm bg-primary-50" title="Edit Pegawai">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                                        </Link>
+                                                        {(canDelete || isAdmin) && (
+                                                            <button onClick={() => handleSingleAction(pegawai.id, 'delete')} className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-red-50" title="Hapus Pegawai">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                            </button>
+                                                        )}
+                                                    </>
                                                 )}
                                             </div>
                                         </td>

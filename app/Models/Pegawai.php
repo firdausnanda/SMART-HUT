@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Wildside\Userstamps\Userstamps;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
@@ -11,7 +12,7 @@ use Carbon\Carbon;
 
 class Pegawai extends Model
 {
-    use HasFactory, Userstamps, LogsActivity;
+    use HasFactory, Userstamps, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'nip',

@@ -7,7 +7,8 @@ export default function BulkActionToolbar({
   canEdit,
   canApprove,
   canDelete,
-  isAdmin
+  isAdmin,
+  isTrashed = false
 }) {
   if (selectedIds.length === 0) return null;
 
@@ -33,8 +34,21 @@ export default function BulkActionToolbar({
       <div className="hidden sm:block h-8 w-px bg-gray-200"></div>
 
       <div className="flex items-center justify-center gap-2 w-full sm:w-auto overflow-x-auto sm:overflow-visible pb-1 sm:pb-0">
+        {/* Bulk Restore - Only for Creator/Admin and when viewing Trashed data */}
+        {(canDelete || isAdmin) && isTrashed && (
+          <button
+            onClick={() => handleBulkAction('restore')}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm shadow-emerald-200 whitespace-nowrap flex-shrink-0"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Pulihkan
+          </button>
+        )}
+
         {/* Bulk Submit - Only for Creator/Admin and Draft/Rejected */}
-        {(canEdit || isAdmin) && (
+        {(canEdit || isAdmin) && !isTrashed && (
           <button
             onClick={() => handleBulkAction('submit')}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm shadow-blue-200 whitespace-nowrap flex-shrink-0"
@@ -47,7 +61,7 @@ export default function BulkActionToolbar({
         )}
 
         {/* Bulk Approve - Only for Kasi/KaCDK */}
-        {(canApprove || isAdmin) && (
+        {(canApprove || isAdmin) && !isTrashed && (
           <button
             onClick={() => handleBulkAction('approve')}
             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm shadow-emerald-200 whitespace-nowrap flex-shrink-0"
@@ -60,7 +74,7 @@ export default function BulkActionToolbar({
         )}
 
         {/* Bulk Reject - Only for Kasi/KaCDK */}
-        {(canApprove || isAdmin) && (
+        {(canApprove || isAdmin) && !isTrashed && (
           <button
             onClick={() => handleBulkAction('reject')}
             className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm shadow-amber-200 whitespace-nowrap flex-shrink-0"
@@ -73,7 +87,7 @@ export default function BulkActionToolbar({
         )}
 
         {/* Bulk Delete - Only for Creator/Admin */}
-        {(canDelete || isAdmin) && (
+        {(canDelete || isAdmin) && !isTrashed && (
           <button
             onClick={() => handleBulkAction('delete')}
             className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm shadow-red-200 whitespace-nowrap flex-shrink-0"

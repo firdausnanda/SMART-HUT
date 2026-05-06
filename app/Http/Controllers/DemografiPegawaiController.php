@@ -37,6 +37,10 @@ class DemografiPegawaiController extends Controller
         // ===== BAGIAN LAMA: Tabel Daftar Pegawai =====
         $query = Pegawai::with('bezetting', 'creator');
 
+        if ($request->has('is_trashed') && $request->is_trashed === 'true') {
+            $query->onlyTrashed();
+        }
+
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -173,6 +177,7 @@ class DemografiPegawaiController extends Controller
                 'sort' => $sort,
                 'dir' => $dir,
                 'per_page' => $perPage,
+                'is_trashed' => $request->is_trashed === 'true',
                 'timeline_year' => $timelineYear ? (int) $timelineYear : null,
             ],
             // NEW — dashboard props
@@ -317,6 +322,29 @@ class DemografiPegawaiController extends Controller
         Pegawai::whereIn('id', $request->ids)->delete();
 
         return redirect()->back()->with('success', count($request->ids) . ' data berhasil dihapus.');
+    }
+
+    public function restore($id)
+    {
+        $this->authorize('kepegawaian.delete');
+        $pegawai = Pegawai::withTrashed()->findOrFail($id);
+        $pegawai->restore();
+
+        return redirect()->back()->with('success', 'Data Pegawai berhasil dipulihkan.');
+    }
+
+    public function bulkRestore(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:pegawais,id',
+        ]);
+
+        $this->authorize('kepegawaian.delete');
+        
+        Pegawai::withTrashed()->whereIn('id', $request->ids)->restore();
+
+        return redirect()->back()->with('success', count($request->ids) . ' data berhasil dipulihkan.');
     }
 
     public function export()
