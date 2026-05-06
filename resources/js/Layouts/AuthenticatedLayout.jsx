@@ -424,7 +424,7 @@ export default function Authenticated({ user, header, children }) {
                                 <button
                                     onClick={() => toggleMenu('kepegawaian')}
                                     className={`w-full group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${isSidebarCollapsed ? 'justify-center px-0' : 'px-4'
-                                        } ${openMenus['kepegawaian'] || route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*')
+                                        } ${openMenus['kepegawaian'] || route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*') || route().current('rekap-bulanan.*')
                                             ? 'bg-white/10 border-white/20 text-white shadow-sm'
                                             : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white'
                                         }`}
@@ -448,6 +448,7 @@ export default function Authenticated({ user, header, children }) {
                                             { name: 'Demografi Pegawai', route: route('demografi-pegawai.index'), pattern: 'demografi-pegawai.*' },
                                             { name: 'Bezetting Jabatan', route: route('bezetting-jabatan.index'), pattern: 'bezetting-jabatan.*' },
                                             { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*' },
+                                            { name: 'Rekap Bulanan', route: route('rekap-bulanan.index'), pattern: 'rekap-bulanan.*' },
                                         ].map((item) => (
                                             <Link
                                                 key={item.name}
@@ -733,8 +734,8 @@ export default function Authenticated({ user, header, children }) {
                                 {openMenus['perlindungan_mobile'] && (
                                     <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                         {[
-                                            { name: 'Pengunjung Objek Wisata', route: route('pengunjung-wisata.index'), pattern: 'pengunjung-wisata.*' },
-                                            { name: 'Kebakaran Hutan', route: route('kebakaran-hutan.index'), pattern: 'kebakaran-hutan.*' }
+                                            { name: 'Kebakaran Hutan', route: route('kebakaran-hutan.index'), pattern: 'kebakaran-hutan.*' },
+                                            { name: 'Pengunjung Objek Wisata', route: route('pengunjung-wisata.index'), pattern: 'pengunjung-wisata.*' }
                                         ].map((item) => (
                                             <Link
                                                 key={item.name}
@@ -868,7 +869,7 @@ export default function Authenticated({ user, header, children }) {
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                     </svg>
-                                    <span className="flex-1 text-left">Pemberdayaan</span>
+                                    <span className="flex-1 text-left">Pemberdayaan Masyarakat</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${openMenus['pemberdayaan_mobile'] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
@@ -947,43 +948,47 @@ export default function Authenticated({ user, header, children }) {
                         )}
 
                         {/* Kepegawaian Mobile */}
-                        <div className="space-y-1">
-                            <button
-                                className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${openMenus['kepegawaian_mobile'] || route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*')
-                                    ? 'bg-white/10 border-white/20 text-white'
-                                    : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
-                                    }`}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                                <span className="flex-1 text-left">Kepegawaian</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${openMenus['kepegawaian_mobile'] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            {openMenus['kepegawaian_mobile'] && (
-                                <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
-                                    {[
-                                        { name: 'Demografi Pegawai', route: route('demografi-pegawai.index'), pattern: 'demografi-pegawai.*' },
-                                        { name: 'Bezetting Jabatan', route: route('bezetting-jabatan.index'), pattern: 'bezetting-jabatan.*' },
-                                        { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*' },
-                                    ].map((item) => (
-                                        <Link
-                                            key={item.name}
-                                            href={item.route}
-                                            onClick={() => setShowingNavigationDropdown(false)}
-                                            className={`block py-2 text-[13px] font-medium transition-colors ${route().current(item.pattern)
-                                                ? 'text-white font-bold'
-                                                : 'text-primary-300 hover:text-white'
-                                                }`}
-                                        >
-                                            {item.name}
-                                        </Link>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        {hasPermission('kepegawaian.view') && (
+                            <div className="space-y-1">
+                                <button
+                                    onClick={() => toggleMenu('kepegawaian_mobile')}
+                                    className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${openMenus['kepegawaian_mobile'] || route().current('demografi-pegawai.*') || route().current('bezetting-jabatan.*') || route().current('proyeksi-gaji.*') || route().current('rekap-bulanan.*')
+                                        ? 'bg-white/10 border-white/20 text-white'
+                                        : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
+                                        }`}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <span className="flex-1 text-left">Kepegawaian</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${openMenus['kepegawaian_mobile'] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                {openMenus['kepegawaian_mobile'] && (
+                                    <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
+                                        {[
+                                            { name: 'Demografi Pegawai', route: route('demografi-pegawai.index'), pattern: 'demografi-pegawai.*' },
+                                            { name: 'Bezetting Jabatan', route: route('bezetting-jabatan.index'), pattern: 'bezetting-jabatan.*' },
+                                            { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*' },
+                                            { name: 'Rekap Bulanan', route: route('rekap-bulanan.index'), pattern: 'rekap-bulanan.*' },
+                                        ].map((item) => (
+                                            <Link
+                                                key={item.name}
+                                                href={item.route}
+                                                onClick={() => setShowingNavigationDropdown(false)}
+                                                className={`block py-2 text-[13px] font-medium transition-colors ${route().current(item.pattern)
+                                                    ? 'text-white font-bold'
+                                                    : 'text-primary-300 hover:text-white'
+                                                    }`}
+                                            >
+                                                {item.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Data Master Mobile */}
                         {user.roles.includes('admin') && (
@@ -1072,6 +1077,18 @@ export default function Authenticated({ user, header, children }) {
                                             </svg>
                                             Log Aktivitas
                                         </Link>
+
+                                        <a
+                                            href="/log-viewer"
+                                            target="_blank"
+                                            className="flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10"
+                                            onClick={() => setShowingNavigationDropdown(false)}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            System Logs
+                                        </a>
 
                                         <Link
                                             href={route('backups.index')}
