@@ -12,7 +12,7 @@ import {
     Users, AlertTriangle, Bell, FileText,
     ArrowRight, Calendar, Activity,
     Clock, ChevronRight, ChevronDown, ChevronUp, Plus, Download, Upload,
-    BarChart2, RefreshCcw, Send, ExternalLink, Eye
+    BarChart2, RefreshCcw, Send, ExternalLink, Eye, UserX
 } from 'lucide-react';
 import Select from 'react-select';
 
@@ -153,7 +153,20 @@ export default function DemografiIndex({
         const newTrashed = e.target.checked;
         setIsTrashed(newTrashed);
         setSelectedIds([]);
-        performQuery(searchQuery, sortField, sortDir, perPage, newTrashed);
+        setLoadingText(newTrashed ? 'Memuat Data Tidak Aktif...' : 'Memuat Data Aktif...');
+        setIsLoading(true);
+        router.get(route('demografi-pegawai.index'), {
+            search: searchQuery,
+            sort: sortField,
+            dir: sortDir,
+            per_page: perPage,
+            is_trashed: newTrashed
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+            onFinish: () => setIsLoading(false)
+        });
     };
 
     const SortIcon = ({ field }) => {
@@ -168,7 +181,7 @@ export default function DemografiIndex({
 
     const handleBulkAction = (action) => {
         if (selectedIds.length === 0) return;
-        
+
         if (action === 'restore') {
             MySwal.fire({
                 title: 'Pulihkan Data Terpilih?', text: `${selectedIds.length} data terpilih akan dipulihkan.`,
@@ -183,11 +196,11 @@ export default function DemografiIndex({
         }
 
         MySwal.fire({
-            title: 'Hapus Data Terpilih?', text: `${selectedIds.length} data terpilih akan dihapus.`,
-            icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal', borderRadius: '1.25rem',
+            title: 'Nonaktifkan Data Terpilih?', text: `${selectedIds.length} data terpilih akan dinonaktifkan.`,
+            icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Nonaktifkan!', cancelButtonText: 'Batal', borderRadius: '1.25rem',
         }).then((result) => {
             if (result.isConfirmed) {
-                setLoadingText('Menghapus Data Terpilih...'); setIsLoading(true);
+                setLoadingText('Menonaktifkan Data Terpilih...'); setIsLoading(true);
                 router.post(route('demografi-pegawai.bulk-delete'), { ids: selectedIds }, { preserveScroll: true, onSuccess: () => setSelectedIds([]), onFinish: () => setIsLoading(false) });
             }
         });
@@ -209,12 +222,12 @@ export default function DemografiIndex({
         }
 
         MySwal.fire({
-            title: 'Hapus Data?', text: 'Data yang dihapus tidak bisa dikembalikan!', icon: 'warning',
-            showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, hapus!', cancelButtonText: 'Batal', borderRadius: '1.25rem',
+            title: 'Nonaktifkan Data?', text: 'Data pegawai akan dinonaktifkan.', icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, nonaktifkan!', cancelButtonText: 'Batal', borderRadius: '1.25rem',
             customClass: { title: 'font-bold text-gray-900', popup: 'rounded-3xl shadow-2xl border-none', confirmButton: 'rounded-xl font-bold px-6 py-2.5', cancelButton: 'rounded-xl font-bold px-6 py-2.5' }
         }).then((result) => {
             if (result.isConfirmed) {
-                setLoadingText('Menghapus Data...'); setIsLoading(true);
+                setLoadingText('Menonaktifkan Data...'); setIsLoading(true);
                 router.delete(route('demografi-pegawai.destroy', id), { preserveScroll: true, onFinish: () => setIsLoading(false) });
             }
         });
@@ -365,19 +378,19 @@ export default function DemografiIndex({
                                         {showAllPending ? (
                                             <><ChevronUp className="h-3 w-3" /> Sembunyikan</>
                                         ) : (
-                                            <><ChevronDown className="h-3 w-3" /> Lihat Semua ({rekap_total.length})</>
+                                            <><ChevronDown className="h-3 w-3" /> Lihat Semua ({Math.min(rekap_total.length, 5)})</>
                                         )}
                                     </button>
                                 )}
                             >
                                 <div className="divide-y divide-gray-50 max-h-[400px] overflow-y-auto custom-scrollbar">
-                                    {(showAllPending ? rekap_total : rekap_pending).map((r) => (
+                                    {(showAllPending ? rekap_total.slice(0, 5) : rekap_pending).map((r) => (
                                         <div key={r.id} className="px-5 py-3 hover:bg-indigo-50/30 transition-colors">
                                             <div className="flex items-center justify-between">
                                                 <p className="text-sm font-bold text-gray-800">{MONTHS[r.periode_bulan - 1]} {r.periode_tahun}</p>
                                                 <StatusChip status={r.status} size="xs" />
                                             </div>
-                                            {r.rejection_note && (
+                                            {r.status === 'rejected' && r.rejection_note && (
                                                 <p className="text-[10px] text-rose-500 italic mt-1 truncate">"{r.rejection_note}"</p>
                                             )}
                                             <Link
@@ -538,7 +551,7 @@ export default function DemografiIndex({
                                     <div className={`block w-10 h-6 rounded-full transition-colors ${isTrashed ? 'bg-primary-500' : 'bg-gray-200 group-hover:bg-gray-300'}`}></div>
                                     <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${isTrashed ? 'transform translate-x-4' : ''}`}></div>
                                 </div>
-                                <span className={`text-xs font-bold uppercase transition-colors ${isTrashed ? 'text-primary-600' : 'text-gray-500'}`}>Data Terhapus</span>
+                                <span className={`text-xs font-bold uppercase transition-colors ${isTrashed ? 'text-primary-600' : 'text-gray-500'}`}>Data Tidak Aktif</span>
                             </label>
                         </div>
                         <div className="flex items-center gap-3">
@@ -639,8 +652,8 @@ export default function DemografiIndex({
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                                         </Link>
                                                         {(canDelete || isAdmin) && (
-                                                            <button onClick={() => handleSingleAction(pegawai.id, 'delete')} className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-red-50" title="Hapus Pegawai">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                            <button onClick={() => handleSingleAction(pegawai.id, 'delete')} className="p-2 text-rose-600 hover:bg-rose-100 rounded-lg transition-colors shadow-sm bg-rose-50" title="Nonaktifkan Pegawai">
+                                                                <UserX className="h-4 w-4" />
                                                             </button>
                                                         )}
                                                     </>
