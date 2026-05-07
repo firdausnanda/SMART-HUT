@@ -13,7 +13,7 @@ use Spatie\Activitylog\LogOptions;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+
     use HasFactory, Notifiable, HasRoles, Impersonate, LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
