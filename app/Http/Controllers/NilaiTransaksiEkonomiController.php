@@ -226,17 +226,17 @@ class NilaiTransaksiEkonomiController extends Controller
     return redirect()->route('nilai-transaksi-ekonomi.index')->with('success', 'Data transaksi berhasil ditambahkan.');
   }
 
-  public function show(NilaiTransaksiEkonomi $nilaiTransaksiEkonomi)
+  public function show(NilaiTransaksiEkonomi $nilai_transaksi_ekonomi)
   {
     //
   }
 
-  public function edit(NilaiTransaksiEkonomi $nilaiTransaksiEkonomi)
+  public function edit(NilaiTransaksiEkonomi $nilai_transaksi_ekonomi)
   {
-    $nilaiTransaksiEkonomi->load(['regency_rel', 'district_rel', 'village_rel', 'details.commodity']);
+    $nilai_transaksi_ekonomi->load(['regency_rel', 'district_rel', 'village_rel', 'details.commodity']);
 
     return Inertia::render('NilaiTransaksiEkonomi/Edit', [
-      'data' => $nilaiTransaksiEkonomi,
+      'data' => $nilai_transaksi_ekonomi,
       'commodities' => Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
         ->where('is_nilai_transaksi_ekonomi', true)
         ->get(),
@@ -244,9 +244,9 @@ class NilaiTransaksiEkonomiController extends Controller
     ]);
   }
 
-  public function update(Request $request, NilaiTransaksiEkonomi $nilaiTransaksiEkonomi)
+  public function update(Request $request, NilaiTransaksiEkonomi $nilai_transaksi_ekonomi)
   {
-    if (!in_array($nilaiTransaksiEkonomi->status, ['draft', 'rejected'])) {
+    if (!in_array($nilai_transaksi_ekonomi->status, ['draft', 'rejected'])) {
       return redirect()->back()->with('error', 'Data tidak dapat diedit karena sedang dalam proses verifikasi atau sudah final.');
     }
 
@@ -269,11 +269,11 @@ class NilaiTransaksiEkonomiController extends Controller
     $totalValue = collect($request->details)->sum('nilai_transaksi');
     $validated['total_nilai_transaksi'] = $totalValue;
 
-    $nilaiTransaksiEkonomi->update($validated);
-    $nilaiTransaksiEkonomi->details()->delete();
+    $nilai_transaksi_ekonomi->update($validated);
+    $nilai_transaksi_ekonomi->details()->delete();
 
     foreach ($request->details as $detail) {
-      $nilaiTransaksiEkonomi->details()->create([
+      $nilai_transaksi_ekonomi->details()->create([
         'commodity_id' => $detail['commodity_id'],
         'volume_produksi' => $detail['volume_produksi'],
         'satuan' => $detail['satuan'],
@@ -284,16 +284,16 @@ class NilaiTransaksiEkonomiController extends Controller
     return redirect()->route('nilai-transaksi-ekonomi.index')->with('success', 'Data transaksi berhasil diperbarui.');
   }
 
-  public function destroy(NilaiTransaksiEkonomi $nilaiTransaksiEkonomi)
+  public function destroy(NilaiTransaksiEkonomi $nilai_transaksi_ekonomi)
   {
-    $nilaiTransaksiEkonomi->delete();
+    $nilai_transaksi_ekonomi->delete();
     return redirect()->route('nilai-transaksi-ekonomi.index')->with('success', 'Data transaksi berhasil dihapus.');
   }
 
   /**
    * Handle single workflow action.
    */
-  public function singleWorkflowAction(Request $request, NilaiTransaksiEkonomi $nilaiTransaksiEkonomi, SingleWorkflowAction $action)
+  public function singleWorkflowAction(Request $request, NilaiTransaksiEkonomi $nilai_transaksi_ekonomi, SingleWorkflowAction $action)
   {
     $request->validate([
       'action' => ['required', Rule::enum(WorkflowAction::class)],
@@ -317,15 +317,19 @@ class NilaiTransaksiEkonomiController extends Controller
       $extraData['rejection_note'] = $request->rejection_note;
     }
 
+    if (!$nilai_transaksi_ekonomi->exists) {
+        $nilai_transaksi_ekonomi = NilaiTransaksiEkonomi::findOrFail($request->route('nilai_transaksi_ekonomi'));
+    }
+
     $success = $action->execute(
-      model: $nilaiTransaksiEkonomi,
+      model: $nilai_transaksi_ekonomi,
       action: $workflowAction,
       user: auth()->user(),
       extraData: $extraData
     );
 
     if ($success) {
-      cache()->forget("nilai-transaksi-stats-{$nilaiTransaksiEkonomi->year}");
+      cache()->forget("nilai-transaksi-stats-{$nilai_transaksi_ekonomi->year}");
 
       $message = match ($workflowAction) {
         WorkflowAction::DELETE => 'dihapus',
