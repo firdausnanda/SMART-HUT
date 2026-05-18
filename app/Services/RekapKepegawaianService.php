@@ -20,6 +20,14 @@ class RekapKepegawaianService
                 ->where('status_kedudukan', 'Aktif')
                 ->get();
 
+            $activePegawaiIds = $pegawais->pluck('id')->toArray();
+
+            // Hapus snapshot bulanan untuk pegawai yang sudah tidak aktif atau sudah dihapus di master data
+            RekapBulananPegawai::where('periode_tahun', $year)
+                ->where('periode_bulan', $month)
+                ->whereNotIn('pegawai_id', $activePegawaiIds)
+                ->delete();
+
             // 2. Simpan snapshot per pegawai
             foreach ($pegawais as $pegawai) {
                 $latestKgb = $pegawai->latestKgb;
