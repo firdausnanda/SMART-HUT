@@ -12,11 +12,14 @@ use Spatie\Activitylog\LogOptions;
 use App\Contracts\Workflowable;
 use Illuminate\Database\Eloquent\Builder;
 
+use App\Traits\BelongsToCdk;
+
 class Bezetting extends Model implements Workflowable
 {
-    use HasFactory, SoftDeletes, Userstamps, LogsActivity;
+    use HasFactory, SoftDeletes, Userstamps, LogsActivity, BelongsToCdk;
 
     protected $fillable = [
+        'cdk_id',
         'nama_jabatan',
         'kebutuhan',
         'status',

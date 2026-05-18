@@ -12,11 +12,14 @@ use Wildside\Userstamps\Userstamps;
 use App\Contracts\Workflowable;
 use Illuminate\Database\Eloquent\Builder;
 
+use App\Traits\BelongsToCdk;
+
 class HasilHutanKayu extends Model implements Workflowable
 {
-    use HasFactory, SoftDeletes, Userstamps, LogsActivity;
+    use HasFactory, SoftDeletes, Userstamps, LogsActivity, BelongsToCdk;
 
     protected $fillable = [
+        "cdk_id",
         "year",
         'year',
         'month',

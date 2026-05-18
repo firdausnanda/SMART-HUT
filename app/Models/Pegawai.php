@@ -9,12 +9,14 @@ use Wildside\Userstamps\Userstamps;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Carbon\Carbon;
+use App\Traits\BelongsToCdk;
 
 class Pegawai extends Model
 {
-    use HasFactory, Userstamps, LogsActivity, SoftDeletes;
+    use HasFactory, Userstamps, LogsActivity, SoftDeletes, BelongsToCdk;
 
     protected $fillable = [
+        'cdk_id',
         'nip',
         'nama_lengkap',
         'tempat_lahir',

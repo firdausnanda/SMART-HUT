@@ -38,6 +38,14 @@ class RoleSeeder extends Seeder
                 'name' => 'kacdk',
                 'description' => 'Kepala CDK',
             ],
+            [
+                'name' => 'admin_cdk',
+                'description' => 'Admin CDK',
+            ],
+            [
+                'name' => 'admin_provinsi',
+                'description' => 'Admin Provinsi',
+            ],
         ];
 
         $allPermissions = \Spatie\Permission\Models\Permission::all();
@@ -50,8 +58,8 @@ class RoleSeeder extends Seeder
                 'description' => $role['description'],
             ]);
 
-            if ($createdRole->name === 'admin') {
-                $createdRole->syncPermissions(\Spatie\Permission\Models\Permission::all());
+            if (in_array($createdRole->name, ['admin', 'admin_provinsi', 'admin_cdk'])) {
+                $createdRole->syncPermissions($allPermissions);
             }
         }
     }

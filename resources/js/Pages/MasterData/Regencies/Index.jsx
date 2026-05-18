@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import Modal from '@/Components/Modal';
+import Select from 'react-select';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
@@ -252,19 +253,27 @@ export default function RegenciesIndex({ auth, regencies, provinces, filters }) 
 
             <div>
               <InputLabel htmlFor="province_id" value="Provinsi" />
-              <select
-                id="province_id"
-                className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm"
-                value={data.province_id}
-                onChange={(e) => setData('province_id', e.target.value)}
-              >
-                <option value="">Pilih Provinsi</option>
-                {provinces.map((province) => (
-                  <option key={province.id} value={province.id}>
-                    {province.name}
-                  </option>
-                ))}
-              </select>
+              <div className="mt-1">
+                <Select
+                  id="province_id"
+                  options={provinces.map(p => ({ value: p.id, label: p.name }))}
+                  value={provinces.map(p => ({ value: p.id, label: p.name })).find(opt => opt.value === data.province_id) || null}
+                  onChange={(option) => setData('province_id', option ? option.value : '')}
+                  placeholder="Pilih Provinsi"
+                  classNamePrefix="react-select"
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: '0.5rem',
+                      borderColor: state.isFocused ? '#6366f1' : '#d1d5db',
+                      boxShadow: state.isFocused ? '0 0 0 1px #6366f1' : 'none',
+                      '&:hover': {
+                        borderColor: '#9ca3af'
+                      }
+                    })
+                  }}
+                />
+              </div>
               <InputError message={errors.province_id} className="mt-2" />
             </div>
 

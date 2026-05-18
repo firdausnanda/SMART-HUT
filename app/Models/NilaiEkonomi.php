@@ -11,13 +11,16 @@ use Wildside\Userstamps\Userstamps;
 use App\Contracts\Workflowable;
 use Illuminate\Database\Eloquent\Builder;
 
+use App\Traits\BelongsToCdk;
+
 class NilaiEkonomi extends Model implements Workflowable
 {
-    use HasFactory, SoftDeletes, LogsActivity, Userstamps;
+    use HasFactory, SoftDeletes, LogsActivity, Userstamps, BelongsToCdk;
 
     protected $table = 'nilai_ekonomi';
 
     protected $fillable = [
+        'cdk_id',
         'nama_kelompok',
         'total_transaction_value',
         'year',

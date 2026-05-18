@@ -23,9 +23,8 @@ export default function Guest({ children }) {
                     {/* Logo Area */}
                     <div className="mb-10 flex justify-center">
                         <div className="relative group">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-yellow-400 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                            <div className="relative w-20 h-20 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 shadow-2xl">
-                                <img src="/img/logo.webp" alt="Logo" className="w-12 h-12 object-contain drop-shadow-lg" />
+                            <div className="relative w-20 h-20  rounded-2xl flex items-center justify-center ">
+                                <img src="/img/logo.webp" alt="Logo" className="w-20 h-20 object-contain drop-shadow-lg" />
                             </div>
                         </div>
                     </div>
@@ -43,7 +42,7 @@ export default function Guest({ children }) {
                     </div>
 
                     <div className="mt-16 text-xs text-primary-400/60 font-medium tracking-wider">
-                        &copy; {new Date().getFullYear()} CDK Wilayah Trenggalek
+                        &copy; {new Date().getFullYear()} Dinas Kehutanan Provinsi Jawa Timur
                     </div>
                 </div>
             </div>

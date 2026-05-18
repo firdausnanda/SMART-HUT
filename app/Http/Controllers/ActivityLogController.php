@@ -11,9 +11,15 @@ class ActivityLogController extends Controller
 {
   public function index(Request $request)
   {
-    abort_unless($request->user()->hasRole('admin'), 403);
+    abort_unless($request->user()->hasRole('admin') || $request->user()->hasRole('admin_provinsi') || $request->user()->hasRole('admin_cdk'), 403);
 
     $query = Activity::query()->with('causer');
+
+    if (!$request->user()->isAdminProvinsi()) {
+      $query->whereHas('causer', function ($q) use ($request) {
+        $q->where('cdk_id', $request->user()->cdk_id);
+      });
+    }
 
     if ($request->sort) {
       if ($request->sort === 'causer_id') {
@@ -64,7 +70,12 @@ class ActivityLogController extends Controller
     $activities = $query->paginate($perPage)->withQueryString();
 
     // Data for Advanced Search Options
-    $users = User::select('id', 'name')->orderBy('name')->get();
+    if (!$request->user()->isAdminProvinsi()) {
+      $users = User::where('cdk_id', $request->user()->cdk_id)->select('id', 'name')->orderBy('name')->get();
+    } else {
+      $users = User::select('id', 'name')->orderBy('name')->get();
+    }
+
     $subjectTypes = Activity::select('subject_type')->whereNotNull('subject_type')->distinct()->pluck('subject_type')->map(function ($type) {
       return [
         'label' => str_replace('App\\Models\\', '', $type),

@@ -11,13 +11,16 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use App\Contracts\Workflowable;
 
+use App\Traits\BelongsToCdk;
+
 class NilaiTransaksiEkonomi extends Model implements Workflowable
 {
-  use HasFactory, SoftDeletes, Userstamps, LogsActivity;
+  use HasFactory, SoftDeletes, Userstamps, LogsActivity, BelongsToCdk;
 
   protected $table = 'nilai_transaksi_ekonomi';
 
   protected $fillable = [
+    'cdk_id',
     'year',
     'month',
     'province_id',

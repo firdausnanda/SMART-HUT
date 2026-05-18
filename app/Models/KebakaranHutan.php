@@ -8,14 +8,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Wildside\Userstamps\Userstamps;
+use App\Traits\BelongsToCdk;
 use App\Contracts\Workflowable;
 use Illuminate\Database\Eloquent\Builder;
 
 class KebakaranHutan extends Model implements Workflowable
 {
-    use HasFactory, SoftDeletes, Userstamps, LogsActivity;
+    use HasFactory, SoftDeletes, Userstamps, LogsActivity, BelongsToCdk;
 
     protected $fillable = [
+        'cdk_id',
         'year',
         'month',
         'province_id',

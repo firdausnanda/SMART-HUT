@@ -40,10 +40,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion, totalData = 
 
                                 <div className="hidden sm:flex flex-col">
                                     <span className="font-display font-bold text-lg text-gray-900 tracking-tight leading-tight">
-                                        Dinas Kehutanan Prov. Jatim
+                                        Dinas Kehutanan
                                     </span>
                                     <span className="text-[10px] uppercase tracking-wider text-primary-700/80 font-bold">
-                                        CDK Wilayah Trenggalek
+                                        Provinsi Jawa Timur
                                     </span>
                                 </div>
                             </div>
@@ -73,7 +73,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion, totalData = 
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                     </span>
-                                    Official Platform CDK Wilayah Trenggalek
+                                    Official Platform Dinas Kehutanan Jawa Timur
                                 </div>
 
                                 <div className="mb-10 relative">
@@ -179,7 +179,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion, totalData = 
                                                 <span className="text-emerald-100 text-xs font-bold tracking-widest uppercase">Wilayah Kerja</span>
                                             </div>
                                             <h3 className="text-white font-display font-bold text-2xl leading-tight">
-                                                CDK Wilayah <br /> Trenggalek
+                                                Dinas Kehutanan <br /> Provinsi Jawa Timur
                                             </h3>
                                         </div>
                                     </div>

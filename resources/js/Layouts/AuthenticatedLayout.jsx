@@ -117,7 +117,7 @@ export default function Authenticated({ user, header, children }) {
                             {!isSidebarCollapsed ? 'Menu Utama' : '•••'}
                         </div>
 
-                        {/* Pembinaan Hutan dan Lahan (Dropdown) */}
+                        {/* Pembinaan Hutan (Dropdown) */}
                         {hasAnyPermission(['rehab.view', 'penghijauan.view']) && (
                             <div className="space-y-1">
                                 <button
@@ -168,7 +168,7 @@ export default function Authenticated({ user, header, children }) {
                             </div>
                         )}
 
-                        {/* Perlindungan dan Pelestarian Hutan */}
+                        {/* Perlindungan dan Jasa Lingkungan */}
                         {/* Perlindungan Hutan (Dropdown) */}
                         {hasPermission('perlindungan.view') && (
                             <div className="space-y-1">
@@ -466,7 +466,7 @@ export default function Authenticated({ user, header, children }) {
                         )}
 
                         {/* Data Master */}
-                        {user.roles.includes('admin') && (
+                        {(user.roles.includes('admin') || user.roles.includes('admin_cdk')) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('data_master')}
@@ -543,23 +543,25 @@ export default function Authenticated({ user, header, children }) {
                                     {!isSidebarCollapsed && <span className="text-sm font-semibold">Manajemen User</span>}
                                 </Link>
 
+                                {(user.roles.includes('admin') || user.roles.includes('admin_cdk')) && (
+                                    <Link
+                                        href={route('activity-log.index')}
+                                        className={`group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${isSidebarCollapsed ? 'justify-center px-0' : 'px-4'
+                                            } ${route().current('activity-log.*')
+                                                ? 'bg-white/10 border-white/20 text-white shadow-lg'
+                                                : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white'
+                                            }`}
+                                        title={isSidebarCollapsed ? 'Log Aktivitas' : ''}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className={`flex-shrink-0 h-5 w-5 transition-colors ${isSidebarCollapsed ? 'mx-auto' : 'mr-3'} ${route().current('activity-log.*') ? 'text-white' : 'text-primary-300 group-hover:text-white'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {!isSidebarCollapsed && <span className="text-sm font-semibold">Log Aktivitas</span>}
+                                    </Link>
+                                )}
+
                                 {user.roles.includes('admin') && (
                                     <>
-                                        <Link
-                                            href={route('activity-log.index')}
-                                            className={`group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${isSidebarCollapsed ? 'justify-center px-0' : 'px-4'
-                                                } ${route().current('activity-log.*')
-                                                    ? 'bg-white/10 border-white/20 text-white shadow-lg'
-                                                    : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white'
-                                                }`}
-                                            title={isSidebarCollapsed ? 'Log Aktivitas' : ''}
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className={`flex-shrink-0 h-5 w-5 transition-colors ${isSidebarCollapsed ? 'mx-auto' : 'mr-3'} ${route().current('activity-log.*') ? 'text-white' : 'text-primary-300 group-hover:text-white'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            {!isSidebarCollapsed && <span className="text-sm font-semibold">Log Aktivitas</span>}
-                                        </Link>
-
                                         <a
                                             href="/log-viewer"
                                             target="_blank"
@@ -640,7 +642,7 @@ export default function Authenticated({ user, header, children }) {
                 {/* Mobile Sidebar */}
                 <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-primary-900 shadow-xl lg:hidden transform transition-transform duration-300 ease-in-out ${showingNavigationDropdown ? 'translate-x-0' : '-translate-x-full'}`}>
                     <div className="flex items-center justify-between h-16 px-4 border-b border-primary-700">
-                        <span className="text-white font-bold text-lg">CDK Wilayah Trenggalek</span>
+                        <span className="text-white font-bold text-lg">{user?.cdk?.nama || 'Administrator'}</span>
                         <button onClick={() => setShowingNavigationDropdown(false)} className="text-primary-300 hover:text-white">
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -989,7 +991,7 @@ export default function Authenticated({ user, header, children }) {
                         )}
 
                         {/* Data Master Mobile */}
-                        {user.roles.includes('admin') && (
+                        {(user.roles.includes('admin') || user.roles.includes('admin_cdk')) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('data_master_mobile')}
@@ -1060,22 +1062,24 @@ export default function Authenticated({ user, header, children }) {
                                     Manajemen User
                                 </Link>
 
+                                {(user.roles.includes('admin') || user.roles.includes('admin_cdk')) && (
+                                    <Link
+                                        href={route('activity-log.index')}
+                                        onClick={() => setShowingNavigationDropdown(false)}
+                                        className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${route().current('activity-log.*')
+                                            ? 'bg-white/10 border-white/20 text-white'
+                                            : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
+                                            }`}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Log Aktivitas
+                                    </Link>
+                                )}
+
                                 {user.roles.includes('admin') && (
                                     <>
-                                        <Link
-                                            href={route('activity-log.index')}
-                                            onClick={() => setShowingNavigationDropdown(false)}
-                                            className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${route().current('activity-log.*')
-                                                ? 'bg-white/10 border-white/20 text-white'
-                                                : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
-                                                }`}
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            Log Aktivitas
-                                        </Link>
-
                                         <a
                                             href="/log-viewer"
                                             target="_blank"

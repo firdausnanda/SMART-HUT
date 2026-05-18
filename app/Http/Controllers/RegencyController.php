@@ -30,8 +30,8 @@ class RegencyController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'id' => 'required|numeric|unique:regencies,id',
-      'province_id' => 'required|exists:provinces,id',
+      'id' => 'required|numeric|unique:m_regencies,id|max:9999',
+      'province_id' => 'required|exists:m_provinces,id|max:99',
       'name' => 'required|string|max:255',
     ]);
 
@@ -43,7 +43,7 @@ class RegencyController extends Controller
   public function update(Request $request, Regencies $regency)
   {
     $request->validate([
-      'province_id' => 'required|exists:provinces,id',
+      'province_id' => 'required|exists:m_provinces,id|max:99',
       'name' => 'required|string|max:255',
     ]);
 
