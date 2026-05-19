@@ -25,10 +25,10 @@ class Kernel extends ConsoleKernel
         })->dailyAt('02:00');
 
         // Rekap Kepegawaian Bulanan setiap tanggal 1 jam 00:05
-        $schedule->command('rekap:kepegawaian')->monthlyOn(1, '00:05');
+        // $schedule->command('rekap:kepegawaian')->monthlyOn(1, '00:05');
 
         // Process automated KGB records daily at 00:01
-        $schedule->command('kgb:process-automated')->dailyAt('00:01');
+        // $schedule->command('kgb:process-automated')->dailyAt('00:01');
     }
 
     /**
