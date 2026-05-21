@@ -17,8 +17,8 @@ class CdkSeeder extends Seeder
             [
                 'kode' => 'CDK-TRG',
                 'nama' => 'CDK Wilayah Trenggalek',
-                'wilayah_kerja' => 'Trenggalek, Ponorogo',
-                'kepala_nama' => 'Drs. Firdaus Nanda, M.Si',
+                'wilayah_kerja' => 'Trenggalek, Tulungagung, Kediri',
+                'kepala_nama' => '-',
                 'alamat' => 'Jl. Raya Trenggalek-Ponorogo No. 12',
                 'is_active' => true,
             ],
@@ -96,14 +96,37 @@ class CdkSeeder extends Seeder
             ],
         ];
 
-        foreach ($cdks as $cdk) {
+        foreach ($cdks as $cdkData) {
+            $wilayahKerjas = explode(', ', $cdkData['wilayah_kerja']);
+            unset($cdkData['wilayah_kerja']);
+
             DB::table('cdks')->updateOrInsert(
-                ['kode' => $cdk['kode']],
-                array_merge($cdk, [
+                ['kode' => $cdkData['kode']],
+                array_merge($cdkData, [
                     'created_at' => now(),
                     'updated_at' => now(),
                 ])
             );
+
+            $cdk = DB::table('cdks')->where('kode', $cdkData['kode'])->first();
+
+            DB::table('cdk_regency')->where('cdk_id', $cdk->id)->delete();
+
+            foreach ($wilayahKerjas as $wilayah) {
+                $regencyName = trim($wilayah);
+
+                // Get matching regencies (e.g. both Kota and Kabupaten if applicable)
+                $regencies = DB::table('m_regencies')
+                    ->where('name', 'LIKE', '%' . strtoupper($regencyName) . '%')
+                    ->get();
+
+                foreach ($regencies as $regency) {
+                    DB::table('cdk_regency')->updateOrInsert([
+                        'cdk_id' => $cdk->id,
+                        'regency_id' => $regency->id,
+                    ]);
+                }
+            }
         }
     }
 }

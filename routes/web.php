@@ -39,6 +39,7 @@ use App\Http\Controllers\DemografiPegawaiController;
 use App\Http\Controllers\BezettingJabatanController;
 use App\Http\Controllers\ProyeksiGajiController;
 use App\Http\Controllers\RekapBulananController;
+use App\Http\Controllers\CdkController;
 use App\Http\Middleware\CheckDashboardAccess;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -197,6 +198,7 @@ Route::middleware('auth')->group(function () {
     // User Management
     // User Management
     Route::resource('users', UserController::class);
+    Route::resource('cdks', CdkController::class)->except(['create', 'edit', 'show']);
 
     // Impersonation Routes
     Route::impersonate();

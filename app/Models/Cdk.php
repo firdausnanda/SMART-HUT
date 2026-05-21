@@ -12,7 +12,6 @@ class Cdk extends Model
     protected $fillable = [
         'kode',
         'nama',
-        'wilayah_kerja',
         'kepala_nama',
         'alamat',
         'is_active',
@@ -25,6 +24,11 @@ class Cdk extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function regencies()
+    {
+        return $this->belongsToMany(Regencies::class, 'cdk_regency', 'cdk_id', 'regency_id');
     }
 
     public function pegawais()

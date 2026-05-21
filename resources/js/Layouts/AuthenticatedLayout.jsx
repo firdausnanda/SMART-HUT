@@ -543,6 +543,23 @@ export default function Authenticated({ user, header, children }) {
                                     {!isSidebarCollapsed && <span className="text-sm font-semibold">Manajemen User</span>}
                                 </Link>
 
+                                {!user.cdk_id && (user.roles.includes('admin') || user.roles.includes('admin_provinsi')) && (
+                                    <Link
+                                        href={route('cdks.index')}
+                                        className={`group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${isSidebarCollapsed ? 'justify-center px-0' : 'px-4'
+                                            } ${route().current('cdks.*')
+                                                ? 'bg-white/10 border-white/20 text-white shadow-lg'
+                                                : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white'
+                                            }`}
+                                        title={isSidebarCollapsed ? 'Data CDK' : ''}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className={`flex-shrink-0 h-5 w-5 transition-colors ${isSidebarCollapsed ? 'mx-auto' : 'mr-3'} ${route().current('cdks.*') ? 'text-white' : 'text-primary-300 group-hover:text-white'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        {!isSidebarCollapsed && <span className="text-sm font-semibold">Data CDK</span>}
+                                    </Link>
+                                )}
+
                                 {(user.roles.includes('admin') || user.roles.includes('admin_cdk')) && (
                                     <Link
                                         href={route('activity-log.index')}
@@ -1061,6 +1078,22 @@ export default function Authenticated({ user, header, children }) {
                                     </svg>
                                     Manajemen User
                                 </Link>
+
+                                {!user.cdk_id && (user.roles.includes('admin') || user.roles.includes('admin_provinsi')) && (
+                                    <Link
+                                        href={route('cdks.index')}
+                                        onClick={() => setShowingNavigationDropdown(false)}
+                                        className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold border transition-all ${route().current('cdks.*')
+                                            ? 'bg-white/10 border-white/20 text-white'
+                                            : 'border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10'
+                                            }`}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        Data CDK
+                                    </Link>
+                                )}
 
                                 {(user.roles.includes('admin') || user.roles.includes('admin_cdk')) && (
                                     <Link

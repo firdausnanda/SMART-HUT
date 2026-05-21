@@ -28,6 +28,11 @@ class Regencies extends Model
         return $this->belongsTo(Provinces::class, "province_id");
     }
 
+    public function cdks()
+    {
+        return $this->belongsToMany(Cdk::class, 'cdk_regency', 'regency_id', 'cdk_id');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
