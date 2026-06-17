@@ -27,14 +27,14 @@ class MultiCdkTestUserSeeder extends Seeder
         $provinsiUser->assignRole('admin_provinsi');
         $provinsiUser->syncPermissions($permissions);
 
-        $cdkUser = User::updateOrCreate([
-            'email' => 'admin.cdk.trg@smarthut.id',
-        ], [
-            'name' => 'Admin CDK Trenggalek',
-            'username' => 'admin.cdk.trg',
-            'password' => bcrypt('password123'),
-        ]);
-        $cdkUser->assignRole('admin_cdk');
-        $cdkUser->syncPermissions($permissions);
+        // $cdkUser = User::updateOrCreate([
+        //     'email' => 'admin.cdk.trg@smarthut.id',
+        // ], [
+        //     'name' => 'Admin CDK Trenggalek',
+        //     'username' => 'admin.cdk.trg',
+        //     'password' => bcrypt('password123'),
+        // ]);
+        // $cdkUser->assignRole('admin_cdk');
+        // $cdkUser->syncPermissions($permissions);
     }
 }

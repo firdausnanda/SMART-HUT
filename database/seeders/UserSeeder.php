@@ -66,25 +66,26 @@ class UserSeeder extends Seeder
         $permission_kasi = $permission->whereIn('name', $kasiCdk);
         $permission_cdk = $permission->whereIn('name', $kasiCdk);
 
-        while (($row = fgetcsv($file)) !== false) {
+        // while (($row = fgetcsv($file)) !== false) {
 
-            $user = User::create([
-                'name' => $row[0],
-                'username' => $row[1],
-                'email' => $row[1],
-                'password' => bcrypt($row[1]),
-            ]);
+        //     $user = User::create([
+        //         'name' => $row[0],
+        //         'username' => $row[1],
+        //         'email' => $row[1],
+        //         'password' => bcrypt($row[1]),
+        //     ]);
 
-            $user->assignRole($row[2]);
+        //     $user->assignRole($row[2]);
 
-            if ($row[2] == 'admin') {
-                $user->syncPermissions($permission);
-            } else if (in_array($row[2], ['pk', 'peh', 'pelaksana'])) {
-                $user->syncPermissions($permission_pk);
-            } else if (in_array($row[2], ['kasi', 'kacdk'])) {
-                $user->syncPermissions($permission_kasi);
-            }
-        }
+        //     if ($row[2] == 'admin') {
+        //         $user->syncPermissions($permission);
+        //     } 
+        //     else if (in_array($row[2], ['pk', 'peh', 'pelaksana'])) {
+        //         $user->syncPermissions($permission_pk);
+        //     } else if (in_array($row[2], ['kasi', 'kacdk'])) {
+        //         $user->syncPermissions($permission_kasi);
+        //     }
+        // }
 
         fclose($file);
     }
