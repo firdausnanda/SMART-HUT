@@ -25,8 +25,8 @@ WORKDIR /app
 # Copy composer files
 COPY composer.json composer.lock ./
 
-# Install composer dependencies without scripts/autoloader (caching layer)
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+# Install composer dependencies ignoring local platform requirements (since extensions are installed in the final stage)
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --ignore-platform-reqs
 
 # Copy the rest of the application
 COPY . .
