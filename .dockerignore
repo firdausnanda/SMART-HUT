@@ -18,3 +18,4 @@ docker-compose*.yml
 Dockerfile
 README.md
 tests
+bootstrap/cache/*.php
