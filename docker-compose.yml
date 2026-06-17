@@ -49,4 +49,4 @@ volumes:
 networks:
   laradock_net:
     external: true
-    name: laradock_cdk_trenggalek_default
+    name: laradock_cdk_trenggalek_backend
