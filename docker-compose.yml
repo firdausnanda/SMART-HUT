@@ -19,9 +19,8 @@ services:
     # Resolves host.docker.internal to host's gateway on Windows/Mac/Linux
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # Uncomment if you want to join the existing Laradock network directly
-    # networks:
-    #   - laradock_net
+    networks:
+      - laradock_net
 
   # Queue Worker
   worker:
@@ -41,15 +40,13 @@ services:
     # Resolves host.docker.internal to host's gateway on Windows/Mac/Linux
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # Uncomment if you want to join the existing Laradock network directly
-    # networks:
-    #   - laradock_net
+    networks:
+      - laradock_net
 
 volumes:
   kda-storage:
 
-# Uncomment to define the external network of Laradock so the app can communicate directly
-# networks:
-#   laradock_net:
-#     external: true
-#     name: laradock_default # Replace with the actual Laradock network name if different
+networks:
+  laradock_net:
+    external: true
+    name: laradock_cdk_trenggalek_default
