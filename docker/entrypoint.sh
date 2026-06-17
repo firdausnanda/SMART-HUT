@@ -25,6 +25,11 @@ if [ "$RUN_MIGRATIONS" = "true" ]; then
     php artisan migrate --force
 fi
 
-# Start Supervisor (which runs Nginx and PHP-FPM)
-echo "Starting Supervisor..."
-exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
+# Start the command passed as arguments, or fallback to Supervisor
+if [ $# -gt 0 ]; then
+    echo "Running custom command: $@"
+    exec "$@"
+else
+    echo "Starting Supervisor..."
+    exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
+fi
