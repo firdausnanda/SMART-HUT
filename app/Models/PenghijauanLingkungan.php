@@ -10,14 +10,16 @@ use Illuminate\Database\Eloquent\Builder;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Wildside\Userstamps\Userstamps;
+use App\Traits\BelongsToCdk;
 
 class PenghijauanLingkungan extends Model implements Workflowable
 {
-    use HasFactory, SoftDeletes, Userstamps, LogsActivity;
+    use HasFactory, SoftDeletes, Userstamps, LogsActivity, BelongsToCdk;
 
     protected $table = 'penghijauan_lingkungan';
 
     protected $fillable = [
+        'cdk_id',
         'year',
         'month',
         'province_id',

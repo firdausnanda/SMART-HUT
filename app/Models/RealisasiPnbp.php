@@ -12,11 +12,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Contracts\Workflowable;
 use Illuminate\Database\Eloquent\Builder;
 
+use App\Traits\BelongsToCdk;
+
 class RealisasiPnbp extends Model implements Workflowable
 {
-    use HasFactory, Userstamps, SoftDeletes, LogsActivity;
+    use HasFactory, Userstamps, SoftDeletes, LogsActivity, BelongsToCdk;
 
     protected $fillable = [
+        "cdk_id",
         "year",
         "month",
         "province_id",

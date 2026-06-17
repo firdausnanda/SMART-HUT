@@ -10,13 +10,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Wildside\Userstamps\Userstamps;
+use App\Traits\BelongsToCdk;
 
 class ReboisasiPS extends Model implements Workflowable
 {
-    use HasFactory, SoftDeletes, Userstamps, LogsActivity;
+    use HasFactory, SoftDeletes, Userstamps, LogsActivity, BelongsToCdk;
 
     protected $table = 'reboisasi_ps';
     protected $fillable = [
+        'cdk_id',
         'year',
         'month',
         'target_annual',

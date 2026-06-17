@@ -1,28 +1,19 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import Modal from '@/Components/Modal';
-import Select from 'react-select';
-import InputLabel from '@/Components/InputLabel';
-import TextInput from '@/Components/TextInput';
-import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 import Pagination from '@/Components/Pagination';
+import FormModal from './FormModal';
 
-export default function DistrictsIndex({ auth, districts, regencies, filters }) {
+export default function Index({ auth, cdks, regencies, filters }) {
   const [search, setSearch] = useState(filters.search || '');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('create');
-  const [currentDistrict, setCurrentDistrict] = useState(null);
-
-  const { data, setData, post, put, delete: destroy, processing, errors, reset, clearErrors } = useForm({
-    id: '',
-    regency_id: '',
-    name: '',
-  });
+  const [currentCdk, setCurrentCdk] = useState(null);
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -31,7 +22,7 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
   useEffect(() => {
     const timer = setTimeout(() => {
       router.get(
-        route('districts.index'),
+        route('cdks.index'),
         { search },
         { preserveState: true, preserveScroll: true, replace: true }
       );
@@ -42,54 +33,33 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
 
   const openCreateModal = () => {
     setModalMode('create');
-    reset();
-    clearErrors();
+    setCurrentCdk(null);
     setIsModalOpen(true);
   };
 
-  const openEditModal = (district) => {
+  const openEditModal = (cdk) => {
     setModalMode('edit');
-    setCurrentDistrict(district);
-    setData({
-      id: district.id,
-      regency_id: district.regency_id,
-      name: district.name,
-    });
-    clearErrors();
+    setCurrentCdk(cdk);
     setIsModalOpen(true);
   };
 
-  const openDeleteModal = (district) => {
-    setCurrentDistrict(district);
+  const openDeleteModal = (cdk) => {
+    setCurrentCdk(cdk);
     setIsDeleteModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    reset();
-    setCurrentDistrict(null);
+    setCurrentCdk(null);
   };
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
-    setCurrentDistrict(null);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (modalMode === 'create') {
-      post(route('districts.store'), {
-        onSuccess: () => closeModal(),
-      });
-    } else {
-      put(route('districts.update', currentDistrict.id), {
-        onSuccess: () => closeModal(),
-      });
-    }
+    setCurrentCdk(null);
   };
 
   const handleDelete = () => {
-    destroy(route('districts.destroy', currentDistrict.id), {
+    router.delete(route('cdks.destroy', currentCdk.id), {
       onSuccess: () => closeDeleteModal(),
     });
   };
@@ -97,9 +67,9 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
   return (
     <AuthenticatedLayout
       user={auth.user}
-      header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Master Data Kecamatan</h2>}
+      header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Pengaturan Cabang Dinas Kehutanan (CDK)</h2>}
     >
-      <Head title="Master Data Kecamatan" />
+      <Head title="Pengaturan CDK" />
 
       <div className="py-12">
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -107,8 +77,8 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
             {/* Header */}
             <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center bg-gray-50/50">
               <h3 className="text-lg font-bold text-gray-900 mb-4 sm:mb-0">
-                Daftar Kecamatan
-                <p className="text-sm font-normal text-gray-500 mt-1">Kelola data kecamatan dalam sistem.</p>
+                Daftar Cabang Dinas Kehutanan (CDK)
+                <p className="text-sm font-normal text-gray-500 mt-1">Kelola data CDK dan wilayah kerja kabupaten/kota terkait.</p>
               </h3>
               <div className="flex w-full sm:w-auto gap-3">
                 <div className="relative w-full sm:w-64">
@@ -120,7 +90,7 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
                   <input
                     type="text"
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
-                    placeholder="Cari Kecamatan..."
+                    placeholder="Cari CDK..."
                     value={search}
                     onChange={handleSearch}
                   />
@@ -132,7 +102,7 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
                   <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  Tambah
+                  Tambah CDK
                 </PrimaryButton>
               </div>
             </div>
@@ -143,13 +113,19 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
                 <thead className="bg-gray-50">
                   <tr>
                     <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      ID
+                      Kode
                     </th>
                     <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      Kabupaten/Kota
+                      Nama CDK
                     </th>
                     <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      Nama Kecamatan
+                      Kepala CDK
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      Wilayah Kerja
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      Status
                     </th>
                     <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
                       Aksi
@@ -157,24 +133,42 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {districts.data.length > 0 ? (
-                    districts.data.map((district) => (
-                      <tr key={district.id} className="hover:bg-gray-50 transition-colors duration-150">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {district.id}
+                  {cdks.data.length > 0 ? (
+                    cdks.data.map((cdk) => (
+                      <tr key={cdk.id} className="hover:bg-gray-50 transition-colors duration-150">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                          {cdk.kode}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {district.regency?.name || '-'}
+                          {cdk.nama}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {cdk.kepala_nama || '-'}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          <div className="flex flex-wrap gap-1 max-w-xs">
+                            {cdk.regencies && cdk.regencies.length > 0 ? (
+                              cdk.regencies.map((reg) => (
+                                <span key={reg.id} className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                  {reg.name}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-gray-400 italic">-</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            cdk.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {cdk.is_active ? 'Aktif' : 'Non-aktif'}
                           </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                          {district.name}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end gap-2">
                             <button
-                              onClick={() => openEditModal(district)}
+                              onClick={() => openEditModal(cdk)}
                               className="p-2 text-primary-600 hover:bg-primary-100 rounded-lg transition-colors shadow-sm bg-primary-50"
                               title="Edit"
                             >
@@ -183,7 +177,7 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
                               </svg>
                             </button>
                             <button
-                              onClick={() => openDeleteModal(district)}
+                              onClick={() => openDeleteModal(cdk)}
                               className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors shadow-sm bg-red-50"
                               title="Hapus"
                             >
@@ -197,12 +191,12 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4" className="px-6 py-12 text-center text-sm text-gray-500">
+                      <td colSpan="6" className="px-6 py-12 text-center text-sm text-gray-500">
                         <div className="flex flex-col items-center justify-center">
                           <svg className="w-12 h-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
-                          <p className="text-gray-500 text-lg font-medium">Tidak ada data kecamatan</p>
+                          <p className="text-gray-500 text-lg font-medium">Tidak ada data CDK</p>
                           <p className="text-gray-400">Silakan tambahkan data baru.</p>
                         </div>
                       </td>
@@ -214,94 +208,22 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
 
             {/* Pagination */}
             <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-2xl">
-              <Pagination links={districts.links} />
+              <Pagination links={cdks.links} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Modal */}
-      <Modal show={isModalOpen} onClose={closeModal}>
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">
-              {modalMode === 'create' ? 'Tambah Kecamatan' : 'Edit Kecamatan'}
-            </h2>
-            <button onClick={closeModal} className="text-gray-400 hover:text-gray-500 transition-colors">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+      {/* Form Modal */}
+      <FormModal
+        show={isModalOpen}
+        onClose={closeModal}
+        mode={modalMode}
+        cdk={currentCdk}
+        regencies={regencies}
+      />
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <InputLabel htmlFor="id" value="ID Kecamatan" />
-              <TextInput
-                id="id"
-                type="text"
-                className={`mt-1 block w-full ${modalMode === 'edit' ? 'bg-gray-100' : ''}`}
-                value={data.id}
-                onChange={(e) => setData('id', e.target.value)}
-                disabled={modalMode === 'edit'}
-                isFocused={modalMode === 'create'}
-                placeholder="Contoh: 3501010"
-              />
-              <p className="mt-1 text-xs text-gray-500">Kode wilayah unik sesuai Kemendagri.</p>
-              <InputError message={errors.id} className="mt-2" />
-            </div>
-
-            <div>
-              <InputLabel htmlFor="regency_id" value="Kabupaten/Kota" />
-              <div className="mt-1">
-                <Select
-                  id="regency_id"
-                  options={regencies.map(r => ({ value: r.id, label: r.name }))}
-                  value={regencies.map(r => ({ value: r.id, label: r.name })).find(opt => opt.value === data.regency_id) || null}
-                  onChange={(option) => setData('regency_id', option ? option.value : '')}
-                  placeholder="Pilih Kabupaten/Kota"
-                  classNamePrefix="react-select"
-                  styles={{
-                    control: (base, state) => ({
-                      ...base,
-                      borderRadius: '0.5rem',
-                      borderColor: state.isFocused ? '#6366f1' : '#d1d5db',
-                      boxShadow: state.isFocused ? '0 0 0 1px #6366f1' : 'none',
-                      '&:hover': {
-                        borderColor: '#9ca3af'
-                      }
-                    })
-                  }}
-                />
-              </div>
-              <InputError message={errors.regency_id} className="mt-2" />
-            </div>
-
-            <div>
-              <InputLabel htmlFor="name" value="Nama Kecamatan" />
-              <TextInput
-                id="name"
-                type="text"
-                className="mt-1 block w-full"
-                value={data.name}
-                onChange={(e) => setData('name', e.target.value)}
-                placeholder="Contoh: KEJAYAN"
-              />
-              <InputError message={errors.name} className="mt-2" />
-            </div>
-
-            <div className="flex justify-end gap-3 mt-8">
-              <SecondaryButton onClick={closeModal} className="rounded-xl px-6 py-3 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 h-[48px] transition-all duration-200 shadow-sm font-medium">
-                Batal
-              </SecondaryButton>
-              <PrimaryButton disabled={processing} className="bg-primary-600 hover:bg-primary-700 text-white shadow-primary-200 h-[48px]">
-                {modalMode === 'create' ? 'Simpan Data' : 'Perbarui Data'}
-              </PrimaryButton>
-            </div>
-          </form>
-        </div>
-      </Modal>
-
+      {/* Delete Confirmation Modal */}
       <Modal show={isDeleteModalOpen} onClose={closeDeleteModal}>
         <div className="p-6 text-center">
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
@@ -310,16 +232,16 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
             </svg>
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">
-            Hapus Data Kecamatan?
+            Hapus Data CDK?
           </h2>
           <p className="text-gray-500 mb-6">
-            Apakah Anda yakin ingin menghapus data <span className="font-semibold text-gray-800">"{currentDistrict?.name}"</span>?
+            Apakah Anda yakin ingin menghapus data CDK <span className="font-semibold text-gray-800">"{currentCdk?.nama}"</span>?
           </p>
           <div className="flex justify-center gap-3">
-            <SecondaryButton onClick={closeDeleteModal} className="rounded-xl px-6 py-3 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 h-[48px] transition-all duration-200 shadow-sm font-medium">
+            <SecondaryButton type="button" onClick={closeDeleteModal} className="rounded-xl px-6 py-3 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 h-[48px] transition-all duration-200 shadow-sm font-medium">
               Batal
             </SecondaryButton>
-            <DangerButton onClick={handleDelete} disabled={processing}>
+            <DangerButton onClick={handleDelete}>
               Ya, Hapus
             </DangerButton>
           </div>

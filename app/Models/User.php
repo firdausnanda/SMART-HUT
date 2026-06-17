@@ -35,6 +35,7 @@ class User extends Authenticatable
         'password',
         'google_id',
         'avatar',
+        'cdk_id',
     ];
 
     /**
@@ -63,5 +64,15 @@ class User extends Authenticatable
     public function getRoleDescriptionAttribute()
     {
         return $this->roles->pluck('description')->first();
+    }
+
+    public function cdk()
+    {
+        return $this->belongsTo(Cdk::class);
+    }
+
+    public function isAdminProvinsi(): bool
+    {
+        return is_null($this->cdk_id) && $this->hasRole(['admin', 'admin_provinsi']);
     }
 }

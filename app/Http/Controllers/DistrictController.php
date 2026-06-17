@@ -18,9 +18,6 @@ class DistrictController extends Controller
     }
 
     $districts = $query->paginate(10)->withQueryString();
-    // Optimizing loading for dropdowns might be needed for large datasets, 
-    // but for now passing all regencies might be too heavy. 
-    // Ideally we filter regencies based on selected province, but for simple CRUD:
     $regencies = Regencies::all();
 
     return Inertia::render('MasterData/Districts/Index', [
@@ -33,8 +30,8 @@ class DistrictController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'id' => 'required|numeric|unique:districts,id',
-      'regency_id' => 'required|exists:regencies,id',
+      'id' => 'required|numeric|unique:m_districts,id|max:9999999',
+      'regency_id' => 'required|exists:m_regencies,id|max:9999',
       'name' => 'required|string|max:255',
     ]);
 
@@ -46,7 +43,7 @@ class DistrictController extends Controller
   public function update(Request $request, Districts $district)
   {
     $request->validate([
-      'regency_id' => 'required|exists:regencies,id',
+      'regency_id' => 'required|exists:m_regencies,id|max:9999',
       'name' => 'required|string|max:255',
     ]);
 

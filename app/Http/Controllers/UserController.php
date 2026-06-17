@@ -24,7 +24,11 @@ class UserController extends Controller
   public function index(Request $request)
   {
     $roleFilter = $request->input('role_filter', 'with_role');
-    $query = User::with('roles');
+    $query = User::with(['roles', 'cdk']);
+
+    if (!auth()->user()->isAdminProvinsi()) {
+      $query->where('cdk_id', auth()->user()->cdk_id);
+    }
 
     if ($roleFilter === 'with_role') {
       $query->has('roles');
@@ -55,8 +59,10 @@ class UserController extends Controller
   public function create()
   {
     $roles = Role::all();
+    $cdks = auth()->user()->isAdminProvinsi() ? \App\Models\Cdk::where('is_active', true)->get(['id', 'nama']) : [];
     return Inertia::render('User/Create', [
-      'roles' => $roles
+      'roles' => $roles,
+      'cdks' => $cdks
     ]);
   }
 
@@ -65,19 +71,28 @@ class UserController extends Controller
    */
   public function store(Request $request)
   {
-    $request->validate([
+    $rules = [
       'name' => 'required|string|max:255',
       'username' => 'required|string|max:255|unique:users',
       'email' => 'required|string|lowercase|email|max:255|unique:users',
       'password' => ['required', 'confirmed', Rules\Password::defaults()],
       'role' => 'required|exists:roles,name',
-    ]);
+    ];
+
+    if (auth()->user()->isAdminProvinsi()) {
+      $rules['cdk_id'] = 'nullable|exists:cdks,id';
+    }
+
+    $request->validate($rules);
+
+    $cdkId = auth()->user()->isAdminProvinsi() ? $request->cdk_id : auth()->user()->cdk_id;
 
     $user = User::create([
       'name' => $request->name,
       'username' => $request->username,
       'email' => $request->email,
       'password' => Hash::make($request->password),
+      'cdk_id' => $cdkId,
     ]);
 
     $user->assignRole($request->role);
@@ -98,10 +113,16 @@ class UserController extends Controller
    */
   public function edit(User $user)
   {
+    if (!auth()->user()->isAdminProvinsi() && $user->cdk_id !== auth()->user()->cdk_id) {
+      abort(403, 'Unauthorized action.');
+    }
+
     $roles = Role::all();
     $permissions = \Spatie\Permission\Models\Permission::all()->groupBy(function ($data) {
       return explode('.', $data->name)[0];
     });
+
+    $cdks = auth()->user()->isAdminProvinsi() ? \App\Models\Cdk::where('is_active', true)->get(['id', 'nama']) : [];
 
     $user->load(['roles', 'permissions']);
 
@@ -110,7 +131,8 @@ class UserController extends Controller
       'roles' => $roles,
       'permissions' => $permissions,
       'userPermissions' => $user->permissions->pluck('name'),
-      'currentRole' => $user->roles->first()?->name
+      'currentRole' => $user->roles->first()?->name,
+      'cdks' => $cdks,
     ]);
   }
 
@@ -119,6 +141,9 @@ class UserController extends Controller
    */
   public function update(Request $request, User $user)
   {
+    if (!auth()->user()->isAdminProvinsi() && $user->cdk_id !== auth()->user()->cdk_id) {
+      abort(403, 'Unauthorized action.');
+    }
 
     $rules = [
       'name' => 'required|string|max:255',
@@ -129,16 +154,24 @@ class UserController extends Controller
       'permissions.*' => 'exists:permissions,name',
     ];
 
+    if (auth()->user()->isAdminProvinsi()) {
+      $rules['cdk_id'] = 'nullable|exists:cdks,id';
+    }
+
     if ($request->filled('password')) {
       $rules['password'] = ['confirmed', Rules\Password::defaults()];
     }
 
     $validated = $request->validate($rules);
 
-    $userData = \Illuminate\Support\Arr::except($validated, ['role', 'permissions', 'password']);
+    $userData = \Illuminate\Support\Arr::except($validated, ['role', 'permissions', 'password', 'cdk_id']);
 
     if ($request->filled('password')) {
       $userData['password'] = Hash::make($request->password);
+    }
+
+    if (auth()->user()->isAdminProvinsi()) {
+      $userData['cdk_id'] = $request->cdk_id;
     }
 
     $user->update($userData);
@@ -158,6 +191,10 @@ class UserController extends Controller
    */
   public function destroy(User $user)
   {
+    if (!auth()->user()->isAdminProvinsi() && $user->cdk_id !== auth()->user()->cdk_id) {
+      abort(403, 'Unauthorized action.');
+    }
+
     if ($user->id === auth()->id()) {
       return back()->with('error', 'You cannot delete your own account.');
     }

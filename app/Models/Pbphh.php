@@ -12,11 +12,14 @@ use Wildside\Userstamps\Userstamps;
 use App\Contracts\Workflowable;
 use Illuminate\Database\Eloquent\Builder;
 
+use App\Traits\BelongsToCdk;
+
 class Pbphh extends Model implements Workflowable
 {
-    use HasFactory, Userstamps, SoftDeletes, LogsActivity;
+    use HasFactory, Userstamps, SoftDeletes, LogsActivity, BelongsToCdk;
 
     protected $fillable = [
+        'cdk_id',
         'name',
         'number',
         'province_id',

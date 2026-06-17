@@ -11,13 +11,16 @@ use Spatie\Activitylog\LogOptions;
 use App\Contracts\Workflowable;
 use Illuminate\Database\Eloquent\Builder;
 
+use App\Traits\BelongsToCdk;
+
 class RekapStatistikBulanan extends Model implements Workflowable
 {
-    use HasFactory, SoftDeletes, Userstamps, LogsActivity;
+    use HasFactory, SoftDeletes, Userstamps, LogsActivity, BelongsToCdk;
 
     protected $table = 'rekap_statistik_bulanan';
 
     protected $fillable = [
+        'cdk_id',
         'periode_tahun',
         'periode_bulan',
         'total_pegawai_aktif',

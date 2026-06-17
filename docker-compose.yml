@@ -1,0 +1,55 @@
+services:
+  # Laravel Application (Web & PHP-FPM)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kda-app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - RUN_MIGRATIONS=true # Set to true to run migrations on startup
+    env_file:
+      - .env
+    volumes:
+      - kda-storage:/var/www/html/storage/app
+    # Resolves host.docker.internal to host's gateway on Windows/Mac/Linux
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # Uncomment if you want to join the existing Laradock network directly
+    # networks:
+    #   - laradock_net
+
+  # Queue Worker
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kda-worker
+    restart: unless-stopped
+    entrypoint: ["php", "artisan", "queue:work", "--verbose", "--tries=3", "--timeout=90"]
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+    env_file:
+      - .env
+    volumes:
+      - kda-storage:/var/www/html/storage/app
+    # Resolves host.docker.internal to host's gateway on Windows/Mac/Linux
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # Uncomment if you want to join the existing Laradock network directly
+    # networks:
+    #   - laradock_net
+
+volumes:
+  kda-storage:
+
+# Uncomment to define the external network of Laradock so the app can communicate directly
+# networks:
+#   laradock_net:
+#     external: true
+#     name: laradock_default # Replace with the actual Laradock network name if different

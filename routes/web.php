@@ -39,6 +39,7 @@ use App\Http\Controllers\DemografiPegawaiController;
 use App\Http\Controllers\BezettingJabatanController;
 use App\Http\Controllers\ProyeksiGajiController;
 use App\Http\Controllers\RekapBulananController;
+use App\Http\Controllers\CdkController;
 use App\Http\Middleware\CheckDashboardAccess;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -197,6 +198,7 @@ Route::middleware('auth')->group(function () {
     // User Management
     // User Management
     Route::resource('users', UserController::class);
+    Route::resource('cdks', CdkController::class)->except(['create', 'edit', 'show']);
 
     // Impersonation Routes
     Route::impersonate();
@@ -257,18 +259,13 @@ Route::middleware('auth')->group(function () {
     Route::post('backups', [BackupController::class, 'create'])->name('backups.create');
     Route::get('backups/{filename}/download', [BackupController::class, 'download'])->name('backups.download')->where('filename', '.*');
     Route::delete('backups/{filename}', [BackupController::class, 'destroy'])->name('backups.destroy')->where('filename', '.*');
+
+    // Clear Cache
+    Route::get('/clear-cache', function () {
+        Artisan::call('optimize:clear');
+        return redirect()->back()->with('success', 'Cache cleared successfully!');
+    })->name('clear-cache');
 });
 
-// Route::get('/permission', function () {
-//     $roles = \Spatie\Permission\Models\Role::whereIn('name', ['pk', 'peh'])->get();
-//     $permissions = \Spatie\Permission\Models\Permission::where('name', 'like', '%export%')
-//         ->orWhere('name', 'like', '%import%')
-//         ->get();
-
-//     foreach ($roles as $role) {
-//         $role->syncPermissions($permissions);
-//     }
-//     return 'Sukses!';
-// });
 
 require __DIR__ . '/auth.php';

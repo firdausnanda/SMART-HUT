@@ -39,6 +39,11 @@ class HandleInertiaRequests extends Middleware
                     'roles' => $request->user()->getRoleNames(),
                     'roles_description' => $request->user()->getRoleDescriptionAttribute(),
                     'permissions' => $request->user()->getAllPermissions()->pluck('name'),
+                    'cdk_id' => $request->user()->cdk_id,
+                    'cdk' => $request->user()->cdk ? [
+                        'id' => $request->user()->cdk->id,
+                        'nama' => $request->user()->cdk->nama,
+                    ] : null,
                 ] : null,
                 'is_impersonating' => app('impersonate')->isImpersonating(),
             ],

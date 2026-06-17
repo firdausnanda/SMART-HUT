@@ -11,13 +11,16 @@ use Spatie\Activitylog\LogOptions;
 use App\Contracts\Workflowable;
 use Illuminate\Database\Eloquent\Builder;
 
+use App\Traits\BelongsToCdk;
+
 class PerkembanganKth extends Model implements Workflowable
 {
-  use HasFactory, SoftDeletes, Userstamps, LogsActivity;
+  use HasFactory, SoftDeletes, Userstamps, LogsActivity, BelongsToCdk;
 
   protected $table = 'perkembangan_kth';
 
   protected $fillable = [
+    'cdk_id',
     'year',
     'month',
     'province_id',
