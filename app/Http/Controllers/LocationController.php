@@ -11,10 +11,18 @@ class LocationController extends Controller
 {
   public function getRegencies($provinceId)
   {
-    $allowedIds = ['3503', '3504', '3506', '3571'];
-    $regencies = Regencies::where('province_id', $provinceId)
-      ->whereIn('id', $allowedIds)
-      ->orderBy('name', 'asc')
+    $query = Regencies::where('province_id', $provinceId);
+
+    if (auth()->check()) {
+      $user = auth()->user();
+      if ($user->cdk_id) {
+        $query->whereHas('cdks', function ($q) use ($user) {
+          $q->where('cdks.id', $user->cdk_id);
+        });
+      }
+    }
+
+    $regencies = $query->orderBy('name', 'asc')
       ->get(['id', 'name']);
 
     return response()->json($regencies);
