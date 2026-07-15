@@ -55,16 +55,16 @@ export default function PublicYoYDashboard({ years, stats }) {
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % modules.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + modules.length) % modules.length);
 
-  // Auto-slide effect (disabled)
-  // useEffect(() => {
-  //   const slideInterval = setInterval(() => {
-  //     if (document.visibilityState === 'visible') {
-  //       nextSlide();
-  //     }
-  //   }, 25000);
-  // 
-  //   return () => clearInterval(slideInterval);
-  // }, [modules.length]);
+  // Auto-slide effect
+  useEffect(() => {
+    const slideInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        nextSlide();
+      }
+    }, 25000);
+
+    return () => clearInterval(slideInterval);
+  }, [modules.length]);
 
   // Data reload effect
   useEffect(() => {
