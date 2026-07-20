@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { debounce } from 'lodash';
 import Modal from '@/Components/Modal';
 import Select from 'react-select';
 import InputLabel from '@/Components/InputLabel';
@@ -11,34 +12,161 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 import Pagination from '@/Components/Pagination';
 
-export default function DistrictsIndex({ auth, districts, regencies, filters }) {
-  const [search, setSearch] = useState(filters.search || '');
+export default function DistrictsIndex({ auth, districts, provinces, regencies, filters }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [currentDistrict, setCurrentDistrict] = useState(null);
+
+  const [params, setParams] = useState({
+    search: filters.search || '',
+    id: filters.id || '',
+    name: filters.name || '',
+    regency_id: filters.regency_id || '',
+    province_id: filters.province_id || '',
+    per_page: filters.per_page || 10,
+    sort: filters.sort || '',
+    direction: filters.direction || 'asc',
+  });
+
+  const [searchQuery, setSearchQuery] = useState(filters.search || '');
+  const [showAdvanced, setShowAdvanced] = useState(
+    !!(filters.id || filters.name || filters.regency_id || filters.province_id)
+  );
+
+  const customSelectStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      borderRadius: '0.75rem',
+      borderColor: state.isFocused ? '#258a55' : '#e5e7eb',
+      boxShadow: state.isFocused ? '0 0 0 2px rgba(37, 138, 85, 0.2)' : 'none',
+      '&:hover': {
+        borderColor: state.isFocused ? '#258a55' : '#d1d5db',
+      },
+      minHeight: '38px',
+      fontSize: '0.875rem',
+      backgroundColor: 'white',
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected ? '#258a55' : state.isFocused ? '#e1f8e8' : 'white',
+      color: state.isSelected ? 'white' : '#374151',
+      fontSize: '0.875rem',
+      cursor: 'pointer',
+      '&:active': {
+        backgroundColor: '#258a55',
+      },
+    }),
+    placeholder: (provided) => ({ ...provided, color: '#9ca3af' }),
+    singleValue: (provided) => ({ ...provided, color: '#374151' }),
+  };
+
+  const applyFilters = (newParams) => {
+    router.get(
+      route('districts.index'),
+      newParams,
+      {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+      }
+    );
+  };
+
+  const handleSearch = useCallback(
+    debounce((query) => {
+      const newParams = { ...params, search: query };
+      setParams(newParams);
+      applyFilters(newParams);
+    }, 500),
+    [params]
+  );
+
+  const onSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    handleSearch(query);
+  };
+
+  const handleFilterChange = (key, value) => {
+    const newParams = { ...params, [key]: value };
+    if (key === 'province_id') {
+      newParams['regency_id'] = '';
+    }
+    setParams(newParams);
+    applyFilters(newParams);
+  };
+
+  const resetFilters = () => {
+    const defaultParams = {
+      search: '',
+      id: '',
+      name: '',
+      regency_id: '',
+      province_id: '',
+      per_page: 10,
+      sort: '',
+      direction: 'asc',
+    };
+    setParams(defaultParams);
+    setSearchQuery('');
+    applyFilters(defaultParams);
+  };
+
+  const handlePerPageChange = (perPage) => {
+    handleFilterChange('per_page', perPage);
+  };
+
+  const handleSort = (field) => {
+    let direction = 'asc';
+    if (params.sort === field && params.direction === 'asc') {
+      direction = 'desc';
+    }
+    const newParams = { ...params, sort: field, direction };
+    setParams(newParams);
+    applyFilters(newParams);
+  };
+
+  const SortIcon = ({ field }) => {
+    const isActive = params.sort === field;
+    const isAsc = params.direction === 'asc';
+
+    return (
+      <span className={`inline-flex items-center justify-center ml-2 p-1 rounded-lg transition-all duration-200 
+        ${isActive 
+          ? 'bg-primary-100 text-primary-700 border border-primary-300 shadow-sm scale-110' 
+          : 'text-gray-300 group-hover:text-gray-500 group-hover:bg-gray-100/80 border border-transparent'}`}
+      >
+        {isActive ? (
+          isAsc ? (
+            <svg className="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            </svg>
+          ) : (
+            <svg className="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          )
+        ) : (
+          <svg className="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+          </svg>
+        )}
+      </span>
+    );
+  };
+
+  const provinceOptions = provinces.map(p => ({ value: p.id, label: p.name }));
+  const filteredRegencies = params.province_id
+    ? regencies.filter(r => r.province_id === params.province_id)
+    : regencies;
+  const regencyOptions = filteredRegencies.map(r => ({ value: r.id, label: r.name }));
 
   const { data, setData, post, put, delete: destroy, processing, errors, reset, clearErrors } = useForm({
     id: '',
     regency_id: '',
     name: '',
   });
-
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.get(
-        route('districts.index'),
-        { search },
-        { preserveState: true, preserveScroll: true, replace: true }
-      );
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [search]);
 
   const openCreateModal = () => {
     setModalMode('create');
@@ -110,7 +238,7 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
                 Daftar Kecamatan
                 <p className="text-sm font-normal text-gray-500 mt-1">Kelola data kecamatan dalam sistem.</p>
               </h3>
-              <div className="flex w-full sm:w-auto gap-3">
+              <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
                 <div className="relative w-full sm:w-64">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
@@ -119,12 +247,38 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
                   </div>
                   <input
                     type="text"
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-all"
                     placeholder="Cari Kecamatan..."
-                    value={search}
-                    onChange={handleSearch}
+                    value={searchQuery}
+                    onChange={onSearchChange}
                   />
                 </div>
+
+                <button
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all border
+                    ${showAdvanced ? 'bg-primary-50 border-primary-100 text-primary-600' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                  Advanced Filter
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
+                  <select
+                    className="text-sm font-bold border-gray-200 rounded-lg focus:ring-primary-500 focus:border-primary-500 py-1 px-2 pr-8"
+                    value={params.per_page}
+                    onChange={(e) => handlePerPageChange(e.target.value)}
+                  >
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+
                 <PrimaryButton
                   onClick={openCreateModal}
                   className="justify-center whitespace-nowrap bg-primary-600 hover:bg-primary-700 text-white shadow-primary-200"
@@ -137,19 +291,104 @@ export default function DistrictsIndex({ auth, districts, regencies, filters }) 
               </div>
             </div>
 
+            {/* Advanced Filter Panel */}
+            {showAdvanced && (
+              <div className="px-6 py-6 bg-gray-50/50 border-b border-gray-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Provinsi</label>
+                    <Select
+                      options={provinceOptions}
+                      styles={customSelectStyles}
+                      value={provinceOptions.find(opt => opt.value === params.province_id) || null}
+                      onChange={(opt) => handleFilterChange('province_id', opt ? opt.value : '')}
+                      placeholder="Pilih Provinsi"
+                      isSearchable
+                      isClearable
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Kabupaten/Kota</label>
+                    <Select
+                      options={regencyOptions}
+                      styles={customSelectStyles}
+                      value={regencyOptions.find(opt => opt.value === params.regency_id) || null}
+                      onChange={(opt) => handleFilterChange('regency_id', opt ? opt.value : '')}
+                      placeholder={params.province_id ? "Pilih Kabupaten/Kota" : "Pilih Provinsi Dahulu"}
+                      isSearchable
+                      isClearable
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">ID Kecamatan</label>
+                    <input
+                      type="text"
+                      className="block w-full text-sm border-gray-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 bg-white px-3 py-[7px]"
+                      placeholder="Contoh: 3501010"
+                      value={params.id}
+                      onChange={(e) => handleFilterChange('id', e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Nama Kecamatan</label>
+                    <input
+                      type="text"
+                      className="block w-full text-sm border-gray-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 bg-white px-3 py-[7px]"
+                      placeholder="Contoh: KEJAYAN"
+                      value={params.name}
+                      onChange={(e) => handleFilterChange('name', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={resetFilters}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Reset Filter
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Table */}
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      ID
+                    <th
+                      scope="col"
+                      className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group"
+                      onClick={() => handleSort('id')}
+                    >
+                      <div className="flex items-center gap-1">
+                        ID <SortIcon field="id" />
+                      </div>
                     </th>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      Kabupaten/Kota
+                    <th
+                      scope="col"
+                      className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group"
+                      onClick={() => handleSort('regency')}
+                    >
+                      <div className="flex items-center gap-1">
+                        Kabupaten/Kota <SortIcon field="regency" />
+                      </div>
                     </th>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      Nama Kecamatan
+                    <th
+                      scope="col"
+                      className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group"
+                      onClick={() => handleSort('name')}
+                    >
+                      <div className="flex items-center gap-1">
+                        Nama Kecamatan <SortIcon field="name" />
+                      </div>
                     </th>
                     <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
                       Aksi
