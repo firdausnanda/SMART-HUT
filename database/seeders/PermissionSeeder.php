@@ -18,6 +18,7 @@ class PermissionSeeder extends Seeder
 
     $modules = [
       'users' => 'Manajemen User',
+      'master' => 'Data Master',
       'rehab' => 'Rehabilitasi Lahan',
       'perlindungan' => 'Perlindungan Hutan',
       'pemberdayaan' => 'Pemberdayaan Masyarakat',

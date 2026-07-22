@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -75,7 +76,16 @@ class UserController extends Controller
       'name' => 'required|string|max:255',
       'username' => 'required|string|max:255|unique:users',
       'email' => 'required|string|lowercase|email|max:255|unique:users',
-      'password' => ['required', 'confirmed', Rules\Password::defaults()],
+      'password' => [
+        'required',
+        'confirmed',
+        Password::min(8)          
+            ->letters()           
+            ->mixedCase()         
+            ->numbers()           
+            ->symbols()           
+            ->uncompromised(),
+      ],
       'role' => 'required|exists:roles,name',
     ];
 
@@ -159,7 +169,12 @@ class UserController extends Controller
     }
 
     if ($request->filled('password')) {
-      $rules['password'] = ['confirmed', Rules\Password::defaults()];
+      $rules['password'] = ['confirmed', Password::min(8)          
+            ->letters()           
+            ->mixedCase()         
+            ->numbers()           
+            ->symbols()           
+            ->uncompromised()];
     }
 
     $validated = $request->validate($rules);
@@ -197,6 +212,10 @@ class UserController extends Controller
 
     if ($user->id === auth()->id()) {
       return back()->with('error', 'You cannot delete your own account.');
+    }
+
+    if ($user->hasRole('admin') && !auth()->user()->hasRole('admin')) {
+      return back()->with('error', 'User dengan role admin tidak dapat dihapus oleh role lain.');
     }
 
     $user->delete();

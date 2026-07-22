@@ -11,6 +11,14 @@ use App\Models\Provinces;
 
 class DistrictController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:master.view')->only(['index', 'show', 'create', 'edit']);
+    $this->middleware('permission:master.create')->only(['store']);
+    $this->middleware('permission:master.edit')->only(['update']);
+    $this->middleware('permission:master.delete')->only(['destroy']);
+  }
+
   public function index(Request $request)
   {
     $query = Districts::with('regency.province');
