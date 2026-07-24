@@ -604,7 +604,19 @@ class DashboardController extends Controller
                 ->groupBy('forest_type')
                 ->pluck(DB::raw('sum(volume_target)'), 'forest_type');
 
-            $bukanKayuMonthlyByForestType = HasilHutanBukanKayu::forCdk($cdkId)->where('year', $currentYear)
+            // HHBK monthly realization (from details table)
+            $bukanKayuMonthlyByForestType = HasilHutanBukanKayuDetail::join('hasil_hutan_bukan_kayu', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id', '=', 'hasil_hutan_bukan_kayu.id')
+                ->where('hasil_hutan_bukan_kayu.year', $currentYear)
+                ->where('hasil_hutan_bukan_kayu.status', 'final')
+                ->whereNull('hasil_hutan_bukan_kayu.deleted_at')
+                ->when($cdkId, fn($q) => $q->where('hasil_hutan_bukan_kayu.cdk_id', $cdkId))
+                ->selectRaw('hasil_hutan_bukan_kayu.forest_type, hasil_hutan_bukan_kayu.month, sum(hasil_hutan_bukan_kayu_details.annual_volume_realization) as total')
+                ->groupBy('hasil_hutan_bukan_kayu.forest_type', 'hasil_hutan_bukan_kayu.month')
+                ->get()
+                ->groupBy('forest_type');
+
+            // HHBK monthly target (from parent table)
+            $bukanKayuTargetMonthlyByForestType = HasilHutanBukanKayu::forCdk($cdkId)->where('year', $currentYear)
                 ->where('status', 'final')
                 ->selectRaw('forest_type, month, sum(volume_target) as total')
                 ->groupBy('forest_type', 'month')
@@ -695,6 +707,12 @@ class DashboardController extends Controller
                 $binaUsahaData[$key]['bukan_kayu_monthly'] = $this->fillMonths(
                     isset($bukanKayuMonthlyByForestType[$type])
                     ? $bukanKayuMonthlyByForestType[$type]->pluck('total', 'month')
+                    : []
+                );
+
+                $binaUsahaData[$key]['bukan_kayu_target_monthly'] = $this->fillMonths(
+                    isset($bukanKayuTargetMonthlyByForestType[$type])
+                    ? $bukanKayuTargetMonthlyByForestType[$type]->pluck('total', 'month')
                     : []
                 );
 
