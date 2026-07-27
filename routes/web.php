@@ -197,7 +197,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/nilai-transaksi-ekonomi/{nilai_transaksi_ekonomi}/single-workflow-action', [NilaiTransaksiEkonomiController::class, 'singleWorkflowAction'])->name('nilai-transaksi-ekonomi.single-workflow-action');
 
     // User Management
-    // User Management
+    Route::get('users/export', [UserController::class, 'export'])->name('users.export');
+    Route::get('users/template', [UserController::class, 'exportTemplate'])->name('users.template');
+    Route::post('users/import', [UserController::class, 'import'])->name('users.import');
     Route::resource('users', UserController::class);
     Route::resource('cdks', CdkController::class)->except(['create', 'edit', 'show']);
 

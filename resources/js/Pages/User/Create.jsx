@@ -7,14 +7,15 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import { useState } from 'react';
 import Select from 'react-select';
 
-export default function Create({ auth, roles }) {
+export default function Create({ auth, roles, cdks = [] }) {
   const { data, setData, post, processing, errors } = useForm({
     name: '',
     username: '',
     email: '',
     password: '',
     password_confirmation: '',
-    role: ''
+    role: '',
+    cdk_id: ''
   });
 
   const submit = (e) => {
@@ -74,6 +75,11 @@ export default function Create({ auth, roles }) {
   const roleOptions = roles.map(role => ({
     value: role.name,
     label: role.description || role.name // Fallback to name if description is missing
+  }));
+
+  const cdkOptions = cdks.map(cdk => ({
+    value: cdk.id,
+    label: cdk.nama
   }));
 
   return (
@@ -158,6 +164,20 @@ export default function Create({ auth, roles }) {
                   />
                   <InputError message={errors.role} className="mt-2" />
                 </div>
+
+                {cdks.length > 0 && (
+                  <div>
+                    <InputLabel htmlFor="cdk_id" value="Penempatan CDK (Khusus Admin/Provinsi)" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={cdkOptions}
+                      onChange={(opt) => setData('cdk_id', opt?.value || '')}
+                      placeholder="Pilih CDK (Opsional)..."
+                      styles={selectStyles}
+                      isClearable
+                    />
+                    <InputError message={errors.cdk_id} className="mt-2" />
+                  </div>
+                )}
 
                 <div>
                   <InputLabel htmlFor="password" value="Password" className="text-gray-700 font-bold mb-2" />

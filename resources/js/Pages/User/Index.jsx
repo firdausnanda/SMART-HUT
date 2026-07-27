@@ -1,4 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, router } from '@inertiajs/react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -13,6 +15,8 @@ export default function Index({ auth, users, filters }) {
     const [loadingText, setLoadingText] = useState('Memproses...');
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [roleFilter, setRoleFilter] = useState(filters.role_filter || 'with_role');
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [importFile, setImportFile] = useState(null);
 
     const isAdmin = auth.user.roles.includes('admin');
     const userPermissions = auth.user.permissions || [];
@@ -117,6 +121,43 @@ export default function Index({ auth, users, filters }) {
         });
     };
 
+    const handleExport = () => {
+        window.location.href = route('users.export', { search: searchQuery, role_filter: roleFilter });
+    };
+
+    const handleDownloadTemplate = () => {
+        window.location.href = route('users.template');
+    };
+
+    const handleImport = (e) => {
+        e.preventDefault();
+        if (!importFile) {
+            MySwal.fire('Error', 'Silakan pilih file terlebih dahulu.', 'error');
+            return;
+        }
+
+        setLoadingText('Mengimport Data...');
+        setIsLoading(true);
+        setIsImportModalOpen(false);
+
+        router.post(route('users.import'), {
+            file: importFile,
+        }, {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                setIsLoading(false);
+                setImportFile(null);
+                MySwal.fire('Berhasil!', 'Data user berhasil diimport.', 'success');
+            },
+            onError: (errors) => {
+                setIsLoading(false);
+                MySwal.fire('Gagal!', 'Terjadi kesalahan saat import data.', 'error');
+            },
+            onFinish: () => setIsLoading(false)
+        });
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -138,14 +179,30 @@ export default function Index({ auth, users, filters }) {
                                 Kelola data pengguna aplikasi, termasuk peran dan hak akses.
                             </p>
                         </div>
-                        <Link href={route('users.create')} className="shrink-0">
-                            <button className="flex items-center gap-2 px-5 py-2.5 bg-white text-primary-700 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-50 transition-colors">
+                        <div className="flex gap-2 shrink-0">
+                            <button onClick={handleExport} className="flex items-center gap-2 px-4 py-3 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50" title="Export Data User">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
-                                Tambah User
+                                Export
                             </button>
-                        </Link>
+                            <button onClick={() => setIsImportModalOpen(true)} className="flex items-center gap-2 px-4 py-3 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50" title="Import Data User">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                Import
+                            </button>
+                            {canCreate && (
+                                <Link href={route('users.create')}>
+                                    <button className="flex items-center gap-2 px-5 py-3 bg-white text-primary-700 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-50 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Tambah Data
+                                    </button>
+                                </Link>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -167,24 +224,28 @@ export default function Index({ auth, users, filters }) {
                                 >
                                     Punya Role
                                 </button>
-                                <button
-                                    onClick={() => onRoleFilterChange('without_role')}
-                                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${roleFilter === 'without_role'
-                                        ? 'bg-white text-primary-700 shadow-sm border border-gray-100'
-                                        : 'text-gray-400 hover:text-gray-600'
-                                        }`}
-                                >
-                                    Tanpa Role
-                                </button>
-                                <button
-                                    onClick={() => onRoleFilterChange('all')}
-                                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${roleFilter === 'all'
-                                        ? 'bg-white text-primary-700 shadow-sm border border-gray-100'
-                                        : 'text-gray-400 hover:text-gray-600'
-                                        }`}
-                                >
-                                    Semua
-                                </button>
+                                {isAdmin && (
+                                    <>
+                                        <button
+                                            onClick={() => onRoleFilterChange('without_role')}
+                                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${roleFilter === 'without_role'
+                                                ? 'bg-white text-primary-700 shadow-sm border border-gray-100'
+                                                : 'text-gray-400 hover:text-gray-600'
+                                                }`}
+                                        >
+                                            Tanpa Role
+                                        </button>
+                                        <button
+                                            onClick={() => onRoleFilterChange('all')}
+                                            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${roleFilter === 'all'
+                                                ? 'bg-white text-primary-700 shadow-sm border border-gray-100'
+                                                : 'text-gray-400 hover:text-gray-600'
+                                                }`}
+                                        >
+                                            Semua
+                                        </button>
+                                    </>
+                                )}
                             </div>
 
                             <div className="text-sm text-gray-400 font-bold bg-white px-3 py-1 rounded-full border border-gray-100 shadow-sm">
@@ -216,6 +277,9 @@ export default function Index({ auth, users, filters }) {
                                     <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider">User Info</th>
                                     <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider">Username</th>
                                     <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider">Role & Hak Akses</th>
+                                    {isAdmin && (
+                                        <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider">CDK</th>
+                                    )}
                                     <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -263,6 +327,19 @@ export default function Index({ auth, users, filters }) {
                                                 </span>
                                             )}
                                         </td>
+                                        {isAdmin && (
+                                            <td className="px-6 py-5">
+                                                {user.cdk ? (
+                                                    <span className="inline-flex items-center px-3 py-1 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 font-bold text-xs tracking-wide">
+                                                        {user.cdk.nama}
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center px-3 py-1 rounded-lg bg-gray-50 border border-gray-100 text-gray-400 font-bold text-xs tracking-wide italic">
+                                                        Provinsi
+                                                    </span>
+                                                )}
+                                            </td>
+                                        )}
                                         <td className="px-6 py-5">
                                             <div className="flex items-center justify-center gap-2">
                                                 <Link
@@ -303,7 +380,7 @@ export default function Index({ auth, users, filters }) {
                                 ))}
                                 {users.data.length === 0 && (
                                     <tr>
-                                        <td colSpan="4" className="text-center py-20">
+                                        <td colSpan={isAdmin ? "5" : "4"} className="text-center py-20">
                                             <div className="flex flex-col items-center justify-center">
                                                 <div className="h-24 w-24 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -347,6 +424,59 @@ export default function Index({ auth, users, filters }) {
                     </div>
                 </div>
             </div>
+
+            <Modal show={isImportModalOpen} onClose={() => setIsImportModalOpen(false)}>
+                <form onSubmit={handleImport} className="p-0 overflow-hidden">
+                    <div className="p-6 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                        <h2 className="text-lg font-bold text-gray-900">Import Data</h2>
+                        <button type="button" onClick={() => setIsImportModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <div className="p-6 space-y-8">
+                        <div className="flex gap-4 items-start">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">1</div>
+                            <div className="flex-1">
+                                <h3 className="text-sm font-bold text-gray-900 mb-1">Unduh Template</h3>
+                                <p className="text-xs text-gray-500 mb-3 leading-relaxed">Gunakan template yang telah disediakan untuk memastikan format data sesuai.</p>
+                                <button type="button" onClick={handleDownloadTemplate} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                    Download Template Excel
+                                </button>
+                            </div>
+                        </div>
+                        <div className="border-t border-gray-100"></div>
+                        <div className="flex gap-4 items-start">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-sm">2</div>
+                            <div className="flex-1">
+                                <h3 className="text-sm font-bold text-gray-900 mb-1">Upload Data</h3>
+                                <p className="text-xs text-gray-500 mb-3 leading-relaxed">Pilih file yang telah diisi sesuai template (.xlsx, .xls, .csv).</p>
+                                <div className={`relative border-2 border-dashed rounded-xl p-6 transition-all duration-200 text-center cursor-pointer ${importFile ? 'border-primary-500 bg-primary-50/50' : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50'}`}>
+                                    <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setImportFile(e.target.files[0])} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                                    <div className="space-y-2 pointer-events-none">
+                                        <div className={`mx-auto h-12 w-12 rounded-full flex items-center justify-center transition-colors ${importFile ? 'bg-primary-100 text-primary-600' : 'bg-gray-100 text-gray-400'}`}>
+                                            {importFile ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                            )}
+                                        </div>
+                                        {importFile ? (
+                                            <div><p className="text-sm font-bold text-primary-800">{importFile.name}</p><p className="text-xs text-primary-600 mt-1">{(importFile.size / 1024).toFixed(1)} KB</p></div>
+                                        ) : (
+                                            <p className="text-sm font-medium text-gray-500">Klik untuk pilih file atau drag & drop</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="p-6 bg-gray-50 flex justify-end gap-3 border-t border-gray-100">
+                        <SecondaryButton onClick={() => setIsImportModalOpen(false)}>Batal</SecondaryButton>
+                        <button type="submit" className="px-6 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all shadow-md shadow-primary-200 disabled:opacity-50 disabled:shadow-none" disabled={!importFile}>Proses Import</button>
+                    </div>
+                </form>
+            </Modal>
         </AuthenticatedLayout>
     );
 }

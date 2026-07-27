@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\UserExport;
+use App\Exports\UserTemplateExport;
+use App\Imports\UserImport;
 
 class UserController extends Controller
 {
@@ -29,12 +33,13 @@ class UserController extends Controller
 
     if (!auth()->user()->isAdminProvinsi()) {
       $query->where('cdk_id', auth()->user()->cdk_id);
-    }
-
-    if ($roleFilter === 'with_role') {
       $query->has('roles');
-    } elseif ($roleFilter === 'without_role') {
-      $query->doesntHave('roles');
+    } else {
+      if ($roleFilter === 'with_role') {
+        $query->has('roles');
+      } elseif ($roleFilter === 'without_role') {
+        $query->doesntHave('roles');
+      }
     }
 
     if ($request->has('search')) {
@@ -221,5 +226,39 @@ class UserController extends Controller
     $user->delete();
 
     return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+  }
+
+  public function export(Request $request)
+  {
+    $this->authorize('users.view');
+    return Excel::download(new UserExport($request), 'data_users.xlsx');
+  }
+
+  public function exportTemplate()
+  {
+    $this->authorize('users.view');
+    return Excel::download(new UserTemplateExport(), 'template_import_users.xlsx');
+  }
+
+  public function import(Request $request)
+  {
+    $this->authorize('users.create');
+    $request->validate([
+      'file' => 'required|mimes:xlsx,xls,csv|max:10240', // Max 10MB
+    ]);
+
+    try {
+      Excel::import(new UserImport, $request->file('file'));
+      return redirect()->back()->with('success', 'Data User berhasil diimport.');
+    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      $failures = $e->failures();
+      $messages = [];
+      foreach ($failures as $failure) {
+        $messages[] = "Baris {$failure->row()}: " . implode(', ', $failure->errors());
+      }
+      return redirect()->back()->with('error', 'Gagal mengimport data: <br>' . implode('<br>', $messages));
+    } catch (\Exception $e) {
+      return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 }

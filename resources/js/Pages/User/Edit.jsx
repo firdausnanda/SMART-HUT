@@ -7,7 +7,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import { useState } from 'react';
 import Select from 'react-select';
 
-export default function Edit({ auth, user, roles, permissions, userPermissions, currentRole }) {
+export default function Edit({ auth, user, roles, permissions, userPermissions, currentRole, cdks = [] }) {
   const { data, setData, put, processing, errors } = useForm({
     name: user.name,
     username: user.username,
@@ -15,7 +15,8 @@ export default function Edit({ auth, user, roles, permissions, userPermissions, 
     password: '',
     password_confirmation: '',
     role: currentRole,
-    permissions: userPermissions || []
+    permissions: userPermissions || [],
+    cdk_id: user.cdk_id || ''
   });
 
   const submit = (e) => {
@@ -83,6 +84,11 @@ export default function Edit({ auth, user, roles, permissions, userPermissions, 
   const roleOptions = roles.map(role => ({
     value: role.name,
     label: role.description || role.name
+  }));
+
+  const cdkOptions = cdks.map(cdk => ({
+    value: cdk.id,
+    label: cdk.nama
   }));
 
   return (
@@ -168,6 +174,21 @@ export default function Edit({ auth, user, roles, permissions, userPermissions, 
                   />
                   <InputError message={errors.role} className="mt-2" />
                 </div>
+
+                {cdks.length > 0 && (
+                  <div>
+                    <InputLabel htmlFor="cdk_id" value="Penempatan CDK (Khusus Admin/Provinsi)" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={cdkOptions}
+                      value={cdkOptions.find(opt => opt.value === data.cdk_id)}
+                      onChange={(opt) => setData('cdk_id', opt?.value || '')}
+                      placeholder="Pilih CDK (Opsional)..."
+                      styles={selectStyles}
+                      isClearable
+                    />
+                    <InputError message={errors.cdk_id} className="mt-2" />
+                  </div>
+                )}
 
                 <div>
                   <InputLabel htmlFor="password" value="Password (Opsional)" className="text-gray-700 font-bold mb-2" />
