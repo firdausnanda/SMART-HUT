@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler } from 'chart.js';
+import Select from 'react-select';
+import LoadingOverlay from '@/Components/LoadingOverlay';
 
 // Imported YoY Slide Components
 import YoYPembinaanSlide from './Components/YoYPembinaanSlide';
@@ -16,10 +18,23 @@ import { truncateName } from './Components/utils';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler);
 
-export default function PublicYoYDashboard({ years, stats }) {
+export default function PublicYoYDashboard({ years, stats, selectedCdkId, cdks }) {
   const { auth } = usePage().props;
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('Memuat Data...');
+
+  const handleCdkChange = (selectedOption) => {
+    router.get(route('public.dashboard-yoy'), { cdk_id: selectedOption.value }, {
+      preserveScroll: true,
+      onStart: () => {
+        setLoadingText('Mengambil Data CDK...');
+        setIsLoading(true);
+      },
+      onFinish: () => setIsLoading(false),
+    });
+  };
 
   const modules = useMemo(() => [
     { id: 0, title: 'YoY: Rehabilitasi Lahan', color: 'bg-emerald-600', text: 'text-emerald-600' },
@@ -91,6 +106,9 @@ export default function PublicYoYDashboard({ years, stats }) {
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans flex flex-col relative">
       <Head title="Tren Infografis Multi-Year" />
 
+      {/* Custom Loading Overlay */}
+      <LoadingOverlay isLoading={isLoading} text={loadingText} />
+
       {/* Navbar */}
       <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -109,8 +127,42 @@ export default function PublicYoYDashboard({ years, stats }) {
               </Link>
             </div>
 
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="w-48 sm:w-64">
+                <Select
+                  value={
+                    selectedCdkId
+                      ? { value: selectedCdkId, label: cdks?.find(c => c.id === selectedCdkId)?.nama || 'Semua CDK' }
+                      : { value: '', label: 'Semua CDK' }
+                  }
+                  onChange={handleCdkChange}
+                  options={[
+                    { value: '', label: 'Semua CDK' },
+                    ...(cdks || []).map(cdk => ({ value: cdk.id, label: cdk.nama }))
+                  ]}
+                  className="text-sm font-bold text-gray-700"
+                  placeholder="Pilih CDK"
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: '0.75rem',
+                      padding: '0.125rem',
+                      borderColor: state.isFocused ? '#10b981' : '#e5e7eb',
+                      boxShadow: state.isFocused ? '0 0 0 2px rgba(16, 185, 129, 0.2)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                      '&:hover': { borderColor: '#d1d5db' }
+                    }),
+                    option: (base, state) => ({
+                      ...base,
+                      backgroundColor: state.isSelected ? '#10b981' : state.isFocused ? '#d1fae5' : null,
+                      color: state.isSelected ? 'white' : '#374151',
+                      cursor: 'pointer'
+                    }),
+                    singleValue: (base) => ({ ...base, color: '#374151' })
+                  }}
+                />
+              </div>
+
+              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100 hidden lg:flex">
                 <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Periode:</span>
                 <span className="text-xs font-bold text-emerald-700">{years[years.length - 1]} - {years[0]}</span>
               </div>

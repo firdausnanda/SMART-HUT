@@ -386,10 +386,14 @@ class DashboardController extends Controller
                             ->when($cdkId, fn($q) => $q->where("$tableName.cdk_id", '=', $cdkId));
                     })
                         ->selectRaw("m_sumber_dana.name as fund, count($tableName.id) as total")
-                        ->groupBy('m_sumber_dana.name')->pluck('total', 'fund'),
+                        ->groupBy('m_sumber_dana.name')
+                        ->orderByDesc('total')
+                        ->pluck('total', 'fund'),
                     'regency' => (clone $baseQuery)->join('m_regencies', "$tableName.regency_id", '=', 'm_regencies.id')
                         ->selectRaw('m_regencies.name as regency, count(*) as total')
-                        ->groupBy('m_regencies.name')->pluck('total', 'regency')
+                        ->groupBy('m_regencies.name')
+                        ->orderByDesc('total')
+                        ->pluck('total', 'regency')
                 ];
             };
 
@@ -411,6 +415,7 @@ class DashboardController extends Controller
                 ->where('reboisasi_ps.status', 'final')
                 ->selectRaw('m_pengelola_ps.name as pengelola, count(reboisasi_ps.id) as total')
                 ->groupBy('m_pengelola_ps.name')
+                ->orderByDesc('total')
                 ->pluck('total', 'pengelola');
 
             // 1.4 RHL Teknis (Optimized with SQL joins)
@@ -446,6 +451,7 @@ class DashboardController extends Controller
             })
                 ->selectRaw('m_sumber_dana.name as fund, count(rhl_teknis.id) as total')
                 ->groupBy('m_sumber_dana.name')
+                ->orderByDesc('total')
                 ->pluck('total', 'fund');
 
             $rhlTeknisType = \App\Models\RhlTeknisDetail::join('rhl_teknis', 'rhl_teknis_details.rhl_teknis_id', '=', 'rhl_teknis.id')
@@ -532,6 +538,7 @@ class DashboardController extends Controller
                 ->join('m_pengelola_wisata', 'kebakaran_hutan.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
                 ->selectRaw('m_pengelola_wisata.name as pengelola, sum(number_of_fires) as incidents, sum(fire_area) as area')
                 ->groupBy('m_pengelola_wisata.name')
+                ->orderByDesc('incidents')
                 ->get()
                 ->keyBy('pengelola');
 
@@ -561,6 +568,7 @@ class DashboardController extends Controller
                 ->join('m_pengelola_wisata', 'pengunjung_wisata.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
                 ->selectRaw('m_pengelola_wisata.name as pengelola, sum(number_of_visitors) as visitors, sum(gross_income) as income')
                 ->groupBy('m_pengelola_wisata.name')
+                ->orderByDesc('visitors')
                 ->get()
                 ->keyBy('pengelola');
 
@@ -737,17 +745,20 @@ class DashboardController extends Controller
                     ->where('pbphh.status', 'final')
                     ->selectRaw('m_regencies.name as regency, count(*) as count')
                     ->groupBy('m_regencies.name')
+                    ->orderByDesc('count')
                     ->pluck('count', 'regency'),
                 'by_production_type' => Pbphh::forCdk($cdkId)->join('pbphh_jenis_produksi', 'pbphh.id', '=', 'pbphh_jenis_produksi.pbphh_id')
                     ->join('m_jenis_produksi', 'pbphh_jenis_produksi.jenis_produksi_id', '=', 'm_jenis_produksi.id')
                     ->where('pbphh.status', 'final')
                     ->selectRaw('m_jenis_produksi.name as type, count(distinct pbphh.id) as count')
                     ->groupBy('m_jenis_produksi.name')
+                    ->orderByDesc('count')
                     ->get()
                     ->toArray(),
                 'by_condition' => Pbphh::forCdk($cdkId)->where('status', 'final')
                     ->selectRaw('present_condition as condition_name, count(*) as count')
                     ->groupBy('present_condition')
+                    ->orderByDesc('count')
                     ->get()
                     ->toArray()
             ];
@@ -779,12 +790,14 @@ class DashboardController extends Controller
                     ->where('realisasi_pnbp.status', 'final')
                     ->selectRaw("m_regencies.name as regency, sum($pnbpRealizationSql) as total")
                     ->groupBy('m_regencies.name')
+                    ->orderByDesc('total')
                     ->pluck('total', 'regency'),
                 'by_pengelola' => RealisasiPnbp::forCdk($cdkId)->join('m_pengelola_wisata', 'realisasi_pnbp.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
                     ->where('realisasi_pnbp.year', $currentYear)
                     ->where('realisasi_pnbp.status', 'final')
                     ->selectRaw("m_pengelola_wisata.name as pengelola, SUM($pnbpRealizationSql) as total")
                     ->groupBy('m_pengelola_wisata.name')
+                    ->orderByDesc('total')
                     ->pluck('total', 'pengelola')->toArray()
             ];
 
@@ -821,12 +834,14 @@ class DashboardController extends Controller
                 })
                     ->selectRaw('m_skema_perhutanan_sosial.name as scheme, count(skps.id) as count')
                     ->groupBy('m_skema_perhutanan_sosial.id', 'm_skema_perhutanan_sosial.name')
+                    ->orderByDesc('count')
                     ->get(),
                 'economic_by_regency' => NilaiEkonomi::forCdk($cdkId)->join('m_regencies', 'nilai_ekonomi.regency_id', '=', 'm_regencies.id')
                     ->where('nilai_ekonomi.year', $currentYear)
                     ->where('nilai_ekonomi.status', 'final')
                     ->selectRaw('m_regencies.name as regency, sum(total_transaction_value) as total')
                     ->groupBy('m_regencies.name')
+                    ->orderByDesc('total')
                     ->pluck('total', 'regency'),
                 'top_groups' => NilaiEkonomi::forCdk($cdkId)->where('year', $currentYear)
                     ->where('status', 'final')
@@ -1172,12 +1187,14 @@ class DashboardController extends Controller
                 'class_distribution' => PerkembanganKth::forCdk($cdkId)->where('status', 'final')
                     ->selectRaw('kelas_kelembagaan as class_name, count(*) as count')
                     ->groupBy('kelas_kelembagaan')
+                    ->orderByDesc('count')
                     ->get(),
                 'economic_by_regency' => NilaiTransaksiEkonomi::forCdk($cdkId)->join('m_regencies', 'nilai_transaksi_ekonomi.regency_id', '=', 'm_regencies.id')
                     ->where('nilai_transaksi_ekonomi.year', $currentYear)
                     ->where('nilai_transaksi_ekonomi.status', 'final')
                     ->selectRaw('m_regencies.name as regency, sum(total_nilai_transaksi) as total')
                     ->groupBy('m_regencies.name')
+                    ->orderByDesc('total')
                     ->pluck('total', 'regency'),
                 'top_commodities' => NilaiTransaksiEkonomiDetail::join('m_commodities', 'nilai_transaksi_ekonomi_details.commodity_id', '=', 'm_commodities.id')
                     ->join('nilai_transaksi_ekonomi', 'nilai_transaksi_ekonomi_details.nilai_transaksi_ekonomi_id', '=', 'nilai_transaksi_ekonomi.id')

@@ -20,7 +20,7 @@ import { truncateName } from './Components/utils';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler);
 
-export default function PublicDashboard({ currentYear, availableYears, stats }) {
+export default function PublicDashboard({ currentYear, availableYears, stats, selectedCdkId, cdks }) {
   const { auth } = usePage().props;
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -84,10 +84,21 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
   }, []);
 
   const handleYearChange = (selectedOption) => {
-    router.get(route('public.dashboard'), { year: selectedOption.value }, {
+    router.get(route('public.dashboard'), { year: selectedOption.value, cdk_id: selectedCdkId }, {
       preserveScroll: true,
       onStart: () => {
         setLoadingText('Mengambil Data Tahun ' + selectedOption.value + '...');
+        setIsLoading(true);
+      },
+      onFinish: () => setIsLoading(false),
+    });
+  };
+
+  const handleCdkChange = (selectedOption) => {
+    router.get(route('public.dashboard'), { year: currentYear, cdk_id: selectedOption.value }, {
+      preserveScroll: true,
+      onStart: () => {
+        setLoadingText('Mengambil Data CDK...');
         setIsLoading(true);
       },
       onFinish: () => setIsLoading(false),
@@ -125,6 +136,40 @@ export default function PublicDashboard({ currentYear, availableYears, stats }) 
               </Link>
             </div>
             <div className="flex items-center gap-4">
+              <div className="w-48 sm:w-64">
+                <Select
+                  value={
+                    selectedCdkId
+                      ? { value: selectedCdkId, label: cdks?.find(c => c.id === selectedCdkId)?.nama || 'Semua CDK' }
+                      : { value: '', label: 'Semua CDK' }
+                  }
+                  onChange={handleCdkChange}
+                  options={[
+                    { value: '', label: 'Semua CDK' },
+                    ...(cdks || []).map(cdk => ({ value: cdk.id, label: cdk.nama }))
+                  ]}
+                  className="text-sm font-bold text-gray-700"
+                  placeholder="Pilih CDK"
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: '0.75rem',
+                      padding: '0.125rem',
+                      borderColor: state.isFocused ? '#10b981' : '#e5e7eb',
+                      boxShadow: state.isFocused ? '0 0 0 2px rgba(16, 185, 129, 0.2)' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                      '&:hover': { borderColor: '#d1d5db' }
+                    }),
+                    option: (base, state) => ({
+                      ...base,
+                      backgroundColor: state.isSelected ? '#10b981' : state.isFocused ? '#d1fae5' : null,
+                      color: state.isSelected ? 'white' : '#374151',
+                      cursor: 'pointer'
+                    }),
+                    singleValue: (base) => ({ ...base, color: '#374151' })
+                  }}
+                />
+              </div>
+
               <div className="w-32 sm:w-48">
                 <Select
                   value={{ value: currentYear, label: `Tahun ${currentYear}` }}
