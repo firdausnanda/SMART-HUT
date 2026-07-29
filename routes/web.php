@@ -41,7 +41,6 @@ use App\Http\Controllers\ProyeksiGajiController;
 use App\Http\Controllers\RekapBulananController;
 use App\Http\Controllers\CdkController;
 use App\Http\Middleware\CheckDashboardAccess;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;

@@ -15,7 +15,7 @@ class KupsExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize
   {
     return Kups::query()
       ->with(['province', 'regency', 'district'])
-      ->where('status', 'finalized')
+      ->where('status', 'final')
       ->orderBy('created_at', 'desc');
   }
 
