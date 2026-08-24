@@ -139,7 +139,7 @@ class HasilHutanKayuController extends Controller
         ->distinct()
         ->pluck('year')
         ->toArray();
-      $fixedYears = range(2025, 2021);
+      $fixedYears = range(2026, 2021);
       $years = array_unique(array_merge($dbYears, $fixedYears));
       rsort($years);
       return $years;
