@@ -105,7 +105,8 @@ class KebakaranHutanController extends Controller
       fn() => [
         'total_fires' => KebakaranHutan::where('year', $selectedYear)->where('status', 'final')->sum('number_of_fires'),
         'total_area' => KebakaranHutan::where('year', $selectedYear)->where('status', 'final')->get()->sum(function ($item) {
-          return (float) filter_var($item->fire_area, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+          $area = str_replace(',', '.', $item->fire_area);
+          return (float) filter_var($area, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         }),
         'total_count' => KebakaranHutan::where('year', $selectedYear)->where('status', 'final')->count(),
       ]
