@@ -75,4 +75,15 @@ class User extends Authenticatable
     {
         return is_null($this->cdk_id) && $this->hasRole(['admin', 'admin_provinsi']);
     }
+
+    public function getRoleLevel(): int
+    {
+        if ($this->hasRole('admin')) return 6;
+        if ($this->hasRole('admin_provinsi')) return 5;
+        if ($this->hasRole('admin_cdk')) return 4;
+        if ($this->hasRole('kacdk')) return 3;
+        if ($this->hasRole('kasi')) return 2;
+        
+        return 1;
+    }
 }

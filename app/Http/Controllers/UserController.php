@@ -64,7 +64,7 @@ class UserController extends Controller
    */
   public function create()
   {
-    $roles = Role::all();
+    $roles = $this->getAllowedRoles();
     $cdks = auth()->user()->isAdminProvinsi() ? \App\Models\Cdk::where('is_active', true)->get(['id', 'nama']) : [];
     return Inertia::render('User/Create', [
       'roles' => $roles,
@@ -100,6 +100,11 @@ class UserController extends Controller
 
     $request->validate($rules);
 
+    $allowedRoles = $this->getAllowedRoles()->pluck('name')->toArray();
+    if (!in_array($request->role, $allowedRoles)) {
+        return back()->withErrors(['role' => 'Role tidak valid untuk tingkat akses Anda.']);
+    }
+
     $cdkId = auth()->user()->isAdminProvinsi() ? $request->cdk_id : auth()->user()->cdk_id;
 
     $user = User::create([
@@ -132,7 +137,11 @@ class UserController extends Controller
       abort(403, 'Unauthorized action.');
     }
 
-    $roles = Role::all();
+    if ($user->getRoleLevel() >= auth()->user()->getRoleLevel() && $user->id !== auth()->id()) {
+        abort(403, 'Anda tidak dapat mengedit user dengan role yang setara atau lebih tinggi.');
+    }
+
+    $roles = $this->getAllowedRoles();
     $permissions = \Spatie\Permission\Models\Permission::all()->groupBy(function ($data) {
       return explode('.', $data->name)[0];
     });
@@ -160,6 +169,10 @@ class UserController extends Controller
       abort(403, 'Unauthorized action.');
     }
 
+    if ($user->getRoleLevel() >= auth()->user()->getRoleLevel() && $user->id !== auth()->id()) {
+        abort(403, 'Anda tidak dapat mengedit user dengan role yang setara atau lebih tinggi.');
+    }
+
     $rules = [
       'name' => 'required|string|max:255',
       'username' => 'required|string|max:255|unique:users,username,' . $user->id,
@@ -183,6 +196,17 @@ class UserController extends Controller
     }
 
     $validated = $request->validate($rules);
+
+    if ($user->id !== auth()->id()) {
+        $allowedRoles = $this->getAllowedRoles()->pluck('name')->toArray();
+        if (!in_array($request->role, $allowedRoles)) {
+            return back()->withErrors(['role' => 'Role tidak valid untuk tingkat akses Anda.']);
+        }
+    } else {
+        if ($request->role !== $user->roles->first()?->name) {
+            return back()->withErrors(['role' => 'Anda tidak dapat mengubah role Anda sendiri.']);
+        }
+    }
 
     $userData = \Illuminate\Support\Arr::except($validated, ['role', 'permissions', 'password', 'cdk_id']);
 
@@ -219,8 +243,8 @@ class UserController extends Controller
       return back()->with('error', 'You cannot delete your own account.');
     }
 
-    if ($user->hasRole('admin') && !auth()->user()->hasRole('admin')) {
-      return back()->with('error', 'User dengan role admin tidak dapat dihapus oleh role lain.');
+    if ($user->getRoleLevel() >= auth()->user()->getRoleLevel()) {
+      return back()->with('error', 'Anda tidak dapat menghapus user dengan role yang setara atau lebih tinggi.');
     }
 
     $user->delete();
@@ -260,5 +284,23 @@ class UserController extends Controller
     } catch (\Exception $e) {
       return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
+  }
+
+  private function getAllowedRoles()
+  {
+    $currentUserLevel = auth()->user()->getRoleLevel();
+    
+    return Role::all()->filter(function ($role) use ($currentUserLevel) {
+      $roleLevel = match ($role->name) {
+        'admin' => 6,
+        'admin_provinsi' => 5,
+        'admin_cdk' => 4,
+        'kacdk' => 3,
+        'kasi' => 2,
+        default => 1,
+      };
+      
+      return $roleLevel < $currentUserLevel;
+    })->values();
   }
 }
