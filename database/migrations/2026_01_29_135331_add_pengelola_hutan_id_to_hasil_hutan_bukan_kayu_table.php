@@ -11,8 +11,10 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('hasil_hutan_bukan_kayu', function (Blueprint $table) {
-            $table->unsignedBigInteger('pengelola_hutan_id')->nullable()->after('district_id');
-            $table->foreign('pengelola_hutan_id')->references('id')->on('m_pengelola_hutan')->onDelete('cascade');
+            if (!Schema::hasColumn('hasil_hutan_bukan_kayu', 'pengelola_hutan_id')) {
+                $table->unsignedBigInteger('pengelola_hutan_id')->nullable()->after('district_id');
+                $table->foreign('pengelola_hutan_id')->references('id')->on('m_pengelola_hutan')->onDelete('cascade');
+            }
         });
     }
 

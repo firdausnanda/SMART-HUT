@@ -12,7 +12,9 @@ return new class extends Migration {
     {
         // 1. Add volume_target to parent
         Schema::table('hasil_hutan_kayu', function (Blueprint $table) {
-            $table->decimal('volume_target', 15, 2)->after('forest_type')->default(0);
+            if (!Schema::hasColumn('hasil_hutan_kayu', 'volume_target')) {
+                $table->decimal('volume_target', 15, 2)->after('forest_type')->default(0);
+            }
         });
 
         // 2. Migrate data: Sum volume_target from details and update parent

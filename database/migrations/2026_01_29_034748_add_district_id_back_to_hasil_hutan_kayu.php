@@ -11,7 +11,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('hasil_hutan_kayu', function (Blueprint $table) {
-            $table->foreignId('district_id')->nullable()->after('regency_id');
+            if (!Schema::hasColumn('hasil_hutan_kayu', 'district_id')) {
+                $table->foreignId('district_id')->nullable()->after('regency_id');
+            }
         });
     }
 

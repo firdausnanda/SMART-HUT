@@ -11,12 +11,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('hasil_hutan_kayu', function (Blueprint $table) {
-            $table->unsignedBigInteger('pengelola_hutan_id')->nullable()->after('regency_id');
-            $table->dropColumn('district_id');
-
-            // Optional: Add Index or Foreign Key if needed, though user didn't explicitly ask for constraint enforcing in DB, it's good practice.
-            // But to avoid issues if table is empty or data mismatch, I'll keep it simple for now, or just index it.
-            $table->index('pengelola_hutan_id');
+            if (!Schema::hasColumn('hasil_hutan_kayu', 'pengelola_hutan_id')) {
+                $table->unsignedBigInteger('pengelola_hutan_id')->nullable()->after('regency_id');
+                $table->index('pengelola_hutan_id');
+            }
+            if (Schema::hasColumn('hasil_hutan_kayu', 'district_id')) {
+                $table->dropColumn('district_id');
+            }
         });
     }
 

@@ -11,7 +11,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('hasil_hutan_bukan_kayu', function (Blueprint $table) {
-            $table->foreignId('pengelola_wisata_id')->nullable()->after('district_id')->constrained('m_pengelola_wisata')->nullOnDelete();
+            if (!Schema::hasColumn('hasil_hutan_bukan_kayu', 'pengelola_wisata_id')) {
+                $table->foreignId('pengelola_wisata_id')->nullable()->after('pengelola_hutan_id')->constrained('m_pengelola_wisata')->nullOnDelete();
+            }
         });
     }
 

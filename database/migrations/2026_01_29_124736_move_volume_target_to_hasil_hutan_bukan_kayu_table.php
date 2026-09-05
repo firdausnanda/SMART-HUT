@@ -11,7 +11,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('hasil_hutan_bukan_kayu', function (Blueprint $table) {
-            $table->decimal('volume_target', 15, 2)->default(0)->after('district_id');
+            if (!Schema::hasColumn('hasil_hutan_bukan_kayu', 'volume_target')) {
+                $table->decimal('volume_target', 15, 2)->default(0)->after('district_id');
+            }
         });
 
         // Migrate data

@@ -11,7 +11,7 @@ services:
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
-      - RUN_MIGRATIONS=true # Set to true to run migrations on startup
+      - RUN_MIGRATIONS=false # Set to true to run migrations on startup
     env_file:
       - .env
     volumes:
