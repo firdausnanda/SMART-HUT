@@ -269,135 +269,135 @@ Route::middleware('auth')->group(function () {
     })->name('clear-cache');
 
     // Run Seeders
-    Route::get('/run-seeder/multi-cdk-test-user', function () {
-        Artisan::call('db:seed', ['--class' => 'MultiCdkTestUserSeeder']);
-        return redirect()->back()->with('success', 'MultiCdkTestUserSeeder executed successfully!');
-    })->name('run-seeder.multi-cdk-test-user');
+    // Route::get('/run-seeder/multi-cdk-test-user', function () {
+    //     Artisan::call('db:seed', ['--class' => 'MultiCdkTestUserSeeder']);
+    //     return redirect()->back()->with('success', 'MultiCdkTestUserSeeder executed successfully!');
+    // })->name('run-seeder.multi-cdk-test-user');
 
-    Route::get('/run-seeder/cdk-user', function () {
-        Artisan::call('db:seed', ['--class' => 'CdkUserSeeder']);
-        return redirect()->back()->with('success', 'CdkUserSeeder executed successfully!');
-    })->name('run-seeder.cdk-user');
+    // Route::get('/run-seeder/cdk-user', function () {
+    //     Artisan::call('db:seed', ['--class' => 'CdkUserSeeder']);
+    //     return 'CdkUserSeeder executed successfully!';
+    // })->name('run-seeder.cdk-user');
 
     // Run migration with safety check
-    Route::get('/run-migration-add-cdk-id', function (\Illuminate\Http\Request $request) {
+    // Route::get('/run-migration-add-cdk-id', function (\Illuminate\Http\Request $request) {
 
-        $migrationName = '2026_05_18_041136_add_cdk_id_to_all_data_tables';
-        $migrationPath = 'database/migrations/2026_05_18_041136_add_cdk_id_to_all_data_tables.php';
+    //     $migrationName = '2026_05_18_041136_add_cdk_id_to_all_data_tables';
+    //     $migrationPath = 'database/migrations/2026_05_18_041136_add_cdk_id_to_all_data_tables.php';
 
-        // 1. Check if 'cdks' table exists
-        $cdksTableExists = \Illuminate\Support\Facades\Schema::hasTable('cdks');
+    //     // 1. Check if 'cdks' table exists
+    //     $cdksTableExists = \Illuminate\Support\Facades\Schema::hasTable('cdks');
         
-        // 2. Check if migration has already been run
-        $isAlreadyRun = \Illuminate\Support\Facades\DB::table('migrations')->where('migration', $migrationName)->exists();
+    //     // 2. Check if migration has already been run
+    //     $isAlreadyRun = \Illuminate\Support\Facades\DB::table('migrations')->where('migration', $migrationName)->exists();
 
-        // 3. Check status of target tables
-        $tables = [
-            'rehab_lahan',
-            'penghijauan_lingkungan',
-            'rehab_manggrove',
-            'rhl_teknis',
-            'reboisasi_ps',
-            'kebakaran_hutan',
-            'pengunjung_wisata',
-            'hasil_hutan_kayu',
-            'hasil_hutan_bukan_kayu',
-            'pbphh',
-            'realisasi_pnbp',
-            'skps',
-            'kups',
-            'nilai_ekonomi',
-            'nilai_transaksi_ekonomi',
-            'perkembangan_kth',
-            'pegawais',
-            'bezettings',
-            'rekap_bulanan_pegawai',
-            'rekap_statistik_bulanan',
-        ];
+    //     // 3. Check status of target tables
+    //     $tables = [
+    //         'rehab_lahan',
+    //         'penghijauan_lingkungan',
+    //         'rehab_manggrove',
+    //         'rhl_teknis',
+    //         'reboisasi_ps',
+    //         'kebakaran_hutan',
+    //         'pengunjung_wisata',
+    //         'hasil_hutan_kayu',
+    //         'hasil_hutan_bukan_kayu',
+    //         'pbphh',
+    //         'realisasi_pnbp',
+    //         'skps',
+    //         'kups',
+    //         'nilai_ekonomi',
+    //         'nilai_transaksi_ekonomi',
+    //         'perkembangan_kth',
+    //         'pegawais',
+    //         'bezettings',
+    //         'rekap_bulanan_pegawai',
+    //         'rekap_statistik_bulanan',
+    //     ];
 
-        $tableStatus = [];
-        $existingCdkIdColumns = 0;
-        $existingTablesCount = 0;
+    //     $tableStatus = [];
+    //     $existingCdkIdColumns = 0;
+    //     $existingTablesCount = 0;
 
-        foreach ($tables as $tableName) {
-            $exists = \Illuminate\Support\Facades\Schema::hasTable($tableName);
-            $hasColumn = $exists ? \Illuminate\Support\Facades\Schema::hasColumn($tableName, 'cdk_id') : false;
+    //     foreach ($tables as $tableName) {
+    //         $exists = \Illuminate\Support\Facades\Schema::hasTable($tableName);
+    //         $hasColumn = $exists ? \Illuminate\Support\Facades\Schema::hasColumn($tableName, 'cdk_id') : false;
             
-            if ($exists) {
-                $existingTablesCount++;
-            }
-            if ($hasColumn) {
-                $existingCdkIdColumns++;
-            }
+    //         if ($exists) {
+    //             $existingTablesCount++;
+    //         }
+    //         if ($hasColumn) {
+    //             $existingCdkIdColumns++;
+    //         }
 
-            $tableStatus[$tableName] = [
-                'exists' => $exists,
-                'has_cdk_id' => $hasColumn,
-            ];
-        }
+    //         $tableStatus[$tableName] = [
+    //             'exists' => $exists,
+    //             'has_cdk_id' => $hasColumn,
+    //         ];
+    //     }
 
-        // Determine safety
-        $isSafe = $cdksTableExists;
-        $message = '';
+    //     // Determine safety
+    //     $isSafe = $cdksTableExists;
+    //     $message = '';
         
-        if (!$isSafe) {
-            $message = "Unsafe: The 'cdks' table does not exist. You must run the cdks table creation migration first.";
-        } elseif ($isAlreadyRun) {
-            $message = "Safe (Already Run): This migration has already been marked as run in the 'migrations' table.";
-        } else {
-            $message = "Safe to run. " . ($existingTablesCount) . " out of " . count($tables) . " tables exist.";
-        }
+    //     if (!$isSafe) {
+    //         $message = "Unsafe: The 'cdks' table does not exist. You must run the cdks table creation migration first.";
+    //     } elseif ($isAlreadyRun) {
+    //         $message = "Safe (Already Run): This migration has already been marked as run in the 'migrations' table.";
+    //     } else {
+    //         $message = "Safe to run. " . ($existingTablesCount) . " out of " . count($tables) . " tables exist.";
+    //     }
 
-        $execute = $request->query('execute') === 'true';
+    //     $execute = $request->query('execute') === 'true';
 
-        if ($execute && $isSafe && !$isAlreadyRun) {
-            try {
-                \Illuminate\Support\Facades\Artisan::call('migrate', [
-                    '--path' => $migrationPath,
-                    '--force' => true,
-                ]);
-                $output = \Illuminate\Support\Facades\Artisan::output();
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Migration ran successfully.',
-                    'safety_check' => [
-                        'safe' => $isSafe,
-                        'message' => $message,
-                        'cdks_table_exists' => $cdksTableExists,
-                        'already_run' => $isAlreadyRun,
-                        'tables_checked' => count($tables),
-                        'tables_exist' => $existingTablesCount,
-                        'columns_exist' => $existingCdkIdColumns,
-                    ],
-                    'artisan_output' => $output,
-                ]);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Migration failed with an exception.',
-                    'error' => $e->getMessage(),
-                ], 500);
-            }
-        }
+    //     if ($execute && $isSafe && !$isAlreadyRun) {
+    //         try {
+    //             \Illuminate\Support\Facades\Artisan::call('migrate', [
+    //                 '--path' => $migrationPath,
+    //                 '--force' => true,
+    //             ]);
+    //             $output = \Illuminate\Support\Facades\Artisan::output();
+    //             return response()->json([
+    //                 'success' => true,
+    //                 'message' => 'Migration ran successfully.',
+    //                 'safety_check' => [
+    //                     'safe' => $isSafe,
+    //                     'message' => $message,
+    //                     'cdks_table_exists' => $cdksTableExists,
+    //                     'already_run' => $isAlreadyRun,
+    //                     'tables_checked' => count($tables),
+    //                     'tables_exist' => $existingTablesCount,
+    //                     'columns_exist' => $existingCdkIdColumns,
+    //                 ],
+    //                 'artisan_output' => $output,
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Migration failed with an exception.',
+    //                 'error' => $e->getMessage(),
+    //             ], 500);
+    //         }
+    //     }
 
-        return response()->json([
-            'success' => true,
-            'execute_triggered' => $execute,
-            'safety_check' => [
-                'safe' => $isSafe,
-                'message' => $message,
-                'cdks_table_exists' => $cdksTableExists,
-                'already_run' => $isAlreadyRun,
-                'tables_checked' => count($tables),
-                'tables_exist' => $existingTablesCount,
-                'columns_exist' => $existingCdkIdColumns,
-                'table_details' => $tableStatus,
-            ],
-            'instruction' => $isSafe && !$isAlreadyRun 
-                ? "To execute the migration, append '?execute=true' to this URL."
-                : "Cannot execute (either unsafe or already run)."
-        ]);
-    })->name('run-migration-add-cdk-id');
+    //     return response()->json([
+    //         'success' => true,
+    //         'execute_triggered' => $execute,
+    //         'safety_check' => [
+    //             'safe' => $isSafe,
+    //             'message' => $message,
+    //             'cdks_table_exists' => $cdksTableExists,
+    //             'already_run' => $isAlreadyRun,
+    //             'tables_checked' => count($tables),
+    //             'tables_exist' => $existingTablesCount,
+    //             'columns_exist' => $existingCdkIdColumns,
+    //             'table_details' => $tableStatus,
+    //         ],
+    //         'instruction' => $isSafe && !$isAlreadyRun 
+    //             ? "To execute the migration, append '?execute=true' to this URL."
+    //             : "Cannot execute (either unsafe or already run)."
+    //     ]);
+    // })->name('run-migration-add-cdk-id');
 });
 
 
