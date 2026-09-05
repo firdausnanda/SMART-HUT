@@ -10,11 +10,13 @@ return new class extends Migration {
    */
   public function up(): void
   {
-    Schema::create('m_pengelola_ps', function (Blueprint $table) {
-      $table->id();
-      $table->string('name');
-      $table->timestamps();
-    });
+    if (!\Illuminate\Support\Facades\Schema::hasTable('m_pengelola_ps')) {
+            Schema::create('m_pengelola_ps', function (Blueprint $table) {
+          $table->id();
+          $table->string('name');
+          $table->timestamps();
+        });
+        }
   }
 
   /**

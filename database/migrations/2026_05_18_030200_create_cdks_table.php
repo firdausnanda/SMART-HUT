@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cdks', function (Blueprint $table) {
-            $table->id();
-            $table->string('kode')->unique();
-            $table->string('nama');
-            $table->string('kepala_nama')->nullable();
-            $table->text('alamat')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
+        if (!\Illuminate\Support\Facades\Schema::hasTable('cdks')) {
+            Schema::create('cdks', function (Blueprint $table) {
+                $table->id();
+                $table->string('kode')->unique();
+                $table->string('nama');
+                $table->string('kepala_nama')->nullable();
+                $table->text('alamat')->nullable();
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+            });
+        }
 
         Schema::create('cdk_regency', function (Blueprint $table) {
             $table->foreignId('cdk_id')->constrained('cdks')->cascadeOnDelete();

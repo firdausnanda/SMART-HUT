@@ -10,12 +10,14 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('m_commodities', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        if (!\Illuminate\Support\Facades\Schema::hasTable('m_commodities')) {
+            Schema::create('m_commodities', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
     }
 
     /**
