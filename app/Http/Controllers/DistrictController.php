@@ -101,8 +101,14 @@ class DistrictController extends Controller
 
   public function destroy(Districts $district)
   {
-    $district->delete();
-
-    return redirect()->route('districts.index')->with('success', 'Kecamatan berhasil dihapus.');
+    try {
+      $district->delete();
+      return redirect()->route('districts.index')->with('success', 'Kecamatan berhasil dihapus.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      if ($e->getCode() == '23000') {
+        return redirect()->route('districts.index')->with('error', 'Kecamatan tidak dapat dihapus karena masih digunakan di data lain (Desa/Kelurahan).');
+      }
+      return redirect()->route('districts.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
+    }
   }
 }

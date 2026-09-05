@@ -62,8 +62,14 @@ class RegencyController extends Controller
 
   public function destroy(Regencies $regency)
   {
-    $regency->delete();
-
-    return redirect()->route('regencies.index')->with('success', 'Kabupaten/Kota berhasil dihapus.');
+    try {
+      $regency->delete();
+      return redirect()->route('regencies.index')->with('success', 'Kabupaten/Kota berhasil dihapus.');
+    } catch (\Illuminate\Database\QueryException $e) {
+      if ($e->getCode() == '23000') {
+        return redirect()->route('regencies.index')->with('error', 'Kabupaten/Kota tidak dapat dihapus karena masih digunakan di data lain (Kecamatan).');
+      }
+      return redirect()->route('regencies.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
+    }
   }
 }

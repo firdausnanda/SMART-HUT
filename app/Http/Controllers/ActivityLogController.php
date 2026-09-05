@@ -51,7 +51,7 @@ class ActivityLogController extends Controller
     }
 
     if ($request->subject_type) {
-      $query->where('subject_type', $request->subject_type);
+      $query->where('subject_type', str_replace('-', '\\', $request->subject_type));
     }
 
     if ($request->subject_id) {
@@ -78,8 +78,8 @@ class ActivityLogController extends Controller
 
     $subjectTypes = Activity::select('subject_type')->whereNotNull('subject_type')->distinct()->pluck('subject_type')->map(function ($type) {
       return [
-        'label' => str_replace('App\\Models\\', '', $type),
-        'value' => $type
+        'label' => class_basename($type),
+        'value' => str_replace('\\', '-', $type)
       ];
     });
     $actions = Activity::select('description')->distinct()->pluck('description');
