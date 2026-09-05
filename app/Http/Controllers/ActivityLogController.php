@@ -76,12 +76,32 @@ class ActivityLogController extends Controller
       $users = User::select('id', 'name')->orderBy('name')->get();
     }
 
-    $subjectTypes = Activity::select('subject_type')->whereNotNull('subject_type')->distinct()->pluck('subject_type')->map(function ($type) {
-      return [
-        'label' => class_basename($type),
-        'value' => str_replace('\\', '-', $type)
-      ];
-    });
+    $subjectTypes = Activity::select('subject_type')
+      ->whereNotNull('subject_type')
+      ->distinct()
+      ->pluck('subject_type')
+      ->map(function ($type) {
+        $baseName = class_basename($type);
+        $label = preg_replace('/(?<!^)([A-Z])/', ' $1', $baseName);
+
+        $customLabels = [
+          'Regencies' => 'Kabupaten / Kota',
+          'Districts' => 'Kecamatan',
+          'Villages' => 'Desa / Kelurahan',
+          'Provinces' => 'Provinsi',
+          'Cdk' => 'Cabang Dinas Kehutanan (CDK)',
+          'Pbphh' => 'PBPHH',
+          'Skps' => 'SKPS',
+          'Kups' => 'KUPS',
+          'RhlTeknis' => 'RHL Teknis',
+          'RhlTeknisDetail' => 'RHL Teknis Detail',
+        ];
+
+        return [
+          'label' => $customLabels[$baseName] ?? $label,
+          'value' => str_replace('\\', '-', $type)
+        ];
+      })->sortBy('label')->values();
     $actions = Activity::select('description')->distinct()->pluck('description');
 
     return Inertia::render('ActivityLog/Index', [

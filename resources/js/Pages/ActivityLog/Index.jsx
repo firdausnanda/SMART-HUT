@@ -156,6 +156,24 @@ export default function Index({ auth, activities, filters, options }) {
     );
   };
 
+  const formatSubjectType = (type) => {
+    if (!type) return '-';
+    const baseName = type.split('\\').pop();
+    const customLabels = {
+      'Regencies': 'Kabupaten / Kota',
+      'Districts': 'Kecamatan',
+      'Villages': 'Desa / Kelurahan',
+      'Provinces': 'Provinsi',
+      'Cdk': 'Cabang Dinas Kehutanan (CDK)',
+      'Pbphh': 'PBPHH',
+      'Skps': 'SKPS',
+      'Kups': 'KUPS',
+      'RhlTeknis': 'RHL Teknis',
+      'RhlTeknisDetail': 'RHL Teknis Detail',
+    };
+    return customLabels[baseName] || baseName.replace(/([A-Z])/g, ' $1').trim();
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString('id-ID', {
       day: 'numeric',
@@ -379,7 +397,7 @@ export default function Index({ auth, activities, filters, options }) {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {activity.subject_type ? activity.subject_type.split('\\').pop() : '-'} #{activity.subject_id}
+                      {formatSubjectType(activity.subject_type)} #{activity.subject_id}
                     </td>
                     <td className="px-6 py-4 text-xs text-gray-500 font-mono">
                       <details className="cursor-pointer">
