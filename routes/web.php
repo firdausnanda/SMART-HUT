@@ -268,6 +268,17 @@ Route::middleware('auth')->group(function () {
         return redirect()->back()->with('success', 'Cache cleared successfully!');
     })->name('clear-cache');
 
+    // Run Seeders
+    Route::get('/run-seeder/multi-cdk-test-user', function () {
+        Artisan::call('db:seed', ['--class' => 'MultiCdkTestUserSeeder']);
+        return redirect()->back()->with('success', 'MultiCdkTestUserSeeder executed successfully!');
+    })->name('run-seeder.multi-cdk-test-user');
+
+    Route::get('/run-seeder/cdk-user', function () {
+        Artisan::call('db:seed', ['--class' => 'CdkUserSeeder']);
+        return redirect()->back()->with('success', 'CdkUserSeeder executed successfully!');
+    })->name('run-seeder.cdk-user');
+
     // Run migration with safety check
     Route::get('/run-migration-add-cdk-id', function (\Illuminate\Http\Request $request) {
 
