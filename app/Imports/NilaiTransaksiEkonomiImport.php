@@ -67,8 +67,6 @@ class NilaiTransaksiEkonomiImport implements
 
   public function model(array $row)
   {
-    \Illuminate\Support\Facades\Log::info('NTE Import Row:', $row);
-
     if (!isset($row['tahun'])) {
       return null;
     }
