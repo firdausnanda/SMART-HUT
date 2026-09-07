@@ -12,6 +12,7 @@ services:
       - APP_ENV=production
       - APP_DEBUG=false
       - RUN_MIGRATIONS=true # Set to true to run migrations on startup
+      - LOG_CHANNEL=${LOG_CHANNEL:-daily}  # Fallback to 'daily' if not set in .env
     env_file:
       - .env
     volumes:
