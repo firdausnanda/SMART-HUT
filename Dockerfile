@@ -77,6 +77,7 @@ RUN { \
 # Configure Nginx to run as www-data to match PHP-FPM and prevent permission issues
 RUN sed -i 's/user nginx;/user www-data;/' /etc/nginx/nginx.conf \
     && mkdir -p /var/log/supervisor /var/run /var/log/nginx \
+    && chown -R www-data:www-data /var/lib/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
