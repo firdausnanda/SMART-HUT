@@ -130,7 +130,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats, se
                 <div className="hidden md:flex flex-col">
                   <span className="font-display font-bold text-lg text-gray-900 leading-tight">Dashboard Monitoring</span>
                   <span className={`text-[10px] uppercase tracking-wider font-bold ${modules[currentSlide]?.text}`}>
-                    CDK Wilayah Trenggalek
+                    Dinas Kehutanan - {selectedCdkId ? cdks?.find(c => c.id === selectedCdkId)?.nama : 'Semua CDK'}
                   </span>
                 </div>
               </Link>

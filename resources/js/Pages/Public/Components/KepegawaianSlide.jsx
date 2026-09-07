@@ -215,17 +215,24 @@ const KepegawaianSlide = ({ stats, currentYear, commonOptions }) => {
             />
 
             {/* Employment Status Pills */}
-            <div className="flex justify-between gap-2">
-              {[
-                { label: 'PNS', value: kepegawaian?.total_pns, color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
-                { label: 'PPPK', value: kepegawaian?.total_pppk, color: 'bg-blue-50 text-blue-700 border-blue-100' },
-                { label: 'PPPK Paruh Waktu', value: kepegawaian?.total_pppk_paruh_waktu, color: 'bg-amber-50 text-amber-700 border-amber-100' },
-              ].map((item, i) => (
-                <div key={i} className={`flex-1 flex flex-col items-center py-2 px-1 rounded-2xl border ${item.color} shadow-sm`}>
-                  <span className="text-[10px] font-black uppercase tracking-tighter opacity-70 mb-0.5">{item.label}</span>
-                  <span className="text-sm font-black">{formatNumber(item.value || 0)}</span>
-                </div>
-              ))}
+            <div className="flex justify-between gap-2 flex-wrap">
+              {Object.entries(kepegawaian?.status || {}).map(([label, value], i) => {
+                const colors = [
+                  'bg-emerald-50 text-emerald-700 border-emerald-100',
+                  'bg-blue-50 text-blue-700 border-blue-100',
+                  'bg-amber-50 text-amber-700 border-amber-100',
+                  'bg-purple-50 text-purple-700 border-purple-100',
+                  'bg-rose-50 text-rose-700 border-rose-100',
+                  'bg-cyan-50 text-cyan-700 border-cyan-100',
+                ];
+                const color = colors[i % colors.length];
+                return (
+                  <div key={i} className={`flex-1 flex flex-col items-center py-2 px-1 rounded-2xl border ${color} shadow-sm min-w-[30%]`}>
+                    <span className="text-[10px] font-black uppercase tracking-tighter opacity-70 mb-0.5 text-center">{label}</span>
+                    <span className="text-sm font-black">{formatNumber(value || 0)}</span>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Alert Cards Grid */}
