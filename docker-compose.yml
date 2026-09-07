@@ -17,6 +17,7 @@ services:
       - .env
     volumes:
       - kda-storage:/var/www/html/storage/app
+      - ./storage/logs:/var/www/html/storage/logs
     # Resolves host.docker.internal to host's gateway on Windows/Mac/Linux
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -38,6 +39,7 @@ services:
       - .env
     volumes:
       - kda-storage:/var/www/html/storage/app
+      - ./storage/logs:/var/www/html/storage/logs
     # Resolves host.docker.internal to host's gateway on Windows/Mac/Linux
     extra_hosts:
       - "host.docker.internal:host-gateway"
