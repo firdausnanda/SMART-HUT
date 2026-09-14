@@ -17,51 +17,13 @@ class MergeCommodities extends Command
     {
         DB::beginTransaction();
         try {
-            // 1. Delete specific commodities
-            $toDelete = ['kg', 'hhk', 'hasil', 'porang', 'pembibitan', 'reyeng', 'getah pinus', 'jahe'];
-            $this->info("Deleting specific commodities...");
-
-            $deleteCommodities = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
-                ->whereIn(DB::raw('LOWER(name)'), $toDelete)
-                ->get();
-
-            foreach ($deleteCommodities as $commodity) {
-                $this->info("Deleting commodity: {$commodity->name} (ID: {$commodity->id})");
-
-                // Delete details from NilaiTransaksiEkonomiDetail
-                $nteDetails = NilaiTransaksiEkonomiDetail::where('commodity_id', $commodity->id)->get();
-                foreach ($nteDetails as $detail) {
-                    $parent = $detail->nilaiTransaksiEkonomi;
-                    $detail->delete();
-                    if ($parent) {
-                        $parent->total_nilai_transaksi = $parent->details()->sum('nilai_transaksi');
-                        $parent->save();
-                    }
-                }
-
-                // Delete details from NilaiEkonomiDetail
-                if (class_exists(NilaiEkonomiDetail::class)) {
-                    $neDetails = NilaiEkonomiDetail::where('commodity_id', $commodity->id)->get();
-                    foreach ($neDetails as $detail) {
-                        $parent = $detail->nilaiEkonomi;
-                        $detail->delete();
-                        if ($parent) {
-                            $parent->total_transaction_value = $parent->details()->sum('transaction_value');
-                            $parent->save();
-                        }
-                    }
-                }
-
-                // Delete the commodity itself
-                $commodity->delete();
-            }
-
-            // 2. Merge duplicates
+            // 1. Merge duplicates and unwanted commodities into specific names
             $this->info("Merging commodities...");
             $mapping = [
                 'Buah-Buahan Segar' => ['Buah - buahan segar', 'Buah -buahan', 'Buah- buahan', 'Buah2segar', 'Buah2 segar'],
                 'Minyak Atsiri' => ['Minyak Astiri'],
                 'Kerajinan Bambu' => ['Kerajinan Berbahan Bambu'],
+                'Lainnya' => ['kg', 'hhk', 'hasil', 'porang', 'pembibitan', 'reyeng', 'getah pinus', 'jahe', 'Lainnya'],
             ];
 
             foreach ($mapping as $canonicalName => $variations) {
