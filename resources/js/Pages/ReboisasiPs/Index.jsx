@@ -29,12 +29,12 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
   const isKaCdk = auth.user.roles.includes('kacdk');
   const userPermissions = auth.user.permissions || [];
 
-  const canCreate = userPermissions.includes('rehab.create') || isAdmin;
-  const canEdit = userPermissions.includes('rehab.edit') || isAdmin;
-  const canDelete = userPermissions.includes('rehab.delete') || isAdmin;
-  const canApprove = userPermissions.includes('rehab.approve') || isAdmin;
-  const canExport = userPermissions.includes('rehab.export') || isAdmin;
-  const canImport = userPermissions.includes('rehab.import') || isAdmin;
+  const canCreate = userPermissions.includes('reboisasi-ps.create') || isAdmin;
+  const canEdit = userPermissions.includes('reboisasi-ps.edit') || isAdmin;
+  const canDelete = userPermissions.includes('reboisasi-ps.delete') || isAdmin;
+  const canApprove = userPermissions.includes('reboisasi-ps.approve') || isAdmin;
+  const canExport = userPermissions.includes('reboisasi-ps.export') || isAdmin;
+  const canImport = userPermissions.includes('reboisasi-ps.import') || isAdmin;
 
   useEffect(() => {
     if (flash?.import_errors) {

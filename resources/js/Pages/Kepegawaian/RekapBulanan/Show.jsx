@@ -112,9 +112,9 @@ export default function Show({ auth, rekap, rekap_sebelumnya, pendidikanLabels, 
     const isKasi = auth.user.roles.includes('kasi');
     const isKaCdk = auth.user.roles.includes('kacdk');
     const userPermissions = auth.user.permissions || [];
-    const canCreate = userPermissions.includes('kepegawaian.create') || isAdmin;
-    const canEdit = userPermissions.includes('kepegawaian.edit') || isAdmin;
-    const canApprove = userPermissions.includes('kepegawaian.approve') || isAdmin;
+    const canCreate = userPermissions.includes('demografi-pegawai.create') || isAdmin;
+    const canEdit = userPermissions.includes('demografi-pegawai.edit') || isAdmin;
+    const canApprove = userPermissions.includes('demografi-pegawai.approve') || isAdmin;
 
     const handleSingleAction = (id, action) => {
         let title = '', text = '', icon = 'warning', confirmText = '', confirmColor = '#258a55', showInput = false;

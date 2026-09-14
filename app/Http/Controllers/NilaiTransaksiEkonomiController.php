@@ -18,16 +18,6 @@ class NilaiTransaksiEkonomiController extends Controller
 {
   use \App\Traits\HandlesImportFailures;
 
-  public function __construct()
-  {
-    $this->middleware('permission:pemberdayaan.view')->only(['index', 'show']);
-    $this->middleware('permission:pemberdayaan.create')->only(['create', 'store']);
-    $this->middleware('permission:pemberdayaan.edit')->only(['edit', 'update']);
-    $this->middleware('permission:pemberdayaan.delete')->only(['destroy']);
-    $this->middleware('permission:pemberdayaan.export')->only(['export']);
-    $this->middleware('permission:pemberdayaan.import')->only(['import']);
-  }
-
   public function index(Request $request)
   {
     $selectedYear = $request->query('year')
@@ -154,9 +144,9 @@ class NilaiTransaksiEkonomiController extends Controller
     ];
 
     match ($data['action']) {
-      WorkflowAction::SUBMIT => $this->authorize('pemberdayaan.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('pemberdayaan.approve'),
-      WorkflowAction::DELETE => $this->authorize('pemberdayaan.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('nilai-transaksi-ekonomi.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('nilai-transaksi-ekonomi.approve'),
+      WorkflowAction::DELETE => $this->authorize('nilai-transaksi-ekonomi.delete'),
     };
 
     try {
@@ -303,9 +293,9 @@ class NilaiTransaksiEkonomiController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('pemberdayaan.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('pemberdayaan.approve'),
-      WorkflowAction::DELETE => $this->authorize('pemberdayaan.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('nilai-transaksi-ekonomi.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('nilai-transaksi-ekonomi.approve'),
+      WorkflowAction::DELETE => $this->authorize('nilai-transaksi-ekonomi.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {

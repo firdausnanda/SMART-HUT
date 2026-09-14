@@ -123,11 +123,14 @@ class NilaiEkonomiImport implements ToModel, WithHeadingRow, WithValidation, Ski
 
       $satuan = $satuans[$i] ?? '-';
 
-      // Find or Create Commodity
-      $commodity = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')->firstOrCreate(
-        ['name' => $commodityName],
-        ['is_nilai_transaksi_ekonomi' => true]
-      );
+      // Find Commodity
+      $commodity = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
+        ->where('name', $commodityName)
+        ->first();
+
+      if (!$commodity) {
+        continue;
+      }
 
       // Create Detail
       $transaction->details()->create([

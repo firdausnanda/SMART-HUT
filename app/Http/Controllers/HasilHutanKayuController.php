@@ -17,17 +17,24 @@ use Illuminate\Validation\Rule;
 class HasilHutanKayuController extends Controller
 {
   use HandlesImportFailures;
-  public function __construct()
-  {
-    $this->middleware('permission:bina-usaha.view')->only(['index', 'show']);
-    $this->middleware('permission:bina-usaha.create')->only(['create', 'store']);
-    $this->middleware('permission:bina-usaha.edit')->only(['edit', 'update']);
-    $this->middleware('permission:bina-usaha.delete')->only(['destroy']);
-  }
 
-  public function index(Request $request)
+  
+    private function authorizeForestType(string $forestType, string $action)
+    {
+        $permPrefix = match ($forestType) {
+            'Hutan Negara' => 'produksi-hutan-negara',
+            'Perhutanan Sosial' => 'produksi-perhutanan-sosial',
+            'Hutan Rakyat' => 'produksi-hutan-rakyat',
+            default => 'produksi-hutan-negara',
+        };
+        $this->authorize("{$permPrefix}.{$action}");
+    }
+
+    public function index(Request $request)
+
   {
     $forestType = $request->query('forest_type', 'Hutan Negara');
+    $this->authorizeForestType($forestType, 'view');
     $defaultYear = HasilHutanKayu::where('forest_type', $forestType)->max('year') ?? now()->year;
     $selectedYear = $request->integer('year', $defaultYear);
 
@@ -163,6 +170,8 @@ class HasilHutanKayuController extends Controller
   public function create(Request $request)
   {
     $forestType = $request->query('forest_type', 'Hutan Negara');
+    $this->authorizeForestType($forestType, 'create');
+    $this->authorizeForestType($forestType, 'view');
 
     return Inertia::render('HasilHutanKayu/Create', [
       'forest_type' => $forestType,
@@ -176,6 +185,7 @@ class HasilHutanKayuController extends Controller
 
   public function store(Request $request)
   {
+    $this->authorizeForestType($request->input('forest_type', 'Hutan Negara'), 'create');
     $validated = $request->validate([
       'year' => 'required|integer|digits:4',
       'month' => 'required|integer|min:1|max:12',
@@ -232,6 +242,7 @@ class HasilHutanKayuController extends Controller
 
   public function edit(HasilHutanKayu $hasilHutanKayu)
   {
+    $this->authorizeForestType($hasilHutanKayu->forest_type, 'edit');
     return Inertia::render('HasilHutanKayu/Edit', [
       'data' => $hasilHutanKayu->load(['details.kayu', 'regency', 'district', 'pengelolaHutan', 'pengelolaWisata']),
       'kayu_list' => Kayu::all(),
@@ -244,6 +255,7 @@ class HasilHutanKayuController extends Controller
 
   public function update(Request $request, HasilHutanKayu $hasilHutanKayu)
   {
+    $this->authorizeForestType($hasilHutanKayu->forest_type, 'edit');
     $validated = $request->validate([
       'year' => 'required|integer|digits:4',
       'month' => 'required|integer|min:1|max:12',
@@ -301,6 +313,7 @@ class HasilHutanKayuController extends Controller
   public function destroy(HasilHutanKayu $hasilHutanKayu)
   {
     $forestType = $hasilHutanKayu->forest_type;
+    $this->authorizeForestType($forestType, 'delete');
     $year = $hasilHutanKayu->year;
     $hasilHutanKayu->delete();
 
@@ -323,9 +336,9 @@ class HasilHutanKayuController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('bina-usaha.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('bina-usaha.approve'),
-      WorkflowAction::DELETE => $this->authorize('bina-usaha.delete'),
+      WorkflowAction::SUBMIT => $this->authorizeForestType($hasilHutanKayu->forest_type, 'edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorizeForestType($hasilHutanKayu->forest_type, 'approve'),
+      WorkflowAction::DELETE => $this->authorizeForestType($hasilHutanKayu->forest_type, 'delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
@@ -362,6 +375,8 @@ class HasilHutanKayuController extends Controller
   public function export(Request $request)
   {
     $forestType = $request->query('forest_type', 'Hutan Negara');
+    $this->authorizeForestType($forestType, 'export');
+    $this->authorizeForestType($forestType, 'view');
     $year = $request->query('year');
     return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\HasilHutanKayuExport($forestType, $year), 'hasil-hutan-kayu-' . date('Y-m-d') . '.xlsx');
   }
@@ -369,11 +384,14 @@ class HasilHutanKayuController extends Controller
   public function template(Request $request)
   {
     $forestType = $request->query('forest_type', 'Hutan Negara');
+    $this->authorizeForestType($forestType, 'create');
+    $this->authorizeForestType($forestType, 'view');
     return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\HasilHutanKayuTemplateExport($forestType), 'template_import_hasil_hutan_kayu.xlsx');
   }
 
   public function import(Request $request)
   {
+    $this->authorizeForestType($request->input('forest_type', 'Hutan Negara'), 'import');
     $request->validate([
       'file' => 'required|mimes:xlsx,csv,xls',
       'forest_type' => 'required',
@@ -415,9 +433,9 @@ class HasilHutanKayuController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('bina-usaha.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('bina-usaha.approve'),
-      WorkflowAction::DELETE => $this->authorize('bina-usaha.delete'),
+      WorkflowAction::SUBMIT => $this->authorizeForestType($hasilHutanKayu->forest_type, 'edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorizeForestType($hasilHutanKayu->forest_type, 'approve'),
+      WorkflowAction::DELETE => $this->authorizeForestType($hasilHutanKayu->forest_type, 'delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {

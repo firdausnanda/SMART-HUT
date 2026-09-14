@@ -16,13 +16,32 @@ use App\Imports\UserImport;
 
 class UserController extends Controller
 {
-  public function __construct()
+  private function getGroupedPermissions()
   {
-    $this->middleware('permission:users.view')->only(['index', 'show']);
-    $this->middleware('permission:users.create')->only(['create', 'store']);
-    $this->middleware('permission:users.edit')->only(['edit', 'update']);
-    $this->middleware('permission:users.delete')->only(['destroy']);
+      $allPermissions = \Spatie\Permission\Models\Permission::all();
+      
+      $map = [
+          'Pembinaan Hutan' => ['rehab-lahan', 'penghijauan-lingkungan', 'rehab-manggrove', 'rhl-teknis', 'reboisasi-ps'],
+          'Perlindungan & Jasa Lingkungan' => ['kebakaran-hutan', 'pengunjung-wisata'],
+          'Bina Usaha' => ['produksi-hutan-negara', 'produksi-perhutanan-sosial', 'produksi-hutan-rakyat', 'pbphh', 'realisasi-pnbp'],
+          'Pemberdayaan Masyarakat' => ['skps', 'kups', 'nilai-ekonomi', 'perkembangan-kth', 'nilai-transaksi-ekonomi'],
+          'Kepegawaian' => ['demografi-pegawai', 'bezetting-jabatan', 'proyeksi-gaji'],
+          'Manajemen User' => ['users']
+      ];
+
+      $groupedPermissions = [];
+      foreach ($map as $mainGroup => $modules) {
+          foreach ($modules as $mod) {
+              $perms = $allPermissions->filter(fn($p) => str_starts_with($p->name, $mod . '.'));
+              if ($perms->count() > 0) {
+                  $groupedPermissions[$mainGroup][$mod] = $perms->values();
+              }
+          }
+      }
+
+      return $groupedPermissions;
   }
+
   /**
    * Display a listing of the resource.
    */
@@ -68,7 +87,8 @@ class UserController extends Controller
     $cdks = auth()->user()->isAdminProvinsi() ? \App\Models\Cdk::where('is_active', true)->get(['id', 'nama']) : [];
     return Inertia::render('User/Create', [
       'roles' => $roles,
-      'cdks' => $cdks
+      'cdks' => $cdks,
+      'permissions' => $this->getGroupedPermissions()
     ]);
   }
 
@@ -92,6 +112,8 @@ class UserController extends Controller
             ->uncompromised(),
       ],
       'role' => 'required|exists:roles,name',
+      'permissions' => 'nullable|array',
+      'permissions.*' => 'exists:permissions,name',
     ];
 
     if (auth()->user()->isAdminProvinsi()) {
@@ -116,6 +138,9 @@ class UserController extends Controller
     ]);
 
     $user->assignRole($request->role);
+    if ($request->has('permissions')) {
+      $user->syncPermissions($request->permissions);
+    }
 
     return redirect()->route('users.index')->with('success', 'User created successfully.');
   }
@@ -142,9 +167,7 @@ class UserController extends Controller
     }
 
     $roles = $this->getAllowedRoles();
-    $permissions = \Spatie\Permission\Models\Permission::all()->groupBy(function ($data) {
-      return explode('.', $data->name)[0];
-    });
+    $permissions = $this->getGroupedPermissions();
 
     $cdks = auth()->user()->isAdminProvinsi() ? \App\Models\Cdk::where('is_active', true)->get(['id', 'nama']) : [];
 
@@ -178,6 +201,8 @@ class UserController extends Controller
       'username' => 'required|string|max:255|unique:users,username,' . $user->id,
       'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . $user->id,
       'role' => 'required|exists:roles,name',
+      'permissions' => 'nullable|array',
+      'permissions.*' => 'exists:permissions,name',
       'permissions' => 'nullable|array',
       'permissions.*' => 'exists:permissions,name',
     ];

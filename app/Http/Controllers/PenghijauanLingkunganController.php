@@ -15,15 +15,6 @@ use Inertia\Inertia;
 class PenghijauanLingkunganController extends Controller
 {
   use \App\Traits\HandlesImportFailures;
-  public function __construct()
-  {
-    $this->middleware('permission:penghijauan.view')->only(['index', 'show']);
-    $this->middleware('permission:penghijauan.create')->only(['create', 'store']);
-    $this->middleware('permission:penghijauan.edit')->only(['edit', 'update']);
-    $this->middleware('permission:penghijauan.delete')->only(['destroy']);
-    $this->middleware('permission:penghijauan.export')->only(['export']);
-    $this->middleware('permission:penghijauan.import')->only(['import']);
-  }
 
   public function index(Request $request)
   {
@@ -228,9 +219,9 @@ class PenghijauanLingkunganController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('penghijauan.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('penghijauan.approve'),
-      WorkflowAction::DELETE => $this->authorize('penghijauan.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('penghijauan-lingkungan.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('penghijauan-lingkungan.approve'),
+      WorkflowAction::DELETE => $this->authorize('penghijauan-lingkungan.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
@@ -318,9 +309,9 @@ class PenghijauanLingkunganController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('penghijauan.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('penghijauan.approve'),
-      WorkflowAction::DELETE => $this->authorize('penghijauan.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('penghijauan-lingkungan.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('penghijauan-lingkungan.approve'),
+      WorkflowAction::DELETE => $this->authorize('penghijauan-lingkungan.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {

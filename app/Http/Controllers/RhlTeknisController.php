@@ -17,15 +17,6 @@ use Illuminate\Support\Facades\DB;
 class RhlTeknisController extends Controller
 {
   use \App\Traits\HandlesImportFailures;
-  public function __construct()
-  {
-    $this->middleware('permission:rehab.view')->only(['index', 'show']);
-    $this->middleware('permission:rehab.create')->only(['create', 'store']);
-    $this->middleware('permission:rehab.edit')->only(['edit', 'update']);
-    $this->middleware('permission:rehab.delete')->only(['destroy']);
-    $this->middleware('permission:rehab.export')->only(['export']);
-    $this->middleware('permission:rehab.import')->only(['import']);
-  }
 
   public function index(Request $request)
   {
@@ -247,9 +238,9 @@ class RhlTeknisController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('rehab.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('rehab.approve'),
-      WorkflowAction::DELETE => $this->authorize('rehab.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('rhl-teknis.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('rhl-teknis.approve'),
+      WorkflowAction::DELETE => $this->authorize('rhl-teknis.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
@@ -325,9 +316,9 @@ class RhlTeknisController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('rehab.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('rehab.approve'),
-      WorkflowAction::DELETE => $this->authorize('rehab.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('rhl-teknis.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('rhl-teknis.approve'),
+      WorkflowAction::DELETE => $this->authorize('rhl-teknis.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {

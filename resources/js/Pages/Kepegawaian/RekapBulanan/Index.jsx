@@ -63,9 +63,9 @@ export default function Index({ auth, rekaps, filters }) {
     const isKaCdk = auth.user.roles.includes('kacdk');
     const userPermissions = auth.user.permissions || [];
 
-    const canApprove = userPermissions.includes('kepegawaian.approve') || isAdmin;
-    const canEdit = userPermissions.includes('kepegawaian.edit') || isAdmin;
-    const canDelete = userPermissions.includes('kepegawaian.delete') || isAdmin;
+    const canApprove = userPermissions.includes('demografi-pegawai.approve') || isAdmin;
+    const canEdit = userPermissions.includes('demografi-pegawai.edit') || isAdmin;
+    const canDelete = userPermissions.includes('demografi-pegawai.delete') || isAdmin;
 
     // Check if the selected month/year is already protected (has waiting or final status)
     const existingRekap = rekaps.find(r => r.periode_bulan === parseInt(data.month) && r.periode_tahun === parseInt(data.year));

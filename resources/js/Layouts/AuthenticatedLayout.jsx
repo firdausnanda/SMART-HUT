@@ -118,7 +118,7 @@ export default function Authenticated({ user, header, children }) {
                         </div>
 
                         {/* Pembinaan Hutan (Dropdown) */}
-                        {hasAnyPermission(['rehab.view', 'penghijauan.view']) && (
+                        {hasAnyPermission(['rehab-lahan.view', 'penghijauan-lingkungan.view', 'rehab-manggrove.view', 'rhl-teknis.view', 'reboisasi-ps.view']) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('pembinaan')}
@@ -144,13 +144,13 @@ export default function Authenticated({ user, header, children }) {
                                 {!isSidebarCollapsed && openMenus['pembinaan'] && (
                                     <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                         {[
-                                            { name: 'Rehabilitasi Lahan', route: 'rehab-lahan.index', pattern: 'rehab-lahan.*', permission: 'rehab.view' },
-                                            { name: 'Penghijauan Lingkungan', route: 'penghijauan-lingkungan.index', pattern: 'penghijauan-lingkungan.*', permission: 'penghijauan.view' },
-                                            { name: 'Rehabilitasi Manggrove', route: 'rehab-manggrove.index', pattern: 'rehab-manggrove.*', permission: 'rehab.view' },
-                                            { name: 'Bangunan Konservasi Tanah & Air', route: 'rhl-teknis.index', pattern: 'rhl-teknis.*', permission: 'rehab.view' },
-                                            { name: 'Reboisasi Area Perhutanan Sosial', route: 'reboisasi-ps.index', pattern: 'reboisasi-ps.*', permission: 'rehab.view' }
+                                            { name: 'Rehabilitasi Lahan', route: 'rehab-lahan.index', pattern: 'rehab-lahan.*', permission: 'rehab-lahan.view' },
+                                            { name: 'Penghijauan Lingkungan', route: 'penghijauan-lingkungan.index', pattern: 'penghijauan-lingkungan.*', permission: 'penghijauan-lingkungan.view' },
+                                            { name: 'Rehabilitasi Manggrove', route: 'rehab-manggrove.index', pattern: 'rehab-manggrove.*', permission: 'rehab-manggrove.view' },
+                                            { name: 'Bangunan Konservasi Tanah & Air', route: 'rhl-teknis.index', pattern: 'rhl-teknis.*', permission: 'rhl-teknis.view' },
+                                            { name: 'Reboisasi Area Perhutanan Sosial', route: 'reboisasi-ps.index', pattern: 'reboisasi-ps.*', permission: 'reboisasi-ps.view' }
                                         ]
-                                            .filter(item => hasPermission(item.permission))
+                                            .filter(item => (item.permission ? hasPermission(item.permission) : (item.permissions ? hasAnyPermission(item.permissions) : true)))
                                             .map((item) => (
                                                 <Link
                                                     key={item.name}
@@ -170,7 +170,7 @@ export default function Authenticated({ user, header, children }) {
 
                         {/* Perlindungan dan Jasa Lingkungan */}
                         {/* Perlindungan Hutan (Dropdown) */}
-                        {hasPermission('perlindungan.view') && (
+                        {hasAnyPermission(['kebakaran-hutan.view', 'pengunjung-wisata.view']) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('perlindungan')}
@@ -196,9 +196,9 @@ export default function Authenticated({ user, header, children }) {
                                 {!isSidebarCollapsed && openMenus['perlindungan'] && (
                                     <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                         {[
-                                            { name: 'Kebakaran Hutan', route: route('kebakaran-hutan.index'), pattern: 'kebakaran-hutan.*' },
-                                            { name: 'Pengunjung Objek Wisata', route: route('pengunjung-wisata.index'), pattern: 'pengunjung-wisata.*' }
-                                        ].map((item) => (
+                                            { name: 'Kebakaran Hutan', route: route('kebakaran-hutan.index'), pattern: 'kebakaran-hutan.*', permission: 'kebakaran-hutan.view' },
+                                            { name: 'Pengunjung Objek Wisata', route: route('pengunjung-wisata.index'), pattern: 'pengunjung-wisata.*', permission: 'pengunjung-wisata.view' }
+                                        ].filter(item => item.permission ? hasPermission(item.permission) : true).map((item) => (
                                             <Link
                                                 key={item.name}
                                                 href={item.route}
@@ -217,7 +217,7 @@ export default function Authenticated({ user, header, children }) {
 
                         {/* Bina Usaha Kehutanan */}
                         {/* Bina Usaha Kehutanan (Dropdown) */}
-                        {hasPermission('bina-usaha.view') && (
+                        {hasAnyPermission(['produksi-hutan-negara.view', 'produksi-perhutanan-sosial.view', 'produksi-hutan-rakyat.view', 'pbphh.view', 'realisasi-pnbp.view']) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('bina_usaha')}
@@ -246,6 +246,7 @@ export default function Authenticated({ user, header, children }) {
                                             {
                                                 name: 'Produksi dari Hutan Negara',
                                                 key: 'hutan_negara',
+                                                permission: 'produksi-hutan-negara.view',
                                                 children: [
                                                     { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Negara' }), activeCheck: () => route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Negara' }) },
                                                     { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Negara' }), activeCheck: () => route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Hutan Negara' }) }
@@ -254,6 +255,7 @@ export default function Authenticated({ user, header, children }) {
                                             {
                                                 name: 'Produksi dari Perhutanan Sosial',
                                                 key: 'perhutanan_sosial',
+                                                permission: 'produksi-perhutanan-sosial.view',
                                                 children: [
                                                     { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Perhutanan Sosial' }), activeCheck: () => route().current('hasil-hutan-kayu.*', { forest_type: 'Perhutanan Sosial' }) },
                                                     { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Perhutanan Sosial' }), activeCheck: () => route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Perhutanan Sosial' }) }
@@ -262,14 +264,15 @@ export default function Authenticated({ user, header, children }) {
                                             {
                                                 name: 'Produksi dari Hutan Rakyat',
                                                 key: 'hutan_rakyat',
+                                                permission: 'produksi-hutan-rakyat.view',
                                                 children: [
                                                     { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Rakyat' }), activeCheck: () => route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Rakyat' }) },
                                                     { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Rakyat' }), activeCheck: () => route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Hutan Rakyat' }) }
                                                 ]
                                             },
-                                            { name: 'PBPHH', route: route('pbphh.index'), pattern: 'pbphh.*' },
-                                            { name: 'PNBP', route: route('realisasi-pnbp.index'), pattern: 'realisasi-pnbp.*' }
-                                        ].map((item) => (
+                                            { name: 'PBPHH', route: route('pbphh.index'), pattern: 'pbphh.*', permission: 'pbphh.view' },
+                                            { name: 'PNBP', route: route('realisasi-pnbp.index'), pattern: 'realisasi-pnbp.*', permission: 'realisasi-pnbp.view' }
+                                        ].filter(item => item.permission ? hasPermission(item.permission) : true).map((item) => (
                                             <div key={item.name}>
                                                 {item.children ? (
                                                     <div>
@@ -324,7 +327,7 @@ export default function Authenticated({ user, header, children }) {
 
                         {/* Pemberdayaan Masyarakat */}
                         {/* Pemberdayaan Masyarakat (Dropdown) */}
-                        {hasPermission('pemberdayaan.view') && (
+                        {hasAnyPermission(['skps.view', 'kups.view', 'nilai-ekonomi.view', 'perkembangan-kth.view', 'nilai-transaksi-ekonomi.view']) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('pemberdayaan')}
@@ -354,20 +357,20 @@ export default function Authenticated({ user, header, children }) {
                                                 name: 'Kelembagaan Perhutanan Sosial',
                                                 key: 'kelembagaan_perhutanan_sosial',
                                                 children: [
-                                                    { name: 'Perkembangan SK PS', route: route('skps.index'), pattern: 'skps.*' },
-                                                    { name: 'Perkembangan KUPS', route: route('kups.index'), pattern: 'kups.*' },
-                                                    { name: 'Nilai Ekonomi (NEKON)', route: route('nilai-ekonomi.index'), pattern: 'nilai-ekonomi.*' }
+                                                    { name: 'Perkembangan SK PS', route: route('skps.index'), pattern: 'skps.*', permission: 'skps.view' },
+                                                    { name: 'Perkembangan KUPS', route: route('kups.index'), pattern: 'kups.*', permission: 'kups.view' },
+                                                    { name: 'Nilai Ekonomi (NEKON)', route: route('nilai-ekonomi.index'), pattern: 'nilai-ekonomi.*', permission: 'nilai-ekonomi.view' }
                                                 ]
                                             },
                                             {
                                                 name: 'Kelembagaan Hutan Rakyat',
                                                 key: 'kelembagaan_hutan_rakyat',
                                                 children: [
-                                                    { name: 'Perkembangan KTH', route: route('perkembangan-kth.index'), pattern: 'perkembangan-kth.*' },
-                                                    { name: 'Nilai Transaksi Ekonomi', route: route('nilai-transaksi-ekonomi.index'), pattern: 'nilai-transaksi-ekonomi.*' }
+                                                    { name: 'Perkembangan KTH', route: route('perkembangan-kth.index'), pattern: 'perkembangan-kth.*', permission: 'perkembangan-kth.view' },
+                                                    { name: 'Nilai Transaksi Ekonomi', route: route('nilai-transaksi-ekonomi.index'), pattern: 'nilai-transaksi-ekonomi.*', permission: 'nilai-transaksi-ekonomi.view' }
                                                 ]
                                             }
-                                        ].map((item) => (
+                                        ].filter(item => item.permission ? hasPermission(item.permission) : true).map((item) => (
                                             <div key={item.name}>
                                                 {item.children ? (
                                                     <div>
@@ -419,7 +422,7 @@ export default function Authenticated({ user, header, children }) {
                         )}
 
                         {/* Kepegawaian */}
-                        {hasPermission('kepegawaian.view') && (
+                        {hasAnyPermission(['demografi-pegawai.view', 'bezetting-jabatan.view', 'proyeksi-gaji.view']) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('kepegawaian')}
@@ -445,10 +448,10 @@ export default function Authenticated({ user, header, children }) {
                                 {!isSidebarCollapsed && openMenus['kepegawaian'] && (
                                     <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                         {[
-                                            { name: 'Demografi Pegawai', route: route('demografi-pegawai.index'), pattern: 'demografi-pegawai.*' },
-                                            { name: 'Bezetting Jabatan', route: route('bezetting-jabatan.index'), pattern: 'bezetting-jabatan.*' },
-                                            { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*' },
-                                        ].map((item) => (
+                                            { name: 'Demografi Pegawai', route: route('demografi-pegawai.index'), pattern: 'demografi-pegawai.*', permission: 'demografi-pegawai.view' },
+                                            { name: 'Bezetting Jabatan', route: route('bezetting-jabatan.index'), pattern: 'bezetting-jabatan.*', permission: 'bezetting-jabatan.view' },
+                                            { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*', permission: 'proyeksi-gaji.view' },
+                                        ].filter(item => item.permission ? hasPermission(item.permission) : true).map((item) => (
                                             <Link
                                                 key={item.name}
                                                 href={item.route}
@@ -505,7 +508,7 @@ export default function Authenticated({ user, header, children }) {
                                             { name: 'Data Pengelola Wisata', route: route('pengelola-wisata.index'), pattern: 'pengelola-wisata.*' },
                                             { name: 'Data Pengelola PS', route: route('pengelola-ps.index'), pattern: 'pengelola-ps.*' },
                                             { name: 'Data Skema Perf. Sosial', route: route('skema-perhutanan-sosial.index'), pattern: 'skema-perhutanan-sosial.*' }
-                                        ].map((item) => (
+                                        ].filter(item => item.permission ? hasPermission(item.permission) : true).map((item) => (
                                             <Link
                                                 key={item.name}
                                                 href={item.route}
@@ -686,7 +689,7 @@ export default function Authenticated({ user, header, children }) {
                         </div>
 
                         {/* Pembinaan Dropdown Mobile */}
-                        {hasAnyPermission(['rehab.view', 'penghijauan.view']) && (
+                        {hasAnyPermission(['rehab-lahan.view', 'penghijauan-lingkungan.view', 'rehab-manggrove.view', 'rhl-teknis.view', 'reboisasi-ps.view']) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('pembinaan_mobile')}
@@ -706,13 +709,13 @@ export default function Authenticated({ user, header, children }) {
                                 {openMenus['pembinaan_mobile'] && (
                                     <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                         {[
-                                            { name: 'Rehabilitasi Lahan', route: 'rehab-lahan.index', pattern: 'rehab-lahan.*', permission: 'rehab.view' },
-                                            { name: 'Penghijauan Lingkungan', route: 'penghijauan-lingkungan.index', pattern: 'penghijauan-lingkungan.*', permission: 'penghijauan.view' },
-                                            { name: 'Rehabilitasi Manggrove', route: 'rehab-manggrove.index', pattern: 'rehab-manggrove.*', permission: 'rehab.view' },
-                                            { name: 'Bangunan Konservasi Tanah & Air', route: 'rhl-teknis.index', pattern: 'rhl-teknis.*', permission: 'rehab.view' },
-                                            { name: 'Reboisasi Area Perhutanan Sosial', route: 'reboisasi-ps.index', pattern: 'reboisasi-ps.*', permission: 'rehab.view' }
+                                            { name: 'Rehabilitasi Lahan', route: 'rehab-lahan.index', pattern: 'rehab-lahan.*', permission: 'rehab-lahan.view' },
+                                            { name: 'Penghijauan Lingkungan', route: 'penghijauan-lingkungan.index', pattern: 'penghijauan-lingkungan.*', permission: 'penghijauan-lingkungan.view' },
+                                            { name: 'Rehabilitasi Manggrove', route: 'rehab-manggrove.index', pattern: 'rehab-manggrove.*', permission: 'rehab-manggrove.view' },
+                                            { name: 'Bangunan Konservasi Tanah & Air', route: 'rhl-teknis.index', pattern: 'rhl-teknis.*', permission: 'rhl-teknis.view' },
+                                            { name: 'Reboisasi Area Perhutanan Sosial', route: 'reboisasi-ps.index', pattern: 'reboisasi-ps.*', permission: 'reboisasi-ps.view' }
                                         ]
-                                            .filter(item => hasPermission(item.permission))
+                                            .filter(item => (item.permission ? hasPermission(item.permission) : (item.permissions ? hasAnyPermission(item.permissions) : true)))
                                             .map((item) => (
                                                 <Link
                                                     key={item.name}
@@ -732,7 +735,7 @@ export default function Authenticated({ user, header, children }) {
                         )}
 
                         {/* Perlindungan Hutan Dropdown Mobile */}
-                        {hasPermission('perlindungan.view') && (
+                        {hasAnyPermission(['kebakaran-hutan.view', 'pengunjung-wisata.view']) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('perlindungan_mobile')}
@@ -752,9 +755,9 @@ export default function Authenticated({ user, header, children }) {
                                 {openMenus['perlindungan_mobile'] && (
                                     <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                         {[
-                                            { name: 'Kebakaran Hutan', route: route('kebakaran-hutan.index'), pattern: 'kebakaran-hutan.*' },
-                                            { name: 'Pengunjung Objek Wisata', route: route('pengunjung-wisata.index'), pattern: 'pengunjung-wisata.*' }
-                                        ].map((item) => (
+                                            { name: 'Kebakaran Hutan', route: route('kebakaran-hutan.index'), pattern: 'kebakaran-hutan.*', permission: 'kebakaran-hutan.view' },
+                                            { name: 'Pengunjung Objek Wisata', route: route('pengunjung-wisata.index'), pattern: 'pengunjung-wisata.*', permission: 'pengunjung-wisata.view' }
+                                        ].filter(item => item.permission ? hasPermission(item.permission) : true).map((item) => (
                                             <Link
                                                 key={item.name}
                                                 href={item.route}
@@ -773,7 +776,7 @@ export default function Authenticated({ user, header, children }) {
                         )}
 
                         {/* Bina Usaha Dropdown Mobile */}
-                        {hasPermission('bina-usaha.view') && (
+                        {hasAnyPermission(['produksi-hutan-negara.view', 'produksi-perhutanan-sosial.view', 'produksi-hutan-rakyat.view', 'pbphh.view', 'realisasi-pnbp.view']) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('bina_usaha_mobile')}
@@ -796,6 +799,7 @@ export default function Authenticated({ user, header, children }) {
                                             {
                                                 name: 'Produksi dari Hutan Negara',
                                                 key: 'hutan_negara_mobile',
+                                                permission: 'produksi-hutan-negara.view',
                                                 children: [
                                                     { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Negara' }), activeCheck: () => route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Negara' }) },
                                                     { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Negara' }), activeCheck: () => route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Hutan Negara' }) }
@@ -804,6 +808,7 @@ export default function Authenticated({ user, header, children }) {
                                             {
                                                 name: 'Produksi dari Perhutanan Sosial',
                                                 key: 'perhutanan_sosial_mobile',
+                                                permission: 'produksi-perhutanan-sosial.view',
                                                 children: [
                                                     { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Perhutanan Sosial' }), activeCheck: () => route().current('hasil-hutan-kayu.*', { forest_type: 'Perhutanan Sosial' }) },
                                                     { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Perhutanan Sosial' }), activeCheck: () => route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Perhutanan Sosial' }) }
@@ -812,14 +817,15 @@ export default function Authenticated({ user, header, children }) {
                                             {
                                                 name: 'Produksi dari Hutan Rakyat',
                                                 key: 'hutan_rakyat_mobile',
+                                                permission: 'produksi-hutan-rakyat.view',
                                                 children: [
                                                     { name: 'Hasil Hutan Kayu', route: route('hasil-hutan-kayu.index', { forest_type: 'Hutan Rakyat' }), activeCheck: () => route().current('hasil-hutan-kayu.*', { forest_type: 'Hutan Rakyat' }) },
                                                     { name: 'Hasil Hutan Bukan Kayu', route: route('hasil-hutan-bukan-kayu.index', { forest_type: 'Hutan Rakyat' }), activeCheck: () => route().current('hasil-hutan-bukan-kayu.*', { forest_type: 'Hutan Rakyat' }) }
                                                 ]
                                             },
-                                            { name: 'PBPHH', route: route('pbphh.index'), pattern: 'pbphh.*' },
-                                            { name: 'PNBP', route: route('realisasi-pnbp.index'), pattern: 'realisasi-pnbp.*' }
-                                        ].map((item) => (
+                                            { name: 'PBPHH', route: route('pbphh.index'), pattern: 'pbphh.*', permission: 'pbphh.view' },
+                                            { name: 'PNBP', route: route('realisasi-pnbp.index'), pattern: 'realisasi-pnbp.*', permission: 'realisasi-pnbp.view' }
+                                        ].filter(item => item.permission ? hasPermission(item.permission) : true).map((item) => (
                                             <div key={item.name}>
                                                 {item.children ? (
                                                     <div>
@@ -875,7 +881,7 @@ export default function Authenticated({ user, header, children }) {
                         )}
 
                         {/* Pemberdayaan Dropdown Mobile */}
-                        {hasPermission('pemberdayaan.view') && (
+                        {hasAnyPermission(['skps.view', 'kups.view', 'nilai-ekonomi.view', 'perkembangan-kth.view', 'nilai-transaksi-ekonomi.view']) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('pemberdayaan_mobile')}
@@ -899,20 +905,20 @@ export default function Authenticated({ user, header, children }) {
                                                 name: 'Kelembagaan Perhutanan Sosial',
                                                 key: 'kelembagaan_perhutanan_sosial_mobile',
                                                 children: [
-                                                    { name: 'Perkembangan SK PS', route: route('skps.index'), pattern: 'skps.*' },
-                                                    { name: 'Perkembangan KUPS', route: route('kups.index'), pattern: 'kups.*' },
-                                                    { name: 'Nilai Ekonomi (NEKON)', route: route('nilai-ekonomi.index'), pattern: 'nilai-ekonomi.*' }
+                                                    { name: 'Perkembangan SK PS', route: route('skps.index'), pattern: 'skps.*', permission: 'skps.view' },
+                                                    { name: 'Perkembangan KUPS', route: route('kups.index'), pattern: 'kups.*', permission: 'kups.view' },
+                                                    { name: 'Nilai Ekonomi (NEKON)', route: route('nilai-ekonomi.index'), pattern: 'nilai-ekonomi.*', permission: 'nilai-ekonomi.view' }
                                                 ]
                                             },
                                             {
                                                 name: 'Kelembagaan Hutan Rakyat',
                                                 key: 'kelembagaan_hutan_rakyat_mobile',
                                                 children: [
-                                                    { name: 'Perkembangan KTH', route: route('perkembangan-kth.index'), pattern: 'perkembangan-kth.*' },
-                                                    { name: 'Nilai Transaksi Ekonomi', route: route('nilai-transaksi-ekonomi.index'), pattern: 'nilai-transaksi-ekonomi.*' }
+                                                    { name: 'Perkembangan KTH', route: route('perkembangan-kth.index'), pattern: 'perkembangan-kth.*', permission: 'perkembangan-kth.view' },
+                                                    { name: 'Nilai Transaksi Ekonomi', route: route('nilai-transaksi-ekonomi.index'), pattern: 'nilai-transaksi-ekonomi.*', permission: 'nilai-transaksi-ekonomi.view' }
                                                 ]
                                             }
-                                        ].map((item) => (
+                                        ].filter(item => item.permission ? hasPermission(item.permission) : true).map((item) => (
                                             <div key={item.name}>
                                                 {item.children ? (
                                                     <div>
@@ -966,7 +972,7 @@ export default function Authenticated({ user, header, children }) {
                         )}
 
                         {/* Kepegawaian Mobile */}
-                        {hasPermission('kepegawaian.view') && (
+                        {hasAnyPermission(['demografi-pegawai.view', 'bezetting-jabatan.view', 'proyeksi-gaji.view']) && (
                             <div className="space-y-1">
                                 <button
                                     onClick={() => toggleMenu('kepegawaian_mobile')}
@@ -986,10 +992,10 @@ export default function Authenticated({ user, header, children }) {
                                 {openMenus['kepegawaian_mobile'] && (
                                     <div className="ml-9 space-y-1 border-l border-white/10 pl-3 py-1">
                                         {[
-                                            { name: 'Demografi Pegawai', route: route('demografi-pegawai.index'), pattern: 'demografi-pegawai.*' },
-                                            { name: 'Bezetting Jabatan', route: route('bezetting-jabatan.index'), pattern: 'bezetting-jabatan.*' },
-                                            { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*' },
-                                        ].map((item) => (
+                                            { name: 'Demografi Pegawai', route: route('demografi-pegawai.index'), pattern: 'demografi-pegawai.*', permission: 'demografi-pegawai.view' },
+                                            { name: 'Bezetting Jabatan', route: route('bezetting-jabatan.index'), pattern: 'bezetting-jabatan.*', permission: 'bezetting-jabatan.view' },
+                                            { name: 'Proyeksi Gaji Berkala dan Pensiun', route: route('proyeksi-gaji.index'), pattern: 'proyeksi-gaji.*', permission: 'proyeksi-gaji.view' },
+                                        ].filter(item => item.permission ? hasPermission(item.permission) : true).map((item) => (
                                             <Link
                                                 key={item.name}
                                                 href={item.route}
@@ -1041,7 +1047,7 @@ export default function Authenticated({ user, header, children }) {
                                             { name: 'Data Pengelola Wisata', route: route('pengelola-wisata.index'), pattern: 'pengelola-wisata.*' },
                                             { name: 'Data Pengelola PS', route: route('pengelola-ps.index'), pattern: 'pengelola-ps.*' },
                                             { name: 'Data Skema Perf. Sosial', route: route('skema-perhutanan-sosial.index'), pattern: 'skema-perhutanan-sosial.*' }
-                                        ].map((item) => (
+                                        ].filter(item => item.permission ? hasPermission(item.permission) : true).map((item) => (
                                             <Link
                                                 key={item.name}
                                                 href={item.route}

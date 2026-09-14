@@ -244,12 +244,12 @@ export default function Index({ auth, datas, stats, filters = {} }) {
   const isKasi = user.roles.includes('kasi') || (Array.isArray(user.roles) && user.roles.some(r => r.name === 'kasi'));
   const isKaCdk = user.roles.includes('kacdk') || (Array.isArray(user.roles) && user.roles.some(r => r.name === 'kacdk'));
 
-  const canCreate = userPermissions.includes('pemberdayaan.create') || isAdmin;
-  const canEdit = userPermissions.includes('pemberdayaan.edit') || isAdmin;
-  const canDelete = userPermissions.includes('pemberdayaan.delete') || isAdmin;
-  const canApprove = userPermissions.includes('pemberdayaan.approve') || isAdmin;
-  const canReject = userPermissions.includes('pemberdayaan.approve') || isAdmin;
-  const canSubmit = userPermissions.includes('pemberdayaan.edit') || isAdmin;
+  const canCreate = userPermissions.includes('skps.create') || isAdmin;
+  const canEdit = userPermissions.includes('skps.edit') || isAdmin;
+  const canDelete = userPermissions.includes('skps.delete') || isAdmin;
+  const canApprove = userPermissions.includes('skps.approve') || isAdmin;
+  const canReject = userPermissions.includes('skps.approve') || isAdmin;
+  const canSubmit = userPermissions.includes('skps.edit') || isAdmin;
 
 
   const handleSingleAction = (id, action) => {

@@ -15,13 +15,6 @@ use Illuminate\Validation\Rule;
 class KebakaranHutanController extends Controller
 {
   use \App\Traits\HandlesImportFailures;
-  public function __construct()
-  {
-    $this->middleware('permission:perlindungan.view')->only(['index', 'show']);
-    $this->middleware('permission:perlindungan.create')->only(['create', 'store']);
-    $this->middleware('permission:perlindungan.edit')->only(['edit', 'update']);
-    $this->middleware('permission:perlindungan.delete')->only(['destroy']);
-  }
 
   public function index(Request $request)
   {
@@ -217,9 +210,9 @@ class KebakaranHutanController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('perlindungan.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('perlindungan.approve'),
-      WorkflowAction::DELETE => $this->authorize('perlindungan.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('kebakaran-hutan.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kebakaran-hutan.approve'),
+      WorkflowAction::DELETE => $this->authorize('kebakaran-hutan.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
@@ -304,9 +297,9 @@ class KebakaranHutanController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('perlindungan.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('perlindungan.approve'),
-      WorkflowAction::DELETE => $this->authorize('perlindungan.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('kebakaran-hutan.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kebakaran-hutan.approve'),
+      WorkflowAction::DELETE => $this->authorize('kebakaran-hutan.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {

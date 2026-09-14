@@ -22,11 +22,6 @@ class RekapBulananController extends Controller
     public function __construct(RekapKepegawaianService $service)
     {
         $this->service = $service;
-        $this->middleware('permission:kepegawaian.view')->only(['index', 'show', 'showPegawai', 'export', 'exportBezetting']);
-        $this->middleware('permission:kepegawaian.create')->only(['generate', 'storePegawai']);
-        $this->middleware('permission:kepegawaian.edit|kepegawaian.approve')->only(['singleWorkflowAction']);
-        $this->middleware('permission:kepegawaian.edit|kepegawaian.approve|kepegawaian.delete')->only(['bulkWorkflowAction']);
-        $this->middleware('permission:kepegawaian.delete')->only(['destroyPegawai', 'destroy']);
     }
 
     public function index(Request $request)

@@ -71,10 +71,10 @@ export default function Bezetting({ auth, bezettings, filters }) {
     const isKaCdk = auth.user.roles.includes('kacdk');
     const userPermissions = auth.user.permissions || [];
 
-    const canCreate = userPermissions.includes('kepegawaian.create') || isAdmin;
-    const canEdit = userPermissions.includes('kepegawaian.edit') || isAdmin;
-    const canDelete = userPermissions.includes('kepegawaian.delete') || isAdmin;
-    const canApprove = userPermissions.includes('kepegawaian.approve') || isAdmin;
+    const canCreate = userPermissions.includes('bezetting-jabatan.create') || isAdmin;
+    const canEdit = userPermissions.includes('bezetting-jabatan.edit') || isAdmin;
+    const canDelete = userPermissions.includes('bezetting-jabatan.delete') || isAdmin;
+    const canApprove = userPermissions.includes('bezetting-jabatan.approve') || isAdmin;
 
     const performQuery = (query, field = sortField, dir = sortDir, limit = perPage) => {
         router.get(

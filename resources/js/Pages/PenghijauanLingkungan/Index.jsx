@@ -29,12 +29,12 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
   const isKaCdk = auth.user.roles.includes('kacdk');
   const userPermissions = auth.user.permissions || [];
 
-  const canCreate = userPermissions.includes('penghijauan.create') || isAdmin;
-  const canEdit = userPermissions.includes('penghijauan.edit') || isAdmin;
-  const canDelete = userPermissions.includes('penghijauan.delete') || isAdmin;
-  const canApprove = userPermissions.includes('penghijauan.approve') || isAdmin;
-  const canExport = userPermissions.includes('penghijauan.export') || isAdmin;
-  const canImport = userPermissions.includes('penghijauan.import') || isAdmin;
+  const canCreate = userPermissions.includes('penghijauan-lingkungan.create') || isAdmin;
+  const canEdit = userPermissions.includes('penghijauan-lingkungan.edit') || isAdmin;
+  const canDelete = userPermissions.includes('penghijauan-lingkungan.delete') || isAdmin;
+  const canApprove = userPermissions.includes('penghijauan-lingkungan.approve') || isAdmin;
+  const canExport = userPermissions.includes('penghijauan-lingkungan.export') || isAdmin;
+  const canImport = userPermissions.includes('penghijauan-lingkungan.import') || isAdmin;
 
   useEffect(() => {
     if (flash?.import_errors) {

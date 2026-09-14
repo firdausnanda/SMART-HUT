@@ -17,13 +17,6 @@ use Illuminate\Validation\Rule;
 class KupsController extends Controller
 {
   use \App\Traits\HandlesImportFailures;
-  public function __construct()
-  {
-    $this->middleware('permission:pemberdayaan.view')->only(['index', 'show']);
-    $this->middleware('permission:pemberdayaan.create')->only(['create', 'store']);
-    $this->middleware('permission:pemberdayaan.edit')->only(['edit', 'update']);
-    $this->middleware('permission:pemberdayaan.delete')->only(['destroy']);
-  }
 
   public function index(Request $request)
   {
@@ -168,9 +161,9 @@ class KupsController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('pemberdayaan.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('pemberdayaan.approve'),
-      WorkflowAction::DELETE => $this->authorize('pemberdayaan.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('kups.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kups.approve'),
+      WorkflowAction::DELETE => $this->authorize('kups.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
@@ -245,9 +238,9 @@ class KupsController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('pemberdayaan.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('pemberdayaan.approve'),
-      WorkflowAction::DELETE => $this->authorize('pemberdayaan.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('kups.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kups.approve'),
+      WorkflowAction::DELETE => $this->authorize('kups.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {

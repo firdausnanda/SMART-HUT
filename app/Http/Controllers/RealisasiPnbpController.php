@@ -15,13 +15,6 @@ use Illuminate\Validation\Rule;
 class RealisasiPnbpController extends Controller
 {
   use \App\Traits\HandlesImportFailures;
-  public function __construct()
-  {
-    $this->middleware('permission:bina-usaha.view')->only(['index', 'show']);
-    $this->middleware('permission:bina-usaha.create')->only(['create', 'store']);
-    $this->middleware('permission:bina-usaha.edit')->only(['edit', 'update']);
-    $this->middleware('permission:bina-usaha.delete')->only(['destroy']);
-  }
 
   public function index(Request $request)
   {
@@ -202,9 +195,9 @@ class RealisasiPnbpController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('bina-usaha.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('bina-usaha.approve'),
-      WorkflowAction::DELETE => $this->authorize('bina-usaha.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('realisasi-pnbp.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('realisasi-pnbp.approve'),
+      WorkflowAction::DELETE => $this->authorize('realisasi-pnbp.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
@@ -280,9 +273,9 @@ class RealisasiPnbpController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('bina-usaha.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('bina-usaha.approve'),
-      WorkflowAction::DELETE => $this->authorize('bina-usaha.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('realisasi-pnbp.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('realisasi-pnbp.approve'),
+      WorkflowAction::DELETE => $this->authorize('realisasi-pnbp.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {

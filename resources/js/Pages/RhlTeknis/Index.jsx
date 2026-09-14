@@ -29,12 +29,12 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
   const isKaCdk = auth.user.roles.includes('kacdk');
   const userPermissions = auth.user.permissions || [];
 
-  const canCreate = userPermissions.includes('rehab.create') || isAdmin;
-  const canEdit = userPermissions.includes('rehab.edit') || isAdmin;
-  const canDelete = userPermissions.includes('rehab.delete') || isAdmin;
-  const canApprove = userPermissions.includes('rehab.approve') || isAdmin;
-  const canExport = userPermissions.includes('rehab.export') || isAdmin;
-  const canImport = userPermissions.includes('rehab.import') || isAdmin;
+  const canCreate = userPermissions.includes('rhl-teknis.create') || isAdmin;
+  const canEdit = userPermissions.includes('rhl-teknis.edit') || isAdmin;
+  const canDelete = userPermissions.includes('rhl-teknis.delete') || isAdmin;
+  const canApprove = userPermissions.includes('rhl-teknis.approve') || isAdmin;
+  const canExport = userPermissions.includes('rhl-teknis.export') || isAdmin;
+  const canImport = userPermissions.includes('rhl-teknis.import') || isAdmin;
 
   useEffect(() => {
     if (flash?.import_errors) {

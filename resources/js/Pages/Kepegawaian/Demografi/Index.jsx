@@ -125,12 +125,12 @@ export default function DemografiIndex({
     const isStaff = auth.user.roles.includes('pk') || auth.user.roles.includes('peh') || auth.user.roles.includes('pelaksana');
     const userPermissions = auth.user.permissions || [];
 
-    const canCreate = userPermissions.includes('kepegawaian.create') || isAdmin;
-    const canEdit = userPermissions.includes('kepegawaian.edit') || isAdmin;
-    const canDelete = userPermissions.includes('kepegawaian.delete') || isAdmin;
-    const canApprove = userPermissions.includes('kepegawaian.approve') || isAdmin;
-    const canExport = userPermissions.includes('kepegawaian.export') || isAdmin;
-    const canImport = userPermissions.includes('kepegawaian.import') || isAdmin;
+    const canCreate = userPermissions.includes('demografi-pegawai.create') || isAdmin;
+    const canEdit = userPermissions.includes('demografi-pegawai.edit') || isAdmin;
+    const canDelete = userPermissions.includes('demografi-pegawai.delete') || isAdmin;
+    const canApprove = userPermissions.includes('demografi-pegawai.approve') || isAdmin;
+    const canExport = userPermissions.includes('demografi-pegawai.export') || isAdmin;
+    const canImport = userPermissions.includes('demografi-pegawai.import') || isAdmin;
     const canShowBulk = isAdmin || (!isKasi && !isKaCdk);
 
     const performQuery = (query, field = sortField, dir = sortDir, limit = perPage, trashed = isTrashed) => {

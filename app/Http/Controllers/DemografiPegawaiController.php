@@ -23,14 +23,6 @@ use Carbon\Carbon;
 class DemografiPegawaiController extends Controller
 {
     use HandlesImportFailures;
-    public function __construct()
-    {
-        $this->middleware('permission:kepegawaian.view')->only(['index', 'show']);
-        $this->middleware('permission:kepegawaian.create')->only(['create', 'store', 'template', 'import']);
-        $this->middleware('permission:kepegawaian.edit')->only(['edit', 'update']);
-        $this->middleware('permission:kepegawaian.delete')->only(['destroy']);
-        $this->middleware('permission:kepegawaian.export')->only(['export']);
-    }
 
     public function index(Request $request)
     {

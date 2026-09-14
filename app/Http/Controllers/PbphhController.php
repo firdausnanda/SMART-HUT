@@ -15,13 +15,6 @@ use Illuminate\Validation\Rule;
 class PbphhController extends Controller
 {
   use \App\Traits\HandlesImportFailures;
-  public function __construct()
-  {
-    $this->middleware('permission:bina-usaha.view')->only(['index', 'show']);
-    $this->middleware('permission:bina-usaha.create')->only(['create', 'store']);
-    $this->middleware('permission:bina-usaha.edit')->only(['edit', 'update']);
-    $this->middleware('permission:bina-usaha.delete')->only(['destroy']);
-  }
 
   public function index(Request $request)
   {
@@ -207,9 +200,9 @@ class PbphhController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('bina-usaha.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('bina-usaha.approve'),
-      WorkflowAction::DELETE => $this->authorize('bina-usaha.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('pbphh.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('pbphh.approve'),
+      WorkflowAction::DELETE => $this->authorize('pbphh.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
@@ -287,9 +280,9 @@ class PbphhController extends Controller
     $workflowAction = WorkflowAction::from($request->action);
 
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorize('bina-usaha.edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('bina-usaha.approve'),
-      WorkflowAction::DELETE => $this->authorize('bina-usaha.delete'),
+      WorkflowAction::SUBMIT => $this->authorize('pbphh.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('pbphh.approve'),
+      WorkflowAction::DELETE => $this->authorize('pbphh.delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {

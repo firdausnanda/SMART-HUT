@@ -21,16 +21,6 @@ class NilaiEkonomiController extends Controller
 {
     use \App\Traits\HandlesImportFailures;
 
-    public function __construct()
-    {
-        $this->middleware('permission:pemberdayaan.view')->only(['index']);
-        $this->middleware('permission:pemberdayaan.create')->only(['create', 'store']);
-        $this->middleware('permission:pemberdayaan.edit')->only(['edit', 'update']);
-        $this->middleware('permission:pemberdayaan.delete')->only(['destroy']);
-        $this->middleware('permission:pemberdayaan.export')->only(['export']);
-        $this->middleware('permission:pemberdayaan.import')->only(['import']);
-    }
-
     public function index(Request $request)
     {
         // Cache available years
@@ -281,9 +271,9 @@ class NilaiEkonomiController extends Controller
         $workflowAction = WorkflowAction::from($request->action);
 
         match ($workflowAction) {
-            WorkflowAction::SUBMIT => $this->authorize('pemberdayaan.edit'),
-            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('pemberdayaan.approve'),
-            WorkflowAction::DELETE => $this->authorize('pemberdayaan.delete'),
+            WorkflowAction::SUBMIT => $this->authorize('nilai-ekonomi.edit'),
+            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('nilai-ekonomi.approve'),
+            WorkflowAction::DELETE => $this->authorize('nilai-ekonomi.delete'),
         };
 
         if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
@@ -329,9 +319,9 @@ class NilaiEkonomiController extends Controller
         $workflowAction = WorkflowAction::from($request->action);
 
         match ($workflowAction) {
-            WorkflowAction::SUBMIT => $this->authorize('pemberdayaan.edit'),
-            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('pemberdayaan.approve'),
-            WorkflowAction::DELETE => $this->authorize('pemberdayaan.delete'),
+            WorkflowAction::SUBMIT => $this->authorize('nilai-ekonomi.edit'),
+            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('nilai-ekonomi.approve'),
+            WorkflowAction::DELETE => $this->authorize('nilai-ekonomi.delete'),
         };
 
         if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {

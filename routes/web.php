@@ -68,139 +68,248 @@ Route::middleware('auth')->group(function () {
     Route::get('/locations/districts/{regencyId}', [LocationController::class, 'getDistricts'])->name('locations.districts');
     Route::get('/locations/villages/{districtId}', [LocationController::class, 'getVillages'])->name('locations.villages');
 
-    Route::post('rehab-lahan/{rehab_lahan}/single-workflow-action', [RehabLahanController::class, 'singleWorkflowAction'])->name('rehab-lahan.single-workflow-action');
-    Route::get('rehab-lahan/export', [RehabLahanController::class, 'export'])->name('rehab-lahan.export');
-    Route::get('rehab-lahan/template', [RehabLahanController::class, 'template'])->name('rehab-lahan.template');
-    Route::post('rehab-lahan/import', [RehabLahanController::class, 'import'])->name('rehab-lahan.import');
-    Route::post('rehab-lahan/bulk-workflow-action', [RehabLahanController::class, 'bulkWorkflowAction'])->name('rehab-lahan.bulk-workflow-action');
-    Route::resource('rehab-lahan', RehabLahanController::class);
+    // === REHAB LAHAN ===
+    Route::controller(RehabLahanController::class)->prefix('rehab-lahan')->name('rehab-lahan.')->group(function () {
+        Route::post('{rehab_lahan}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:rehab-lahan.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:rehab-lahan.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:rehab-lahan.create')->name('template');
+    });
+    
+    // === PENGHIJAUAN LINGKUNGAN ===
+    Route::controller(PenghijauanLingkunganController::class)->prefix('penghijauan-lingkungan')->name('penghijauan-lingkungan.')->group(function () {
+        Route::post('{penghijauan_lingkungan}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:penghijauan-lingkungan.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:penghijauan-lingkungan.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:penghijauan-lingkungan.create')->name('template');
+    });
+    
+    // === REHAB MANGGROVE ===
+    Route::controller(RehabManggroveController::class)->prefix('rehab-manggrove')->name('rehab-manggrove.')->group(function () {
+        Route::post('{rehab_manggrove}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:rehab-manggrove.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:rehab-manggrove.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:rehab-manggrove.create')->name('template');
+    });
+    
+    // === RHL TEKNIS ===
+    Route::controller(RhlTeknisController::class)->prefix('rhl-teknis')->name('rhl-teknis.')->group(function () {
+        Route::post('{rhl_teknis}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:rhl-teknis.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:rhl-teknis.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:rhl-teknis.create')->name('template');
+    });
 
-    Route::post('penghijauan-lingkungan/{penghijauan_lingkungan}/single-workflow-action', [PenghijauanLingkunganController::class, 'singleWorkflowAction'])->name('penghijauan-lingkungan.single-workflow-action');
-    Route::get('penghijauan-lingkungan/export', [PenghijauanLingkunganController::class, 'export'])->name('penghijauan-lingkungan.export');
-    Route::get('penghijauan-lingkungan/template', [PenghijauanLingkunganController::class, 'template'])->name('penghijauan-lingkungan.template');
-    Route::post('penghijauan-lingkungan/import', [PenghijauanLingkunganController::class, 'import'])->name('penghijauan-lingkungan.import');
-    Route::post('penghijauan-lingkungan/bulk-workflow-action', [PenghijauanLingkunganController::class, 'bulkWorkflowAction'])->name('penghijauan-lingkungan.bulk-workflow-action');
-    Route::resource('penghijauan-lingkungan', PenghijauanLingkunganController::class);
+    // === REBOISASI PS ===
+    Route::controller(ReboisasiPsController::class)->prefix('reboisasi-ps')->name('reboisasi-ps.')->group(function () {
+        Route::post('{reboisasi_ps}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:reboisasi-ps.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:reboisasi-ps.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:reboisasi-ps.create')->name('template');
+    });
 
-    Route::post('/rehab-manggrove/{rehab_manggrove}/single-workflow-action', [RehabManggroveController::class, 'singleWorkflowAction'])->name('rehab-manggrove.single-workflow-action');
-    Route::get('rehab-manggrove/export', [RehabManggroveController::class, 'export'])->name('rehab-manggrove.export');
-    Route::get('rehab-manggrove/template', [RehabManggroveController::class, 'template'])->name('rehab-manggrove.template');
-    Route::post('rehab-manggrove/import', [RehabManggroveController::class, 'import'])->name('rehab-manggrove.import');
-    Route::post('rehab-manggrove/bulk-workflow-action', [RehabManggroveController::class, 'bulkWorkflowAction'])->name('rehab-manggrove.bulk-workflow-action');
-    Route::resource('rehab-manggrove', RehabManggroveController::class);
+    // === PENGUNJUNG WISATA ===
+    Route::controller(PengunjungWisataController::class)->prefix('pengunjung-wisata')->name('pengunjung-wisata.')->group(function () {
+        Route::post('{pengunjung_wisata}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:pengunjung-wisata.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:pengunjung-wisata.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:pengunjung-wisata.create')->name('template');
+    });
 
-    // RHL Teknis
-    Route::get('rhl-teknis/export', [RhlTeknisController::class, 'export'])->name('rhl-teknis.export');
-    Route::get('rhl-teknis/template', [RhlTeknisController::class, 'template'])->name('rhl-teknis.template');
-    Route::post('rhl-teknis/import', [RhlTeknisController::class, 'import'])->name('rhl-teknis.import');
-    Route::post('rhl-teknis/bulk-workflow-action', [RhlTeknisController::class, 'bulkWorkflowAction'])->name('rhl-teknis.bulk-workflow-action');
-    Route::resource('rhl-teknis', RhlTeknisController::class)->parameters(['rhl-teknis' => 'rhl_teknis']);
-    Route::post('/rhl-teknis/{rhl_teknis}/single-workflow-action', [RhlTeknisController::class, 'singleWorkflowAction'])->name('rhl-teknis.single-workflow-action');
+    // === KEBAKARAN HUTAN ===
+    Route::controller(KebakaranHutanController::class)->prefix('kebakaran-hutan')->name('kebakaran-hutan.')->group(function () {
+        Route::post('{kebakaran_hutan}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:kebakaran-hutan.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:kebakaran-hutan.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:kebakaran-hutan.create')->name('template');
+    });
 
-    // Reboisasi Area PS
-    Route::get('reboisasi-ps/export', [ReboisasiPsController::class, 'export'])->name('reboisasi-ps.export');
-    Route::get('reboisasi-ps/template', [ReboisasiPsController::class, 'template'])->name('reboisasi-ps.template');
-    Route::post('reboisasi-ps/import', [ReboisasiPsController::class, 'import'])->name('reboisasi-ps.import');
-    Route::post('reboisasi-ps/bulk-workflow-action', [ReboisasiPsController::class, 'bulkWorkflowAction'])->name('reboisasi-ps.bulk-workflow-action');
-    Route::resource('reboisasi-ps', ReboisasiPsController::class)->parameters(['reboisasi-ps' => 'reboisasi_ps']);
-    Route::post('/reboisasi-ps/{reboisasi_ps}/single-workflow-action', [ReboisasiPsController::class, 'singleWorkflowAction'])->name('reboisasi-ps.single-workflow-action');
+    // === HASIL HUTAN KAYU ===
+    Route::controller(HasilHutanKayuController::class)->prefix('hasil-hutan-kayu')->name('hasil-hutan-kayu.')->group(function () {
+        Route::post('{hasil_hutan_kayu}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->name('export');
+        Route::post('import', 'import')->name('import');
+        Route::get('template', 'template')->name('template');
+    });
 
+    // === HASIL HUTAN BUKAN KAYU ===
+    Route::controller(HasilHutanBukanKayuController::class)->prefix('hasil-hutan-bukan-kayu')->name('hasil-hutan-bukan-kayu.')->group(function () {
+        Route::post('{hasil_hutan_bukan_kayu}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->name('export');
+        Route::post('import', 'import')->name('import');
+        Route::get('template', 'template')->name('template');
+    });
 
-    // Pengunjung Objek Wisata
-    Route::get('pengunjung-wisata/export', [PengunjungWisataController::class, 'export'])->name('pengunjung-wisata.export');
-    Route::get('pengunjung-wisata/template', [PengunjungWisataController::class, 'template'])->name('pengunjung-wisata.template');
-    Route::post('pengunjung-wisata/import', [PengunjungWisataController::class, 'import'])->name('pengunjung-wisata.import');
-    Route::post('pengunjung-wisata/bulk-workflow-action', [PengunjungWisataController::class, 'bulkWorkflowAction'])->name('pengunjung-wisata.bulk-workflow-action');
-    Route::resource('pengunjung-wisata', PengunjungWisataController::class)->parameters(['pengunjung-wisata' => 'pengunjung_wisata']);
-    Route::post('/pengunjung-wisata/{pengunjung_wisata}/single-workflow-action', [PengunjungWisataController::class, 'singleWorkflowAction'])->name('pengunjung-wisata.single-workflow-action');
+    // === PBPHH ===
+    Route::controller(PbphhController::class)->prefix('pbphh')->name('pbphh.')->group(function () {
+        Route::post('{pbphh}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:pbphh.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:pbphh.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:pbphh.create')->name('template');
+    });
 
-    // Kebakaran Hutan
-    Route::get('kebakaran-hutan/export', [KebakaranHutanController::class, 'export'])->name('kebakaran-hutan.export');
-    Route::get('kebakaran-hutan/template', [KebakaranHutanController::class, 'template'])->name('kebakaran-hutan.template');
-    Route::post('kebakaran-hutan/import', [KebakaranHutanController::class, 'import'])->name('kebakaran-hutan.import');
-    Route::post('kebakaran-hutan/bulk-workflow-action', [KebakaranHutanController::class, 'bulkWorkflowAction'])->name('kebakaran-hutan.bulk-workflow-action');
-    Route::resource('kebakaran-hutan', KebakaranHutanController::class)->parameters(['kebakaran-hutan' => 'kebakaran_hutan']);
-    Route::post('/kebakaran-hutan/{kebakaran_hutan}/single-workflow-action', [KebakaranHutanController::class, 'singleWorkflowAction'])->name('kebakaran-hutan.single-workflow-action');
+    // === REALISASI PNBP ===
+    Route::controller(RealisasiPnbpController::class)->prefix('realisasi-pnbp')->name('realisasi-pnbp.')->group(function () {
+        Route::post('{realisasi_pnbp}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:realisasi-pnbp.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:realisasi-pnbp.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:realisasi-pnbp.create')->name('template');
+    });
 
-    // Hasil Hutan Kayu
-    Route::get('hasil-hutan-kayu/export', [HasilHutanKayuController::class, 'export'])->name('hasil-hutan-kayu.export');
-    Route::get('hasil-hutan-kayu/template', [HasilHutanKayuController::class, 'template'])->name('hasil-hutan-kayu.template');
-    Route::post('hasil-hutan-kayu/import', [HasilHutanKayuController::class, 'import'])->name('hasil-hutan-kayu.import');
-    Route::post('hasil-hutan-kayu/bulk-workflow-action', [HasilHutanKayuController::class, 'bulkWorkflowAction'])->name('hasil-hutan-kayu.bulk-workflow-action');
-    Route::resource('hasil-hutan-kayu', HasilHutanKayuController::class)->parameters(['hasil-hutan-kayu' => 'hasil_hutan_kayu']);
-    Route::post('/hasil-hutan-kayu/{hasil_hutan_kayu}/single-workflow-action', [HasilHutanKayuController::class, 'singleWorkflowAction'])->name('hasil-hutan-kayu.single-workflow-action');
+    // === SKPS ===
+    Route::controller(SkpsController::class)->prefix('skps')->name('skps.')->group(function () {
+        Route::post('{skp}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:skps.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:skps.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:skps.create')->name('template');
+    });
 
-    // Hasil Hutan Bukan Kayu
-    Route::get('hasil-hutan-bukan-kayu/export', [HasilHutanBukanKayuController::class, 'export'])->name('hasil-hutan-bukan-kayu.export');
-    Route::get('hasil-hutan-bukan-kayu/template', [HasilHutanBukanKayuController::class, 'template'])->name('hasil-hutan-bukan-kayu.template');
-    Route::post('hasil-hutan-bukan-kayu/import', [HasilHutanBukanKayuController::class, 'import'])->name('hasil-hutan-bukan-kayu.import');
-    Route::post('hasil-hutan-bukan-kayu/bulk-workflow-action', [HasilHutanBukanKayuController::class, 'bulkWorkflowAction'])->name('hasil-hutan-bukan-kayu.bulk-workflow-action');
-    Route::resource('hasil-hutan-bukan-kayu', HasilHutanBukanKayuController::class)->parameters(['hasil-hutan-bukan-kayu' => 'hasil_hutan_bukan_kayu']);
-    Route::post('/hasil-hutan-bukan-kayu/{hasil_hutan_bukan_kayu}/single-workflow-action', [HasilHutanBukanKayuController::class, 'singleWorkflowAction'])->name('hasil-hutan-bukan-kayu.single-workflow-action');
+    // === KUPS ===
+    Route::controller(KupsController::class)->prefix('kups')->name('kups.')->group(function () {
+        Route::post('{kup}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:kups.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:kups.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:kups.create')->name('template');
+    });
 
-    // PBPHH
-    Route::get('pbphh/export', [PbphhController::class, 'export'])->name('pbphh.export');
-    Route::get('pbphh/template', [PbphhController::class, 'template'])->name('pbphh.template');
-    Route::post('pbphh/import', [PbphhController::class, 'import'])->name('pbphh.import');
-    Route::post('pbphh/bulk-workflow-action', [PbphhController::class, 'bulkWorkflowAction'])->name('pbphh.bulk-workflow-action');
-    Route::resource('pbphh', PbphhController::class);
-    Route::post('/pbphh/{pbphh}/single-workflow-action', [PbphhController::class, 'singleWorkflowAction'])->name('pbphh.single-workflow-action');
+    // === NILAI EKONOMI ===
+    Route::controller(NilaiEkonomiController::class)->prefix('nilai-ekonomi')->name('nilai-ekonomi.')->group(function () {
+        Route::post('{nilai_ekonomi}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:nilai-ekonomi.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:nilai-ekonomi.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:nilai-ekonomi.create')->name('template');
+    });
 
-    // Realisasi PNBP
-    Route::get('realisasi-pnbp/export', [RealisasiPnbpController::class, 'export'])->name('realisasi-pnbp.export');
-    Route::get('realisasi-pnbp/template', [RealisasiPnbpController::class, 'template'])->name('realisasi-pnbp.template');
-    Route::post('realisasi-pnbp/import', [RealisasiPnbpController::class, 'import'])->name('realisasi-pnbp.import');
-    Route::post('realisasi-pnbp/bulk-workflow-action', [RealisasiPnbpController::class, 'bulkWorkflowAction'])->name('realisasi-pnbp.bulk-workflow-action');
-    Route::resource('realisasi-pnbp', RealisasiPnbpController::class)->parameters(['realisasi-pnbp' => 'realisasi_pnbp']);
-    Route::post('/realisasi-pnbp/{realisasi_pnbp}/single-workflow-action', [RealisasiPnbpController::class, 'singleWorkflowAction'])->name('realisasi-pnbp.single-workflow-action');
+    // === PERKEMBANGAN KTH ===
+    Route::controller(PerkembanganKthController::class)->prefix('perkembangan-kth')->name('perkembangan-kth.')->group(function () {
+        Route::post('{perkembangan_kth}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:perkembangan-kth.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:perkembangan-kth.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:perkembangan-kth.create')->name('template');
+    });
 
-    // Perkembangan SK PS
-    Route::get('skps/export', [SkpsController::class, 'export'])->name('skps.export');
-    Route::get('skps/template', [SkpsController::class, 'template'])->name('skps.template');
-    Route::post('skps/import', [SkpsController::class, 'import'])->name('skps.import');
-    Route::post('skps/bulk-workflow-action', [SkpsController::class, 'bulkWorkflowAction'])->name('skps.bulk-workflow-action');
-    Route::resource('skps', SkpsController::class);
-    Route::post('/skps/{skp}/single-workflow-action', [SkpsController::class, 'singleWorkflowAction'])->name('skps.single-workflow-action');
+    // === NILAI TRANSAKSI EKONOMI ===
+    Route::controller(NilaiTransaksiEkonomiController::class)->prefix('nilai-transaksi-ekonomi')->name('nilai-transaksi-ekonomi.')->group(function () {
+        Route::post('{nilai_transaksi_ekonomi}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
+        Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
+        Route::get('export', 'export')->middleware('permission:nilai-transaksi-ekonomi.export')->name('export');
+        Route::post('import', 'import')->middleware('permission:nilai-transaksi-ekonomi.import')->name('import');
+        Route::get('template', 'template')->middleware('permission:nilai-transaksi-ekonomi.create')->name('template');
+    });
 
-    // Perkembangan KUPS
-    Route::get('kups/export', [KupsController::class, 'export'])->name('kups.export');
-    Route::get('kups/template', [KupsController::class, 'template'])->name('kups.template');
-    Route::post('kups/import', [KupsController::class, 'import'])->name('kups.import');
-    Route::post('kups/bulk-workflow-action', [KupsController::class, 'bulkWorkflowAction'])->name('kups.bulk-workflow-action');
-    Route::resource('kups', KupsController::class);
-    Route::post('/kups/{kup}/single-workflow-action', [KupsController::class, 'singleWorkflowAction'])->name('kups.single-workflow-action');
+    // === USER MANAGEMENT ===
+    Route::get('users/export', [UserController::class, 'export'])->middleware('permission:users.export')->name('users.export');
+    Route::get('users/template', [UserController::class, 'exportTemplate'])->middleware('permission:users.create')->name('users.template');
+    Route::post('users/import', [UserController::class, 'import'])->middleware('permission:users.create')->name('users.import');
 
-    // Nilai Ekonomi (NEKON)
-    Route::get('nilai-ekonomi/export', [NilaiEkonomiController::class, 'export'])->name('nilai-ekonomi.export');
-    Route::get('nilai-ekonomi/template', [NilaiEkonomiController::class, 'template'])->name('nilai-ekonomi.template');
-    Route::post('nilai-ekonomi/import', [NilaiEkonomiController::class, 'import'])->name('nilai-ekonomi.import');
-    Route::post('nilai-ekonomi/bulk-workflow-action', [NilaiEkonomiController::class, 'bulkWorkflowAction'])->name('nilai-ekonomi.bulk-workflow-action');
-    Route::resource('nilai-ekonomi', NilaiEkonomiController::class);
-    Route::post('/nilai-ekonomi/{nilai_ekonomi}/single-workflow-action', [NilaiEkonomiController::class, 'singleWorkflowAction'])->name('nilai-ekonomi.single-workflow-action');
+    // RESOURCES (Grouped by Permissions)
+    $groupedResources = [
+        'rehab' => [
+            ['rehab-lahan', RehabLahanController::class, null],
+            ['rehab-manggrove', RehabManggroveController::class, null],
+            ['rhl-teknis', RhlTeknisController::class, ['rhl-teknis' => 'rhl_teknis']],
+            ['reboisasi-ps', ReboisasiPsController::class, ['reboisasi-ps' => 'reboisasi_ps']],
+        ],
+        'penghijauan' => [
+            ['penghijauan-lingkungan', PenghijauanLingkunganController::class, null],
+        ],
+        'perlindungan' => [
+            ['kebakaran-hutan', KebakaranHutanController::class, ['kebakaran-hutan' => 'kebakaran_hutan']],
+        ],
+        'bina-usaha' => [
+            ['pengunjung-wisata', PengunjungWisataController::class, ['pengunjung-wisata' => 'pengunjung_wisata']],
+            ['pbphh', PbphhController::class, null],
+            ['realisasi-pnbp', RealisasiPnbpController::class, ['realisasi-pnbp' => 'realisasi_pnbp']],
+        ],
+        'pemberdayaan' => [
+            ['skps', SkpsController::class, null],
+            ['kups', KupsController::class, null],
+            ['nilai-ekonomi', NilaiEkonomiController::class, null],
+            ['perkembangan-kth', PerkembanganKthController::class, ['perkembangan-kth' => 'perkembangan_kth']],
+            ['nilai-transaksi-ekonomi', NilaiTransaksiEkonomiController::class, ['nilai-transaksi-ekonomi' => 'nilai_transaksi_ekonomi']],
+        ],
+        'users' => [
+            ['users', UserController::class, null],
+        ],
+        'master' => [
+            ['provinces', ProvinceController::class, null],
+            ['regencies', RegencyController::class, null],
+            ['districts', DistrictController::class, null],
+            ['villages', VillageController::class, null],
+            ['bangunan-kta', BangunanKtaController::class, null],
+            ['sumber-dana', SumberDanaController::class, null],
+            ['commodities', CommodityController::class, null],
+            ['bukan-kayu', BukanKayuController::class, null],
+            ['kayu', KayuController::class, null],
+            ['jenis-produksi', JenisProduksiController::class, null],
+            ['pengelola-wisata', PengelolaWisataController::class, null],
+            ['pengelola-ps', PengelolaPsController::class, null],
+            ['skema-perhutanan-sosial', SkemaPerhutananSosialController::class, null],
+        ],
+    ];
 
-
-    // Perkembangan KTH
-    Route::post('perkembangan-kth/bulk-workflow-action', [PerkembanganKthController::class, 'bulkWorkflowAction'])->name('perkembangan-kth.bulk-workflow-action');
-    Route::get('perkembangan-kth/export', [PerkembanganKthController::class, 'export'])->name('perkembangan-kth.export');
-    Route::get('perkembangan-kth/template', [PerkembanganKthController::class, 'template'])->name('perkembangan-kth.template');
-    Route::post('perkembangan-kth/import', [PerkembanganKthController::class, 'import'])->name('perkembangan-kth.import');
-    Route::resource('perkembangan-kth', PerkembanganKthController::class)->parameters(['perkembangan-kth' => 'perkembangan_kth']);
-    Route::post('/perkembangan-kth/{perkembangan_kth}/single-workflow-action', [PerkembanganKthController::class, 'singleWorkflowAction'])->name('perkembangan-kth.single-workflow-action');
-
-    // Nilai Transaksi Ekonomi
-    Route::post('nilai-transaksi-ekonomi/bulk-workflow-action', [NilaiTransaksiEkonomiController::class, 'bulkWorkflowAction'])->name('nilai-transaksi-ekonomi.bulk-workflow-action');
-    Route::get('nilai-transaksi-ekonomi/export', [NilaiTransaksiEkonomiController::class, 'export'])->name('nilai-transaksi-ekonomi.export');
-    Route::get('nilai-transaksi-ekonomi/template', [NilaiTransaksiEkonomiController::class, 'template'])->name('nilai-transaksi-ekonomi.template');
-    Route::post('nilai-transaksi-ekonomi/import', [NilaiTransaksiEkonomiController::class, 'import'])->name('nilai-transaksi-ekonomi.import');
-    Route::resource('nilai-transaksi-ekonomi', NilaiTransaksiEkonomiController::class)->parameters(['nilai-transaksi-ekonomi' => 'nilai_transaksi_ekonomi']);
-    Route::post('/nilai-transaksi-ekonomi/{nilai_transaksi_ekonomi}/single-workflow-action', [NilaiTransaksiEkonomiController::class, 'singleWorkflowAction'])->name('nilai-transaksi-ekonomi.single-workflow-action');
-
-    // User Management
-    Route::get('users/export', [UserController::class, 'export'])->name('users.export');
-    Route::get('users/template', [UserController::class, 'exportTemplate'])->name('users.template');
-    Route::post('users/import', [UserController::class, 'import'])->name('users.import');
-    Route::resource('users', UserController::class);
+    foreach ($groupedResources as $perm => $resources) {
+        foreach ($resources as $res) {
+            $uri = $res[0];
+            $ctrl = $res[1];
+            $params = $res[2];
+            
+            $options = $params ? ['parameters' => $params] : [];
+            
+            Route::resource($uri, $ctrl, $options)->only(['create', 'store'])->middleware("permission:{$uri}.create");
+            Route::resource($uri, $ctrl, $options)->only(['index', 'show'])->middleware("permission:{$uri}.view");
+            Route::resource($uri, $ctrl, $options)->only(['edit', 'update'])->middleware("permission:{$uri}.edit");
+            Route::resource($uri, $ctrl, $options)->only(['destroy'])->middleware("permission:{$uri}.delete");
+        }
+    }
     Route::resource('cdks', CdkController::class)->except(['create', 'edit', 'show']);
+
+    
+    Route::resource('hasil-hutan-kayu', HasilHutanKayuController::class, ['parameters' => ['hasil-hutan-kayu' => 'hasil_hutan_kayu']]);
+    Route::resource('hasil-hutan-bukan-kayu', HasilHutanBukanKayuController::class, ['parameters' => ['hasil-hutan-bukan-kayu' => 'hasil_hutan_bukan_kayu']]);
+
+    // === KEPEGAWAIAN ===
+    Route::get('demografi-pegawai/export', [DemografiPegawaiController::class, 'export'])->middleware('permission:demografi-pegawai.export')->name('demografi-pegawai.export');
+    Route::get('demografi-pegawai/template', [DemografiPegawaiController::class, 'template'])->middleware('permission:demografi-pegawai.create')->name('demografi-pegawai.template');
+    Route::post('demografi-pegawai/import', [DemografiPegawaiController::class, 'import'])->middleware('permission:demografi-pegawai.create')->name('demografi-pegawai.import');
+    Route::post('demografi-pegawai/bulk-delete', [DemografiPegawaiController::class, 'bulkDelete'])->middleware('permission:demografi-pegawai.delete')->name('demografi-pegawai.bulk-delete');
+    Route::post('demografi-pegawai/bulk-restore', [DemografiPegawaiController::class, 'bulkRestore'])->middleware('permission:demografi-pegawai.edit')->name('demografi-pegawai.bulk-restore');
+    Route::post('demografi-pegawai/{id}/restore', [DemografiPegawaiController::class, 'restore'])->middleware('permission:demografi-pegawai.edit')->name('demografi-pegawai.restore');
+    
+    Route::resource('demografi-pegawai', DemografiPegawaiController::class)->only(['index', 'show'])->middleware('permission:demografi-pegawai.view');
+    Route::resource('demografi-pegawai', DemografiPegawaiController::class)->only(['create', 'store'])->middleware('permission:demografi-pegawai.create');
+    Route::resource('demografi-pegawai', DemografiPegawaiController::class)->only(['edit', 'update'])->middleware('permission:demografi-pegawai.edit');
+    Route::resource('demografi-pegawai', DemografiPegawaiController::class)->only(['destroy'])->middleware('permission:demografi-pegawai.delete');
+
+    Route::post('demografi-pegawai/{pegawai}/riwayat-kgb', [DemografiPegawaiController::class, 'storeKgb'])->middleware('permission:demografi-pegawai.create')->name('demografi-pegawai.kgb.store');
+    Route::put('demografi-pegawai/riwayat-kgb/{riwayat_kgb}', [DemografiPegawaiController::class, 'updateKgb'])->middleware('permission:demografi-pegawai.edit')->name('demografi-pegawai.kgb.update');
+    Route::delete('demografi-pegawai/riwayat-kgb/{riwayat_kgb}', [DemografiPegawaiController::class, 'destroyKgb'])->middleware('permission:demografi-pegawai.delete')->name('demografi-pegawai.kgb.destroy');
+
+    Route::post('bezetting-jabatan/{bezetting_jabatan}/single-workflow-action', [BezettingJabatanController::class, 'singleWorkflowAction'])->name('bezetting-jabatan.single-workflow-action');
+    Route::post('bezetting-jabatan/bulk-workflow-action', [BezettingJabatanController::class, 'bulkWorkflowAction'])->name('bezetting-jabatan.bulk-workflow-action');
+    
+    Route::resource('bezetting-jabatan', BezettingJabatanController::class, ['parameters' => ['bezetting-jabatan' => 'bezetting_jabatan']])->only(['index', 'show'])->middleware('permission:bezetting-jabatan.view');
+    Route::resource('bezetting-jabatan', BezettingJabatanController::class, ['parameters' => ['bezetting-jabatan' => 'bezetting_jabatan']])->only(['create', 'store'])->middleware('permission:bezetting-jabatan.create');
+    Route::resource('bezetting-jabatan', BezettingJabatanController::class, ['parameters' => ['bezetting-jabatan' => 'bezetting_jabatan']])->only(['edit', 'update'])->middleware('permission:bezetting-jabatan.edit');
+    Route::resource('bezetting-jabatan', BezettingJabatanController::class, ['parameters' => ['bezetting-jabatan' => 'bezetting_jabatan']])->only(['destroy'])->middleware('permission:bezetting-jabatan.delete');
+
+    Route::get('proyeksi-gaji/export', [ProyeksiGajiController::class, 'export'])->middleware('permission:proyeksi-gaji.export')->name('proyeksi-gaji.export');
+    Route::get('proyeksi-gaji', [ProyeksiGajiController::class, 'index'])->middleware('permission:proyeksi-gaji.view')->name('proyeksi-gaji.index');
 
     // Impersonation Routes
     Route::impersonate();
@@ -263,10 +372,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('backups/{filename}', [BackupController::class, 'destroy'])->name('backups.destroy')->where('filename', '.*');
 
     // Clear Cache
-    Route::get('/clear-cache', function () {
-        Artisan::call('optimize:clear');
-        return redirect()->back()->with('success', 'Cache cleared successfully!');
-    })->name('clear-cache');
+    // Route::get('/clear-cache', function () {
+    //     Artisan::call('optimize:clear');
+    //     return redirect()->back()->with('success', 'Cache cleared successfully!');
+    // })->name('clear-cache');
 
     // Run Seeders
     // Route::get('/run-seeder/multi-cdk-test-user', function () {

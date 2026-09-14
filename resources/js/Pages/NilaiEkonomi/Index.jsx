@@ -350,12 +350,12 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
   const isAdmin = user.roles.includes('admin') || (Array.isArray(user.roles) && user.roles.some(r => r.name === 'admin'));
   const isKasi = user.roles.includes('kasi') || (Array.isArray(user.roles) && user.roles.some(r => r.name === 'kasi'));
   const isKaCdk = user.roles.includes('kacdk') || (Array.isArray(user.roles) && user.roles.some(r => r.name === 'kacdk'));
-  const canCreate = user.permissions?.includes('pemberdayaan.create') || isAdmin;
-  const canEdit = user.permissions?.includes('pemberdayaan.edit') || canCreate || isAdmin;
-  const canDelete = user.permissions?.includes('pemberdayaan.delete') || isAdmin;
-  const canApprove = user.permissions?.includes('pemberdayaan.approve') || isAdmin;
-  const canExport = user.permissions?.includes('pemberdayaan.export') || isAdmin;
-  const canImport = user.permissions?.includes('pemberdayaan.import') || isAdmin;
+  const canCreate = user.permissions?.includes('nilai-ekonomi.create') || isAdmin;
+  const canEdit = user.permissions?.includes('nilai-ekonomi.edit') || canCreate || isAdmin;
+  const canDelete = user.permissions?.includes('nilai-ekonomi.delete') || isAdmin;
+  const canApprove = user.permissions?.includes('nilai-ekonomi.approve') || isAdmin;
+  const canExport = user.permissions?.includes('nilai-ekonomi.export') || isAdmin;
+  const canImport = user.permissions?.includes('nilai-ekonomi.import') || isAdmin;
 
   return (
     <AuthenticatedLayout

@@ -221,33 +221,39 @@ export default function Edit({ auth, user, roles, permissions, userPermissions, 
               <div className="pt-6 border-t border-gray-100">
                 <h4 className="text-lg font-bold text-gray-900 mb-4">Hak Akses Spesifik</h4>
                 <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {Object.keys(permissions).map((group) => (
-                      <div key={group} className="space-y-3">
-                        <h5 className="font-bold text-primary-700 uppercase text-xs tracking-wider border-b border-gray-200 pb-1">
-                          {group.replace('-', ' ')}
-                        </h5>
-                        <div className="space-y-2">
-                          {permissions[group].map((permission) => (
-                            <label key={permission.id} className="flex items-center space-x-3 cursor-pointer group">
-                              <div className="relative flex items-center">
-                                <input
-                                  type="checkbox"
-                                  className="peer h-5 w-5 rounded-md border-gray-300 text-primary-600 focus:ring-primary-500 transition-all checked:bg-primary-600 checked:border-primary-600"
-                                  checked={data.permissions.includes(permission.name)}
-                                  onChange={() => handlePermissionChange(permission.name)}
-                                />
-                                <div className="absolute inset-0 bg-primary-600 rounded-md opacity-0 peer-checked:opacity-20 pointer-events-none transition-opacity"></div>
-                              </div>
-                              <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors select-none">
-                                {permission.description}
-                              </span>
-                            </label>
-                          ))}
-                        </div>
+                  {Object.keys(permissions).map((mainGroup) => (
+                    <div key={mainGroup} className="mb-6 last:mb-0">
+                      <h4 className="font-bold text-[15px] text-primary-800 border-b border-primary-200/50 pb-2 mb-4">
+                        {mainGroup}
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {Object.keys(permissions[mainGroup]).map((moduleName) => (
+                          <div key={moduleName} className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                            <h5 className="font-bold text-gray-700 uppercase text-[11px] tracking-wider border-b border-gray-100 pb-2 mb-3">
+                              {moduleName.replace(/-/g, ' ')}
+                            </h5>
+                            <div className="space-y-2">
+                              {permissions[mainGroup][moduleName].map((permission) => (
+                                <label key={permission.id} className="flex items-start space-x-3 cursor-pointer group">
+                                  <div className="relative flex items-center mt-0.5">
+                                    <input
+                                      type="checkbox"
+                                      className="peer h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 transition-all checked:bg-primary-600 checked:border-primary-600"
+                                      checked={data.permissions.includes(permission.name)}
+                                      onChange={() => handlePermissionChange(permission.name)}
+                                    />
+                                  </div>
+                                  <span className="text-[13px] text-gray-600 group-hover:text-gray-900 transition-colors select-none leading-tight">
+                                    {permission.description}
+                                  </span>
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
                 <p className="mt-3 text-xs text-gray-500 italic">
                   * Centang untuk memberikan akses tambahan spesifik kepada user di luar akses role utamanya.

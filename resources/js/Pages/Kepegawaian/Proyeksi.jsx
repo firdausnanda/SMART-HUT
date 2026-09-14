@@ -27,7 +27,7 @@ export default function Proyeksi({ auth, proyeksiKgb, proyeksiPensiun, filters, 
 
     const isAdmin = auth.user.roles.includes('admin');
     const userPermissions = auth.user.permissions || [];
-    const canExport = userPermissions.includes('kepegawaian.export') || isAdmin;
+    const canExport = userPermissions.includes('proyeksi-gaji.export') || isAdmin;
 
     const months = [
         { value: 'all', label: 'Semua Bulan' },

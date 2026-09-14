@@ -25,10 +25,10 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
   const isKaCdk = auth.user.roles.includes('kacdk');
   const userPermissions = auth.user.permissions || [];
 
-  const canCreate = userPermissions.includes('bina-usaha.create') || isAdmin;
-  const canEdit = userPermissions.includes('bina-usaha.edit') || isAdmin;
-  const canDelete = userPermissions.includes('bina-usaha.delete') || isAdmin;
-  const canApprove = userPermissions.includes('bina-usaha.approve') || isAdmin;
+  const canCreate = userPermissions.includes('realisasi-pnbp.create') || isAdmin;
+  const canEdit = userPermissions.includes('realisasi-pnbp.edit') || isAdmin;
+  const canDelete = userPermissions.includes('realisasi-pnbp.delete') || isAdmin;
+  const canApprove = userPermissions.includes('realisasi-pnbp.approve') || isAdmin;
 
   const yearOptions = available_years?.length > 0 ? available_years : [new Date().getFullYear()];
 

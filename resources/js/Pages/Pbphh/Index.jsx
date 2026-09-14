@@ -36,10 +36,10 @@ export default function Index({ auth, datas, stats, filters = {} }) {
   const isKaCdk = auth.user.roles.includes('kacdk');
   const userPermissions = auth.user.permissions || [];
 
-  const canCreate = userPermissions.includes('bina-usaha.create') || isAdmin;
-  const canEdit = userPermissions.includes('bina-usaha.edit') || isAdmin;
-  const canDelete = userPermissions.includes('bina-usaha.delete') || isAdmin;
-  const canApprove = userPermissions.includes('bina-usaha.approve') || isAdmin;
+  const canCreate = userPermissions.includes('pbphh.create') || isAdmin;
+  const canEdit = userPermissions.includes('pbphh.edit') || isAdmin;
+  const canDelete = userPermissions.includes('pbphh.delete') || isAdmin;
+  const canApprove = userPermissions.includes('pbphh.approve') || isAdmin;
 
   useEffect(() => {
     if (flash?.import_errors) {

@@ -14,10 +14,7 @@ class BezettingJabatanController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:kepegawaian.view')->only(['index', 'show']);
         $this->middleware('permission:kepegawaian.create')->only(['store']); // Bezetting uses store for creating from modal
-        $this->middleware('permission:kepegawaian.edit')->only(['update']);
-        $this->middleware('permission:kepegawaian.delete')->only(['destroy']);
     }
     public function index(Request $request)
     {

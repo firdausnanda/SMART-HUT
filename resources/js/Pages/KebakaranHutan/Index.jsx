@@ -27,10 +27,10 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
   const isKaCdk = auth.user.roles.includes('kacdk');
   const userPermissions = auth.user.permissions || [];
 
-  const canCreate = userPermissions.includes('perlindungan.create') || isAdmin;
-  const canEdit = userPermissions.includes('perlindungan.edit') || isAdmin;
-  const canDelete = userPermissions.includes('perlindungan.delete') || isAdmin;
-  const canApprove = userPermissions.includes('perlindungan.approve') || isAdmin;
+  const canCreate = userPermissions.includes('kebakaran-hutan.create') || isAdmin;
+  const canEdit = userPermissions.includes('kebakaran-hutan.edit') || isAdmin;
+  const canDelete = userPermissions.includes('kebakaran-hutan.delete') || isAdmin;
+  const canApprove = userPermissions.includes('kebakaran-hutan.approve') || isAdmin;
 
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
   const [isSearching, setIsSearching] = useState(false);

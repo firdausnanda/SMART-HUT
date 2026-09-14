@@ -38,12 +38,12 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
   const isKaCdk = auth.user.roles.includes('kacdk');
   const userPermissions = auth.user.permissions || [];
 
-  const canCreate = userPermissions.includes('pemberdayaan.create') || isAdmin;
-  const canEdit = userPermissions.includes('pemberdayaan.edit') || isAdmin;
-  const canDelete = userPermissions.includes('pemberdayaan.delete') || isAdmin;
-  const canApprove = userPermissions.includes('pemberdayaan.approve') || isAdmin;
-  const canExport = userPermissions.includes('pemberdayaan.export') || isAdmin;
-  const canImport = userPermissions.includes('pemberdayaan.import') || isAdmin;
+  const canCreate = userPermissions.includes('perkembangan-kth.create') || isAdmin;
+  const canEdit = userPermissions.includes('perkembangan-kth.edit') || isAdmin;
+  const canDelete = userPermissions.includes('perkembangan-kth.delete') || isAdmin;
+  const canApprove = userPermissions.includes('perkembangan-kth.approve') || isAdmin;
+  const canExport = userPermissions.includes('perkembangan-kth.export') || isAdmin;
+  const canImport = userPermissions.includes('perkembangan-kth.import') || isAdmin;
 
   useEffect(() => {
     if (flash?.import_errors) {

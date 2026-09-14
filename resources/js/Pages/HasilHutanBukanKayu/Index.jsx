@@ -196,10 +196,23 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
   const isKaCdk = auth.user.roles.includes('kacdk');
   const userPermissions = auth.user.permissions || [];
 
-  const canCreate = userPermissions.includes('bina-usaha.create') || isAdmin;
-  const canEdit = userPermissions.includes('bina-usaha.edit') || isAdmin;
-  const canDelete = userPermissions.includes('bina-usaha.delete') || isAdmin;
-  const canApprove = userPermissions.includes('bina-usaha.approve') || isAdmin;
+  const getPermissionPrefix = () => {
+    if (forest_type === 'Hutan Negara') return 'produksi-hutan-negara';
+    if (forest_type === 'Perhutanan Sosial') return 'produksi-perhutanan-sosial';
+    if (forest_type === 'Hutan Rakyat') return 'produksi-hutan-rakyat';
+    // fallback just in case it's lowercase or slugified
+    if (forest_type === 'hutan-negara') return 'produksi-hutan-negara';
+    if (forest_type === 'perhutanan-sosial') return 'produksi-perhutanan-sosial';
+    if (forest_type === 'hutan-rakyat') return 'produksi-hutan-rakyat';
+    return 'bina-usaha'; // fallback
+  };
+  const permPrefix = getPermissionPrefix();
+
+
+  const canCreate = userPermissions.includes(`${permPrefix}.create`) || isAdmin;
+  const canEdit = userPermissions.includes(`${permPrefix}.edit`) || isAdmin;
+  const canDelete = userPermissions.includes(`${permPrefix}.delete`) || isAdmin;
+  const canApprove = userPermissions.includes(`${permPrefix}.approve`) || isAdmin;
 
   useEffect(() => {
     if (flash?.import_errors) {
