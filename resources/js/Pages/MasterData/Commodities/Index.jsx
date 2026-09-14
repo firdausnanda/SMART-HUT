@@ -12,6 +12,7 @@ import Pagination from '@/Components/Pagination';
 
 export default function CommodityIndex({ auth, commodities, filters }) {
   const [search, setSearch] = useState(filters.search || '');
+  const [moduleFilter, setModuleFilter] = useState(filters.module !== undefined ? filters.module : '');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('create');
@@ -20,23 +21,28 @@ export default function CommodityIndex({ auth, commodities, filters }) {
   const { data, setData, post, put, delete: destroy, processing, errors, reset, clearErrors } = useForm({
     name: '',
     type: '', // Optional field based on controller validation
+    is_nilai_transaksi_ekonomi: '0', // '0' for Nilai Ekonomi, '1' for Nilai Transaksi
   });
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
   };
 
+  const handleModuleChange = (e) => {
+    setModuleFilter(e.target.value);
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       router.get(
         route('commodities.index'),
-        { search },
+        { search, module: moduleFilter },
         { preserveState: true, preserveScroll: true, replace: true }
       );
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, moduleFilter]);
 
   const openCreateModal = () => {
     setModalMode('create');
@@ -51,6 +57,7 @@ export default function CommodityIndex({ auth, commodities, filters }) {
     setData({
       name: item.name,
       type: item.type || '',
+      is_nilai_transaksi_ekonomi: item.is_nilai_transaksi_ekonomi ? '1' : '0',
     });
     clearErrors();
     setIsModalOpen(true);
@@ -123,6 +130,17 @@ export default function CommodityIndex({ auth, commodities, filters }) {
                     onChange={handleSearch}
                   />
                 </div>
+                <div className="w-full sm:w-48">
+                  <select
+                    className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    value={moduleFilter}
+                    onChange={handleModuleChange}
+                  >
+                    <option value="">Semua Modul</option>
+                    <option value="0">Nilai Ekonomi</option>
+                    <option value="1">Nilai Transaksi Ekonomi</option>
+                  </select>
+                </div>
                 <PrimaryButton
                   onClick={openCreateModal}
                   className="justify-center whitespace-nowrap bg-primary-600 hover:bg-primary-700 text-white shadow-primary-200"
@@ -147,6 +165,9 @@ export default function CommodityIndex({ auth, commodities, filters }) {
                       Nama Komoditas
                     </th>
                     <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      Modul Penggunaan
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                       Tipe
                     </th>
                     <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -163,6 +184,13 @@ export default function CommodityIndex({ auth, commodities, filters }) {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                           {item.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {item.is_nilai_transaksi_ekonomi ? (
+                            <span className="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">Nilai Transaksi Ekonomi</span>
+                          ) : (
+                            <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">Nilai Ekonomi</span>
+                          )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {item.type || '-'}
@@ -242,6 +270,20 @@ export default function CommodityIndex({ auth, commodities, filters }) {
                 placeholder="Contoh: Kopi"
               />
               <InputError message={errors.name} className="mt-2" />
+            </div>
+
+            <div>
+              <InputLabel htmlFor="is_nilai_transaksi_ekonomi" value="Modul Penggunaan" />
+              <select
+                id="is_nilai_transaksi_ekonomi"
+                className="mt-1 block w-full border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm"
+                value={data.is_nilai_transaksi_ekonomi}
+                onChange={(e) => setData('is_nilai_transaksi_ekonomi', e.target.value)}
+              >
+                <option value="0">Nilai Ekonomi</option>
+                <option value="1">Nilai Transaksi Ekonomi</option>
+              </select>
+              <InputError message={errors.is_nilai_transaksi_ekonomi} className="mt-2" />
             </div>
 
             <div>

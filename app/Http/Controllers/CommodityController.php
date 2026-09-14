@@ -11,17 +11,21 @@ class CommodityController extends Controller
 
     public function index(Request $request)
     {
-        $query = Commodity::query();
+        $query = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi');
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('module')) {
+            $query->where('is_nilai_transaksi_ekonomi', $request->module);
         }
 
         $commodities = $query->paginate(10)->withQueryString();
 
         return Inertia::render('MasterData/Commodities/Index', [
             'commodities' => $commodities,
-            'filters' => $request->only(['search']),
+            'filters' => $request->only(['search', 'module']),
         ]);
     }
 
@@ -66,10 +70,29 @@ class CommodityController extends Controller
 
     public function update(Request $request, Commodity $commodity)
     {
+        if ($request->has('name')) {
+            $name = trim(preg_replace('/\s+/', ' ', $request->name));
+            $name = ucwords(strtolower($name));
+            $request->merge(['name' => $name]);
+        }
+
         $request->validate([
-            'name' => 'required|string|max:255|unique:m_commodities,name,' . $commodity->id,
+            'name' => 'required|string|max:255',
             'type' => 'nullable|string',
+            'is_nilai_transaksi_ekonomi' => 'nullable|boolean',
         ]);
+
+        // Check uniqueness for the same scope
+        $isTransaksi = $request->boolean('is_nilai_transaksi_ekonomi');
+        $existing = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
+            ->where('is_nilai_transaksi_ekonomi', $isTransaksi)
+            ->where('name', $request->name)
+            ->where('id', '!=', $commodity->id)
+            ->first();
+
+        if ($existing) {
+            return redirect()->route('commodities.index')->with('error', 'Komoditas dengan nama ini sudah ada di modul tersebut');
+        }
 
         $commodity->update($request->all());
 
