@@ -27,8 +27,27 @@ class CommodityController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->has('name')) {
+            $name = trim(preg_replace('/\s+/', ' ', $request->name));
+            $name = ucwords(strtolower($name));
+            $request->merge(['name' => $name]);
+        }
+
+        $isTransaksi = $request->boolean('is_nilai_transaksi_ekonomi');
+        $existing = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
+            ->where('is_nilai_transaksi_ekonomi', $isTransaksi)
+            ->where('name', $request->name)
+            ->first();
+
+        if ($existing) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => true, 'commodity' => $existing]);
+            }
+            return redirect()->route('commodities.index')->with('success', 'Komoditas sudah ada');
+        }
+
         $request->validate([
-            'name' => 'required|string|unique:m_commodities,name|max:255',
+            'name' => 'required|string|max:255',
             'type' => 'nullable|string',
             'is_nilai_transaksi_ekonomi' => 'nullable|boolean',
         ]);

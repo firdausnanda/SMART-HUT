@@ -42,11 +42,33 @@ class NilaiTransaksiEkonomiController extends Controller
       })
 
       ->when($request->search, function ($q, $search) {
-        $q->where('nama_kth', 'like', "{$search}%")
-          ->orWhereHas('village_rel', fn($q) => $q->where('name', 'like', "{$search}%"))
-          ->orWhereHas('district_rel', fn($q) => $q->where('name', 'like', "{$search}%"))
-          ->orWhereHas('regency_rel', fn($q) => $q->where('name', 'like', "{$search}%"))
-          ->orWhereHas('details.commodity', fn($q) => $q->where('name', 'like', "{$search}%"));
+        $q->where(function ($q) use ($search) {
+          $q->where('nama_kth', 'like', "{$search}%")
+            ->orWhereHas('village_rel', fn($q) => $q->where('name', 'like', "{$search}%"))
+            ->orWhereHas('district_rel', fn($q) => $q->where('name', 'like', "{$search}%"))
+            ->orWhereHas('regency_rel', fn($q) => $q->where('name', 'like', "{$search}%"))
+            ->orWhereHas('details.commodity', fn($q) => $q->where('name', 'like', "{$search}%"));
+        });
+      })
+      ->when($request->month, function ($q, $month) {
+        $q->where('month', $month);
+      })
+      ->when($request->status, function ($q, $status) {
+        $q->where('status', $status);
+      })
+      ->when($request->regency_id, function ($q, $regencyId) {
+        $q->where('regency_id', $regencyId);
+      })
+      ->when($request->district_id, function ($q, $districtId) {
+        $q->where('district_id', $districtId);
+      })
+      ->when($request->village_id, function ($q, $villageId) {
+        $q->where('village_id', $villageId);
+      })
+      ->when($request->commodity_id, function ($q, $commodityId) {
+        $q->whereHas('details', function ($q) use ($commodityId) {
+          $q->where('commodity_id', $commodityId);
+        });
       })
 
       ->when($request->sort, function ($q) use ($request) {
@@ -113,9 +135,19 @@ class NilaiTransaksiEkonomiController extends Controller
       return $years;
     });
 
+    $commodities = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
+      ->where('is_nilai_transaksi_ekonomi', true)
+      ->whereIn('id', function($query) {
+          $query->select('commodity_id')
+                ->from('nilai_transaksi_ekonomi_details');
+      })
+      ->orderBy('name')
+      ->get();
+
     return Inertia::render('NilaiTransaksiEkonomi/Index', [
       'datas' => $datas,
       'stats' => $stats,
+      'commodities' => $commodities,
       'filters' => [
         'year' => (int) $selectedYear,
         'search' => $request->search,
@@ -123,6 +155,12 @@ class NilaiTransaksiEkonomiController extends Controller
         'direction' => $direction,
         'per_page' => (int) $request->query('per_page', 10),
         'only_mine' => $request->boolean('only_mine'),
+        'month' => $request->month,
+        'status' => $request->status,
+        'regency_id' => $request->regency_id,
+        'district_id' => $request->district_id,
+        'village_id' => $request->village_id,
+        'commodity_id' => $request->commodity_id,
       ],
       'availableYears' => $availableYears,
     ]);

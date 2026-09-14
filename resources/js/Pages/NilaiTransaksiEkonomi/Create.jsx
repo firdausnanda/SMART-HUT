@@ -20,7 +20,7 @@ export default function Create({ auth, commodities, satuanOptions }) {
     village_id: '',
     nama_kth: '',
     details: [
-      { commodity_id: '', volume_produksi: '', satuan: 'Kg', nilai_transaksi: '' }
+      { commodity_id: '', volume_produksi: '', satuan: 'kg', nilai_transaksi: '' }
     ],
   });
 
@@ -76,7 +76,7 @@ export default function Create({ auth, commodities, satuanOptions }) {
   };
 
   const addDetail = () => {
-    setData('details', [...data.details, { commodity_id: '', volume_produksi: '', satuan: 'Kg', nilai_transaksi: '' }]);
+    setData('details', [...data.details, { commodity_id: '', volume_produksi: '', satuan: 'kg', nilai_transaksi: '' }]);
   };
 
   const removeDetail = (index) => {

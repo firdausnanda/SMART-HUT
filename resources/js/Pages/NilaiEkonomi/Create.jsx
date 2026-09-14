@@ -19,8 +19,8 @@ export default function Create({ auth, commodities, satuanOptions }) {
     regency_id: '',
     district_id: '',
     details: [
-      { commodity_id: '', production_volume: '', satuan: 'Kg', transaction_value: '' }
-    ]
+      { commodity_id: '', production_volume: '', satuan: 'kg', transaction_value: '' }
+    ],
   });
 
   const [regencies, setRegencies] = useState([]);
@@ -76,7 +76,7 @@ export default function Create({ auth, commodities, satuanOptions }) {
   };
 
   const addDetail = () => {
-    setData('details', [...data.details, { commodity_id: '', production_volume: '', satuan: 'Kg', transaction_value: '' }]);
+    setData('details', [...data.details, { commodity_id: '', production_volume: '', satuan: 'kg', transaction_value: '' }]);
   };
 
   const removeDetail = (index) => {

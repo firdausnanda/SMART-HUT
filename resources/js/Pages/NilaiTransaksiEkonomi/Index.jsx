@@ -4,6 +4,7 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { debounce } from 'lodash';
+import axios from 'axios';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import Pagination from '@/Components/Pagination';
@@ -16,7 +17,7 @@ import BulkActionToolbar from '@/Components/BulkActionToolbar';
 
 const MySwal = withReactContent(Swal);
 
-export default function Index({ auth, datas, stats, filters, availableYears }) {
+export default function Index({ auth, datas, stats, filters, availableYears, commodities }) {
   const { flash } = usePage().props;
   const [selectedIds, setSelectedIds] = useState([]);
   const [params, setParams] = useState({
@@ -26,12 +27,63 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
     direction: filters.direction || 'asc',
     per_page: filters.per_page || 10,
     only_mine: filters.only_mine || false,
+    month: filters.month || '',
+    status: filters.status || '',
+    regency_id: filters.regency_id || '',
+    district_id: filters.district_id || '',
+    village_id: filters.village_id || '',
+    commodity_id: filters.commodity_id || '',
   });
+  const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
+  const [regencies, setRegencies] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [villages, setVillages] = useState([]);
+  const [loadingRegencies, setLoadingRegencies] = useState(false);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
+  const [loadingVillages, setLoadingVillages] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memproses...');
   const [showImportModal, setShowImportModal] = useState(false);
   const [importFile, setImportFile] = useState(null);
+
+  const formatLabel = (name) => {
+    if (!name) return '';
+    return name.toLowerCase().replace('kota', 'Kota').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  useEffect(() => {
+    setLoadingRegencies(true);
+    axios.get(route('locations.regencies', 35)).then(res => {
+      setRegencies(res.data.map(item => ({ value: item.id, label: formatLabel(item.name) })));
+      setLoadingRegencies(false);
+    }).catch(() => setLoadingRegencies(false));
+  }, []);
+
+  useEffect(() => {
+    if (params.regency_id) {
+      setLoadingDistricts(true);
+      axios.get(route('locations.districts', params.regency_id)).then(res => {
+        setDistricts(res.data.map(item => ({ value: item.id, label: formatLabel(item.name) })));
+        setLoadingDistricts(false);
+      }).catch(() => setLoadingDistricts(false));
+    } else {
+      setDistricts([]);
+    }
+  }, [params.regency_id]);
+
+  useEffect(() => {
+    if (params.district_id) {
+      setLoadingVillages(true);
+      axios.get(route('locations.villages', params.district_id)).then(res => {
+        setVillages(res.data.map(item => ({ value: item.id, label: formatLabel(item.name) })));
+        setLoadingVillages(false);
+      }).catch(() => setLoadingVillages(false));
+    } else {
+      setVillages([]);
+    }
+  }, [params.district_id]);
+
 
   useEffect(() => {
     if (flash?.success) {
@@ -416,6 +468,49 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
   const canExport = user.permissions?.includes('nilai-transaksi-ekonomi.export') || isAdmin;
   const canImport = user.permissions?.includes('nilai-transaksi-ekonomi.import') || isAdmin;
 
+  const handleApplyFilter = () => {
+    setLoadingText('Memfilter Data...');
+    setIsLoading(true);
+    router.get(route('nilai-transaksi-ekonomi.index'), params, {
+      preserveState: true,
+      preserveScroll: true,
+      onFinish: () => setIsLoading(false)
+    });
+  };
+
+  const handleResetFilter = () => {
+    const defaultParams = {
+      year: new Date().getFullYear(),
+      search: '',
+      sort: '',
+      direction: 'asc',
+      per_page: 10,
+      only_mine: false,
+      month: '',
+      status: '',
+      regency_id: '',
+      district_id: '',
+      village_id: '',
+      commodity_id: '',
+    };
+    setParams(defaultParams);
+    setSearchQuery('');
+    setLoadingText('Mereset Filter...');
+    setIsLoading(true);
+    router.get(route('nilai-transaksi-ekonomi.index'), defaultParams, {
+      preserveState: true,
+      preserveScroll: true,
+      onFinish: () => setIsLoading(false)
+    });
+  };
+
+  const selectStyles = {
+    control: (base, state) => ({ ...base, borderRadius: '0.75rem', padding: '2px', backgroundColor: state.isDisabled ? '#f3f4f6' : '#f9fafb', borderColor: state.isDisabled ? '#f3f4f6' : '#e5e7eb', boxShadow: state.isFocused ? '0 0 0 1px #10b981' : 'none', '&:hover': { borderColor: state.isDisabled ? '#f3f4f6' : '#10b981' }, minHeight: '42px' }),
+    singleValue: (base, state) => ({ ...base, color: state.isDisabled ? '#9ca3af' : '#111827', fontWeight: 'bold', fontSize: '0.875rem' }),
+    placeholder: (base) => ({ ...base, color: '#9ca3af', fontSize: '0.875rem' }),
+    menu: (base) => ({ ...base, borderRadius: '1rem', zIndex: 50 })
+  };
+
   return (
     <AuthenticatedLayout user={user} header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Nilai Transaksi Ekonomi</h2>}>
       <Head title="Nilai Transaksi Ekonomi" />
@@ -478,20 +573,20 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
               <div className="flex flex-wrap items-center gap-4 flex-1">
                 <h3 className="font-bold text-gray-800 hidden md:block">Daftar Data Nilai Transaksi</h3>
                 <div className="h-6 w-px bg-gray-200 hidden md:block"></div>
-                <div className="w-40">
+                <div className="w-32">
                   <Select
                     options={yearOptions}
                     value={yearOptions.find(opt => opt.value == params.year)}
                     onChange={handleYearChange}
-                    className="text-sm font-bold"
-                    placeholder="Pilih Tahun"
+                    className="text-xs font-bold"
+                    placeholder="Tahun"
                     styles={{
                       control: (base) => ({
                         ...base,
                         borderRadius: '0.75rem',
                         borderColor: '#e5e7eb',
                         backgroundColor: '#f9fafb',
-                        minHeight: '42px',
+                        minHeight: '38px',
                         boxShadow: 'none',
                         '&:hover': {
                           borderColor: '#10b981'
@@ -510,16 +605,16 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                     }}
                   />
                 </div>
-                <div className="w-full md:w-64 relative">
-                  <TextInput className="w-full text-sm pl-10 bg-gray-50 border-gray-200 focus:bg-white transition-colors rounded-xl" placeholder="Cari KTH, Komoditas..." value={searchQuery} onChange={onSearchChange} />
+                <div className="w-full md:w-56 relative">
+                  <TextInput className="w-full text-xs py-2 pl-9 bg-gray-50 border-gray-200 focus:bg-white transition-colors rounded-xl h-[38px]" placeholder="Cari data..." value={searchQuery} onChange={onSearchChange} />
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <svg className="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <svg className="w-3.5 h-3.5 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                       <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                     </svg>
                   </div>
-                  {isSearching && <div className="absolute right-3 top-1/2 -translate-y-1/2"><svg className="animate-spin h-4 w-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>}
+                  {isSearching && <div className="absolute right-3 top-1/2 -translate-y-1/2"><svg className="animate-spin h-3.5 w-3.5 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>}
                 </div>
-                <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 rounded-xl border border-emerald-100 hover:bg-emerald-100/50 transition-colors cursor-pointer group" onClick={() => handleOnlyMineToggle({ target: { checked: !params.only_mine } })}>
+                <div className="flex items-center gap-2 px-2.5 py-1.5 h-[38px] bg-emerald-50 rounded-xl border border-emerald-100 hover:bg-emerald-100/50 transition-colors cursor-pointer group shrink-0" onClick={() => handleOnlyMineToggle({ target: { checked: !params.only_mine } })}>
                   <div className="relative inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
@@ -527,10 +622,17 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                       checked={params.only_mine}
                       onChange={handleOnlyMineToggle}
                     />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                    <div className="w-8 h-4 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-600"></div>
                   </div>
-                  <span className="text-xs font-bold text-emerald-800 select-none whitespace-nowrap">Hanya Inputan Saya</span>
+                  <span className="text-[11px] font-bold text-emerald-800 select-none whitespace-nowrap">Inputan Saya</span>
                 </div>
+                <button
+                  onClick={() => setShowAdvancedFilter(!showAdvancedFilter)}
+                  className={`px-3 py-1.5 h-[38px] text-xs font-bold border rounded-xl shadow-sm transition-colors flex items-center gap-1.5 shrink-0 ${showAdvancedFilter ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+                  Filter Lanjutan
+                </button>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-gray-400 uppercase">Baris:</span>
@@ -546,6 +648,87 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                 </select>
               </div>
             </div>
+            
+            {showAdvancedFilter && (
+              <div className="px-6 py-4 bg-gray-50/50 border-b border-gray-100">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1">Status Verifikasi</label>
+                    <select className="w-full text-sm font-bold border-gray-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500 min-h-[42px]" value={params.status} onChange={(e) => setParams({ ...params, status: e.target.value })}>
+                      <option value="">Semua Status</option>
+                      <option value="draft">Draft</option>
+                      <option value="waiting_kasi">Menunggu Kasi</option>
+                      <option value="waiting_cdk">Menunggu Kacabdin</option>
+                      <option value="final">Final (Disetujui)</option>
+                      <option value="rejected">Ditolak</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1">Bulan</label>
+                    <select className="w-full text-sm font-bold border-gray-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500 min-h-[42px]" value={params.month} onChange={(e) => setParams({ ...params, month: e.target.value })}>
+                      <option value="">Semua Bulan</option>
+                      {[...Array(12)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>{new Date(0, i).toLocaleString('id-ID', { month: 'long' })}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1">Komoditas</label>
+                    <Select
+                      options={commodities.map(c => ({ value: c.id, label: c.name }))}
+                      value={commodities.map(c => ({ value: c.id, label: c.name })).find(c => c.value == params.commodity_id) || null}
+                      onChange={(opt) => setParams({ ...params, commodity_id: opt?.value || '' })}
+                      styles={selectStyles}
+                      placeholder="Semua Komoditas"
+                      isClearable
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1">Kabupaten/Kota</label>
+                    <Select
+                      options={regencies}
+                      value={regencies.find(r => r.value == params.regency_id) || null}
+                      onChange={(opt) => setParams({ ...params, regency_id: opt?.value || '', district_id: '', village_id: '' })}
+                      styles={selectStyles}
+                      placeholder="Semua Kabupaten"
+                      isClearable
+                      isLoading={loadingRegencies}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1">Kecamatan</label>
+                    <Select
+                      options={districts}
+                      value={districts.find(d => d.value == params.district_id) || null}
+                      onChange={(opt) => setParams({ ...params, district_id: opt?.value || '', village_id: '' })}
+                      styles={selectStyles}
+                      placeholder="Semua Kecamatan"
+                      isClearable
+                      isDisabled={!params.regency_id}
+                      isLoading={loadingDistricts}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1">Desa</label>
+                    <Select
+                      options={villages}
+                      value={villages.find(v => v.value == params.village_id) || null}
+                      onChange={(opt) => setParams({ ...params, village_id: opt?.value || '' })}
+                      styles={selectStyles}
+                      placeholder="Semua Desa"
+                      isClearable
+                      isDisabled={!params.district_id}
+                      isLoading={loadingVillages}
+                    />
+                  </div>
+                </div>
+                <div className="mt-4 flex justify-end gap-3">
+                  <button onClick={handleResetFilter} className="px-5 py-2 text-sm font-bold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">Reset Filter</button>
+                  <button onClick={handleApplyFilter} className="px-5 py-2 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 shadow-md shadow-emerald-500/20 transition-all">Terapkan Filter</button>
+                </div>
+              </div>
+            )}
+            
             <div className="overflow-x-auto min-h-[400px]">
               <table className="w-full text-left text-sm text-gray-500 min-w-[1000px]">
                 <thead className="bg-gray-50/50 text-gray-700 uppercase tracking-wider text-[11px] font-bold">

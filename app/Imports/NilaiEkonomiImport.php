@@ -121,7 +121,8 @@ class NilaiEkonomiImport implements ToModel, WithHeadingRow, WithValidation, Ski
         $nilai = 0;
       }
 
-      $satuan = $satuans[$i] ?? '-';
+      $satuanRaw = trim($satuans[$i] ?? '-');
+      $satuan = $this->mapSatuan($satuanRaw);
 
       // Find Commodity
       $commodity = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
@@ -153,5 +154,31 @@ class NilaiEkonomiImport implements ToModel, WithHeadingRow, WithValidation, Ski
   public function getRowNumber()
   {
     return $this->rowNumber++;
+  }
+
+  private function mapSatuan($satuanRaw)
+  {
+      $map = [
+          'kg' => ['kg', 'kilogram (kg)', 'lg', 'kilogram'],
+          'm3' => ['m3', 'meter kubik (m3)', 'meter kubik (m³)', 'meter kubik'],
+          'batang' => ['batang', 'batangan', 'bantangan', 'btg'],
+          'ton' => ['ton'],
+          'pcs' => ['pcs'],
+          'buah' => ['buah'],
+          'bibit' => ['tanaman', 'bibit'],
+          'stup' => ['stup'],
+          'orang' => ['orang'],
+          'ekor' => ['ekor'],
+          'liter' => ['liter'],
+          'ikat' => ['ikat'],
+          'butir' => ['butir']
+      ];
+      $lower = strtolower($satuanRaw);
+      foreach ($map as $canonical => $variations) {
+          if (in_array($lower, $variations)) {
+              return $canonical;
+          }
+      }
+      return 'lainnya';
   }
 }
