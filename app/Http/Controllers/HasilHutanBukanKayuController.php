@@ -194,6 +194,7 @@ class HasilHutanBukanKayuController extends Controller
       'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
       'pengelola_hutan' => PengelolaHutan::all(),
       'pengelola_wisata_list' => PengelolaWisata::all(),
+      'satuan_list' => collect(\App\Enums\Satuan::cases())->map(fn($s) => ['value' => $s->value, 'label' => $s->label()]),
     ]);
   }
 
@@ -213,7 +214,7 @@ class HasilHutanBukanKayuController extends Controller
       'details' => 'required|array|min:1',
       'details.*.bukan_kayu_id' => 'required|exists:m_bukan_kayu,id',
       'details.*.annual_volume_realization' => 'nullable|numeric|min:0',
-      'details.*.unit' => 'nullable|string',
+      'details.*.unit' => ['nullable', \Illuminate\Validation\Rule::enum(\App\Enums\Satuan::class)],
     ]);
 
     // Custom Validation
@@ -245,7 +246,7 @@ class HasilHutanBukanKayuController extends Controller
         $parent->details()->create([
           'bukan_kayu_id' => $detail['bukan_kayu_id'],
           'annual_volume_realization' => $detail['annual_volume_realization'] ?? 0,
-          'unit' => $detail['unit'] ?? 'Kg',
+          'unit' => $detail['unit'] ?? 'kg',
         ]);
       }
     });
@@ -267,6 +268,7 @@ class HasilHutanBukanKayuController extends Controller
       'districts' => DB::table('m_districts')->where('regency_id', $hasilHutanBukanKayu->regency_id)->get(),
       'pengelola_hutan' => PengelolaHutan::all(),
       'pengelola_wisata_list' => PengelolaWisata::all(),
+      'satuan_list' => collect(\App\Enums\Satuan::cases())->map(fn($s) => ['value' => $s->value, 'label' => $s->label()]),
     ]);
   }
 
@@ -286,7 +288,7 @@ class HasilHutanBukanKayuController extends Controller
       'details' => 'required|array|min:1',
       'details.*.bukan_kayu_id' => 'required|exists:m_bukan_kayu,id',
       'details.*.annual_volume_realization' => 'nullable|numeric|min:0',
-      'details.*.unit' => 'nullable|string',
+      'details.*.unit' => ['nullable', \Illuminate\Validation\Rule::enum(\App\Enums\Satuan::class)],
     ]);
 
     // Custom Validation
@@ -318,7 +320,7 @@ class HasilHutanBukanKayuController extends Controller
         $hasilHutanBukanKayu->details()->create([
           'bukan_kayu_id' => $detail['bukan_kayu_id'],
           'annual_volume_realization' => $detail['annual_volume_realization'] ?? 0,
-          'unit' => $detail['unit'] ?? 'Kg',
+          'unit' => $detail['unit'] ?? 'kg',
         ]);
       }
     });
@@ -534,7 +536,10 @@ class HasilHutanBukanKayuController extends Controller
           $unitKey = $slug . '_satuan';
 
           $realizationVolume = $row[$realizationKey] ?? 0;
-          $unit = $row[$unitKey] ?? 'Kg';
+          
+          $rawUnit = $row[$unitKey] ?? 'kg';
+          $normalizedUnit = strtolower(trim($rawUnit));
+          $unit = \App\Enums\Satuan::tryFrom($normalizedUnit) ? $normalizedUnit : 'lainnya';
 
           if ($realizationVolume > 0) {
             $hhbk->details()->create([

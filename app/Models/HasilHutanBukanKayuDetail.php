@@ -16,6 +16,10 @@ class HasilHutanBukanKayuDetail extends Model
     'unit',
   ];
 
+  protected $casts = [
+    'unit' => \App\Enums\Satuan::class,
+  ];
+
   public function hasilHutanBukanKayu()
   {
     return $this->belongsTo(HasilHutanBukanKayu::class, 'hasil_hutan_bukan_kayu_id');

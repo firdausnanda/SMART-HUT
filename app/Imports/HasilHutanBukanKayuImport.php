@@ -161,7 +161,10 @@ class HasilHutanBukanKayuImport implements ToModel, WithHeadingRow, WithValidati
       $unitKey = $slug . '_satuan';
 
       $realizationVolume = $row[$realizationKey] ?? 0;
-      $unit = $row[$unitKey] ?? 'Kg';
+      
+      $rawUnit = $row[$unitKey] ?? 'kg';
+      $normalizedUnit = strtolower(trim($rawUnit));
+      $unit = \App\Enums\Satuan::tryFrom($normalizedUnit) ? $normalizedUnit : 'lainnya';
 
       // Only add detail if there is non-zero data
       if ($realizationVolume > 0) {

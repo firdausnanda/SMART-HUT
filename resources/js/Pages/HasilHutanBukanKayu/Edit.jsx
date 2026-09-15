@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
 
-export default function Edit({ auth, data: data_item, bukan_kayu_list = [], pengelola_hutan = [], pengelola_wisata_list = [] }) {
+export default function Edit({ auth, data: data_item, bukan_kayu_list = [], pengelola_hutan = [], pengelola_wisata_list = [], satuan_list = [] }) {
   const { data, setData, put, processing, errors } = useForm({
     year: data_item.year || new Date().getFullYear(),
     month: data_item.month || new Date().getMonth() + 1,
@@ -22,8 +22,8 @@ export default function Edit({ auth, data: data_item, bukan_kayu_list = [], peng
     details: data_item.details?.map(d => ({
       bukan_kayu_id: d.bukan_kayu_id,
       annual_volume_realization: d.annual_volume_realization,
-      unit: d.unit || 'Kg'
-    })) || [{ bukan_kayu_id: '', annual_volume_realization: '', unit: 'Kg' }]
+      unit: d.unit || 'kg'
+    })) || [{ bukan_kayu_id: '', annual_volume_realization: '', unit: 'kg' }]
   });
 
   const [regencies, setRegencies] = useState([]);
@@ -32,15 +32,7 @@ export default function Edit({ auth, data: data_item, bukan_kayu_list = [], peng
   const [loadingRegencies, setLoadingRegencies] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
 
-  const unitOptions = [
-    { value: 'Kg', label: 'Kg' },
-    { value: 'Ton', label: 'Ton' },
-    { value: 'Ltr', label: 'Liter' },
-    { value: 'Batang', label: 'Batang' },
-    { value: 'Ikat', label: 'Ikat' },
-    { value: 'Buah', label: 'Buah' },
-    { value: 'M3', label: 'M3' },
-  ];
+
 
   const formatLabel = (name) => {
     if (!name) return '';
@@ -93,7 +85,7 @@ export default function Edit({ auth, data: data_item, bukan_kayu_list = [], peng
   const addDetail = () => {
     setData('details', [
       ...data.details,
-      { bukan_kayu_id: '', annual_volume_realization: '', unit: 'Kg' }
+      { bukan_kayu_id: '', annual_volume_realization: '', unit: 'kg' }
     ]);
   };
 
@@ -418,9 +410,9 @@ export default function Edit({ auth, data: data_item, bukan_kayu_list = [], peng
                           <div>
                             <InputLabel value="Satuan" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
                             <Select
-                              options={unitOptions}
-                              value={unitOptions.find(u => u.value === detail.unit)}
-                              onChange={(opt) => updateDetail(index, 'unit', opt?.value || 'Kg')}
+                              options={satuan_list}
+                              value={satuan_list.find(u => u.value === detail.unit)}
+                              onChange={(opt) => updateDetail(index, 'unit', opt?.value || 'kg')}
                               placeholder="Pilih Satuan..."
                               styles={selectStyles}
                               menuPlacement="top"

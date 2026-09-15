@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
 
-export default function Create({ auth, bukan_kayu_list = [], pengelola_hutan = [], pengelola_wisata_list = [], forest_type }) { // Added pengelola_wisata_list prop
+export default function Create({ auth, bukan_kayu_list = [], pengelola_hutan = [], pengelola_wisata_list = [], forest_type, satuan_list = [] }) { // Added satuan_list prop
   const { data, setData, post, processing, errors } = useForm({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
@@ -20,7 +20,7 @@ export default function Create({ auth, bukan_kayu_list = [], pengelola_hutan = [
     forest_type: forest_type || 'Hutan Negara',
     volume_target: '',
     details: [
-      { bukan_kayu_id: '', annual_volume_realization: '', unit: 'Kg' }
+      { bukan_kayu_id: '', annual_volume_realization: '', unit: 'kg' }
     ]
   });
 
@@ -30,15 +30,7 @@ export default function Create({ auth, bukan_kayu_list = [], pengelola_hutan = [
   const [loadingRegencies, setLoadingRegencies] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
 
-  const unitOptions = [
-    { value: 'Kg', label: 'Kg' },
-    { value: 'Ton', label: 'Ton' },
-    { value: 'Ltr', label: 'Liter' },
-    { value: 'Batang', label: 'Batang' },
-    { value: 'Ikat', label: 'Ikat' },
-    { value: 'Buah', label: 'Buah' },
-    { value: 'M3', label: 'M3' },
-  ];
+
 
   const formatLabel = (name) => {
     if (!name) return '';
@@ -89,7 +81,7 @@ export default function Create({ auth, bukan_kayu_list = [], pengelola_hutan = [
   const addDetail = () => {
     setData('details', [
       ...data.details,
-      { bukan_kayu_id: '', volume: '', annual_volume_realization: '', unit: 'Kg' }
+      { bukan_kayu_id: '', volume: '', annual_volume_realization: '', unit: 'kg' }
     ]);
   };
 
@@ -412,9 +404,9 @@ export default function Create({ auth, bukan_kayu_list = [], pengelola_hutan = [
                           <div>
                             <InputLabel value="Satuan" className="text-xs font-bold text-gray-500 mb-1.5 ml-1" />
                             <Select
-                              options={unitOptions}
-                              value={unitOptions.find(u => u.value === detail.unit)}
-                              onChange={(opt) => updateDetail(index, 'unit', opt?.value || 'Kg')}
+                              options={satuan_list}
+                              value={satuan_list.find(u => u.value === detail.unit)}
+                              onChange={(opt) => updateDetail(index, 'unit', opt?.value || 'kg')}
                               placeholder="Pilih Satuan..."
                               styles={selectStyles}
                               menuPlacement="top"

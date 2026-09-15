@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import StagingImportPreview from "@/Components/StagingImportPreview";
@@ -39,7 +39,7 @@ export default function ImportPreview({ auth, batch, rows, forestType }) {
         const formatWithUnit = (val, rowData) => {
             if (!val || isNaN(val)) return "-";
             const num = new Intl.NumberFormat("id-ID").format(val);
-            const unit = rowData[unitKey] || "Kg";
+            const unit = rowData[unitKey] || "kg";
             return `${num} ${unit}`;
         };
 
