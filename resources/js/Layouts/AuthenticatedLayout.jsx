@@ -84,7 +84,7 @@ export default function Authenticated({ user, header, children }) {
             )}
             <div className={`flex flex-1 ${isImpersonating ? 'mt-10' : ''}`}>
                 {/* Sidebar Desktop */}
-                <aside className={`fixed inset-y-0 left-0 z-50 bg-gradient-to-b from-primary-800 to-primary-900 shadow-xl hidden lg:flex flex-col transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}>
+                <aside className={`fixed inset-y-0 left-0 z-[60] bg-gradient-to-b from-primary-800 to-primary-900 shadow-xl hidden lg:flex flex-col transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}>
                     {/* Logo Area */}
                     <div className={`flex items-center h-20 border-b border-white/10 bg-primary-800/50 backdrop-blur-sm transition-all duration-300 ${isSidebarCollapsed ? 'px-4 justify-center' : 'px-6'}`}>
                         <Link href="/">
