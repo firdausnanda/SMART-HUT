@@ -268,17 +268,23 @@ export default function Create({ auth, jenis_produksi_list, provinces, regencies
                         </div>
                         <div className="flex-1 w-full">
                           <InputLabel value="Kapasitas Ijin" className="mb-1 text-xs" />
-                          <TextInput
-                            type="text"
-                            className="w-full"
-                            value={item.kapasitas_ijin}
-                            onChange={(e) => {
-                              const newData = [...data.jenis_produksi];
-                              newData[index].kapasitas_ijin = e.target.value;
-                              setData('jenis_produksi', newData);
-                            }}
-                            placeholder="Contoh: 1000 m3/tahun"
-                          />
+                          <div className="relative">
+                            <TextInput
+                              type="number"
+                              step="any"
+                              className="w-full pr-10"
+                              value={item.kapasitas_ijin}
+                              onChange={(e) => {
+                                const newData = [...data.jenis_produksi];
+                                newData[index].kapasitas_ijin = e.target.value;
+                                setData('jenis_produksi', newData);
+                              }}
+                              placeholder="0"
+                            />
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                              <span className="text-gray-500 sm:text-sm font-semibold">m&sup3;</span>
+                            </div>
+                          </div>
                           <InputError message={errors[`jenis_produksi.${index}.kapasitas_ijin`]} className="mt-1" />
                         </div>
                         {data.jenis_produksi.length > 1 && (

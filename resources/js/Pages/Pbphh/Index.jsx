@@ -713,7 +713,7 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                                     <div className="flex items-center gap-1 mt-0.5">
                                       <span className="text-[10px] uppercase font-semibold text-orange-600/80 tracking-wide font-display">Kapasitas:</span>
                                       <span className="text-[10px] font-medium text-gray-600 bg-white px-1.5 py-0.5 rounded border border-orange-100">
-                                        {jp.pivot?.kapasitas_ijin || '-'}
+                                        {jp.pivot?.kapasitas_ijin ? `${jp.pivot.kapasitas_ijin} m³` : '-'}
                                       </span>
                                     </div>
                                   </div>

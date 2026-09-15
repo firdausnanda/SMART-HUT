@@ -88,10 +88,12 @@ class PbphhImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
         $name = trim($matches[1]);
         $capacity = trim($matches[2]);
       } else {
-        // Fallback: Use entire string as name, empty capacity
+        // Fallback: Use entire string as name, 0 capacity
         $name = $item;
-        $capacity = '-';
+        $capacity = '0';
       }
+      $cleanCapacity = str_ireplace(['m3', 'm³'], '', $capacity);
+      $capacity = floatval(preg_replace('/[^0-9.]/', '', str_replace(',', '.', $cleanCapacity)));
 
       $jenisProduksi = DB::table('m_jenis_produksi')
         ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($name) . '%'])

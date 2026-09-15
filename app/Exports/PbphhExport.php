@@ -52,8 +52,9 @@ class PbphhExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSiz
       $row->number_of_workers,
       $row->present_condition ? 'Aktif' : 'Tidak Aktif',
       $row->jenis_produksi->map(function ($jp) {
-        return $jp->name . ' (' . ($jp->pivot->kapasitas_ijin ?? '-') . ')';
-      })->implode(', '),
+        $capacity = is_numeric($jp->pivot->kapasitas_ijin) ? floatval($jp->pivot->kapasitas_ijin) : 0;
+        return $jp->name . ' (' . $capacity . ' m³)';
+      })->join(', '),
       ucfirst($row->status),
       $row->creator->name ?? 'Unknown',
       $row->created_at->format('d-m-Y H:i'),

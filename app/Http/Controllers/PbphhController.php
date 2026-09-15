@@ -132,7 +132,7 @@ class PbphhController extends Controller
       'present_condition' => 'required|boolean',
       'jenis_produksi' => 'required|array|min:1',
       'jenis_produksi.*.jenis_produksi_id' => 'required|exists:m_jenis_produksi,id',
-      'jenis_produksi.*.kapasitas_ijin' => 'required|string',
+      'jenis_produksi.*.kapasitas_ijin' => 'required|numeric|min:0',
     ]);
 
     $data = collect($validated)->except('jenis_produksi')->toArray();
@@ -172,7 +172,7 @@ class PbphhController extends Controller
       'present_condition' => 'required|boolean',
       'jenis_produksi' => 'required|array|min:1',
       'jenis_produksi.*.jenis_produksi_id' => 'required|exists:m_jenis_produksi,id',
-      'jenis_produksi.*.kapasitas_ijin' => 'required|string',
+      'jenis_produksi.*.kapasitas_ijin' => 'required|numeric|min:0',
     ]);
 
     $data = collect($validated)->except('jenis_produksi')->toArray();
@@ -320,8 +320,10 @@ class PbphhController extends Controller
                   $capacity = trim($matches[2]);
               } else {
                   $name = $item;
-                  $capacity = '-';
+                  $capacity = '0';
               }
+              $cleanCapacity = str_ireplace(['m3', 'm³'], '', $capacity);
+              $capacity = floatval(preg_replace('/[^0-9.]/', '', str_replace(',', '.', $cleanCapacity)));
 
               $jenisProduksi = DB::table('m_jenis_produksi')
                   ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($name) . '%'])
