@@ -10,7 +10,16 @@ use Illuminate\Support\Facades\DB;
 use App\Actions\BulkWorkflowAction;
 use App\Actions\SingleWorkflowAction;
 use App\Enums\WorkflowAction;
+use App\Exports\RealisasiPnbpExport;
+use App\Exports\RealisasiPnbpTemplateExport;
 use Illuminate\Validation\Rule;
+use App\Models\ImportBatch;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StagingImport;
+use App\Services\Imports\RealisasiPnbpImportValidator;
+use Maatwebsite\Excel\Validators\ValidationException;
+use App\Imports\RealisasiPnbpImport;
 
 class RealisasiPnbpController extends Controller
 {
@@ -234,23 +243,102 @@ class RealisasiPnbpController extends Controller
   public function export(Request $request)
   {
     $year = $request->query('year');
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\RealisasiPnbpExport($year), 'realisasi-pnbp-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new RealisasiPnbpExport($year), 'realisasi-pnbp-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\RealisasiPnbpTemplateExport, 'template_import_realisasi_pnbp.xlsx');
+    return Excel::download(new RealisasiPnbpTemplateExport, 'template_import_realisasi_pnbp.xlsx');
+  }
+
+  public function previewImport(Request $request)
+  {
+      $this->authorize('realisasi-pnbp.import');
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => Auth::id(),
+          'module_name' => 'realisasi-pnbp',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new RealisasiPnbpImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('realisasi-pnbp.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'realisasi-pnbp') abort(404);
+      $this->authorize('realisasi-pnbp.import');
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return Inertia::render('RealisasiPnbp/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'realisasi-pnbp' || $batch->status !== 'pending') abort(400);
+      $this->authorize('realisasi-pnbp.import');
+      
+      $batch->update(['status' => 'processing']);
+      
+      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+      $importedCount = 0;
+
+      foreach ($validRows as $stagingRow) {
+          $row = $stagingRow->data_payload;
+          
+          $regency = DB::table('m_regencies')
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupatenkota'])) . '%'])
+              ->first();
+
+          $pengelolaWisata = DB::table('m_pengelola_wisata')
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_pengelola_wisata'])) . '%'])
+              ->first();
+
+          RealisasiPnbp::create([
+              'year' => $row['tahun'],
+              'month' => $row['bulan_angka_1_12'],
+              'province_id' => $regency->province_id,
+              'regency_id' => $regency->id,
+              'id_pengelola_wisata' => $pengelolaWisata->id,
+              'types_of_forest_products' => $row['jenis_hasil_hutan'],
+              'pnbp_target' => $row['target_pnbp'],
+              'pnbp_realization' => $row['realisasi_pnbp'],
+              'status' => 'draft',
+              'created_by' => Auth::id(),
+          ]);
+          
+          $importedCount++;
+      }
+
+      $batch->update(['status' => 'completed']);
+      
+      foreach (range(date('Y'), date('Y') - 5) as $y) {
+          cache()->forget("pnbp-stats-{$y}");
+      }
+      
+      return redirect()->route('realisasi-pnbp.index')->with('success', "Berhasil mengimport {$importedCount} data PNBP yang valid.");
   }
 
   public function import(Request $request)
   {
     $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
 
-    $import = new \App\Imports\RealisasiPnbpImport();
+    $import = new RealisasiPnbpImport();
 
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
 
@@ -309,3 +397,4 @@ class RealisasiPnbpController extends Controller
     return redirect()->back()->with('success', "{$count} data berhasil {$message}.");
   }
 }
+

@@ -12,7 +12,16 @@ use Illuminate\Support\Facades\Auth;
 use App\Actions\BulkWorkflowAction;
 use App\Actions\SingleWorkflowAction;
 use App\Enums\WorkflowAction;
+use App\Exports\KupsExport;
+use App\Exports\KupsTemplateExport;
+use App\Imports\KupsImport;
+use App\Imports\StagingImport;
+use App\Models\ImportBatch;
+use App\Services\Imports\KupsImportValidator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class KupsController extends Controller
 {
@@ -199,23 +208,93 @@ class KupsController extends Controller
 
   public function export()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\KupsExport, 'perkembangan-kups-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new KupsExport, 'perkembangan-kups-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\KupsTemplateExport, 'template_import_kups.xlsx');
+    return Excel::download(new KupsTemplateExport, 'template_import_kups.xlsx');
+  }
+
+  public function previewImport(Request $request)
+  {
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => \Illuminate\Support\Facades\Auth::id(),
+          'module_name' => 'kups',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new KupsImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('kups.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'kups') abort(404);
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return Inertia::render('Kups/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'kups' || $batch->status !== 'pending') abort(400);
+      
+      $batch->update(['status' => 'processing']);
+      
+      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+      $importedCount = 0;
+
+      foreach ($validRows as $stagingRow) {
+          $row = $stagingRow->data_payload;
+          
+          $regency = DB::table('m_regencies')
+            ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupatenkota'])) . '%'])
+            ->first();
+            
+          $district = DB::table('m_districts')
+            ->where('regency_id', $regency->id)
+            ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+            ->first();
+
+          Kups::create([
+            'province_id' => $regency->province_id,
+            'regency_id' => $regency->id,
+            'district_id' => $district->id,
+            'nama_kups' => $row['nama_kups'],
+            'category' => $row['kategori'],
+            'commodity' => $row['komoditas'],
+            'status' => 'draft',
+            'created_by' => Auth::id(),
+          ]);
+          $importedCount++;
+      }
+
+      $batch->update(['status' => 'completed']);
+      
+      return redirect()->route('kups.index')->with('success', "Berhasil mengimport {$importedCount} data KUPS yang valid.");
   }
 
   public function import(Request $request)
   {
     $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
 
-    $import = new \App\Imports\KupsImport();
+    $import = new KupsImport();
 
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
 

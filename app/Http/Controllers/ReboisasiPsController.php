@@ -10,7 +10,17 @@ use App\Models\ReboisasiPS;
 use App\Models\PengelolaPS;
 use App\Models\SumberDana;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use App\Models\ImportBatch;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StagingImport;
+use App\Services\Imports\ReboisasiPsImportValidator;
+use App\Exports\ReboisasiPsExport;
+use App\Exports\ReboisasiPsTemplateExport;
+use App\Imports\ReboisasiPsImport;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class ReboisasiPsController extends Controller
 {
@@ -161,14 +171,6 @@ class ReboisasiPsController extends Controller
   }
 
   /**
-   * Display the specified resource.
-   */
-  public function show(ReboisasiPS $reboisasiPs)
-  {
-    //
-  }
-
-  /**
    * Show the form for editing the specified resource.
    */
   public function edit(ReboisasiPS $reboisasiPs)
@@ -266,21 +268,117 @@ class ReboisasiPsController extends Controller
   public function export(Request $request)
   {
     $year = $request->query('year');
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\ReboisasiPsExport($year), 'reboisasi-ps-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new ReboisasiPsExport($year), 'reboisasi-ps-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\ReboisasiPsTemplateExport, 'template_import_reboisasi_ps.xlsx');
+    return Excel::download(new ReboisasiPsTemplateExport, 'template_import_reboisasi_ps.xlsx');
+  }
+
+  public function previewImport(Request $request)
+  {
+    $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+
+    $batch = ImportBatch::create([
+      'user_id' => Auth::id(),
+      'module_name' => 'reboisasi-ps',
+      'filename' => $request->file('file')->getClientOriginalName(),
+      'status' => 'pending',
+    ]);
+
+    Excel::import(
+      new StagingImport($batch->id, new ReboisasiPsImportValidator()),
+      $request->file('file')
+    );
+
+    return redirect()->route('reboisasi-ps.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+    if ($batch->module_name !== 'reboisasi-ps') abort(404);
+
+    $rows = $batch->stagingRows()->paginate(50);
+
+    return Inertia::render('ReboisasiPs/ImportPreview', [
+      'batch' => $batch,
+      'rows' => $rows
+    ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+    if ($batch->module_name !== 'reboisasi-ps' || $batch->status !== 'pending') abort(400);
+
+    $batch->update(['status' => 'processing']);
+
+    $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+    $importedCount = 0;
+
+    foreach ($validRows as $stagingRow) {
+      $row = $stagingRow->data_payload;
+
+      $regency = DB::table('m_regencies')
+        ->where('province_id', 35)
+        ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupaten'])) . '%'])
+        ->first();
+
+      $district = DB::table('m_districts')
+        ->where('regency_id', $regency->id)
+        ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+        ->first();
+
+      if (!$district) {
+        $district = DB::table('m_districts')
+          ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+          ->first();
+      }
+
+      $village = null;
+      if (!empty($row['nama_desa'])) {
+        $village = DB::table('m_villages')
+          ->where('district_id', $district->id)
+          ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_desa'])) . '%'])
+          ->first();
+      }
+
+      $pengelola = null;
+      if (!empty($row['pengelola'])) {
+        $pengelola = DB::table('m_pengelola_ps')
+          ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['pengelola'])) . '%'])
+          ->first();
+      }
+
+      ReboisasiPS::create([
+        'year' => $row['tahun'],
+        'month' => $row['bulan_angka'],
+        'province_id' => 35,
+        'regency_id' => $regency->id,
+        'district_id' => $district->id,
+        'village_id' => $village?->id,
+        'pengelola_id' => $pengelola?->id,
+        'target_annual' => $row['target_tahunan_ha'] ?? 0,
+        'realization' => $row['realisasi_ha'] ?? 0,
+        'fund_source' => strtolower(trim($row['sumber_dana'])) ?? 'other',
+        'status' => 'draft',
+        'created_by' => Auth::id(),
+      ]);
+      $importedCount++;
+    }
+
+    $batch->update(['status' => 'completed']);
+
+    return redirect()->route('reboisasi-ps.index')->with('success', "Berhasil mengimport {$importedCount} data Reboisasi PS yang valid.");
   }
 
   public function import(Request $request)
   {
     $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
-    $import = new \App\Imports\ReboisasiPsImport();
+    $import = new ReboisasiPsImport();
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
     if ($import->failures()->isNotEmpty()) {
@@ -289,9 +387,6 @@ class ReboisasiPsController extends Controller
     return redirect()->back()->with('success', 'Data berhasil diimport.');
   }
 
-  /**
-   * Bulk delete records.
-   */
   /**
    * Bulk workflow action.
    */

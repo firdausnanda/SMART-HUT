@@ -19,7 +19,7 @@ class SkpsTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle, Wit
       'Nama Kecamatan',
       'Nama Kelompok',
       'Nama Skema Perhutanan Sosial',
-      'Potensi (Ha)',
+      'Potensi',
       'Luas PS (Ha)',
       'Jumlah KK'
     ];
@@ -46,13 +46,13 @@ class SkpsTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle, Wit
       AfterSheet::class => function (AfterSheet $event) {
         $sheet = $event->sheet->getDelegate();
 
-        // Add helpful comments
         $sheet->getComment('A1')->getText()->createTextRun('Contoh: TRENGGALEK, TULUNGAGUNG');
         $sheet->getComment('B1')->getText()->createTextRun('Contoh: WATULIMO, MUNJUNGAN');
-        $sheet->getComment('C1')->getText()->createTextRun('Contoh nama skema dari master data seperti: Hutan Desa, Hutan Kemasyarakatan, dll');
-        $sheet->getComment('D1')->getText()->createTextRun('Luas potensi dalam hektar (angka)');
-        $sheet->getComment('E1')->getText()->createTextRun('Luas PS dalam hektar (angka)');
-        $sheet->getComment('F1')->getText()->createTextRun('Jumlah Kepala Keluarga (angka)');
+        $sheet->getComment('C1')->getText()->createTextRun('Contoh: KTH Sukses Makmur');
+        $sheet->getComment('D1')->getText()->createTextRun('Contoh nama skema dari master data seperti: Hutan Desa, Hutan Kemasyarakatan, dll');
+        $sheet->getComment('E1')->getText()->createTextRun('Contoh potensi: Madu, Kayu, Jasa Lingkungan, dll');
+        $sheet->getComment('F1')->getText()->createTextRun('Luas PS dalam hektar (wajib angka, boleh desimal)');
+        $sheet->getComment('G1')->getText()->createTextRun('Jumlah Kepala Keluarga (wajib angka, tidak boleh desimal)');
       },
     ];
   }

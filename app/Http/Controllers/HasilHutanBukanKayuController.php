@@ -9,26 +9,38 @@ use Inertia\Inertia;
 use App\Actions\BulkWorkflowAction;
 use App\Actions\SingleWorkflowAction;
 use App\Enums\WorkflowAction;
+use App\Exports\HasilHutanBukanKayuExport;
+use App\Exports\HasilHutanBukanKayuTemplateExport;
 use Illuminate\Validation\Rule;
+use App\Models\ImportBatch;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StagingImport;
+use App\Services\Imports\HasilHutanBukanKayuImportValidator;
+use Maatwebsite\Excel\Validators\ValidationException;
+use App\Imports\HasilHutanBukanKayuImport;
+use App\Models\BukanKayu;
+use App\Models\PengelolaHutan;
+use App\Models\PengelolaWisata;
 use Illuminate\Support\Facades\DB;
 
 class HasilHutanBukanKayuController extends Controller
 {
   use \App\Traits\HandlesImportFailures;
 
-  
-    private function authorizeForestType(string $forestType, string $action)
-    {
-        $permPrefix = match ($forestType) {
-            'Hutan Negara' => 'produksi-hutan-negara',
-            'Perhutanan Sosial' => 'produksi-perhutanan-sosial',
-            'Hutan Rakyat' => 'produksi-hutan-rakyat',
-            default => 'produksi-hutan-negara',
-        };
-        $this->authorize("{$permPrefix}.{$action}");
-    }
 
-    public function index(Request $request)
+  private function authorizeForestType(string $forestType, string $action)
+  {
+    $permPrefix = match ($forestType) {
+      'Hutan Negara' => 'produksi-hutan-negara',
+      'Perhutanan Sosial' => 'produksi-perhutanan-sosial',
+      'Hutan Rakyat' => 'produksi-hutan-rakyat',
+      default => 'produksi-hutan-negara',
+    };
+    $this->authorize("{$permPrefix}.{$action}");
+  }
+
+  public function index(Request $request)
 
   {
     $forestType = $request->query('forest_type', 'Hutan Negara');
@@ -177,11 +189,11 @@ class HasilHutanBukanKayuController extends Controller
 
     return Inertia::render('HasilHutanBukanKayu/Create', [
       'forest_type' => $forestType,
-      'bukan_kayu_list' => \App\Models\BukanKayu::all(),
+      'bukan_kayu_list' => BukanKayu::all(),
       'provinces' => DB::table('m_provinces')->where('id', '35')->get(),
       'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
-      'pengelola_hutan' => \App\Models\PengelolaHutan::all(),
-      'pengelola_wisata_list' => \App\Models\PengelolaWisata::all(),
+      'pengelola_hutan' => PengelolaHutan::all(),
+      'pengelola_wisata_list' => PengelolaWisata::all(),
     ]);
   }
 
@@ -249,12 +261,12 @@ class HasilHutanBukanKayuController extends Controller
     $this->authorizeForestType($hasilHutanBukanKayu->forest_type, 'edit');
     return Inertia::render('HasilHutanBukanKayu/Edit', [
       'data' => $hasilHutanBukanKayu->load(['details.bukanKayu', 'regency', 'district', 'pengelolaHutan', 'pengelolaWisata']),
-      'bukan_kayu_list' => \App\Models\BukanKayu::all(),
+      'bukan_kayu_list' => BukanKayu::all(),
       'provinces' => DB::table('m_provinces')->where('id', '35')->get(),
       'regencies' => DB::table('m_regencies')->where('province_id', '35')->get(),
       'districts' => DB::table('m_districts')->where('regency_id', $hasilHutanBukanKayu->regency_id)->get(),
-      'pengelola_hutan' => \App\Models\PengelolaHutan::all(),
-      'pengelola_wisata_list' => \App\Models\PengelolaWisata::all(),
+      'pengelola_hutan' => PengelolaHutan::all(),
+      'pengelola_wisata_list' => PengelolaWisata::all(),
     ]);
   }
 
@@ -385,7 +397,7 @@ class HasilHutanBukanKayuController extends Controller
     $this->authorizeForestType($forestType, 'export');
     $this->authorizeForestType($forestType, 'view');
     $year = $request->query('year');
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\HasilHutanBukanKayuExport($forestType, $year), 'hasil-hutan-bukan-kayu-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new HasilHutanBukanKayuExport($forestType, $year), 'hasil-hutan-bukan-kayu-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template(Request $request)
@@ -393,7 +405,157 @@ class HasilHutanBukanKayuController extends Controller
     $forestType = $request->query('forest_type', 'Hutan Negara');
     $this->authorizeForestType($forestType, 'create');
     $this->authorizeForestType($forestType, 'view');
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\HasilHutanBukanKayuTemplateExport($forestType), 'template_import_hasil_hutan_bukan_kayu.xlsx');
+    return Excel::download(new HasilHutanBukanKayuTemplateExport($forestType), 'template_import_hasil_hutan_bukan_kayu.xlsx');
+  }
+
+  public function previewImport(Request $request)
+  {
+    $this->authorizeForestType($request->input('forest_type', 'Hutan Negara'), 'import');
+    $request->validate([
+      'file' => 'required|mimes:xlsx,csv,xls',
+      'forest_type' => 'required'
+    ]);
+
+    $batch = ImportBatch::create([
+      'user_id' => Auth::id(),
+      'module_name' => 'hhbk|' . $request->input('forest_type'),
+      'filename' => $request->file('file')->getClientOriginalName(),
+      'status' => 'pending',
+    ]);
+
+    Excel::import(
+      new StagingImport($batch->id, new HasilHutanBukanKayuImportValidator($request->input('forest_type'))),
+      $request->file('file')
+    );
+
+    return redirect()->route('hasil-hutan-bukan-kayu.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+    if (!str_starts_with($batch->module_name, 'hhbk|')) abort(404);
+
+    $forestType = explode('|', $batch->module_name)[1];
+    $this->authorizeForestType($forestType, 'import');
+
+    $rows = $batch->stagingRows()->paginate(50);
+
+    return Inertia::render('HasilHutanBukanKayu/ImportPreview', [
+      'batch' => $batch,
+      'rows' => $rows,
+      'forestType' => $forestType
+    ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+    if (!str_starts_with($batch->module_name, 'hhbk|') || $batch->status !== 'pending') abort(400);
+
+    $forestType = explode('|', $batch->module_name)[1];
+    $this->authorizeForestType($forestType, 'import');
+
+    $batch->update(['status' => 'processing']);
+
+    $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+    $importedCount = 0;
+
+    $orderedNames = [
+      'Bambu',
+      'Getah Pinus',
+      'Daun Kayu Putih',
+      'Porang',
+      'Kopi',
+      'Madu',
+      'Durian',
+      'Alpukat',
+      'Jahe',
+      'Kunyit'
+    ];
+    $all = BukanKayu::all();
+    $commodities = $all->sortBy(function ($model) use ($orderedNames) {
+      $index = array_search($model->name, $orderedNames);
+      return $index === false ? 9999 + $model->id : $index;
+    })->values();
+
+    foreach ($validRows as $stagingRow) {
+      $row = $stagingRow->data_payload;
+
+      $regency = DB::table('m_regencies')
+        ->where('province_id', 35)
+        ->where('name', 'like', '%' . $row['nama_kabupaten'] . '%')
+        ->first();
+
+      $districtId = null;
+      if ($forestType !== 'Hutan Negara' && !empty($row['nama_kecamatan'])) {
+        $district = DB::table('m_districts')
+          ->where('regency_id', $regency->id)
+          ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
+          ->first();
+        if (!$district) {
+          $district = DB::table('m_districts')->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')->first();
+        }
+        $districtId = $district?->id;
+      }
+
+      $pengelolaId = null;
+      if ($forestType === 'Hutan Negara' && !empty($row['nama_pengelola'])) {
+        $ph = DB::table('m_pengelola_hutan')
+          ->where('name', 'like', '%' . $row['nama_pengelola'] . '%')
+          ->first();
+        $pengelolaId = $ph?->id;
+      }
+
+      $pengelolaWisataId = null;
+      if ($forestType === 'Perhutanan Sosial' && !empty($row['nama_pengelola_wisata'])) {
+        $pw = DB::table('m_pengelola_wisata')
+          ->where('name', 'like', '%' . $row['nama_pengelola_wisata'] . '%')
+          ->first();
+        $pengelolaWisataId = $pw?->id;
+      }
+
+      DB::transaction(function () use ($row, $regency, $districtId, $pengelolaId, $pengelolaWisataId, $forestType, $commodities) {
+        $hhbk = HasilHutanBukanKayu::create([
+          'year' => $row['tahun'],
+          'month' => $row['bulan_angka'],
+          'province_id' => 35,
+          'regency_id' => $regency->id,
+          'district_id' => $forestType === 'Hutan Rakyat' ? $districtId : null,
+          'pengelola_hutan_id' => $forestType === 'Hutan Negara' ? $pengelolaId : null,
+          'pengelola_wisata_id' => $forestType === 'Perhutanan Sosial' ? $pengelolaWisataId : null,
+          'forest_type' => $forestType,
+          'volume_target' => $row['total_target'] ?? 0,
+          'status' => 'draft',
+          'created_by' => Auth::id(),
+        ]);
+
+        foreach ($commodities as $commodity) {
+          $slug = \Illuminate\Support\Str::slug($commodity->name, '_');
+          $realizationKey = $slug . '_realisasi';
+          $unitKey = $slug . '_satuan';
+
+          $realizationVolume = $row[$realizationKey] ?? 0;
+          $unit = $row[$unitKey] ?? 'Kg';
+
+          if ($realizationVolume > 0) {
+            $hhbk->details()->create([
+              'bukan_kayu_id' => $commodity->id,
+              'annual_volume_realization' => $realizationVolume,
+              'unit' => $unit,
+            ]);
+          }
+        }
+      });
+
+      $importedCount++;
+    }
+
+    $batch->update(['status' => 'completed']);
+
+    foreach (range(date('Y'), date('Y') - 5) as $y) {
+      cache()->forget("hhbk-stats-{$forestType}-{$y}");
+    }
+
+    return redirect()->route('hasil-hutan-bukan-kayu.index', ['forest_type' => $forestType])->with('success', "Berhasil mengimport {$importedCount} data Hasil Hutan Bukan Kayu yang valid.");
   }
 
   public function import(Request $request)
@@ -404,11 +566,11 @@ class HasilHutanBukanKayuController extends Controller
       'forest_type' => 'required',
     ]);
 
-    $import = new \App\Imports\HasilHutanBukanKayuImport($request->forest_type);
+    $import = new HasilHutanBukanKayuImport($request->forest_type);
 
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
 

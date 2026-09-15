@@ -73,6 +73,12 @@ Route::middleware('auth')->group(function () {
         Route::post('{rehab_lahan}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:rehab-lahan.export')->name('export');
+        
+        // Staging Import Routes
+        Route::post('import-preview', 'previewImport')->middleware('permission:rehab-lahan.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:rehab-lahan.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:rehab-lahan.import')->name('commit-import');
+        
         Route::post('import', 'import')->middleware('permission:rehab-lahan.import')->name('import');
         Route::get('template', 'template')->middleware('permission:rehab-lahan.create')->name('template');
     });
@@ -82,6 +88,12 @@ Route::middleware('auth')->group(function () {
         Route::post('{penghijauan_lingkungan}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:penghijauan-lingkungan.export')->name('export');
+        
+        // Staging Import Routes
+        Route::post('import-preview', 'previewImport')->middleware('permission:penghijauan-lingkungan.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:penghijauan-lingkungan.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:penghijauan-lingkungan.import')->name('commit-import');
+
         Route::post('import', 'import')->middleware('permission:penghijauan-lingkungan.import')->name('import');
         Route::get('template', 'template')->middleware('permission:penghijauan-lingkungan.create')->name('template');
     });
@@ -91,6 +103,12 @@ Route::middleware('auth')->group(function () {
         Route::post('{rehab_manggrove}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:rehab-manggrove.export')->name('export');
+        
+        // Staging Import Routes
+        Route::post('import-preview', 'previewImport')->middleware('permission:rehab-manggrove.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:rehab-manggrove.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:rehab-manggrove.import')->name('commit-import');
+
         Route::post('import', 'import')->middleware('permission:rehab-manggrove.import')->name('import');
         Route::get('template', 'template')->middleware('permission:rehab-manggrove.create')->name('template');
     });
@@ -100,6 +118,12 @@ Route::middleware('auth')->group(function () {
         Route::post('{rhl_teknis}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:rhl-teknis.export')->name('export');
+        
+        // Staging Import Routes
+        Route::post('import-preview', 'previewImport')->middleware('permission:rhl-teknis.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:rhl-teknis.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:rhl-teknis.import')->name('commit-import');
+
         Route::post('import', 'import')->middleware('permission:rhl-teknis.import')->name('import');
         Route::get('template', 'template')->middleware('permission:rhl-teknis.create')->name('template');
     });
@@ -109,6 +133,12 @@ Route::middleware('auth')->group(function () {
         Route::post('{reboisasi_ps}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:reboisasi-ps.export')->name('export');
+        
+        // Staging Import Routes
+        Route::post('import-preview', 'previewImport')->middleware('permission:reboisasi-ps.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:reboisasi-ps.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:reboisasi-ps.import')->name('commit-import');
+
         Route::post('import', 'import')->middleware('permission:reboisasi-ps.import')->name('import');
         Route::get('template', 'template')->middleware('permission:reboisasi-ps.create')->name('template');
     });
@@ -118,6 +148,11 @@ Route::middleware('auth')->group(function () {
         Route::post('{pengunjung_wisata}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:pengunjung-wisata.export')->name('export');
+        // Staging Import Routes
+        Route::post('import-preview', 'previewImport')->middleware('permission:pengunjung-wisata.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:pengunjung-wisata.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:pengunjung-wisata.import')->name('commit-import');
+
         Route::post('import', 'import')->middleware('permission:pengunjung-wisata.import')->name('import');
         Route::get('template', 'template')->middleware('permission:pengunjung-wisata.create')->name('template');
     });
@@ -127,6 +162,12 @@ Route::middleware('auth')->group(function () {
         Route::post('{kebakaran_hutan}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:kebakaran-hutan.export')->name('export');
+        
+        // Staging Import Routes
+        Route::post('import-preview', 'previewImport')->middleware('permission:kebakaran-hutan.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:kebakaran-hutan.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:kebakaran-hutan.import')->name('commit-import');
+
         Route::post('import', 'import')->middleware('permission:kebakaran-hutan.import')->name('import');
         Route::get('template', 'template')->middleware('permission:kebakaran-hutan.create')->name('template');
     });
@@ -136,6 +177,10 @@ Route::middleware('auth')->group(function () {
         Route::post('{hasil_hutan_kayu}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->name('export');
+        Route::post('import-preview', 'previewImport')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->name('commit-import');
+
         Route::post('import', 'import')->name('import');
         Route::get('template', 'template')->name('template');
     });
@@ -145,6 +190,10 @@ Route::middleware('auth')->group(function () {
         Route::post('{hasil_hutan_bukan_kayu}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->name('export');
+        Route::post('import-preview', 'previewImport')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->name('commit-import');
+
         Route::post('import', 'import')->name('import');
         Route::get('template', 'template')->name('template');
     });
@@ -154,6 +203,10 @@ Route::middleware('auth')->group(function () {
         Route::post('{pbphh}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:pbphh.export')->name('export');
+        Route::post('import-preview', 'previewImport')->middleware('permission:pbphh.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:pbphh.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:pbphh.import')->name('commit-import');
+
         Route::post('import', 'import')->middleware('permission:pbphh.import')->name('import');
         Route::get('template', 'template')->middleware('permission:pbphh.create')->name('template');
     });
@@ -163,6 +216,10 @@ Route::middleware('auth')->group(function () {
         Route::post('{realisasi_pnbp}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:realisasi-pnbp.export')->name('export');
+        Route::post('import-preview', 'previewImport')->middleware('permission:realisasi-pnbp.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:realisasi-pnbp.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:realisasi-pnbp.import')->name('commit-import');
+
         Route::post('import', 'import')->middleware('permission:realisasi-pnbp.import')->name('import');
         Route::get('template', 'template')->middleware('permission:realisasi-pnbp.create')->name('template');
     });
@@ -172,6 +229,10 @@ Route::middleware('auth')->group(function () {
         Route::post('{skp}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:skps.export')->name('export');
+        Route::post('import-preview', 'previewImport')->middleware('permission:skps.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:skps.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:skps.import')->name('commit-import');
+
         Route::post('import', 'import')->middleware('permission:skps.import')->name('import');
         Route::get('template', 'template')->middleware('permission:skps.create')->name('template');
     });
@@ -181,7 +242,13 @@ Route::middleware('auth')->group(function () {
         Route::post('{kup}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:kups.export')->name('export');
-        Route::post('import', 'import')->middleware('permission:kups.import')->name('import');
+        
+        // Staging Import Routes
+        Route::post('import-preview', 'previewImport')->middleware('permission:kups.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:kups.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:kups.import')->name('commit-import');
+        
+        Route::post('import', 'import')->middleware('permission:kups.import')->name('import'); // legacy if needed
         Route::get('template', 'template')->middleware('permission:kups.create')->name('template');
     });
 
@@ -190,6 +257,9 @@ Route::middleware('auth')->group(function () {
         Route::post('{nilai_ekonomi}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:nilai-ekonomi.export')->name('export');
+        Route::post('import-preview', 'previewImport')->middleware('permission:nilai-ekonomi.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:nilai-ekonomi.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:nilai-ekonomi.import')->name('commit-import');
         Route::post('import', 'import')->middleware('permission:nilai-ekonomi.import')->name('import');
         Route::get('template', 'template')->middleware('permission:nilai-ekonomi.create')->name('template');
     });
@@ -199,6 +269,9 @@ Route::middleware('auth')->group(function () {
         Route::post('{perkembangan_kth}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:perkembangan-kth.export')->name('export');
+        Route::post('import-preview', 'previewImport')->middleware('permission:perkembangan-kth.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:perkembangan-kth.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:perkembangan-kth.import')->name('commit-import');
         Route::post('import', 'import')->middleware('permission:perkembangan-kth.import')->name('import');
         Route::get('template', 'template')->middleware('permission:perkembangan-kth.create')->name('template');
     });
@@ -208,6 +281,9 @@ Route::middleware('auth')->group(function () {
         Route::post('{nilai_transaksi_ekonomi}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
         Route::get('export', 'export')->middleware('permission:nilai-transaksi-ekonomi.export')->name('export');
+        Route::post('import-preview', 'previewImport')->middleware('permission:nilai-transaksi-ekonomi.import')->name('preview-import');
+        Route::get('import-preview/{batch}', 'showPreview')->middleware('permission:nilai-transaksi-ekonomi.import')->name('show-preview');
+        Route::post('import-commit/{batch}', 'commitImport')->middleware('permission:nilai-transaksi-ekonomi.import')->name('commit-import');
         Route::post('import', 'import')->middleware('permission:nilai-transaksi-ekonomi.import')->name('import');
         Route::get('template', 'template')->middleware('permission:nilai-transaksi-ekonomi.create')->name('template');
     });

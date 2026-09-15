@@ -443,16 +443,24 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
     formData.append('file', importFile);
     formData.append('forest_type', forest_type);
 
-    setLoadingText('Mengimport Data...');
+    setLoadingText('Memproses Preview Import...');
     setIsLoading(true);
     setShowImportModal(false);
 
-    router.post(route('hasil-hutan-kayu.import'), formData, {
+    router.post(route('hasil-hutan-kayu.preview-import'), formData, {
       onFinish: () => {
         setIsLoading(false);
         setImportFile(null);
       },
-      onError: () => setIsLoading(false),
+      onError: (errors) => {
+        setIsLoading(false);
+        MySwal.fire({
+          title: 'Gagal!',
+          text: errors.file || errors.forest_type || 'Terjadi kesalahan saat import.',
+          icon: 'error',
+          confirmButtonColor: '#15803d',
+        });
+      },
       forceFormData: true,
       preserveScroll: true,
     });

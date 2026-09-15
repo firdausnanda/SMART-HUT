@@ -6,11 +6,21 @@ use App\Models\PenghijauanLingkungan;
 use App\Actions\SingleWorkflowAction;
 use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
+use App\Exports\PenghijauanLingkunganExport;
+use App\Exports\PenghijauanLingkunganTemplateExport;
+use App\Imports\PenghijauanLingkunganImport;
+use App\Imports\StagingImport;
+use App\Models\ImportBatch;
 use Illuminate\Validation\Rule;
 use App\Models\Regencies;
 use App\Models\SumberDana;
+use App\Services\Imports\PenghijauanLingkunganImportValidator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class PenghijauanLingkunganController extends Controller
 {
@@ -259,7 +269,7 @@ class PenghijauanLingkunganController extends Controller
   public function export(Request $request)
   {
     $year = $request->query('year');
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PenghijauanLingkunganExport($year), 'penghijauan-lingkungan-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new PenghijauanLingkunganExport($year), 'penghijauan-lingkungan-' . date('Y-m-d') . '.xlsx');
   }
 
   /**
@@ -267,7 +277,95 @@ class PenghijauanLingkunganController extends Controller
    */
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PenghijauanLingkunganTemplateExport, 'template_import_penghijauan_lingkungan.xlsx');
+    return Excel::download(new PenghijauanLingkunganTemplateExport, 'template_import_penghijauan_lingkungan.xlsx');
+  }
+
+  public function previewImport(Request $request)
+  {
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => Auth::id(),
+          'module_name' => 'penghijauan-lingkungan',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new PenghijauanLingkunganImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('penghijauan-lingkungan.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'penghijauan-lingkungan') abort(404);
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return \Inertia\Inertia::render('PenghijauanLingkungan/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'penghijauan-lingkungan' || $batch->status !== 'pending') abort(400);
+      
+      $batch->update(['status' => 'processing']);
+      
+      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+      $importedCount = 0;
+
+      foreach ($validRows as $stagingRow) {
+          $row = $stagingRow->data_payload;
+          
+          $regency = DB::table('m_regencies')
+              ->where('province_id', 35)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupaten'])) . '%'])
+              ->first();
+              
+          $district = DB::table('m_districts')
+              ->where('regency_id', $regency->id)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+              ->first();
+
+          if (!$district) {
+              $district = DB::table('m_districts')
+                  ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+                  ->first();
+          }
+
+          $village = null;
+          if (!empty($row['nama_desa'])) {
+              $village = DB::table('m_villages')
+                  ->where('district_id', $district->id)
+                  ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_desa'])) . '%'])
+                  ->first();
+          }
+
+          PenghijauanLingkungan::create([
+              'year' => $row['tahun'],
+              'month' => $row['bulan_angka'],
+              'province_id' => 35,
+              'regency_id' => $regency->id,
+              'district_id' => $district->id,
+              'village_id' => $village?->id,
+              'target_annual' => $row['target_tahunan_ha'] ?? 0,
+              'realization' => $row['realisasi_ha'] ?? 0,
+              'fund_source' => strtolower(trim($row['sumber_dana'])) ?? 'other',
+              'status' => 'draft',
+              'created_by' => Auth::id(),
+          ]);
+          $importedCount++;
+      }
+
+      $batch->update(['status' => 'completed']);
+      
+      return redirect()->route('penghijauan-lingkungan.index')->with('success', "Berhasil mengimport {$importedCount} data Penghijauan Lingkungan yang valid.");
   }
 
   /**
@@ -279,11 +377,11 @@ class PenghijauanLingkunganController extends Controller
       'file' => 'required|mimes:xlsx,csv,xls',
     ]);
 
-    $import = new \App\Imports\PenghijauanLingkunganImport();
+    $import = new PenghijauanLingkunganImport();
 
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
 

@@ -234,15 +234,26 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
   const handleImportSubmit = (e) => {
     e.preventDefault();
     if (!importFile) return;
-    setLoadingText('Mengimport Data...');
+
+    setLoadingText('Memproses Preview Import...');
     setIsLoading(true);
     setShowImportModal(false);
-    router.post(route('kebakaran-hutan.import'), { file: importFile }, {
-      forceFormData: true,
-      onFinish: () => {
-        setIsLoading(false);
-        setImportFile(null);
-      }
+
+    router.post(route('kebakaran-hutan.preview-import'), { file: importFile }, {
+        forceFormData: true,
+        preserveScroll: true,
+        onError: (errors) => {
+            MySwal.fire({
+                title: 'Gagal!',
+                text: errors.file || 'Terjadi kesalahan saat import.',
+                icon: 'error',
+                confirmButtonColor: '#15803d',
+            });
+        },
+        onFinish: () => {
+            setIsLoading(false);
+            setImportFile(null);
+        }
     });
   };
 
@@ -876,3 +887,4 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
     </>
   );
 }
+

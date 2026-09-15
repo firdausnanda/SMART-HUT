@@ -9,10 +9,19 @@ use App\Actions\BulkWorkflowAction;
 use App\Actions\SingleWorkflowAction;
 use App\Enums\WorkflowAction;
 use App\Enums\Satuan;
+use App\Exports\NilaiTransaksiEkonomiExport;
+use App\Exports\NilaiTransaksiEkonomiTemplateExport;
+use App\Imports\NilaiTransaksiEkonomiImport;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\ImportBatch;
+use App\Imports\StagingImport;
+use App\Services\Imports\NilaiTransaksiEkonomiImportValidator;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class NilaiTransaksiEkonomiController extends Controller
 {
@@ -254,11 +263,6 @@ class NilaiTransaksiEkonomiController extends Controller
     return redirect()->route('nilai-transaksi-ekonomi.index')->with('success', 'Data transaksi berhasil ditambahkan.');
   }
 
-  public function show(NilaiTransaksiEkonomi $nilai_transaksi_ekonomi)
-  {
-    //
-  }
-
   public function edit(NilaiTransaksiEkonomi $nilai_transaksi_ekonomi)
   {
     $nilai_transaksi_ekonomi->load(['regency_rel', 'district_rel', 'village_rel', 'details.commodity']);
@@ -376,22 +380,202 @@ class NilaiTransaksiEkonomiController extends Controller
   public function export(Request $request)
   {
     $year = $request->query('year');
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\NilaiTransaksiEkonomiExport($year), 'nilai-transaksi-ekonomi-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new NilaiTransaksiEkonomiExport($year), 'nilai-transaksi-ekonomi-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\NilaiTransaksiEkonomiTemplateExport, 'template_import_nilai_transaksi_ekonomi.xlsx');
+    return Excel::download(new NilaiTransaksiEkonomiTemplateExport, 'template_import_nilai_transaksi_ekonomi.xlsx');
+  }
+
+  public function previewImport(Request $request)
+  {
+      $this->authorize('nilai-transaksi-ekonomi.import');
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => Auth::id(),
+          'module_name' => 'nilai-transaksi-ekonomi',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new NilaiTransaksiEkonomiImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('nilai-transaksi-ekonomi.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'nilai-transaksi-ekonomi') abort(404);
+      $this->authorize('nilai-transaksi-ekonomi.import');
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return \Inertia\Inertia::render('NilaiTransaksiEkonomi/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'nilai-transaksi-ekonomi' || $batch->status !== 'pending') abort(400);
+      $this->authorize('nilai-transaksi-ekonomi.import');
+      
+      $batch->update(['status' => 'processing']);
+      
+      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+      $importedCount = 0;
+
+      foreach ($validRows as $stagingRow) {
+          $row = $stagingRow->data_payload;
+          
+          $kabupatenInfo = $row['nama_kabupaten'] ?? $row['kabupatenkota'] ?? null;
+          $kecamatanInfo = $row['nama_kecamatan'] ?? $row['kecamatan'] ?? null;
+          $desaInfo = $row['nama_desa'] ?? $row['desa'] ?? null;
+          $bulanInfo = $row['bulan_1_12'] ?? $row['bulan'] ?? null;
+
+          $regency = DB::table('m_regencies')
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($kabupatenInfo)) . '%'])
+              ->first();
+
+          $district = DB::table('m_districts')
+              ->where('regency_id', $regency->id)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($kecamatanInfo)) . '%'])
+              ->first();
+
+          $village = DB::table('m_villages')
+              ->where('district_id', $district->id)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($desaInfo)) . '%'])
+              ->first();
+
+          $transaction = NilaiTransaksiEkonomi::firstOrCreate([
+              'year' => $row['tahun'],
+              'month' => $bulanInfo,
+              'nama_kth' => $row['nama_kth'],
+              'province_id' => 35,
+              'regency_id' => $regency->id,
+              'district_id' => $district->id,
+              'village_id' => $village->id,
+          ], [
+              'status' => 'draft',
+              'created_by' => Auth::id(),
+              'total_nilai_transaksi' => 0,
+          ]);
+
+          if (!$transaction->wasRecentlyCreated) {
+              $transaction->update(['status' => 'draft']);
+          }
+
+          $commodities = array_map('trim', explode(',', (string) $row['komoditas']));
+          $volumes = array_map('trim', explode(',', (string) $row['volume_produksi']));
+          $satuans = array_map('trim', explode(',', (string) $row['satuan']));
+          $nilais = array_map('trim', explode(',', (string) $row['nilai_transaksi_rp']));
+
+          $count = count($commodities);
+          $detailsToInsert = [];
+          $totalNilai = 0;
+          $now = now();
+
+          for ($i = 0; $i < $count; $i++) {
+              $commodityName = $commodities[$i] ?? null;
+              if (!$commodityName) continue;
+
+              $volumeStr = $volumes[$i] ?? '0';
+              if ($volumeStr !== '') {
+                  $volumeStr = str_replace([' ', "\r", "\n"], '', $volumeStr);
+                  $volume = (float) str_replace(',', '.', $volumeStr);
+              } else {
+                  $volume = 0;
+              }
+
+              $nilaiStr = $nilais[$i] ?? '0';
+              if ($nilaiStr !== '') {
+                  $nilaiStr = str_replace([' ', "\r", "\n", '.'], '', $nilaiStr);
+                  $nilaiStr = str_replace(',', '.', $nilaiStr);
+                  $nilai = (float) $nilaiStr;
+              } else {
+                  $nilai = 0;
+              }
+
+              $satuanRaw = trim($satuans[$i] ?? '-');
+              $satuan = $this->mapSatuan($satuanRaw);
+
+              $commodity = \App\Models\Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
+                  ->where('name', trim($commodityName))
+                  ->first();
+
+              if (!$commodity) continue;
+
+              $detailsToInsert[] = [
+                  'nilai_transaksi_ekonomi_id' => $transaction->id,
+                  'commodity_id' => $commodity->id,
+                  'volume_produksi' => $volume,
+                  'satuan' => $satuan,
+                  'nilai_transaksi' => $nilai,
+                  'created_at' => $now,
+                  'updated_at' => $now,
+              ];
+
+              $totalNilai += $nilai;
+          }
+
+          if ($totalNilai > 0 || $transaction->total_nilai_transaksi != $totalNilai) {
+              $transaction->total_nilai_transaksi += $totalNilai;
+              $transaction->save();
+          }
+
+          if (!empty($detailsToInsert)) {
+              NilaiTransaksiEkonomiDetail::insert($detailsToInsert);
+          }
+          
+          $importedCount++;
+      }
+
+      $batch->update(['status' => 'completed']);
+      cache()->forget('nilai-transaksi-years');
+      
+      return redirect()->route('nilai-transaksi-ekonomi.index')->with('success', "Berhasil mengimport {$importedCount} data Nilai Transaksi Ekonomi yang valid.");
+  }
+
+  private function mapSatuan($satuanRaw)
+  {
+      $map = [
+          'kg' => ['kg', 'kilogram (kg)', 'lg', 'kilogram'],
+          'm3' => ['m3', 'meter kubik (m3)', 'meter kubik (m³)', 'meter kubik'],
+          'batang' => ['batang', 'batangan', 'bantangan', 'btg'],
+          'ton' => ['ton'],
+          'pcs' => ['pcs'],
+          'buah' => ['buah'],
+          'bibit' => ['tanaman', 'bibit'],
+          'stup' => ['stup'],
+          'orang' => ['orang'],
+          'ekor' => ['ekor'],
+          'liter' => ['liter'],
+          'ikat' => ['ikat'],
+          'butir' => ['butir']
+      ];
+      $lower = strtolower($satuanRaw);
+      foreach ($map as $canonical => $variations) {
+          if (in_array($lower, $variations)) {
+              return $canonical;
+          }
+      }
+      return 'lainnya';
   }
 
   public function import(Request $request)
   {
     $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
-    $import = new \App\Imports\NilaiTransaksiEkonomiImport();
+    $import = new NilaiTransaksiEkonomiImport();
 
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
 
@@ -402,3 +586,4 @@ class NilaiTransaksiEkonomiController extends Controller
     return redirect()->back()->with('success', 'Data berhasil diimport.');
   }
 }
+

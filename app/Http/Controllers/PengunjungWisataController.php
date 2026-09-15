@@ -10,6 +10,14 @@ use App\Actions\SingleWorkflowAction;
 use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
 use Illuminate\Validation\Rule;
+use App\Models\ImportBatch;
+use Maatwebsite\Excel\Validators\ValidationException;
+use App\Imports\PengunjungWisataImport;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StagingImport;
+use App\Services\Imports\PengunjungWisataImportValidator;
+use Illuminate\Support\Facades\DB;
 
 class PengunjungWisataController extends Controller
 {
@@ -210,7 +218,7 @@ class PengunjungWisataController extends Controller
   public function export(Request $request)
   {
     $year = $request->query('year');
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PengunjungWisataExport($year), 'pengunjung-wisata-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new \App\Exports\PengunjungWisataExport($year), 'pengunjung-wisata-' . date('Y-m-d') . '.xlsx');
   }
 
   /**
@@ -218,23 +226,87 @@ class PengunjungWisataController extends Controller
    */
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PengunjungWisataTemplateExport, 'template_import_pengunjung_wisata.xlsx');
+    return Excel::download(new \App\Exports\PengunjungWisataTemplateExport, 'template_import_pengunjung_wisata.xlsx');
   }
 
   /**
    * Import data from Excel.
    */
+  public function previewImport(Request $request)
+  {
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => Auth::id(),
+          'module_name' => 'pengunjung-wisata',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new PengunjungWisataImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('pengunjung-wisata.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'pengunjung-wisata') abort(404);
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return Inertia::render('PengunjungWisata/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'pengunjung-wisata' || $batch->status !== 'pending') abort(400);
+      
+      $batch->update(['status' => 'processing']);
+      
+      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+      $importedCount = 0;
+
+      foreach ($validRows as $stagingRow) {
+          $row = $stagingRow->data_payload;
+          
+          $pengelolaWisata = DB::table('m_pengelola_wisata')
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_pengelola_wisata'])) . '%'])
+              ->first();
+
+          PengunjungWisata::create([
+              'year' => $row['tahun'],
+              'month' => $row['bulan_angka_1_12'],
+              'id_pengelola_wisata' => $pengelolaWisata->id,
+              'number_of_visitors' => $row['jumlah_pengunjung'],
+              'gross_income' => $row['pendapatan_bruto_rp'],
+              'status' => 'draft',
+              'created_by' => Auth::id(),
+          ]);
+          $importedCount++;
+      }
+
+      $batch->update(['status' => 'completed']);
+      
+      return redirect()->route('pengunjung-wisata.index')->with('success', "Berhasil mengimport {$importedCount} data Pengunjung Wisata yang valid.");
+  }
+
   public function import(Request $request)
   {
     $request->validate([
       'file' => 'required|mimes:xlsx,csv,xls',
     ]);
 
-    $import = new \App\Imports\PengunjungWisataImport();
+    $import = new PengunjungWisataImport();
 
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
 
@@ -289,3 +361,5 @@ class PengunjungWisataController extends Controller
     return redirect()->back()->with('success', "{$count} data berhasil {$message}.");
   }
 }
+
+

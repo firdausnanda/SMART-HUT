@@ -8,11 +8,23 @@ use App\Actions\SingleWorkflowAction;
 use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
 use Illuminate\Validation\Rule;
-use App\Models\RhlTeknisDetail;
 use App\Models\SumberDana;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\ImportBatch;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StagingImport;
+use App\Services\Imports\RhlTeknisImportValidator;
+use App\Models\Regencies;
+use App\Models\Districts;
+use App\Models\Villages;
+use App\Exports\RhlTeknisExport;
+use App\Exports\RhlTeknisTemplateExport;
+use App\Imports\RhlTeknisImport;
+use App\Models\RhlTeknisDetail;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class RhlTeknisController extends Controller
 {
@@ -275,21 +287,110 @@ class RhlTeknisController extends Controller
   public function export(Request $request)
   {
     $year = $request->query('year');
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\RhlTeknisExport($year), 'rhl-teknis-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new RhlTeknisExport($year), 'rhl-teknis-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\RhlTeknisTemplateExport, 'template_import_rhl_teknis.xlsx');
+    return Excel::download(new RhlTeknisTemplateExport, 'template_import_rhl_teknis.xlsx');
+  }
+
+  public function previewImport(Request $request)
+  {
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => Auth::id(),
+          'module_name' => 'rhl-teknis',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new RhlTeknisImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('rhl-teknis.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'rhl-teknis') abort(404);
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return Inertia::render('RhlTeknis/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'rhl-teknis' || $batch->status !== 'pending') abort(400);
+      
+      $batch->update(['status' => 'processing']);
+      
+      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+      $importedCount = 0;
+
+      foreach ($validRows as $stagingRow) {
+          $row = $stagingRow->data_payload;
+          
+          $regency = Regencies::where('name', 'like', '%' . trim($row['kabupaten']) . '%')->first();
+          $district = Districts::where('name', 'like', '%' . trim($row['kecamatan']) . '%')
+              ->where('regency_id', $regency?->id)
+              ->first();
+          if (!$district) {
+              $district = Districts::where('name', 'like', '%' . trim($row['kecamatan']) . '%')->first();
+          }
+          $village = Villages::where('name', 'like', '%' . trim($row['desa']) . '%')
+              ->where('district_id', $district?->id)
+              ->first();
+
+          $rhlTeknis = RhlTeknis::create([
+              'year' => $row['tahun'],
+              'month' => $row['bulan_angka'],
+              'target_annual' => $row['target_tahunan_unit'],
+              'fund_source' => strtolower(trim($row['sumber_dana'])) ?? 'other',
+              'province_id' => 35,
+              'regency_id' => $regency?->id,
+              'district_id' => $district?->id,
+              'village_id' => $village?->id,
+              'status' => 'draft',
+              'created_by' => Auth::id(),
+          ]);
+
+          $types = array_map('trim', explode(',', $row['jenis_bangunan']));
+          $units = array_map('trim', explode(',', $row['jumlah_unit']));
+
+          foreach ($types as $index => $typeName) {
+              $bangunan = BangunanKta::where('name', $typeName)->first();
+              if ($bangunan && isset($units[$index])) {
+                  RhlTeknisDetail::create([
+                      'rhl_teknis_id' => $rhlTeknis->id,
+                      'bangunan_kta_id' => $bangunan->id,
+                      'unit_amount' => (int) $units[$index],
+                  ]);
+              }
+          }
+
+          $importedCount++;
+      }
+
+      $batch->update(['status' => 'completed']);
+      
+      return redirect()->route('rhl-teknis.index')->with('success', "Berhasil mengimport {$importedCount} data RHL Teknis yang valid.");
   }
 
   public function import(Request $request)
   {
     $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
-    $import = new \App\Imports\RhlTeknisImport();
+    $import = new RhlTeknisImport();
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
     if ($import->failures()->isNotEmpty()) {
@@ -348,3 +449,4 @@ class RhlTeknisController extends Controller
     return redirect()->back()->with('success', "{$count} data berhasil {$message}.");
   }
 }
+

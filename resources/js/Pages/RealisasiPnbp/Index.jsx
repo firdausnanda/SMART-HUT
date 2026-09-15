@@ -248,14 +248,29 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
   const handleImportSubmit = (e) => {
     e.preventDefault();
     if (!importFile) return;
-    setLoadingText('Mengimport Data...');
+
+    setLoadingText('Memproses Preview Import...');
     setIsLoading(true);
-    setShowImportModal(false);
-    router.post(route('realisasi-pnbp.import'), { file: importFile }, {
+
+    const formData = new FormData();
+    formData.append('file', importFile);
+
+    router.post(route('realisasi-pnbp.preview-import'), formData, {
       forceFormData: true,
+      preserveScroll: true,
+      onError: (errors) => {
+        setIsLoading(false);
+        MySwal.fire({
+          title: 'Gagal!',
+          text: errors.file || 'Terjadi kesalahan saat memproses file import.',
+          icon: 'error',
+          confirmButtonColor: '#15803d',
+        });
+      },
       onFinish: () => {
         setIsLoading(false);
         setImportFile(null);
+        setShowImportModal(false);
       }
     });
   };
@@ -965,3 +980,4 @@ export default function Index({ auth, datas, filters, stats, available_years }) 
   );
 
 }
+

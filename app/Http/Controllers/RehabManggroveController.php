@@ -6,11 +6,21 @@ use App\Models\RehabManggrove;
 use App\Actions\SingleWorkflowAction;
 use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
+use App\Exports\RehabManggroveExport;
+use App\Exports\RehabManggroveTemplateExport;
+use App\Imports\RehabManggroveImport;
+use App\Imports\StagingImport;
+use App\Models\ImportBatch;
 use Illuminate\Validation\Rule;
 use App\Models\Regencies;
 use App\Models\SumberDana;
+use App\Services\Imports\RehabManggroveImportValidator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class RehabManggroveController extends Controller
 {
@@ -248,21 +258,109 @@ class RehabManggroveController extends Controller
   public function export(Request $request)
   {
     $year = $request->query('year');
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\RehabManggroveExport($year), 'rehab-manggrove-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new RehabManggroveExport($year), 'rehab-manggrove-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\RehabManggroveTemplateExport, 'template_import_rehab_manggrove.xlsx');
+    return Excel::download(new RehabManggroveTemplateExport, 'template_import_rehab_manggrove.xlsx');
+  }
+
+  public function previewImport(Request $request)
+  {
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => Auth::id(),
+          'module_name' => 'rehab-manggrove',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new RehabManggroveImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('rehab-manggrove.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'rehab-manggrove') abort(404);
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return Inertia::render('RehabManggrove/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'rehab-manggrove' || $batch->status !== 'pending') abort(400);
+      
+      $batch->update(['status' => 'processing']);
+      
+      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+      $importedCount = 0;
+
+      foreach ($validRows as $stagingRow) {
+          $row = $stagingRow->data_payload;
+          
+          $regency = DB::table('m_regencies')
+              ->where('province_id', 35)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupaten'])) . '%'])
+              ->first();
+              
+          $district = DB::table('m_districts')
+              ->where('regency_id', $regency->id)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+              ->first();
+
+          if (!$district) {
+              $district = DB::table('m_districts')
+                  ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+                  ->first();
+          }
+
+          $village = null;
+          if (!empty($row['nama_desa'])) {
+              $village = DB::table('m_villages')
+                  ->where('district_id', $district->id)
+                  ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_desa'])) . '%'])
+                  ->first();
+          }
+
+          RehabManggrove::create([
+              'year' => $row['tahun'],
+              'month' => $row['bulan_angka'],
+              'province_id' => 35,
+              'regency_id' => $regency->id,
+              'district_id' => $district->id,
+              'village_id' => $village?->id,
+              'target_annual' => $row['target_tahunan_ha'] ?? 0,
+              'realization' => $row['realisasi_ha'] ?? 0,
+              'fund_source' => strtolower(trim($row['sumber_dana'])) ?? 'other',
+              'status' => 'draft',
+              'created_by' => Auth::id(),
+          ]);
+          $importedCount++;
+      }
+
+      $batch->update(['status' => 'completed']);
+      
+      return redirect()->route('rehab-manggrove.index')->with('success', "Berhasil mengimport {$importedCount} data Rehab Manggrove yang valid.");
   }
 
   public function import(Request $request)
   {
     $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
-    $import = new \App\Imports\RehabManggroveImport();
+    $import = new RehabManggroveImport();
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
     if ($import->failures()->isNotEmpty()) {
@@ -271,9 +369,6 @@ class RehabManggroveController extends Controller
     return redirect()->back()->with('success', 'Data berhasil diimport.');
   }
 
-  /**
-   * Bulk delete records.
-   */
   /**
    * Bulk workflow action.
    */

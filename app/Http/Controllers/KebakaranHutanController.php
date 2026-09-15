@@ -6,11 +6,20 @@ use App\Models\KebakaranHutan;
 use App\Models\PengelolaWisata;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\ImportBatch;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StagingImport;
+use App\Services\Imports\KebakaranHutanImportValidator;
 use Illuminate\Support\Facades\DB;
 use App\Actions\SingleWorkflowAction;
 use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
+use App\Exports\KebakaranHutanExport;
+use App\Exports\KebakaranHutanTemplateExport;
+use App\Imports\KebakaranHutanImport;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class KebakaranHutanController extends Controller
 {
@@ -250,7 +259,7 @@ class KebakaranHutanController extends Controller
   public function export(Request $request)
   {
     $year = $request->query('year');
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\KebakaranHutanExport($year), 'kebakaran-hutan-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new KebakaranHutanExport($year), 'kebakaran-hutan-' . date('Y-m-d') . '.xlsx');
   }
 
   /**
@@ -258,23 +267,106 @@ class KebakaranHutanController extends Controller
    */
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\KebakaranHutanTemplateExport, 'template_import_kebakaran_hutan.xlsx');
+    return Excel::download(new KebakaranHutanTemplateExport, 'template_import_kebakaran_hutan.xlsx');
   }
 
   /**
    * Import data from Excel.
    */
+  public function previewImport(Request $request)
+  {
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => Auth::id(),
+          'module_name' => 'kebakaran-hutan',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new KebakaranHutanImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('kebakaran-hutan.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'kebakaran-hutan') abort(404);
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return Inertia::render('KebakaranHutan/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'kebakaran-hutan' || $batch->status !== 'pending') abort(400);
+      
+      $batch->update(['status' => 'processing']);
+      
+      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+      $importedCount = 0;
+
+      foreach ($validRows as $stagingRow) {
+          $row = $stagingRow->data_payload;
+          
+          $regency = DB::table('m_regencies')
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupatenkota'])) . '%'])
+              ->first();
+              
+          $district = DB::table('m_districts')
+              ->where('regency_id', $regency->id)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+              ->first();
+
+          $village = DB::table('m_villages')
+              ->where('district_id', $district->id)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_desa'])) . '%'])
+              ->first();
+
+          $pengelolaWisata = DB::table('m_pengelola_wisata')
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_pengelola_wisata'])) . '%'])
+              ->first();
+
+          KebakaranHutan::create([
+              'year' => $row['tahun'],
+              'month' => $row['bulan_angka_1_12'],
+              'province_id' => $regency->province_id,
+              'regency_id' => $regency->id,
+              'district_id' => $district->id,
+              'village_id' => $village->id,
+              'id_pengelola_wisata' => $pengelolaWisata->id,
+              'area_function' => $row['fungsi_kawasan'],
+              'number_of_fires' => $row['jumlah_kejadian'],
+              'fire_area' => $row['luas_kebakaran_ha'],
+              'status' => 'draft',
+              'created_by' => Auth::id(),
+          ]);
+          $importedCount++;
+      }
+
+      $batch->update(['status' => 'completed']);
+      
+      return redirect()->route('kebakaran-hutan.index')->with('success', "Berhasil mengimport {$importedCount} data Kebakaran Hutan yang valid.");
+  }
+
   public function import(Request $request)
   {
     $request->validate([
       'file' => 'required|mimes:xlsx,csv,xls',
     ]);
 
-    $import = new \App\Imports\KebakaranHutanImport();
+    $import = new KebakaranHutanImport();
 
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
 

@@ -8,7 +8,17 @@ use Inertia\Inertia;
 use App\Actions\BulkWorkflowAction;
 use App\Actions\SingleWorkflowAction;
 use App\Enums\WorkflowAction;
+use App\Exports\PerkembanganKthExport;
+use App\Exports\PerkembanganKthTemplateExport;
+use App\Imports\PerkembanganKthImport;
+use App\Imports\StagingImport;
+use App\Models\ImportBatch;
+use App\Services\Imports\PerkembanganKthImportValidator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class PerkembanganKthController extends Controller
 {
@@ -199,14 +209,6 @@ class PerkembanganKthController extends Controller
   }
 
   /**
-   * Display the specified resource.
-   */
-  public function show(PerkembanganKth $perkembanganKth)
-  {
-    //
-  }
-
-  /**
    * Show the form for editing the specified resource.
    */
   public function edit(PerkembanganKth $perkembanganKth)
@@ -343,7 +345,7 @@ class PerkembanganKthController extends Controller
   public function export(Request $request)
   {
     $year = $request->query('year');
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PerkembanganKthExport($year), 'perkembangan-kth-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new PerkembanganKthExport($year), 'perkembangan-kth-' . date('Y-m-d') . '.xlsx');
   }
 
   /**
@@ -351,23 +353,121 @@ class PerkembanganKthController extends Controller
    */
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PerkembanganKthTemplateExport, 'template_import_perkembangan_kth.xlsx');
+    return Excel::download(new PerkembanganKthTemplateExport, 'template_import_perkembangan_kth.xlsx');
   }
 
   /**
    * Import data from Excel.
    */
+  public function previewImport(Request $request)
+  {
+      $this->authorize('perkembangan-kth.import');
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => Auth::id(),
+          'module_name' => 'perkembangan-kth',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new PerkembanganKthImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('perkembangan-kth.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'perkembangan-kth') abort(404);
+      $this->authorize('perkembangan-kth.import');
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return Inertia::render('PerkembanganKth/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'perkembangan-kth' || $batch->status !== 'pending') abort(400);
+      $this->authorize('perkembangan-kth.import');
+      
+      $batch->update(['status' => 'processing']);
+      
+      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+      $importedCount = 0;
+
+      foreach ($validRows as $stagingRow) {
+          $row = $stagingRow->data_payload;
+          
+          $kabupatenInfo = $row['nama_kabupaten'] ?? $row['kabupatenkota'] ?? null;
+          $kecamatanInfo = $row['nama_kecamatan'] ?? $row['kecamatan'] ?? null;
+          $desaInfo = $row['nama_desa'] ?? $row['desa'] ?? null;
+          $bulanInfo = $row['bulan_angka'] ?? $row['bulan_1_12'] ?? $row['bulan'] ?? null;
+          $kelasInfo = $row['kelas_kelembagaan'] ?? $row['kelas_kelembagaan_pemulamadyautama'] ?? 'pemula';
+          $luasInfo = $row['luas_kelola_ha'] ?? $row['luas_kelola'] ?? 0;
+
+          $regency = DB::table('m_regencies')
+            ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($kabupatenInfo)) . '%'])
+            ->first();
+
+          $district = null;
+          if ($regency && $kecamatanInfo) {
+            $district = DB::table('m_districts')
+              ->where('regency_id', $regency->id)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($kecamatanInfo)) . '%'])
+              ->first();
+          }
+
+          $village = null;
+          if ($district && $desaInfo) {
+            $village = DB::table('m_villages')
+              ->where('district_id', $district->id)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($desaInfo)) . '%'])
+              ->first();
+          }
+
+          PerkembanganKth::create([
+            'year' => $row['tahun'],
+            'month' => $bulanInfo,
+            'province_id' => 35,
+            'regency_id' => $regency?->id,
+            'district_id' => $district?->id,
+            'village_id' => $village?->id,
+            'nama_kth' => $row['nama_kth'],
+            'nomor_register' => $row['nomor_register'] ?? null,
+            'kelas_kelembagaan' => strtolower(trim($kelasInfo)),
+            'jumlah_anggota' => $row['jumlah_anggota'] ?? 0,
+            'luas_kelola' => $luasInfo,
+            'potensi_kawasan' => $row['potensi_kawasan'] ?? null,
+            'status' => 'draft',
+          ]);
+          
+          $importedCount++;
+      }
+
+      $batch->update(['status' => 'completed']);
+      cache()->forget('perkembangan-kth-stats-all');
+      
+      return redirect()->route('perkembangan-kth.index')->with('success', "Berhasil mengimport {$importedCount} data Perkembangan KTH yang valid.");
+  }
+
   public function import(Request $request)
   {
     $request->validate([
       'file' => 'required|mimes:xlsx,csv,xls',
     ]);
 
-    $import = new \App\Imports\PerkembanganKthImport();
+    $import = new PerkembanganKthImport();
 
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
 
@@ -378,3 +478,4 @@ class PerkembanganKthController extends Controller
     return redirect()->back()->with('success', 'Data berhasil diimport.');
   }
 }
+

@@ -159,30 +159,17 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
         });
     };
 
-    const handleImport = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    const handleImportSubmit = (e) => {
+        e.preventDefault();
+        if (!importFile) return;
 
-        setLoadingText('Mengimport Data...');
+        setLoadingText('Memproses Preview Import...');
         setIsLoading(true);
+        setShowImportModal(false);
 
-        const formData = new FormData();
-        formData.append('file', file);
-
-        router.post(route('rehab-lahan.import'), formData, {
+        router.post(route('rehab-lahan.preview-import'), { file: importFile }, {
             forceFormData: true,
             preserveScroll: true,
-            onSuccess: () => {
-                MySwal.fire({
-                    title: 'Berhasil!',
-                    text: 'Data berhasil diimport.',
-                    icon: 'success',
-                    confirmButtonColor: '#15803d',
-                    timer: 2000,
-                    timerProgressBar: true,
-                    showConfirmButton: false,
-                });
-            },
             onError: (errors) => {
                 MySwal.fire({
                     title: 'Gagal!',
@@ -193,6 +180,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
             },
             onFinish: () => {
                 setIsLoading(false);
+                setImportFile(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
             }
         });
@@ -820,7 +808,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
             />
 
             <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
-                <form onSubmit={(e) => { e.preventDefault(); if (!importFile) return; const formData = new FormData(); formData.append('file', importFile); setLoadingText('Mengimport Data...'); setIsLoading(true); setShowImportModal(false); router.post(route('rehab-lahan.import'), formData, { forceFormData: true, preserveScroll: true, onFinish: () => { setIsLoading(false); setImportFile(null); }, onError: () => setIsLoading(false) }); }} className="p-0 overflow-hidden">
+                <form onSubmit={handleImportSubmit} className="p-0 overflow-hidden">
                     <div className="p-6 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
                         <h2 className="text-lg font-bold text-gray-900">Import Data</h2>
                         <button type="button" onClick={() => setShowImportModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">

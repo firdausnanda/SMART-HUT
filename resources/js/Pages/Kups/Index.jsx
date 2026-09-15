@@ -185,10 +185,10 @@ export default function Index({ auth, kups, stats, filters }) {
   const handleImportSubmit = (e) => {
     e.preventDefault();
     if (!importFile) return;
-    setLoadingText('Mengimport Data...');
+    setLoadingText('Memproses Preview Import...');
     setIsLoading(true);
     setShowImportModal(false);
-    router.post(route('kups.import'), { file: importFile }, {
+    router.post(route('kups.preview-import'), { file: importFile }, {
       forceFormData: true,
       onFinish: () => { setIsLoading(false); setImportFile(null); }
     });

@@ -74,7 +74,7 @@ export default function Index({ auth, datas, stats, filters = {} }) {
     if (Object.keys(errors).length > 0) {
       let errorHtml = '<div class="text-left text-sm space-y-1">';
       Object.keys(errors).forEach(key => {
-        errorHtml += `<div class="text-red-600 font-medium">• ${errors[key]}</div>`;
+        errorHtml += `<div class="text-red-600 font-medium">â€¢ ${errors[key]}</div>`;
       });
       errorHtml += '</div>';
       MySwal.fire({ title: 'Terjadi Kesalahan', html: errorHtml, icon: 'error', confirmButtonText: 'Tutup', confirmButtonColor: '#d33' });
@@ -389,38 +389,28 @@ export default function Index({ auth, datas, stats, filters = {} }) {
     e.preventDefault();
     if (!importFile) return;
 
-    setLoadingText('Mengimport Data...');
+    setLoadingText('Memproses Preview Import...');
     setIsLoading(true);
 
     const formData = new FormData();
     formData.append('file', importFile);
 
-    router.post(route('pbphh.import'), formData, {
+    router.post(route('pbphh.preview-import'), formData, {
       forceFormData: true,
       preserveScroll: true,
-      onSuccess: () => {
-        MySwal.fire({
-          title: 'Berhasil!',
-          text: 'Data berhasil diimport.',
-          icon: 'success',
-          confirmButtonColor: '#15803d',
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
-        setShowImportModal(false);
-        setImportFile(null);
-      },
       onError: (errors) => {
+        setIsLoading(false);
         MySwal.fire({
           title: 'Gagal!',
-          text: errors.file || 'Terjadi kesalahan saat import.',
+          text: errors.file || 'Terjadi kesalahan saat memproses file import.',
           icon: 'error',
           confirmButtonColor: '#15803d',
         });
       },
       onFinish: () => {
         setIsLoading(false);
+        setImportFile(null);
+        setShowImportModal(false);
       }
     });
   };
@@ -914,3 +904,4 @@ export default function Index({ auth, datas, stats, filters = {} }) {
     </>
   );
 }
+

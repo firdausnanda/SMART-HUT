@@ -206,6 +206,32 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
     });
   };
 
+  const handleImportSubmit = (e) => {
+    e.preventDefault();
+    if (!importFile) return;
+
+    setLoadingText('Memproses Preview Import...');
+    setIsLoading(true);
+    setShowImportModal(false);
+
+    router.post(route('rehab-manggrove.preview-import'), { file: importFile }, {
+        forceFormData: true,
+        preserveScroll: true,
+        onError: (errors) => {
+            MySwal.fire({
+                title: 'Gagal!',
+                text: errors.file || 'Terjadi kesalahan saat import.',
+                icon: 'error',
+                confirmButtonColor: '#15803d',
+            });
+        },
+        onFinish: () => {
+            setIsLoading(false);
+            setImportFile(null);
+        }
+    });
+  };
+
   const SortIcon = ({ field }) => {
     if (filters.sort !== field) return <div className="w-4 h-4 ml-1 opacity-20"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" /></svg></div>;
 
@@ -772,7 +798,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, sum
       />
 
       <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
-        <form onSubmit={(e) => { e.preventDefault(); if (!importFile) return; const formData = new FormData(); formData.append('file', importFile); setLoadingText('Mengimport Data...'); setIsLoading(true); setShowImportModal(false); router.post(route('rehab-manggrove.import'), formData, { forceFormData: true, preserveScroll: true, onFinish: () => { setIsLoading(false); setImportFile(null); }, onError: () => setIsLoading(false) }); }} className="p-0 overflow-hidden">
+        <form onSubmit={handleImportSubmit} className="p-0 overflow-hidden">
           <div className="p-6 bg-slate-50 border-b border-gray-100 flex items-center justify-between"><h2 className="text-lg font-bold text-gray-900">Import Data</h2><button type="button" onClick={() => setShowImportModal(false)} className="text-gray-400 hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button></div>
           <div className="p-6 space-y-8">
             <div className="flex gap-4 items-start"><div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">1</div><div className="flex-1"><h3 className="text-sm font-bold text-gray-900 mb-1">Unduh Template</h3><p className="text-xs text-gray-500 mb-3">Gunakan template yang telah disediakan.</p><button type="button" onClick={() => window.location.href = route('rehab-manggrove.template')} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-100 hover:bg-blue-100"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>Download Template</button></div></div>

@@ -10,7 +10,16 @@ use Illuminate\Support\Facades\DB;
 use App\Actions\SingleWorkflowAction;
 use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
+use App\Exports\PbphhExport;
+use App\Exports\PbphhTemplateExport;
 use Illuminate\Validation\Rule;
+use App\Models\ImportBatch;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StagingImport;
+use App\Services\Imports\PbphhImportValidator;
+use Maatwebsite\Excel\Validators\ValidationException;
+use App\Imports\PbphhImport;
 
 class PbphhController extends Controller
 {
@@ -238,23 +247,130 @@ class PbphhController extends Controller
 
   public function export(Request $request)
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PbphhExport(), 'pbphh-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new PbphhExport(), 'pbphh-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PbphhTemplateExport, 'template_import_pbphh.xlsx');
+    return Excel::download(new PbphhTemplateExport, 'template_import_pbphh.xlsx');
+  }
+
+  public function previewImport(Request $request)
+  {
+      $this->authorize('pbphh.import');
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => Auth::id(),
+          'module_name' => 'pbphh',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new PbphhImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('pbphh.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'pbphh') abort(404);
+      $this->authorize('pbphh.import');
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return Inertia::render('Pbphh/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'pbphh' || $batch->status !== 'pending') abort(400);
+      $this->authorize('pbphh.import');
+      
+      $batch->update(['status' => 'processing']);
+      
+      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+      $importedCount = 0;
+
+      foreach ($validRows as $stagingRow) {
+          $row = $stagingRow->data_payload;
+          
+          $regency = DB::table('m_regencies')
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupatenkota'])) . '%'])
+              ->first();
+
+          $district = DB::table('m_districts')
+              ->where('regency_id', $regency->id)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+              ->first();
+
+          $rawJenis = $row['jenis_produksi_kapasitas'];
+          $items = array_map('trim', explode(',', $rawJenis));
+          $pivotData = [];
+
+          foreach ($items as $item) {
+              if (preg_match('/^(.+?)\s*\((.+?)\)$/', $item, $matches)) {
+                  $name = trim($matches[1]);
+                  $capacity = trim($matches[2]);
+              } else {
+                  $name = $item;
+                  $capacity = '-';
+              }
+
+              $jenisProduksi = DB::table('m_jenis_produksi')
+                  ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($name) . '%'])
+                  ->first();
+
+              if ($jenisProduksi) {
+                  $pivotData[$jenisProduksi->id] = ['kapasitas_ijin' => $capacity];
+              }
+          }
+
+          $condition = strtolower(trim($row['kondisi_saat_ini']));
+          $presentCondition = in_array($condition, ['aktif', '1', 'true']) ? true : false;
+
+          DB::transaction(function () use ($row, $regency, $district, $pivotData, $presentCondition) {
+              $pbphh = Pbphh::create([
+                  'name' => $row['nama_industri'],
+                  'number' => $row['nomor_izin'],
+                  'province_id' => $regency->province_id,
+                  'regency_id' => $regency->id,
+                  'district_id' => $district->id,
+                  'investment_value' => (int) $row['nilai_investasi'],
+                  'number_of_workers' => (int) $row['jumlah_tenaga_kerja'],
+                  'present_condition' => $presentCondition,
+                  'status' => 'draft',
+                  'created_by' => Auth::id(),
+              ]);
+
+              $pbphh->jenis_produksi()->sync($pivotData);
+          });
+          
+          $importedCount++;
+      }
+
+      $batch->update(['status' => 'completed']);
+      
+      cache()->forget('pbphh-stats');
+      
+      return redirect()->route('pbphh.index')->with('success', "Berhasil mengimport {$importedCount} data PBPHH yang valid.");
   }
 
   public function import(Request $request)
   {
     $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
 
-    $import = new \App\Imports\PbphhImport();
+    $import = new PbphhImport();
 
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
 
@@ -315,3 +431,4 @@ class PbphhController extends Controller
     return redirect()->back()->with('success', "{$count} data berhasil {$message}.");
   }
 }
+

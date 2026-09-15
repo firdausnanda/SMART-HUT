@@ -11,10 +11,19 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\ImportBatch;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StagingImport;
+use App\Services\Imports\NilaiEkonomiImportValidator;
+use Maatwebsite\Excel\Validators\ValidationException;
+use App\Imports\NilaiEkonomiImport;
 use App\Actions\BulkWorkflowAction;
 use App\Actions\SingleWorkflowAction;
 use App\Enums\WorkflowAction;
 use App\Enums\Satuan;
+use App\Exports\NilaiEkonomiExport;
+use App\Exports\NilaiEkonomiTemplateExport;
+use App\Models\NilaiEkonomiDetail;
 use Illuminate\Validation\Rule;
 
 class NilaiEkonomiController extends Controller
@@ -103,7 +112,7 @@ class NilaiEkonomiController extends Controller
         $stats = cache()->remember('nilai-ekonomi-stats-' . $selectedYear, 300, function () use ($selectedYear) {
             $baseQuery = NilaiEkonomi::where('year', $selectedYear);
             return [
-                'total_volume' => \App\Models\NilaiEkonomiDetail::whereHas('nilaiEkonomi', fn($q) => $q->where('year', $selectedYear))->sum('production_volume'),
+                'total_volume' => NilaiEkonomiDetail::whereHas('nilaiEkonomi', fn($q) => $q->where('year', $selectedYear))->sum('production_volume'),
                 'total_transaction' => $baseQuery->sum('total_transaction_value'),
                 'count' => $baseQuery->count(),
             ];
@@ -372,22 +381,176 @@ class NilaiEkonomiController extends Controller
     public function export(Request $request)
     {
         $year = $request->query('year');
-        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\NilaiEkonomiExport($year), 'nilai-ekonomi-' . date('Y-m-d') . '.xlsx');
+        return Excel::download(new NilaiEkonomiExport($year), 'nilai-ekonomi-' . date('Y-m-d') . '.xlsx');
     }
 
     public function template()
     {
-        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\NilaiEkonomiTemplateExport, 'template_import_nilai_ekonomi.xlsx');
+        return Excel::download(new NilaiEkonomiTemplateExport, 'template_import_nilai_ekonomi.xlsx');
+    }
+
+    public function previewImport(Request $request)
+    {
+        $this->authorize('nilai-ekonomi.import');
+        $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+        
+        $batch = ImportBatch::create([
+            'user_id' => Auth::id(),
+            'module_name' => 'nilai-ekonomi',
+            'filename' => $request->file('file')->getClientOriginalName(),
+            'status' => 'pending',
+        ]);
+
+        Excel::import(
+            new StagingImport($batch->id, new NilaiEkonomiImportValidator()), 
+            $request->file('file')
+        );
+
+        return redirect()->route('nilai-ekonomi.show-preview', $batch->id);
+    }
+
+    public function showPreview(ImportBatch $batch)
+    {
+        if ($batch->module_name !== 'nilai-ekonomi') abort(404);
+        $this->authorize('nilai-ekonomi.import');
+
+        $rows = $batch->stagingRows()->paginate(50);
+        
+        return Inertia::render('NilaiEkonomi/ImportPreview', [
+            'batch' => $batch,
+            'rows' => $rows
+        ]);
+    }
+
+    public function commitImport(ImportBatch $batch)
+    {
+        if ($batch->module_name !== 'nilai-ekonomi' || $batch->status !== 'pending') abort(400);
+        $this->authorize('nilai-ekonomi.import');
+        
+        $batch->update(['status' => 'processing']);
+        
+        $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+        $importedCount = 0;
+
+        foreach ($validRows as $stagingRow) {
+            $row = $stagingRow->data_payload;
+            
+            $regency = DB::table('m_regencies')
+                ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupaten'])) . '%'])
+                ->first();
+
+            $district = DB::table('m_districts')
+                ->where('regency_id', $regency->id)
+                ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+                ->first();
+
+            $transaction = NilaiEkonomi::firstOrCreate([
+                'year' => $row['tahun'],
+                'month' => $row['bulan_1_12'],
+                'nama_kelompok' => $row['nama_kelompok'],
+                'province_id' => 35,
+                'regency_id' => $regency->id,
+                'district_id' => $district->id,
+            ], [
+                'status' => 'draft',
+                'created_by' => Auth::id(),
+                'total_transaction_value' => 0,
+            ]);
+
+            if (!$transaction->wasRecentlyCreated) {
+                $transaction->update(['status' => 'draft']);
+            }
+
+            $commodities = array_map('trim', explode(',', (string) $row['komoditas']));
+            $volumes = array_map('trim', explode(',', (string) $row['volume_produksi']));
+            $satuans = array_map('trim', explode(',', (string) $row['satuan']));
+            $nilais = array_map('trim', explode(',', (string) $row['nilai_transaksi_rp']));
+
+            $count = count($commodities);
+
+            for ($i = 0; $i < $count; $i++) {
+                $commodityName = $commodities[$i] ?? null;
+                if (!$commodityName) continue;
+
+                $volumeStr = $volumes[$i] ?? '0';
+                if ($volumeStr !== '') {
+                    $volumeStr = str_replace([' ', "\r", "\n"], '', $volumeStr);
+                    $volume = (float) str_replace(',', '.', $volumeStr);
+                } else {
+                    $volume = 0;
+                }
+
+                $nilaiStr = $nilais[$i] ?? '0';
+                if ($nilaiStr !== '') {
+                    $nilaiStr = str_replace([' ', "\r", "\n", '.'], '', $nilaiStr);
+                    $nilaiStr = str_replace(',', '.', $nilaiStr);
+                    $nilai = (float) $nilaiStr;
+                } else {
+                    $nilai = 0;
+                }
+
+                $satuanRaw = trim($satuans[$i] ?? '-');
+                $satuan = $this->mapSatuan($satuanRaw);
+
+                $commodity = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
+                    ->where('name', $commodityName)
+                    ->first();
+
+                if (!$commodity) continue;
+
+                $transaction->details()->create([
+                    'commodity_id' => $commodity->id,
+                    'production_volume' => $volume,
+                    'satuan' => $satuan,
+                    'transaction_value' => $nilai,
+                ]);
+
+                $transaction->increment('total_transaction_value', $nilai);
+            }
+            
+            $importedCount++;
+        }
+
+        $batch->update(['status' => 'completed']);
+        cache()->forget('nilai-ekonomi-years');
+        
+        return redirect()->route('nilai-ekonomi.index')->with('success', "Berhasil mengimport {$importedCount} data Nilai Ekonomi yang valid.");
+    }
+
+    private function mapSatuan($satuanRaw)
+    {
+        $map = [
+            'kg' => ['kg', 'kilogram (kg)', 'lg', 'kilogram'],
+            'm3' => ['m3', 'meter kubik (m3)', 'meter kubik (m�)', 'meter kubik'],
+            'batang' => ['batang', 'batangan', 'bantangan', 'btg'],
+            'ton' => ['ton'],
+            'pcs' => ['pcs'],
+            'buah' => ['buah'],
+            'bibit' => ['tanaman', 'bibit'],
+            'stup' => ['stup'],
+            'orang' => ['orang'],
+            'ekor' => ['ekor'],
+            'liter' => ['liter'],
+            'ikat' => ['ikat'],
+            'butir' => ['butir']
+        ];
+        $lower = strtolower($satuanRaw);
+        foreach ($map as $canonical => $variations) {
+            if (in_array($lower, $variations)) {
+                return $canonical;
+            }
+        }
+        return 'lainnya';
     }
 
     public function import(Request $request)
     {
         $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
-        $import = new \App\Imports\NilaiEkonomiImport();
+        $import = new NilaiEkonomiImport();
 
         try {
-            \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            Excel::import($import, $request->file('file'));
+        } catch (ValidationException $e) {
             return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
         }
 
@@ -398,3 +561,4 @@ class NilaiEkonomiController extends Controller
         return redirect()->back()->with('success', 'Data berhasil diimport.');
     }
 }
+

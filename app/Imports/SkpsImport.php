@@ -22,9 +22,9 @@ class SkpsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFail
       'nama_kecamatan' => 'required|string',
       'nama_kelompok' => 'required|string',
       'nama_skema_perhutanan_sosial' => 'required|string',
-      'potensi_ha' => 'required|string',
-      'luas_ps_ha' => 'required|string',
-      'jumlah_kk' => 'required|string',
+      'potensi' => 'required|string',
+      'luas_ps_ha' => 'required|numeric|min:0',
+      'jumlah_kk' => 'required|numeric|min:0',
     ];
   }
 
@@ -92,9 +92,9 @@ class SkpsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFail
       'district_id' => $district->id,
       'id_skema_perhutanan_sosial' => $skema->id,
       'nama_kelompok' => $row['nama_kelompok'],
-      'potential' => $row['potensi_ha'],
+      'potential' => $row['potensi'],
       'ps_area' => $row['luas_ps_ha'],
-      'number_of_kk' => $row['jumlah_kk'],
+      'number_of_kk' => (int) $row['jumlah_kk'],
       'status' => 'draft',
       'created_by' => Auth::id(),
     ]);

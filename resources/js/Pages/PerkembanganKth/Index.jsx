@@ -768,7 +768,35 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
 
       </AuthenticatedLayout>
       <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
-        <form onSubmit={(e) => { e.preventDefault(); if (!importFile) return; const formData = new FormData(); formData.append('file', importFile); setLoadingText('Mengimport Data...'); setIsLoading(true); setShowImportModal(false); router.post(route('perkembangan-kth.import'), formData, { forceFormData: true, preserveScroll: true, onFinish: () => { setIsLoading(false); setImportFile(null); }, onError: () => setIsLoading(false) }); }} className="p-0 overflow-hidden">
+        <form onSubmit={(e) => { 
+          e.preventDefault(); 
+          if (!importFile) return; 
+          
+          setLoadingText('Memproses Preview Import...'); 
+          setIsLoading(true); 
+          
+          const formData = new FormData(); 
+          formData.append('file', importFile); 
+          
+          router.post(route('perkembangan-kth.preview-import'), formData, { 
+            forceFormData: true, 
+            preserveScroll: true,
+            onError: (errors) => {
+              setIsLoading(false);
+              MySwal.fire({
+                title: 'Gagal!',
+                text: errors.file || 'Terjadi kesalahan saat memproses file import.',
+                icon: 'error',
+                confirmButtonColor: '#15803d',
+              });
+            },
+            onFinish: () => { 
+              setIsLoading(false); 
+              setImportFile(null); 
+              setShowImportModal(false); 
+            } 
+          }); 
+        }} className="p-0 overflow-hidden">
           <div className="p-6 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-900">Import Data</h2>
             <button type="button" onClick={() => setShowImportModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">

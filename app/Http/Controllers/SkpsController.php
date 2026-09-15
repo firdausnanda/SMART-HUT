@@ -10,7 +10,17 @@ use Illuminate\Support\Facades\Redirect;
 use App\Actions\BulkWorkflowAction;
 use App\Actions\SingleWorkflowAction;
 use App\Enums\WorkflowAction;
+use App\Exports\SkpsExport;
+use App\Exports\SkpsTemplateExport;
 use Illuminate\Validation\Rule;
+use App\Models\ImportBatch;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StagingImport;
+use App\Services\Imports\SkpsImportValidator;
+use Maatwebsite\Excel\Validators\ValidationException;
+use App\Imports\SkpsImport;
+use Illuminate\Support\Facades\DB;
 
 class SkpsController extends Controller
 {
@@ -232,23 +242,104 @@ class SkpsController extends Controller
 
   public function export()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\SkpsExport, 'perkembangan-skps-' . date('Y-m-d') . '.xlsx');
+    return Excel::download(new SkpsExport, 'perkembangan-skps-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()
   {
-    return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\SkpsTemplateExport, 'template_import_skps.xlsx');
+    return Excel::download(new SkpsTemplateExport, 'template_import_skps.xlsx');
+  }
+
+  public function previewImport(Request $request)
+  {
+      $this->authorize('skps.import');
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => Auth::id(),
+          'module_name' => 'skps',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new SkpsImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('skps.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'skps') abort(404);
+      $this->authorize('skps.import');
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return Inertia::render('Skps/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'skps' || $batch->status !== 'pending') abort(400);
+      $this->authorize('skps.import');
+      
+      $batch->update(['status' => 'processing']);
+      
+      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
+      $importedCount = 0;
+
+      foreach ($validRows as $stagingRow) {
+          $row = $stagingRow->data_payload;
+          
+          $regency = DB::table('m_regencies')
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupatenkota'])) . '%'])
+              ->first();
+
+          $district = DB::table('m_districts')
+              ->where('regency_id', $regency->id)
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
+              ->first();
+
+          $skema = DB::table('m_skema_perhutanan_sosial')
+              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_skema_perhutanan_sosial'])) . '%'])
+              ->first();
+
+          Skps::create([
+              'province_id' => $regency->province_id,
+              'regency_id' => $regency->id,
+              'district_id' => $district->id,
+              'id_skema_perhutanan_sosial' => $skema->id,
+              'nama_kelompok' => $row['nama_kelompok'],
+              'potential' => $row['potensi'] ?? $row['potensi_ha'] ?? null,
+              'ps_area' => $row['luas_ps_ha'],
+              'number_of_kk' => $row['jumlah_kk'],
+              'status' => 'draft',
+              'created_by' => Auth::id(),
+          ]);
+          
+          $importedCount++;
+      }
+
+      $batch->update(['status' => 'completed']);
+      cache()->forget('skps-stats');
+      
+      return redirect()->route('skps.index')->with('success', "Berhasil mengimport {$importedCount} data SK PS yang valid.");
   }
 
   public function import(Request $request)
   {
     $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
 
-    $import = new \App\Imports\SkpsImport();
+    $import = new SkpsImport();
 
     try {
-      \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
-    } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
       return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
     }
 
@@ -307,3 +398,4 @@ class SkpsController extends Controller
     return redirect()->back()->with('success', "{$count} data berhasil {$message}.");
   }
 }
+

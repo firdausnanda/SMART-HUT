@@ -310,31 +310,20 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
     e.preventDefault();
     if (!importFile) return;
 
-    setLoadingText('Mengimport Data...');
+    setLoadingText('Memproses Preview Import...');
     setIsLoading(true);
-    setShowImportModal(false);
 
     const formData = new FormData();
     formData.append('file', importFile);
 
-    router.post(route('nilai-ekonomi.import'), formData, {
+    router.post(route('nilai-ekonomi.preview-import'), formData, {
       forceFormData: true,
       preserveScroll: true,
-      onSuccess: () => {
-        MySwal.fire({
-          title: 'Berhasil!',
-          text: 'Data berhasil diimport.',
-          icon: 'success',
-          confirmButtonColor: '#15803d',
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
-      },
       onError: (errors) => {
+        setIsLoading(false);
         MySwal.fire({
           title: 'Gagal!',
-          text: errors.file || 'Terjadi kesalahan saat import.',
+          text: errors.file || 'Terjadi kesalahan saat memproses file import.',
           icon: 'error',
           confirmButtonColor: '#15803d',
         });
@@ -342,6 +331,7 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
       onFinish: () => {
         setIsLoading(false);
         setImportFile(null);
+        setShowImportModal(false);
       }
     });
   };
