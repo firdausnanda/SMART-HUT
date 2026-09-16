@@ -47,6 +47,7 @@ RUN apk add --no-cache \
     nginx \
     supervisor \
     mysql-client \
+    mariadb-connector-c \
     libpng \
     libjpeg-turbo \
     freetype \
