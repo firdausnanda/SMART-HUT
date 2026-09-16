@@ -29,10 +29,8 @@ return new class extends Migration
             }
         });
 
-        // 2. Change column type
-        Schema::table('pbphh_jenis_produksi', function (Blueprint $table) {
-            $table->decimal('kapasitas_ijin', 15, 2)->nullable()->change();
-        });
+        // 2. Change column type using raw SQL to avoid requiring doctrine/dbal package
+        DB::statement('ALTER TABLE pbphh_jenis_produksi MODIFY kapasitas_ijin DECIMAL(15, 2) NULL');
     }
 
     /**
@@ -40,8 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pbphh_jenis_produksi', function (Blueprint $table) {
-            $table->string('kapasitas_ijin')->nullable()->change();
-        });
+        DB::statement('ALTER TABLE pbphh_jenis_produksi MODIFY kapasitas_ijin VARCHAR(255) NULL');
     }
 };
