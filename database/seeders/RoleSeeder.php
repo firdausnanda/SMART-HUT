@@ -50,6 +50,11 @@ class RoleSeeder extends Seeder
 
         $allPermissions = \Spatie\Permission\Models\Permission::all();
 
+        // Permission view + approve untuk semua modul (dipakai oleh kacdk di level role)
+        $viewApprovePermissions = $allPermissions->filter(
+            fn($p) => str_ends_with($p->name, '.view') || str_ends_with($p->name, '.approve')
+        );
+
         foreach ($roles as $role) {
             $createdRole = Role::firstOrCreate([
                 'name' => $role['name'],
@@ -59,7 +64,17 @@ class RoleSeeder extends Seeder
             ]);
 
             if (in_array($createdRole->name, ['admin', 'admin_provinsi', 'admin_cdk'])) {
+                // Super-admin roles: semua permission di level role
                 $createdRole->syncPermissions($allPermissions);
+            } elseif ($createdRole->name === 'kacdk') {
+                // Kepala CDK: hanya view + approve di level role
+                // Permission granular lain dikelola via direct permission per user
+                $createdRole->syncPermissions($viewApprovePermissions);
+            } else {
+                // kasi, pelaksana, pk, peh:
+                // TIDAK punya permission di level role.
+                // Semua akses dikelola via direct permission per user melalui UI manajemen user.
+                $createdRole->syncPermissions([]);
             }
         }
     }
