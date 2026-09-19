@@ -122,7 +122,7 @@ export default function DemografiIndex({
     const isAdmin = auth.user.roles.includes('admin');
     const isKasi = auth.user.roles.includes('kasi');
     const isKaCdk = auth.user.roles.includes('kacdk');
-    const isStaff = auth.user.roles.includes('pk') || auth.user.roles.includes('peh') || auth.user.roles.includes('pelaksana');
+    const isStaff = auth.user.roles.includes('pelaksana');
     const userPermissions = auth.user.permissions || [];
 
     const canCreate = userPermissions.includes('demografi-pegawai.create') || isAdmin;

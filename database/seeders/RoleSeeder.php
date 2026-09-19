@@ -23,14 +23,6 @@ class RoleSeeder extends Seeder
                 'description' => 'Pelaksana',
             ],
             [
-                'name' => 'pk',
-                'description' => 'Penyuluh Kehutanan',
-            ],
-            [
-                'name' => 'peh',
-                'description' => 'Pengendali Ekosistem Hutan',
-            ],
-            [
                 'name' => 'kasi',
                 'description' => 'Kepala Seksi',
             ],
@@ -71,7 +63,7 @@ class RoleSeeder extends Seeder
                 // Permission granular lain dikelola via direct permission per user
                 $createdRole->syncPermissions($viewApprovePermissions);
             } else {
-                // kasi, pelaksana, pk, peh:
+                // kasi, pelaksana:
                 // TIDAK punya permission di level role.
                 // Semua akses dikelola via direct permission per user melalui UI manajemen user.
                 $createdRole->syncPermissions([]);

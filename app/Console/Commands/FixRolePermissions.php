@@ -18,7 +18,7 @@ class FixRolePermissions extends Command
                             {--dry-run : Preview perubahan tanpa mengeksekusi}
                             {--yes    : Skip konfirmasi (untuk CI/deploy server)}';
 
-    protected $description = 'Fix role-level permissions: hapus permission dari role pelaksana/pk/peh/kasi, pertahankan kacdk';
+    protected $description = 'Fix role-level permissions: hapus permission dari role pelaksana/kasi, pertahankan kacdk';
 
     public function handle(): int
     {
@@ -30,10 +30,10 @@ class FixRolePermissions extends Command
 
         // Role yang akan di-clear semua permission-nya dari level role
         // Penjelasan:
-        //   pelaksana, pk, peh → tidak punya permission di level role, dikelola via direct permission per user
-        //   kasi               → per direct permission (keputusan: 2026-09-18)
-        //   kacdk              → TETAP, permission view+approve di level role (dipertahankan)
-        $rolesToClear = ['pelaksana', 'pk', 'peh', 'kasi'];
+        //   pelaksana → tidak punya permission di level role, dikelola via direct permission per user
+        //   kasi      → per direct permission
+        //   kacdk     → TETAP, permission view+approve di level role (dipertahankan)
+        $rolesToClear = ['pelaksana', 'kasi'];
 
         // --- SNAPSHOT SEBELUM ---
         $this->line('<options=bold>📊 State sebelum fix:</>');

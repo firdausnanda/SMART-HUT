@@ -32,6 +32,7 @@ class User extends Authenticatable
         'name',
         'email',
         'username',
+        'jabatan',
         'password',
         'google_id',
         'avatar',
@@ -63,6 +64,11 @@ class User extends Authenticatable
 
     public function getRoleDescriptionAttribute()
     {
+        // Prioritaskan label jabatan personal (untuk role pelaksana)
+        if ($this->jabatan) {
+            return $this->jabatan;
+        }
+        // Fallback: deskripsi dari role (untuk kasi, kacdk, dll.)
         return $this->roles->pluck('description')->first();
     }
 

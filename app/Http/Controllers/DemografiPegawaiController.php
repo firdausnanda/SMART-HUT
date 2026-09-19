@@ -119,7 +119,7 @@ class DemografiPegawaiController extends Controller
         if ($user->hasRole('admin')) {
             $pendingStatuses = ['draft', 'waiting_kasi', 'waiting_cdk', 'rejected'];
         } else {
-            if ($user->hasAnyRole(['pk', 'peh', 'pelaksana'])) {
+            if ($user->hasRole('pelaksana')) {
                 $pendingStatuses = array_merge($pendingStatuses, ['draft', 'rejected']);
             }
             if ($user->hasRole('kasi')) {

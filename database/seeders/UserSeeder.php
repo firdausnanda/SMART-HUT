@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
      *  1. Role admin/admin_cdk/admin_provinsi → permission sudah diberikan di level ROLE
      *     melalui RoleSeeder (semua permission).
      *  2. Role kacdk → permission view+approve sudah diberikan di level ROLE melalui RoleSeeder.
-     *  3. Role kasi/pelaksana/pk/peh → permission dikelola via UI manajemen user
+     *  3. Role kasi/pelaksana → permission dikelola via UI manajemen user
      *     (halaman /users/{id}/edit) secara granular per user, BUKAN di seeder.
      *
      * Logika lama yang melakukan syncPermissions() di seeder ini dihapus karena:

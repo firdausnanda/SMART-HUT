@@ -15,6 +15,7 @@ export default function Create({ auth, roles, cdks = [], permissions = {} }) {
     password: '',
     password_confirmation: '',
     role: '',
+    jabatan: '',
     cdk_id: '',
     permissions: []
   });
@@ -86,6 +87,12 @@ export default function Create({ auth, roles, cdks = [], permissions = {} }) {
     value: role.name,
     label: role.description || role.name // Fallback to name if description is missing
   }));
+
+  const jabatanOptions = [
+    { value: 'Pelaksana', label: 'Pelaksana' },
+    { value: 'Penyuluh Kehutanan', label: 'Penyuluh Kehutanan (PK)' },
+    { value: 'Pengendali Ekosistem Hutan', label: 'Pengendali Ekosistem Hutan (PEH)' },
+  ];
 
   const cdkOptions = cdks.map(cdk => ({
     value: cdk.id,
@@ -167,13 +174,32 @@ export default function Create({ auth, roles, cdks = [], permissions = {} }) {
                   <InputLabel htmlFor="role" value="Role" className="text-gray-700 font-bold mb-2" />
                   <Select
                     options={roleOptions}
-                    onChange={(opt) => setData('role', opt?.value || '')}
+                    onChange={(opt) => {
+                      setData('role', opt?.value || '');
+                      if (opt?.value !== 'pelaksana') setData('jabatan', '');
+                    }}
                     placeholder="Pilih Role..."
                     styles={selectStyles}
                     isClearable
                   />
                   <InputError message={errors.role} className="mt-2" />
                 </div>
+
+                {data.role === 'pelaksana' && (
+                  <div>
+                    <InputLabel htmlFor="jabatan" value="Jabatan" className="text-gray-700 font-bold mb-2" />
+                    <Select
+                      options={jabatanOptions}
+                      value={jabatanOptions.find(o => o.value === data.jabatan) || null}
+                      onChange={(opt) => setData('jabatan', opt?.value || '')}
+                      placeholder="Pilih Jabatan..."
+                      styles={selectStyles}
+                      isClearable
+                    />
+                    <p className="mt-1 text-xs text-gray-400">Jabatan fungsional yang akan ditampilkan di sidebar.</p>
+                    <InputError message={errors.jabatan} className="mt-2" />
+                  </div>
+                )}
 
                 {cdks.length > 0 && (
                   <div>

@@ -112,6 +112,7 @@ class UserController extends Controller
             ->uncompromised(),
       ],
       'role' => 'required|exists:roles,name',
+      'jabatan' => 'nullable|string|max:100',
       'permissions' => 'nullable|array',
       'permissions.*' => 'exists:permissions,name',
     ];
@@ -135,6 +136,7 @@ class UserController extends Controller
       'email' => $request->email,
       'password' => Hash::make($request->password),
       'cdk_id' => $cdkId,
+      'jabatan' => $request->jabatan,
     ]);
 
     $user->assignRole($request->role);
@@ -201,8 +203,7 @@ class UserController extends Controller
       'username' => 'required|string|max:255|unique:users,username,' . $user->id,
       'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . $user->id,
       'role' => 'required|exists:roles,name',
-      'permissions' => 'nullable|array',
-      'permissions.*' => 'exists:permissions,name',
+      'jabatan' => 'nullable|string|max:100',
       'permissions' => 'nullable|array',
       'permissions.*' => 'exists:permissions,name',
     ];
@@ -242,6 +243,8 @@ class UserController extends Controller
     if (auth()->user()->isAdminProvinsi()) {
       $userData['cdk_id'] = $request->cdk_id;
     }
+
+    $userData['jabatan'] = $request->jabatan;
 
     $user->update($userData);
 
