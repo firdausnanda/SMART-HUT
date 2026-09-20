@@ -75,6 +75,12 @@ RUN { \
         echo 'opcache.enable_cli=1'; \
     } > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
+# Apply custom PHP production settings (memory_limit, upload limits, etc.)
+COPY docker/php.ini /usr/local/etc/php/conf.d/app.ini
+
+# Apply custom PHP-FPM pool configuration (pm settings, request_terminate_timeout, etc.)
+COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+
 # Configure Nginx to run as www-data to match PHP-FPM and prevent permission issues
 RUN sed -i 's/user nginx;/user www-data;/' /etc/nginx/nginx.conf \
     && mkdir -p /var/log/supervisor /var/run /var/log/nginx \
@@ -91,6 +97,7 @@ COPY --from=node-builder --chown=www-data:www-data /app/public/build /var/www/ht
 # Copy configurations
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/worker.conf /etc/supervisor/conf.d/worker.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Fix line endings (CRLF to LF) for the entrypoint and make it executable

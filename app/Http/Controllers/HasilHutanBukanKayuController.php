@@ -15,6 +15,7 @@ use Illuminate\Validation\Rule;
 use App\Models\ImportBatch;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\ProcessImportBatch;
 use App\Imports\StagingImport;
 use App\Services\Imports\HasilHutanBukanKayuImportValidator;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -458,109 +459,8 @@ class HasilHutanBukanKayuController extends Controller
 
     $batch->update(['status' => 'processing']);
 
-    $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-    $importedCount = 0;
-
-    $orderedNames = [
-      'Bambu',
-      'Getah Pinus',
-      'Daun Kayu Putih',
-      'Porang',
-      'Kopi',
-      'Madu',
-      'Durian',
-      'Alpukat',
-      'Jahe',
-      'Kunyit'
-    ];
-    $all = BukanKayu::all();
-    $commodities = $all->sortBy(function ($model) use ($orderedNames) {
-      $index = array_search($model->name, $orderedNames);
-      return $index === false ? 9999 + $model->id : $index;
-    })->values();
-
-    foreach ($validRows as $stagingRow) {
-      $row = $stagingRow->data_payload;
-
-      $regency = DB::table('m_regencies')
-        ->where('province_id', 35)
-        ->where('name', 'like', '%' . $row['nama_kabupaten'] . '%')
-        ->first();
-
-      $districtId = null;
-      if ($forestType !== 'Hutan Negara' && !empty($row['nama_kecamatan'])) {
-        $district = DB::table('m_districts')
-          ->where('regency_id', $regency->id)
-          ->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')
-          ->first();
-        if (!$district) {
-          $district = DB::table('m_districts')->where('name', 'like', '%' . $row['nama_kecamatan'] . '%')->first();
-        }
-        $districtId = $district?->id;
-      }
-
-      $pengelolaId = null;
-      if ($forestType === 'Hutan Negara' && !empty($row['nama_pengelola'])) {
-        $ph = DB::table('m_pengelola_hutan')
-          ->where('name', 'like', '%' . $row['nama_pengelola'] . '%')
-          ->first();
-        $pengelolaId = $ph?->id;
-      }
-
-      $pengelolaWisataId = null;
-      if ($forestType === 'Perhutanan Sosial' && !empty($row['nama_pengelola_wisata'])) {
-        $pw = DB::table('m_pengelola_wisata')
-          ->where('name', 'like', '%' . $row['nama_pengelola_wisata'] . '%')
-          ->first();
-        $pengelolaWisataId = $pw?->id;
-      }
-
-      DB::transaction(function () use ($row, $regency, $districtId, $pengelolaId, $pengelolaWisataId, $forestType, $commodities) {
-        $hhbk = HasilHutanBukanKayu::create([
-          'year' => $row['tahun'],
-          'month' => $row['bulan_angka'],
-          'province_id' => 35,
-          'regency_id' => $regency->id,
-          'district_id' => $forestType === 'Hutan Rakyat' ? $districtId : null,
-          'pengelola_hutan_id' => $forestType === 'Hutan Negara' ? $pengelolaId : null,
-          'pengelola_wisata_id' => $forestType === 'Perhutanan Sosial' ? $pengelolaWisataId : null,
-          'forest_type' => $forestType,
-          'volume_target' => $row['total_target'] ?? 0,
-          'status' => 'draft',
-          'created_by' => Auth::id(),
-        ]);
-
-        foreach ($commodities as $commodity) {
-          $slug = \Illuminate\Support\Str::slug($commodity->name, '_');
-          $realizationKey = $slug . '_realisasi';
-          $unitKey = $slug . '_satuan';
-
-          $realizationVolume = $row[$realizationKey] ?? 0;
-          
-          $rawUnit = $row[$unitKey] ?? 'kg';
-          $normalizedUnit = strtolower(trim($rawUnit));
-          $unit = \App\Enums\Satuan::tryFrom($normalizedUnit) ? $normalizedUnit : 'lainnya';
-
-          if ($realizationVolume > 0) {
-            $hhbk->details()->create([
-              'bukan_kayu_id' => $commodity->id,
-              'annual_volume_realization' => $realizationVolume,
-              'unit' => $unit,
-            ]);
-          }
-        }
-      });
-
-      $importedCount++;
-    }
-
-    $batch->update(['status' => 'completed']);
-
-    foreach (range(date('Y'), date('Y') - 5) as $y) {
-      cache()->forget("hhbk-stats-{$forestType}-{$y}");
-    }
-
-    return redirect()->route('hasil-hutan-bukan-kayu.index', ['forest_type' => $forestType])->with('success', "Berhasil mengimport {$importedCount} data Hasil Hutan Bukan Kayu yang valid.");
+    ProcessImportBatch::dispatch($batch->id);
+    return back();
   }
 
   public function import(Request $request)
@@ -605,10 +505,12 @@ class HasilHutanBukanKayuController extends Controller
 
     $workflowAction = WorkflowAction::from($request->action);
 
+    $firstModel = \App\Models\HasilHutanBukanKayu::find($request->ids[0]);
+
     match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorizeForestType($hasilHutanBukanKayu->forest_type, 'edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorizeForestType($hasilHutanBukanKayu->forest_type, 'approve'),
-      WorkflowAction::DELETE => $this->authorizeForestType($hasilHutanBukanKayu->forest_type, 'delete'),
+      WorkflowAction::SUBMIT => $this->authorizeForestType($firstModel->forest_type, 'edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorizeForestType($firstModel->forest_type, 'approve'),
+      WorkflowAction::DELETE => $this->authorizeForestType($firstModel->forest_type, 'delete'),
     };
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {

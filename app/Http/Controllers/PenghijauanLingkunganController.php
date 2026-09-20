@@ -18,6 +18,7 @@ use App\Services\Imports\PenghijauanLingkunganImportValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\ProcessImportBatch;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -314,58 +315,11 @@ class PenghijauanLingkunganController extends Controller
   public function commitImport(ImportBatch $batch)
   {
       if ($batch->module_name !== 'penghijauan-lingkungan' || $batch->status !== 'pending') abort(400);
-      
+
       $batch->update(['status' => 'processing']);
-      
-      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-      $importedCount = 0;
 
-      foreach ($validRows as $stagingRow) {
-          $row = $stagingRow->data_payload;
-          
-          $regency = DB::table('m_regencies')
-              ->where('province_id', 35)
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupaten'])) . '%'])
-              ->first();
-              
-          $district = DB::table('m_districts')
-              ->where('regency_id', $regency->id)
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
-              ->first();
-
-          if (!$district) {
-              $district = DB::table('m_districts')
-                  ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
-                  ->first();
-          }
-
-          $village = null;
-          if (!empty($row['nama_desa'])) {
-              $village = DB::table('m_villages')
-                  ->where('district_id', $district->id)
-                  ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_desa'])) . '%'])
-                  ->first();
-          }
-
-          PenghijauanLingkungan::create([
-              'year' => $row['tahun'],
-              'month' => $row['bulan_angka'],
-              'province_id' => 35,
-              'regency_id' => $regency->id,
-              'district_id' => $district->id,
-              'village_id' => $village?->id,
-              'target_annual' => $row['target_tahunan_ha'] ?? 0,
-              'realization' => $row['realisasi_ha'] ?? 0,
-              'fund_source' => strtolower(trim($row['sumber_dana'])) ?? 'other',
-              'status' => 'draft',
-              'created_by' => Auth::id(),
-          ]);
-          $importedCount++;
-      }
-
-      $batch->update(['status' => 'completed']);
-      
-      return redirect()->route('penghijauan-lingkungan.index')->with('success', "Berhasil mengimport {$importedCount} data Penghijauan Lingkungan yang valid.");
+      ProcessImportBatch::dispatch($batch->id);
+    return back();
   }
 
   /**

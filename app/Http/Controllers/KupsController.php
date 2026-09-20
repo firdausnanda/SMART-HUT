@@ -9,6 +9,7 @@ use App\Models\Districts;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use App\Jobs\ProcessImportBatch;
 use App\Actions\BulkWorkflowAction;
 use App\Actions\SingleWorkflowAction;
 use App\Enums\WorkflowAction;
@@ -250,40 +251,11 @@ class KupsController extends Controller
   public function commitImport(ImportBatch $batch)
   {
       if ($batch->module_name !== 'kups' || $batch->status !== 'pending') abort(400);
-      
+
       $batch->update(['status' => 'processing']);
-      
-      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-      $importedCount = 0;
 
-      foreach ($validRows as $stagingRow) {
-          $row = $stagingRow->data_payload;
-          
-          $regency = DB::table('m_regencies')
-            ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupatenkota'])) . '%'])
-            ->first();
-            
-          $district = DB::table('m_districts')
-            ->where('regency_id', $regency->id)
-            ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
-            ->first();
-
-          Kups::create([
-            'province_id' => $regency->province_id,
-            'regency_id' => $regency->id,
-            'district_id' => $district->id,
-            'nama_kups' => $row['nama_kups'],
-            'category' => $row['kategori'],
-            'commodity' => $row['komoditas'],
-            'status' => 'draft',
-            'created_by' => Auth::id(),
-          ]);
-          $importedCount++;
-      }
-
-      $batch->update(['status' => 'completed']);
-      
-      return redirect()->route('kups.index')->with('success', "Berhasil mengimport {$importedCount} data KUPS yang valid.");
+      ProcessImportBatch::dispatch($batch->id);
+    return back();
   }
 
   public function import(Request $request)

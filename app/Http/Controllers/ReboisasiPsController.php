@@ -15,6 +15,7 @@ use Inertia\Inertia;
 use App\Models\ImportBatch;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\ProcessImportBatch;
 use App\Imports\StagingImport;
 use App\Services\Imports\ReboisasiPsImportValidator;
 use App\Exports\ReboisasiPsExport;
@@ -313,63 +314,8 @@ class ReboisasiPsController extends Controller
 
     $batch->update(['status' => 'processing']);
 
-    $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-    $importedCount = 0;
-
-    foreach ($validRows as $stagingRow) {
-      $row = $stagingRow->data_payload;
-
-      $regency = DB::table('m_regencies')
-        ->where('province_id', 35)
-        ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupaten'])) . '%'])
-        ->first();
-
-      $district = DB::table('m_districts')
-        ->where('regency_id', $regency->id)
-        ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
-        ->first();
-
-      if (!$district) {
-        $district = DB::table('m_districts')
-          ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
-          ->first();
-      }
-
-      $village = null;
-      if (!empty($row['nama_desa'])) {
-        $village = DB::table('m_villages')
-          ->where('district_id', $district->id)
-          ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_desa'])) . '%'])
-          ->first();
-      }
-
-      $pengelola = null;
-      if (!empty($row['pengelola'])) {
-        $pengelola = DB::table('m_pengelola_ps')
-          ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['pengelola'])) . '%'])
-          ->first();
-      }
-
-      ReboisasiPS::create([
-        'year' => $row['tahun'],
-        'month' => $row['bulan_angka'],
-        'province_id' => 35,
-        'regency_id' => $regency->id,
-        'district_id' => $district->id,
-        'village_id' => $village?->id,
-        'pengelola_id' => $pengelola?->id,
-        'target_annual' => $row['target_tahunan_ha'] ?? 0,
-        'realization' => $row['realisasi_ha'] ?? 0,
-        'fund_source' => strtolower(trim($row['sumber_dana'])) ?? 'other',
-        'status' => 'draft',
-        'created_by' => Auth::id(),
-      ]);
-      $importedCount++;
-    }
-
-    $batch->update(['status' => 'completed']);
-
-    return redirect()->route('reboisasi-ps.index')->with('success', "Berhasil mengimport {$importedCount} data Reboisasi PS yang valid.");
+    ProcessImportBatch::dispatch($batch->id);
+    return back();
   }
 
   public function import(Request $request)

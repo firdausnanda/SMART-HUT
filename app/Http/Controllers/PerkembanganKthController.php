@@ -16,6 +16,7 @@ use App\Models\ImportBatch;
 use App\Services\Imports\PerkembanganKthImportValidator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\ProcessImportBatch;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -396,65 +397,11 @@ class PerkembanganKthController extends Controller
   {
       if ($batch->module_name !== 'perkembangan-kth' || $batch->status !== 'pending') abort(400);
       $this->authorize('perkembangan-kth.import');
-      
+
       $batch->update(['status' => 'processing']);
-      
-      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-      $importedCount = 0;
 
-      foreach ($validRows as $stagingRow) {
-          $row = $stagingRow->data_payload;
-          
-          $kabupatenInfo = $row['nama_kabupaten'] ?? $row['kabupatenkota'] ?? null;
-          $kecamatanInfo = $row['nama_kecamatan'] ?? $row['kecamatan'] ?? null;
-          $desaInfo = $row['nama_desa'] ?? $row['desa'] ?? null;
-          $bulanInfo = $row['bulan_angka'] ?? $row['bulan_1_12'] ?? $row['bulan'] ?? null;
-          $kelasInfo = $row['kelas_kelembagaan'] ?? $row['kelas_kelembagaan_pemulamadyautama'] ?? 'pemula';
-          $luasInfo = $row['luas_kelola_ha'] ?? $row['luas_kelola'] ?? 0;
-
-          $regency = DB::table('m_regencies')
-            ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($kabupatenInfo)) . '%'])
-            ->first();
-
-          $district = null;
-          if ($regency && $kecamatanInfo) {
-            $district = DB::table('m_districts')
-              ->where('regency_id', $regency->id)
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($kecamatanInfo)) . '%'])
-              ->first();
-          }
-
-          $village = null;
-          if ($district && $desaInfo) {
-            $village = DB::table('m_villages')
-              ->where('district_id', $district->id)
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($desaInfo)) . '%'])
-              ->first();
-          }
-
-          PerkembanganKth::create([
-            'year' => $row['tahun'],
-            'month' => $bulanInfo,
-            'province_id' => 35,
-            'regency_id' => $regency?->id,
-            'district_id' => $district?->id,
-            'village_id' => $village?->id,
-            'nama_kth' => $row['nama_kth'],
-            'nomor_register' => $row['nomor_register'] ?? null,
-            'kelas_kelembagaan' => strtolower(trim($kelasInfo)),
-            'jumlah_anggota' => $row['jumlah_anggota'] ?? 0,
-            'luas_kelola' => $luasInfo,
-            'potensi_kawasan' => $row['potensi_kawasan'] ?? null,
-            'status' => 'draft',
-          ]);
-          
-          $importedCount++;
-      }
-
-      $batch->update(['status' => 'completed']);
-      cache()->forget('perkembangan-kth-stats-all');
-      
-      return redirect()->route('perkembangan-kth.index')->with('success', "Berhasil mengimport {$importedCount} data Perkembangan KTH yang valid.");
+      ProcessImportBatch::dispatch($batch->id);
+    return back();
   }
 
   public function import(Request $request)

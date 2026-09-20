@@ -61,6 +61,7 @@ export default function ImportPreview({ auth, batch, rows, forestType }) {
                         columns={columns}
                         commitUrl={route("hasil-hutan-bukan-kayu.commit-import", batch.id)}
                         cancelUrl={route("hasil-hutan-bukan-kayu.index", { forest_type: forestType })}
+                        statusUrl={route("import.status", batch.id)}
                         title={`Preview Data Hasil Hutan Bukan Kayu`}
                         description={`Menampilkan data dari file "${batch.filename}" untuk jenis ${forestType}. Silakan tinjau kembali data di bawah ini sebelum menyimpannya secara permanen ke database utama.`}
                     />
@@ -69,4 +70,5 @@ export default function ImportPreview({ auth, batch, rows, forestType }) {
         </AuthenticatedLayout>
     );
 }
+
 

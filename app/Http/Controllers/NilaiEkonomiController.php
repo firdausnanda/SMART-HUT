@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\ProcessImportBatch;
 use App\Models\ImportBatch;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\StagingImport;
@@ -426,95 +427,11 @@ class NilaiEkonomiController extends Controller
     {
         if ($batch->module_name !== 'nilai-ekonomi' || $batch->status !== 'pending') abort(400);
         $this->authorize('nilai-ekonomi.import');
-        
+
         $batch->update(['status' => 'processing']);
-        
-        $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-        $importedCount = 0;
 
-        foreach ($validRows as $stagingRow) {
-            $row = $stagingRow->data_payload;
-            
-            $regency = DB::table('m_regencies')
-                ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupaten'])) . '%'])
-                ->first();
-
-            $district = DB::table('m_districts')
-                ->where('regency_id', $regency->id)
-                ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
-                ->first();
-
-            $transaction = NilaiEkonomi::firstOrCreate([
-                'year' => $row['tahun'],
-                'month' => $row['bulan_1_12'],
-                'nama_kelompok' => $row['nama_kelompok'],
-                'province_id' => 35,
-                'regency_id' => $regency->id,
-                'district_id' => $district->id,
-            ], [
-                'status' => 'draft',
-                'created_by' => Auth::id(),
-                'total_transaction_value' => 0,
-            ]);
-
-            if (!$transaction->wasRecentlyCreated) {
-                $transaction->update(['status' => 'draft']);
-            }
-
-            $commodities = array_map('trim', explode(',', (string) $row['komoditas']));
-            $volumes = array_map('trim', explode(',', (string) $row['volume_produksi']));
-            $satuans = array_map('trim', explode(',', (string) $row['satuan']));
-            $nilais = array_map('trim', explode(',', (string) $row['nilai_transaksi_rp']));
-
-            $count = count($commodities);
-
-            for ($i = 0; $i < $count; $i++) {
-                $commodityName = $commodities[$i] ?? null;
-                if (!$commodityName) continue;
-
-                $volumeStr = $volumes[$i] ?? '0';
-                if ($volumeStr !== '') {
-                    $volumeStr = str_replace([' ', "\r", "\n"], '', $volumeStr);
-                    $volume = (float) str_replace(',', '.', $volumeStr);
-                } else {
-                    $volume = 0;
-                }
-
-                $nilaiStr = $nilais[$i] ?? '0';
-                if ($nilaiStr !== '') {
-                    $nilaiStr = str_replace([' ', "\r", "\n", '.'], '', $nilaiStr);
-                    $nilaiStr = str_replace(',', '.', $nilaiStr);
-                    $nilai = (float) $nilaiStr;
-                } else {
-                    $nilai = 0;
-                }
-
-                $satuanRaw = trim($satuans[$i] ?? '-');
-                $satuan = $this->mapSatuan($satuanRaw);
-
-                $commodity = Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
-                    ->where('name', $commodityName)
-                    ->first();
-
-                if (!$commodity) continue;
-
-                $transaction->details()->create([
-                    'commodity_id' => $commodity->id,
-                    'production_volume' => $volume,
-                    'satuan' => $satuan,
-                    'transaction_value' => $nilai,
-                ]);
-
-                $transaction->increment('total_transaction_value', $nilai);
-            }
-            
-            $importedCount++;
-        }
-
-        $batch->update(['status' => 'completed']);
-        cache()->forget('nilai-ekonomi-years');
-        
-        return redirect()->route('nilai-ekonomi.index')->with('success', "Berhasil mengimport {$importedCount} data Nilai Ekonomi yang valid.");
+        ProcessImportBatch::dispatch($batch->id);
+    return back();
     }
 
     private function mapSatuan($satuanRaw)

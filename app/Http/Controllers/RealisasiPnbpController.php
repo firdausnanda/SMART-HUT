@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 use App\Models\ImportBatch;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\ProcessImportBatch;
 use App\Imports\StagingImport;
 use App\Services\Imports\RealisasiPnbpImportValidator;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -288,46 +289,11 @@ class RealisasiPnbpController extends Controller
   {
       if ($batch->module_name !== 'realisasi-pnbp' || $batch->status !== 'pending') abort(400);
       $this->authorize('realisasi-pnbp.import');
-      
+
       $batch->update(['status' => 'processing']);
-      
-      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-      $importedCount = 0;
 
-      foreach ($validRows as $stagingRow) {
-          $row = $stagingRow->data_payload;
-          
-          $regency = DB::table('m_regencies')
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupatenkota'])) . '%'])
-              ->first();
-
-          $pengelolaWisata = DB::table('m_pengelola_wisata')
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_pengelola_wisata'])) . '%'])
-              ->first();
-
-          RealisasiPnbp::create([
-              'year' => $row['tahun'],
-              'month' => $row['bulan_angka_1_12'],
-              'province_id' => $regency->province_id,
-              'regency_id' => $regency->id,
-              'id_pengelola_wisata' => $pengelolaWisata->id,
-              'types_of_forest_products' => $row['jenis_hasil_hutan'],
-              'pnbp_target' => $row['target_pnbp'],
-              'pnbp_realization' => $row['realisasi_pnbp'],
-              'status' => 'draft',
-              'created_by' => Auth::id(),
-          ]);
-          
-          $importedCount++;
-      }
-
-      $batch->update(['status' => 'completed']);
-      
-      foreach (range(date('Y'), date('Y') - 5) as $y) {
-          cache()->forget("pnbp-stats-{$y}");
-      }
-      
-      return redirect()->route('realisasi-pnbp.index')->with('success', "Berhasil mengimport {$importedCount} data PNBP yang valid.");
+      ProcessImportBatch::dispatch($batch->id);
+    return back();
   }
 
   public function import(Request $request)

@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import StagingImportPreview from "@/Components/StagingImportPreview";
@@ -50,6 +50,7 @@ export default function ImportPreview({ auth, batch, rows, forestType }) {
                         columns={columns}
                         commitUrl={route("hasil-hutan-kayu.commit-import", batch.id)}
                         cancelUrl={route("hasil-hutan-kayu.index", { forest_type: forestType })}
+                        statusUrl={route("import.status", batch.id)}
                         title={`Preview Data Hasil Hutan Kayu`}
                         description={`Menampilkan data dari file "${batch.filename}" untuk jenis ${forestType}. Silakan tinjau kembali data di bawah ini sebelum menyimpannya secara permanen ke database utama.`}
                     />
@@ -58,6 +59,7 @@ export default function ImportPreview({ auth, batch, rows, forestType }) {
         </AuthenticatedLayout>
     );
 }
+
 
 
 

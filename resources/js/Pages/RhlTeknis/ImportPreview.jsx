@@ -31,6 +31,7 @@ export default function ImportPreview({ auth, batch, rows }) {
                         columns={columns}
                         commitUrl={route("rhl-teknis.commit-import", batch.id)}
                         cancelUrl={route("rhl-teknis.index")}
+                        statusUrl={route("import.status", batch.id)}
                         title={`Preview Data RHL Teknis`}
                         description={`Menampilkan data dari file "${batch.filename}". Silakan tinjau kembali data di bawah ini sebelum menyimpannya secara permanen ke database utama.`}
                     />
@@ -39,4 +40,7 @@ export default function ImportPreview({ auth, batch, rows }) {
         </AuthenticatedLayout>
     );
 }
+
+
+
 

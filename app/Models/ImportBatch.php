@@ -16,6 +16,8 @@ class ImportBatch extends Model
         'module_name',
         'filename',
         'status',
+        'imported_count',
+        'error_message',
     ];
 
     public function user()

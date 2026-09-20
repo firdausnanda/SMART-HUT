@@ -42,7 +42,21 @@ if [ "$RUN_MIGRATIONS" = "true" ]; then
     php artisan migrate --force
 fi
 
+# ---------------------------------------------------------------------------
+# Prune stale queue data to keep the database clean
+# ---------------------------------------------------------------------------
+
+# Remove failed jobs older than 7 days (168 hours)
+echo "Pruning old failed jobs..."
+php artisan queue:prune-failed --hours=168 2>/dev/null || true
+
+# Prune completed/cancelled job batches older than 7 days (168 hours)
+echo "Pruning old job batches..."
+php artisan queue:prune-batches --hours=168 2>/dev/null || true
+
+# ---------------------------------------------------------------------------
 # Start the command passed as arguments, or fallback to Supervisor
+# ---------------------------------------------------------------------------
 if [ $# -gt 0 ]; then
     echo "Running custom command: $@"
     exec "$@"

@@ -29,6 +29,7 @@ export default function ImportPreview({ auth, batch, rows }) {
                         columns={columns}
                         commitUrl={route("rehab-lahan.commit-import", batch.id)}
                         cancelUrl={route("rehab-lahan.index")}
+                        statusUrl={route("import.status", batch.id)}
                         title={`Preview Data Rehab Lahan`}
                         description={`Menampilkan data dari file "${batch.filename}". Silakan tinjau kembali data di bawah ini sebelum menyimpannya secara permanen ke database utama.`}
                     />
@@ -37,4 +38,7 @@ export default function ImportPreview({ auth, batch, rows }) {
         </AuthenticatedLayout>
     );
 }
+
+
+
 

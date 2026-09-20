@@ -14,6 +14,7 @@ use Inertia\Inertia;
 use App\Models\ImportBatch;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\ProcessImportBatch;
 use App\Imports\StagingImport;
 use App\Services\Imports\RhlTeknisImportValidator;
 use App\Models\Regencies;
@@ -329,59 +330,11 @@ class RhlTeknisController extends Controller
   public function commitImport(ImportBatch $batch)
   {
       if ($batch->module_name !== 'rhl-teknis' || $batch->status !== 'pending') abort(400);
-      
+
       $batch->update(['status' => 'processing']);
-      
-      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-      $importedCount = 0;
 
-      foreach ($validRows as $stagingRow) {
-          $row = $stagingRow->data_payload;
-          
-          $regency = Regencies::where('name', 'like', '%' . trim($row['kabupaten']) . '%')->first();
-          $district = Districts::where('name', 'like', '%' . trim($row['kecamatan']) . '%')
-              ->where('regency_id', $regency?->id)
-              ->first();
-          if (!$district) {
-              $district = Districts::where('name', 'like', '%' . trim($row['kecamatan']) . '%')->first();
-          }
-          $village = Villages::where('name', 'like', '%' . trim($row['desa']) . '%')
-              ->where('district_id', $district?->id)
-              ->first();
-
-          $rhlTeknis = RhlTeknis::create([
-              'year' => $row['tahun'],
-              'month' => $row['bulan_angka'],
-              'target_annual' => $row['target_tahunan_unit'],
-              'fund_source' => strtolower(trim($row['sumber_dana'])) ?? 'other',
-              'province_id' => 35,
-              'regency_id' => $regency?->id,
-              'district_id' => $district?->id,
-              'village_id' => $village?->id,
-              'status' => 'draft',
-              'created_by' => Auth::id(),
-          ]);
-
-          $types = array_map('trim', explode(',', $row['jenis_bangunan']));
-          $units = array_map('trim', explode(',', $row['jumlah_unit']));
-
-          foreach ($types as $index => $typeName) {
-              $bangunan = BangunanKta::where('name', $typeName)->first();
-              if ($bangunan && isset($units[$index])) {
-                  RhlTeknisDetail::create([
-                      'rhl_teknis_id' => $rhlTeknis->id,
-                      'bangunan_kta_id' => $bangunan->id,
-                      'unit_amount' => (int) $units[$index],
-                  ]);
-              }
-          }
-
-          $importedCount++;
-      }
-
-      $batch->update(['status' => 'completed']);
-      
-      return redirect()->route('rhl-teknis.index')->with('success', "Berhasil mengimport {$importedCount} data RHL Teknis yang valid.");
+      ProcessImportBatch::dispatch($batch->id);
+    return back();
   }
 
   public function import(Request $request)

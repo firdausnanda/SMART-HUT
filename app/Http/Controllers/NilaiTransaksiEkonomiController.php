@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\ProcessImportBatch;
 use App\Models\ImportBatch;
 use App\Imports\StagingImport;
 use App\Services\Imports\NilaiTransaksiEkonomiImportValidator;
@@ -425,121 +426,11 @@ class NilaiTransaksiEkonomiController extends Controller
   {
       if ($batch->module_name !== 'nilai-transaksi-ekonomi' || $batch->status !== 'pending') abort(400);
       $this->authorize('nilai-transaksi-ekonomi.import');
-      
+
       $batch->update(['status' => 'processing']);
-      
-      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-      $importedCount = 0;
 
-      foreach ($validRows as $stagingRow) {
-          $row = $stagingRow->data_payload;
-          
-          $kabupatenInfo = $row['nama_kabupaten'] ?? $row['kabupatenkota'] ?? null;
-          $kecamatanInfo = $row['nama_kecamatan'] ?? $row['kecamatan'] ?? null;
-          $desaInfo = $row['nama_desa'] ?? $row['desa'] ?? null;
-          $bulanInfo = $row['bulan_1_12'] ?? $row['bulan'] ?? null;
-
-          $regency = DB::table('m_regencies')
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($kabupatenInfo)) . '%'])
-              ->first();
-
-          $district = DB::table('m_districts')
-              ->where('regency_id', $regency->id)
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($kecamatanInfo)) . '%'])
-              ->first();
-
-          $village = DB::table('m_villages')
-              ->where('district_id', $district->id)
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($desaInfo)) . '%'])
-              ->first();
-
-          $transaction = NilaiTransaksiEkonomi::firstOrCreate([
-              'year' => $row['tahun'],
-              'month' => $bulanInfo,
-              'nama_kth' => $row['nama_kth'],
-              'province_id' => 35,
-              'regency_id' => $regency->id,
-              'district_id' => $district->id,
-              'village_id' => $village->id,
-          ], [
-              'status' => 'draft',
-              'created_by' => Auth::id(),
-              'total_nilai_transaksi' => 0,
-          ]);
-
-          if (!$transaction->wasRecentlyCreated) {
-              $transaction->update(['status' => 'draft']);
-          }
-
-          $commodities = array_map('trim', explode(',', (string) $row['komoditas']));
-          $volumes = array_map('trim', explode(',', (string) $row['volume_produksi']));
-          $satuans = array_map('trim', explode(',', (string) $row['satuan']));
-          $nilais = array_map('trim', explode(',', (string) $row['nilai_transaksi_rp']));
-
-          $count = count($commodities);
-          $detailsToInsert = [];
-          $totalNilai = 0;
-          $now = now();
-
-          for ($i = 0; $i < $count; $i++) {
-              $commodityName = $commodities[$i] ?? null;
-              if (!$commodityName) continue;
-
-              $volumeStr = $volumes[$i] ?? '0';
-              if ($volumeStr !== '') {
-                  $volumeStr = str_replace([' ', "\r", "\n"], '', $volumeStr);
-                  $volume = (float) str_replace(',', '.', $volumeStr);
-              } else {
-                  $volume = 0;
-              }
-
-              $nilaiStr = $nilais[$i] ?? '0';
-              if ($nilaiStr !== '') {
-                  $nilaiStr = str_replace([' ', "\r", "\n", '.'], '', $nilaiStr);
-                  $nilaiStr = str_replace(',', '.', $nilaiStr);
-                  $nilai = (float) $nilaiStr;
-              } else {
-                  $nilai = 0;
-              }
-
-              $satuanRaw = trim($satuans[$i] ?? '-');
-              $satuan = $this->mapSatuan($satuanRaw);
-
-              $commodity = \App\Models\Commodity::withoutGlobalScope('not_nilai_transaksi_ekonomi')
-                  ->where('name', trim($commodityName))
-                  ->first();
-
-              if (!$commodity) continue;
-
-              $detailsToInsert[] = [
-                  'nilai_transaksi_ekonomi_id' => $transaction->id,
-                  'commodity_id' => $commodity->id,
-                  'volume_produksi' => $volume,
-                  'satuan' => $satuan,
-                  'nilai_transaksi' => $nilai,
-                  'created_at' => $now,
-                  'updated_at' => $now,
-              ];
-
-              $totalNilai += $nilai;
-          }
-
-          if ($totalNilai > 0 || $transaction->total_nilai_transaksi != $totalNilai) {
-              $transaction->total_nilai_transaksi += $totalNilai;
-              $transaction->save();
-          }
-
-          if (!empty($detailsToInsert)) {
-              NilaiTransaksiEkonomiDetail::insert($detailsToInsert);
-          }
-          
-          $importedCount++;
-      }
-
-      $batch->update(['status' => 'completed']);
-      cache()->forget('nilai-transaksi-years');
-      
-      return redirect()->route('nilai-transaksi-ekonomi.index')->with('success', "Berhasil mengimport {$importedCount} data Nilai Transaksi Ekonomi yang valid.");
+      ProcessImportBatch::dispatch($batch->id);
+    return back();
   }
 
   private function mapSatuan($satuanRaw)

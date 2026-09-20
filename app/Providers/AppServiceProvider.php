@@ -25,11 +25,14 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 
-        if (class_exists(LogViewer::class)) {
-            LogViewer::auth(function ($request) {
-                return $request->user()
-                    && $request->user()->hasRole('admin');
-            });
+        try {
+            if (class_exists(\Opcodes\LogViewer\Facades\LogViewer::class)) {
+                \Opcodes\LogViewer\Facades\LogViewer::auth(function ($request) {
+                    return $request->user() && $request->user()->hasRole('admin');
+                });
+            }
+        } catch (\Throwable $e) {
+            // Silently ignore if LogViewer is not installed
         }
 
         // Register Google Drive filesystem driver

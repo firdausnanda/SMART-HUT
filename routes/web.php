@@ -23,4 +23,14 @@ Route::middleware('auth')->group(function () {
     Route::impersonate();
 });
 
+// Import status polling endpoint (used by frontend progress bar)
+Route::middleware('auth')->get('/import-status/{batch}', function (\App\Models\ImportBatch $batch) {
+    if ($batch->user_id !== auth()->id()) abort(403);
+    return response()->json([
+        'status'          => $batch->status,
+        'imported_count'  => $batch->imported_count,
+        'error_message'   => $batch->error_message,
+    ]);
+})->name('import.status');
+
 require __DIR__ . '/auth.php';

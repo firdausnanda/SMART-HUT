@@ -6,9 +6,14 @@ use App\Models\ImportStagingRow;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class StagingImport implements ToCollection, WithHeadingRow
+class StagingImport implements ToCollection, WithHeadingRow, WithChunkReading
 {
+    public function chunkSize(): int
+    {
+        return 200;
+    }
     protected $batchId;
     protected $validatorCallback;
     protected $rowNumber = 1;

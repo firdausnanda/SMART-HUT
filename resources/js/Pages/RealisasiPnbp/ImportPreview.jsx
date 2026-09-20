@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import StagingImportPreview from "@/Components/StagingImportPreview";
@@ -39,6 +39,7 @@ export default function ImportPreview({ auth, batch, rows }) {
                         columns={columns}
                         commitUrl={route("realisasi-pnbp.commit-import", batch.id)}
                         cancelUrl={route("realisasi-pnbp.index")}
+                        statusUrl={route("import.status", batch.id)}
                         title={`Preview Data PNBP`}
                         description={`Menampilkan data dari file "${batch.filename}". Silakan tinjau kembali data di bawah ini sebelum menyimpannya secara permanen ke database utama.`}
                     />
@@ -47,4 +48,7 @@ export default function ImportPreview({ auth, batch, rows }) {
         </AuthenticatedLayout>
     );
 }
+
+
+
 

@@ -1,5 +1,12 @@
 services:
-  # Laravel Application (Web & PHP-FPM)
+  # ---------------------------------------------------------------------------
+  # Laravel Application (Web + PHP-FPM + Supervisor)
+  # Supervisor inside this container runs:
+  #   - php-fpm       (process HTTP requests)
+  #   - nginx         (serve static assets & reverse proxy to php-fpm)
+  #   - laravel-schedule (artisan schedule:work)
+  #   - laravel-worker   (2 processes, queue=imports,default, timeout=1800)
+  # ---------------------------------------------------------------------------
   app:
     build:
       context: .
@@ -11,8 +18,9 @@ services:
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
-      - RUN_MIGRATIONS=true # Set to true to run migrations on startup
+      - RUN_MIGRATIONS=true          # Set to true to run migrations on startup
       - LOG_CHANNEL=${LOG_CHANNEL:-daily}  # Fallback to 'daily' if not set in .env
+      - QUEUE_CONNECTION=database    # Ensure queue driver is database (not sync)
     env_file:
       - .env
     volumes:
@@ -23,18 +31,36 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - laradock_net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/up"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
-  # Queue Worker
+  # ---------------------------------------------------------------------------
+  # Standalone Queue Worker Container (optional — for extra worker capacity)
+  #
+  # The 'app' container already runs 2 worker processes via its supervisord.conf.
+  # This dedicated 'worker' container adds 4 MORE worker processes (worker.conf)
+  # for heavier import workloads. Disable this service if the 2 workers in 'app'
+  # are sufficient.
+  #
+  # It runs supervisor with docker/worker.conf (4 processes, timeout=1800)
+  # instead of the full supervisord.conf (no nginx/php-fpm overhead).
+  # ---------------------------------------------------------------------------
   worker:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: kda-worker
     restart: unless-stopped
-    command: ["php", "artisan", "queue:work", "--verbose", "--tries=3", "--timeout=90"]
+    # Override default entrypoint to run supervisor with the worker-only config
+    command: ["/usr/local/bin/entrypoint.sh", "supervisord", "-c", "/etc/supervisor/conf.d/worker.conf"]
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
+      - QUEUE_CONNECTION=database    # Explicit override for worker container
     env_file:
       - .env
     volumes:
@@ -45,6 +71,8 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - laradock_net
+    # Worker containers do not expose ports; no healthcheck needed via HTTP.
+    # The supervisor process itself keeps workers alive (autorestart=true).
 
 volumes:
   kda-storage:

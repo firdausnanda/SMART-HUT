@@ -27,6 +27,7 @@ export default function ImportPreview({ auth, batch, rows }) {
                         columns={columns}
                         commitUrl={route("kups.commit-import", batch.id)}
                         cancelUrl={route("kups.index")}
+                        statusUrl={route("import.status", batch.id)}
                         title={`Preview Data KUPS`}
                         description={`Menampilkan data dari file "${batch.filename}". Silakan tinjau kembali data di bawah ini sebelum menyimpannya secara permanen ke database utama KUPS.`}
                     />
@@ -35,4 +36,7 @@ export default function ImportPreview({ auth, batch, rows }) {
         </AuthenticatedLayout>
     );
 }
+
+
+
 

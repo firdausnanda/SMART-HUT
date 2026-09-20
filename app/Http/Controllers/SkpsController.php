@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 use App\Models\ImportBatch;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\ProcessImportBatch;
 use App\Imports\StagingImport;
 use App\Services\Imports\SkpsImportValidator;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -287,48 +288,11 @@ class SkpsController extends Controller
   {
       if ($batch->module_name !== 'skps' || $batch->status !== 'pending') abort(400);
       $this->authorize('skps.import');
-      
+
       $batch->update(['status' => 'processing']);
-      
-      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-      $importedCount = 0;
 
-      foreach ($validRows as $stagingRow) {
-          $row = $stagingRow->data_payload;
-          
-          $regency = DB::table('m_regencies')
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupatenkota'])) . '%'])
-              ->first();
-
-          $district = DB::table('m_districts')
-              ->where('regency_id', $regency->id)
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
-              ->first();
-
-          $skema = DB::table('m_skema_perhutanan_sosial')
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_skema_perhutanan_sosial'])) . '%'])
-              ->first();
-
-          Skps::create([
-              'province_id' => $regency->province_id,
-              'regency_id' => $regency->id,
-              'district_id' => $district->id,
-              'id_skema_perhutanan_sosial' => $skema->id,
-              'nama_kelompok' => $row['nama_kelompok'],
-              'potential' => $row['potensi'] ?? $row['potensi_ha'] ?? null,
-              'ps_area' => $row['luas_ps_ha'],
-              'number_of_kk' => $row['jumlah_kk'],
-              'status' => 'draft',
-              'created_by' => Auth::id(),
-          ]);
-          
-          $importedCount++;
-      }
-
-      $batch->update(['status' => 'completed']);
-      cache()->forget('skps-stats');
-      
-      return redirect()->route('skps.index')->with('success', "Berhasil mengimport {$importedCount} data SK PS yang valid.");
+      ProcessImportBatch::dispatch($batch->id);
+    return back();
   }
 
   public function import(Request $request)

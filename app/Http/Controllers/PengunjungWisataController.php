@@ -13,10 +13,12 @@ use Illuminate\Validation\Rule;
 use App\Models\ImportBatch;
 use Maatwebsite\Excel\Validators\ValidationException;
 use App\Imports\PengunjungWisataImport;
-use Illuminate\Support\Facades\Auth;
+use App\Jobs\ProcessImportBatch;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\StagingImport;
 use App\Services\Imports\PengunjungWisataImportValidator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PengunjungWisataController extends Controller
@@ -269,31 +271,9 @@ class PengunjungWisataController extends Controller
       
       $batch->update(['status' => 'processing']);
       
-      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-      $importedCount = 0;
-
-      foreach ($validRows as $stagingRow) {
-          $row = $stagingRow->data_payload;
-          
-          $pengelolaWisata = DB::table('m_pengelola_wisata')
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_pengelola_wisata'])) . '%'])
-              ->first();
-
-          PengunjungWisata::create([
-              'year' => $row['tahun'],
-              'month' => $row['bulan_angka_1_12'],
-              'id_pengelola_wisata' => $pengelolaWisata->id,
-              'number_of_visitors' => $row['jumlah_pengunjung'],
-              'gross_income' => $row['pendapatan_bruto_rp'],
-              'status' => 'draft',
-              'created_by' => Auth::id(),
-          ]);
-          $importedCount++;
-      }
-
-      $batch->update(['status' => 'completed']);
+      ProcessImportBatch::dispatch($batch->id);
       
-      return redirect()->route('pengunjung-wisata.index')->with('success', "Berhasil mengimport {$importedCount} data Pengunjung Wisata yang valid.");
+      return back();
   }
 
   public function import(Request $request)

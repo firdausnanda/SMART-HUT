@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 use App\Models\ImportBatch;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\ProcessImportBatch;
 use App\Imports\StagingImport;
 use App\Services\Imports\PbphhImportValidator;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -292,76 +293,11 @@ class PbphhController extends Controller
   {
       if ($batch->module_name !== 'pbphh' || $batch->status !== 'pending') abort(400);
       $this->authorize('pbphh.import');
-      
+
       $batch->update(['status' => 'processing']);
-      
-      $validRows = $batch->stagingRows()->where('status', 'valid')->get();
-      $importedCount = 0;
 
-      foreach ($validRows as $stagingRow) {
-          $row = $stagingRow->data_payload;
-          
-          $regency = DB::table('m_regencies')
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kabupatenkota'])) . '%'])
-              ->first();
-
-          $district = DB::table('m_districts')
-              ->where('regency_id', $regency->id)
-              ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower(trim($row['nama_kecamatan'])) . '%'])
-              ->first();
-
-          $rawJenis = $row['jenis_produksi_kapasitas'];
-          $items = array_map('trim', explode(',', $rawJenis));
-          $pivotData = [];
-
-          foreach ($items as $item) {
-              if (preg_match('/^(.+?)\s*\((.+?)\)$/', $item, $matches)) {
-                  $name = trim($matches[1]);
-                  $capacity = trim($matches[2]);
-              } else {
-                  $name = $item;
-                  $capacity = '0';
-              }
-              $cleanCapacity = str_ireplace(['m3', 'm³'], '', $capacity);
-              $capacity = floatval(preg_replace('/[^0-9.]/', '', str_replace(',', '.', $cleanCapacity)));
-
-              $jenisProduksi = DB::table('m_jenis_produksi')
-                  ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($name) . '%'])
-                  ->first();
-
-              if ($jenisProduksi) {
-                  $pivotData[$jenisProduksi->id] = ['kapasitas_ijin' => $capacity];
-              }
-          }
-
-          $condition = strtolower(trim($row['kondisi_saat_ini']));
-          $presentCondition = in_array($condition, ['aktif', '1', 'true']) ? true : false;
-
-          DB::transaction(function () use ($row, $regency, $district, $pivotData, $presentCondition) {
-              $pbphh = Pbphh::create([
-                  'name' => $row['nama_industri'],
-                  'number' => $row['nomor_izin'],
-                  'province_id' => $regency->province_id,
-                  'regency_id' => $regency->id,
-                  'district_id' => $district->id,
-                  'investment_value' => (int) $row['nilai_investasi'],
-                  'number_of_workers' => (int) $row['jumlah_tenaga_kerja'],
-                  'present_condition' => $presentCondition,
-                  'status' => 'draft',
-                  'created_by' => Auth::id(),
-              ]);
-
-              $pbphh->jenis_produksi()->sync($pivotData);
-          });
-          
-          $importedCount++;
-      }
-
-      $batch->update(['status' => 'completed']);
-      
-      cache()->forget('pbphh-stats');
-      
-      return redirect()->route('pbphh.index')->with('success', "Berhasil mengimport {$importedCount} data PBPHH yang valid.");
+      ProcessImportBatch::dispatch($batch->id);
+    return back();
   }
 
   public function import(Request $request)
