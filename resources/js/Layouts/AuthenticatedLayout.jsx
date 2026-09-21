@@ -546,6 +546,20 @@ export default function Authenticated({ user, header, children }) {
                                     {!isSidebarCollapsed && <span className="text-sm font-semibold">Manajemen User</span>}
                                 </Link>
 
+                                {user.roles.includes('admin') && (
+                                    <a
+                                        href="/pulse"
+                                        target="_blank"
+                                        className={`group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${isSidebarCollapsed ? 'justify-center px-0' : 'px-4'} border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white`}
+                                        title={isSidebarCollapsed ? 'System Pulse' : ''}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className={`flex-shrink-0 h-5 w-5 transition-colors ${isSidebarCollapsed ? 'mx-auto' : 'mr-3'} text-primary-300 group-hover:text-white`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        {!isSidebarCollapsed && <span className="text-sm font-semibold">System Pulse</span>}
+                                    </a>
+                                )}
+
                                 {!user.cdk_id && (user.roles.includes('admin') || user.roles.includes('admin_provinsi')) && (
                                     <Link
                                         href={route('cdks.index')}
@@ -1084,6 +1098,19 @@ export default function Authenticated({ user, header, children }) {
                                     </svg>
                                     Manajemen User
                                 </Link>
+
+                                {user.roles.includes('admin') && (
+                                    <a
+                                        href="/pulse"
+                                        target="_blank"
+                                        className={`group relative flex items-center px-4 py-3 rounded-xl transition-all duration-200 border border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white`}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        System Pulse
+                                    </a>
+                                )}
 
                                 {!user.cdk_id && (user.roles.includes('admin') || user.roles.includes('admin_provinsi')) && (
                                     <Link

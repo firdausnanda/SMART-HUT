@@ -24,5 +24,9 @@ class AuthServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
             return $user->hasRole('admin') ? true : null;
         });
+
+        \Illuminate\Support\Facades\Gate::define('viewPulse', function ($user) {
+            return $user->hasRole('admin');
+        });
     }
 }
