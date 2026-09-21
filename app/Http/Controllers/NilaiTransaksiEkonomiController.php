@@ -82,7 +82,7 @@ class NilaiTransaksiEkonomiController extends Controller
       })
 
       ->when($request->sort, function ($q) use ($request) {
-        $user = auth()->user();
+        $user = $this->user();
         $sortField = $request->query('sort', 'created_at');
         $sortDirection = $request->query('direction', 'desc');
 
@@ -107,7 +107,7 @@ class NilaiTransaksiEkonomiController extends Controller
           default => $q->latest(),
         };
       }, function ($q) {
-        $user = auth()->user();
+        $user = $this->user();
         if ($user->hasRole('kacdk')) {
           $q->orderByRaw("CASE WHEN status = 'waiting_cdk' THEN 0 ELSE 1 END");
         } elseif ($user->hasRole('kasi')) {
@@ -119,7 +119,7 @@ class NilaiTransaksiEkonomiController extends Controller
       })
 
       ->paginate($request->integer('per_page', 10))
-      ->withQueryString();
+      ->appends(request()->query());
 
     $stats = cache()->remember(
       "nilai-transaksi-stats-{$selectedYear}",
@@ -202,7 +202,7 @@ class NilaiTransaksiEkonomiController extends Controller
         model: NilaiTransaksiEkonomi::class,
         action: $data['action'],
         ids: $data['ids'],
-        user: auth()->user(),
+        user: $this->user(),
         extraData: ['rejection_note' => $data['rejection_note']]
       );
       $message = match ($request->action) {
@@ -357,7 +357,7 @@ class NilaiTransaksiEkonomiController extends Controller
     $success = $action->execute(
       model: $nilai_transaksi_ekonomi,
       action: $workflowAction,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 

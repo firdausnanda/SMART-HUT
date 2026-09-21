@@ -17,7 +17,7 @@ class JenisProduksiController extends Controller
       $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $jenisProduksi = $query->paginate(10)->withQueryString();
+    $jenisProduksi = $query->paginate(10)->appends(request()->query());
 
     return Inertia::render('MasterData/JenisProduksi/Index', [
       'jenisProduksi' => $jenisProduksi,

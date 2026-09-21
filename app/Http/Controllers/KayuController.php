@@ -17,7 +17,7 @@ class KayuController extends Controller
       $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $kayu = $query->paginate(10)->withQueryString();
+    $kayu = $query->paginate(10)->appends(request()->query());
 
     return Inertia::render('MasterData/Kayu/Index', [
       'kayu' => $kayu,

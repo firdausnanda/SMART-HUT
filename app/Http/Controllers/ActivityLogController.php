@@ -11,13 +11,14 @@ class ActivityLogController extends Controller
 {
   public function index(Request $request)
   {
-    abort_unless($request->user()->hasRole('admin') || $request->user()->hasRole('admin_provinsi') || $request->user()->hasRole('admin_cdk'), 403);
+    $user = $this->user();
+    abort_unless($user->hasRole('admin') || $user->hasRole('admin_provinsi') || $user->hasRole('admin_cdk'), 403);
 
     $query = Activity::query()->with('causer');
 
-    if (!$request->user()->isAdminProvinsi()) {
-      $query->whereHas('causer', function ($q) use ($request) {
-        $q->where('cdk_id', $request->user()->cdk_id);
+    if (!$user->isAdminProvinsi()) {
+      $query->whereHas('causer', function ($q) use ($user) {
+        $q->where('cdk_id', $user->cdk_id);
       });
     }
 
@@ -67,11 +68,11 @@ class ActivityLogController extends Controller
     }
 
     $perPage = $request->per_page ? $request->per_page : 10;
-    $activities = $query->paginate($perPage)->withQueryString();
+    $activities = $query->paginate($perPage)->appends(request()->query());
 
     // Data for Advanced Search Options
-    if (!$request->user()->isAdminProvinsi()) {
-      $users = User::where('cdk_id', $request->user()->cdk_id)->select('id', 'name')->orderBy('name')->get();
+    if (!$user->isAdminProvinsi()) {
+      $users = User::where('cdk_id', $user->cdk_id)->select('id', 'name')->orderBy('name')->get();
     } else {
       $users = User::select('id', 'name')->orderBy('name')->get();
     }

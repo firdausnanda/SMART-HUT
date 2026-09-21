@@ -40,7 +40,7 @@ class DashboardController extends Controller
         $chartYear = $request->input('year', $currentYear);
         $cdkId = $request->input('cdk_id');
 
-        $user = auth()->user();
+        $user = $this->user();
         // If local admin_cdk, they can only see their own CDK. If admin_provinsi, they can choose cdk_id or see all (null)
         $selectedCdkId = !$user->isAdminProvinsi() ? $user->cdk_id : $cdkId;
 

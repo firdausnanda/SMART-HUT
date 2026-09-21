@@ -79,7 +79,7 @@ class RhlTeknisController extends Controller
       })
 
       ->when($sortField !== 'location', function ($q) use ($sortField, $sortDirection) {
-        $user = auth()->user();
+        $user = $this->user();
 
         if ($sortField === 'created_at' && $sortDirection === 'desc') {
           if ($user->hasRole('kacdk')) {
@@ -99,7 +99,7 @@ class RhlTeknisController extends Controller
       })
 
       ->paginate($request->integer('per_page', 10))
-      ->withQueryString();
+      ->appends(request()->query());
 
     $stats = cache()->remember(
       "rhl-teknis-stats-{$selectedYear}",
@@ -268,7 +268,7 @@ class RhlTeknisController extends Controller
     $success = $action->execute(
       model: $rhlTeknis,
       action: $workflowAction,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 
@@ -388,7 +388,7 @@ class RhlTeknisController extends Controller
       model: RhlTeknis::class,
       action: $workflowAction,
       ids: $request->ids,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 

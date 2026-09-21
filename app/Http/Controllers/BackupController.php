@@ -186,7 +186,8 @@ class BackupController extends Controller
    */
   private function authorizeAdmin()
   {
-    if (!auth()->user() || !auth()->user()->hasRole('admin')) {
+    $user = $this->user();
+    if (!$user || !$user->hasRole('admin')) {
       abort(403, 'Unauthorized. Only administrators can manage backups.');
     }
   }

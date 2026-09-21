@@ -54,7 +54,7 @@ class DistrictController extends Controller
     }
 
     $perPage = $request->per_page ? $request->per_page : 10;
-    $districts = $query->paginate($perPage)->withQueryString();
+    $districts = $query->paginate($perPage)->appends(request()->query());
     
     $provinces = Provinces::orderBy('name')->get();
     $regencies = Regencies::orderBy('name')->get();

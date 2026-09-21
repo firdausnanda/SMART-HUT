@@ -17,7 +17,7 @@ class SumberDanaController extends Controller
       $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $sumberDana = $query->paginate(10)->withQueryString();
+    $sumberDana = $query->paginate(10)->appends(request()->query());
 
     return Inertia::render('MasterData/SumberDana/Index', [
       'sumberDana' => $sumberDana,

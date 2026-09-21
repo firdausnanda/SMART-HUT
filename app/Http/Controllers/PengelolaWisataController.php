@@ -17,7 +17,7 @@ class PengelolaWisataController extends Controller
       $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $pengelolaWisata = $query->paginate(10)->withQueryString();
+    $pengelolaWisata = $query->paginate(10)->appends(request()->query());
 
     return Inertia::render('MasterData/PengelolaWisata/Index', [
       'pengelolaWisata' => $pengelolaWisata,

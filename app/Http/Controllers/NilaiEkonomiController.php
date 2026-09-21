@@ -87,7 +87,7 @@ class NilaiEkonomiController extends Controller
                 ->orderBy('m_districts.name', $sortDirection);
         })
             ->when(!in_array($sortField, ['location']), function ($q) use ($sortField, $sortDirection) {
-                $user = auth()->user();
+                $user = $this->user();
 
                 if ($sortField === 'created_at' && $sortDirection === 'desc') {
                     if ($user->hasRole('kacdk')) {
@@ -107,7 +107,7 @@ class NilaiEkonomiController extends Controller
                 };
             });
 
-        $data = $query->paginate($request->integer('per_page', 10))->withQueryString();
+        $data = $query->paginate($request->integer('per_page', 10))->appends(request()->query());
 
         // Stats Caching
         $stats = cache()->remember('nilai-ekonomi-stats-' . $selectedYear, 300, function () use ($selectedYear) {
@@ -298,7 +298,7 @@ class NilaiEkonomiController extends Controller
         $success = $action->execute(
             model: $nilaiEkonomi,
             action: $workflowAction,
-            user: auth()->user(),
+            user: $this->user(),
             extraData: $extraData
         );
 
@@ -347,7 +347,7 @@ class NilaiEkonomiController extends Controller
             model: NilaiEkonomi::class,
             action: $workflowAction,
             ids: $request->ids,
-            user: auth()->user(),
+            user: $this->user(),
             extraData: $extraData
         );
 

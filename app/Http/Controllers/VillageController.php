@@ -60,7 +60,7 @@ class VillageController extends Controller
     }
 
     $perPage = $request->per_page ? $request->per_page : 10;
-    $villages = $query->paginate($perPage)->withQueryString();
+    $villages = $query->paginate($perPage)->appends(request()->query());
 
     $provinces = Provinces::orderBy('name')->get();
     $regencies = Regencies::orderBy('name')->get();

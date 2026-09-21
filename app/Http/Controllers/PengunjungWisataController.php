@@ -14,12 +14,10 @@ use App\Models\ImportBatch;
 use Maatwebsite\Excel\Validators\ValidationException;
 use App\Imports\PengunjungWisataImport;
 use App\Jobs\ProcessImportBatch;
-use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\StagingImport;
 use App\Services\Imports\PengunjungWisataImportValidator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class PengunjungWisataController extends Controller
 {
@@ -61,7 +59,7 @@ class PengunjungWisataController extends Controller
       })
 
       ->when($sortField !== 'pengelola', function ($q) use ($sortField, $sortDirection) {
-        $user = auth()->user();
+        $user = $this->user();
 
         if ($sortField === 'created_at' && $sortDirection === 'desc') {
           if ($user->hasRole('kacdk')) {
@@ -81,7 +79,7 @@ class PengunjungWisataController extends Controller
       })
 
       ->paginate($request->integer('per_page', 10))
-      ->withQueryString();
+      ->appends(request()->query());
 
     $stats = cache()->remember(
       "wisata-stats-{$selectedYear}",
@@ -197,7 +195,7 @@ class PengunjungWisataController extends Controller
     $success = $action->execute(
       model: $pengunjungWisata,
       action: $workflowAction,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 
@@ -327,7 +325,7 @@ class PengunjungWisataController extends Controller
       model: PengunjungWisata::class,
       action: $workflowAction,
       ids: $request->ids,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 

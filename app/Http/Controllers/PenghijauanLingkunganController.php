@@ -74,7 +74,7 @@ class PenghijauanLingkunganController extends Controller
       })
 
       ->when($sortField !== 'location', function ($q) use ($sortField, $sortDirection) {
-        $user = auth()->user();
+        $user = $this->user();
 
         if ($sortField === 'created_at' && $sortDirection === 'desc') {
           if ($user->hasRole('kacdk')) {
@@ -95,7 +95,7 @@ class PenghijauanLingkunganController extends Controller
       })
 
       ->paginate($request->integer('per_page', 10))
-      ->withQueryString();
+      ->appends(request()->query());
 
     $stats = cache()->remember(
       "penghijauan-lingkungan-stats-{$selectedYear}",
@@ -247,7 +247,7 @@ class PenghijauanLingkunganController extends Controller
     $success = $action->execute(
       model: $penghijauanLingkungan,
       action: $workflowAction,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 
@@ -379,7 +379,7 @@ class PenghijauanLingkunganController extends Controller
       model: PenghijauanLingkungan::class,
       action: $workflowAction,
       ids: $request->ids,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 

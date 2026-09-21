@@ -52,7 +52,7 @@ class DemografiPegawaiController extends Controller
             $query->latest();
         }
 
-        $pegawais = $query->paginate($perPage)->withQueryString();
+        $pegawais = $query->paginate($perPage)->appends(request()->query());
 
         // ===== BAGIAN BARU: Dashboard Hub Data =====
 
@@ -114,7 +114,7 @@ class DemografiPegawaiController extends Controller
             ]);
 
         // 6. Rekap pending (perlu tindakan) sesuai role
-        $user = $request->user();
+        $user = $this->user();
         $pendingStatuses = [];
         if ($user->hasRole('admin')) {
             $pendingStatuses = ['draft', 'waiting_kasi', 'waiting_cdk', 'rejected'];

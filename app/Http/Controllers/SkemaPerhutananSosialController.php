@@ -17,7 +17,7 @@ class SkemaPerhutananSosialController extends Controller
       $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $skema = $query->paginate(10)->withQueryString();
+    $skema = $query->paginate(10)->appends(request()->query());
 
     return Inertia::render('MasterData/SkemaPerhutananSosial/Index', [
       'skema' => $skema,

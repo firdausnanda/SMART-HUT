@@ -18,7 +18,7 @@ class RegencyController extends Controller
       $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $regencies = $query->paginate(10)->withQueryString();
+    $regencies = $query->paginate(10)->appends(request()->query());
     $provinces = Provinces::all();
 
     return Inertia::render('MasterData/Regencies/Index', [

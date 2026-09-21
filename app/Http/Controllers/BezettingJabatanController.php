@@ -38,7 +38,7 @@ class BezettingJabatanController extends Controller
             $query->orderBy('nama_jabatan', 'asc');
         }
 
-        $bezettings = $query->paginate($perPage)->withQueryString();
+        $bezettings = $query->paginate($perPage)->appends(request()->query());
 
         return Inertia::render('Kepegawaian/Bezetting', [
             'bezettings' => $bezettings,
@@ -113,7 +113,7 @@ class BezettingJabatanController extends Controller
         $success = $action->execute(
             model: $bezetting_jabatan,
             action: $workflowAction,
-            user: /** @var \App\Models\User */ $request->user(),
+            user: $this->user(),
             extraData: $extraData
         );
 
@@ -161,7 +161,7 @@ class BezettingJabatanController extends Controller
             model: Bezetting::class,
             action: $workflowAction,
             ids: $request->ids,
-            user: /** @var \App\Models\User */ $request->user(),
+            user: $this->user(),
             extraData: $extraData
         );
 

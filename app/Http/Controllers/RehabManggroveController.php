@@ -74,7 +74,7 @@ class RehabManggroveController extends Controller
       })
 
       ->when($sortField !== 'location', function ($q) use ($sortField, $sortDirection) {
-        $user = auth()->user();
+        $user = $this->user();
 
         if ($sortField === 'created_at' && $sortDirection === 'desc') {
           if ($user->hasRole('kacdk')) {
@@ -95,7 +95,7 @@ class RehabManggroveController extends Controller
       })
 
       ->paginate($request->integer('per_page', 10))
-      ->withQueryString();
+      ->appends(request()->query());
 
     $stats = cache()->remember(
       "rehab-manggrove-stats-{$selectedYear}",
@@ -239,7 +239,7 @@ class RehabManggroveController extends Controller
     $success = $action->execute(
       model: $rehabManggrove,
       action: $workflowAction,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 
@@ -356,7 +356,7 @@ class RehabManggroveController extends Controller
       model: RehabManggrove::class,
       action: $workflowAction,
       ids: $request->ids,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 

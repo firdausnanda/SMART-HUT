@@ -14,7 +14,7 @@ class LocationController extends Controller
     $query = Regencies::where('province_id', $provinceId);
 
     if (auth()->check()) {
-      $user = auth()->user();
+      $user = $this->user();
       if ($user->cdk_id) {
         $query->whereHas('cdks', function ($q) use ($user) {
           $q->where('cdks.id', $user->cdk_id);

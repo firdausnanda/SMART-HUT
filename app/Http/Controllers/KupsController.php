@@ -62,7 +62,7 @@ class KupsController extends Controller
           ->orderBy('m_districts.name', $sortDirection);
       })
       ->when(!in_array($sortField, ['location']), function ($q) use ($sortField, $sortDirection) {
-        $user = auth()->user();
+        $user = $this->user();
 
         if ($sortField === 'created_at' && $sortDirection === 'desc') {
           if ($user->hasRole('kacdk')) {
@@ -75,7 +75,7 @@ class KupsController extends Controller
         $q->orderBy($sortField, $sortDirection);
       })
       ->paginate($request->integer('per_page', 10))
-      ->withQueryString();
+      ->appends(request()->query());
 
     // Stats with caching
     $stats = cache()->remember('kups-stats', 300, function () {
@@ -188,7 +188,7 @@ class KupsController extends Controller
     $success = $action->execute(
       model: $kup,
       action: $workflowAction,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 
@@ -307,7 +307,7 @@ class KupsController extends Controller
       model: Kups::class,
       action: $workflowAction,
       ids: $request->ids,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 

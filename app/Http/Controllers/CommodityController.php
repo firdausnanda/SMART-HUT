@@ -21,7 +21,7 @@ class CommodityController extends Controller
             $query->where('is_nilai_transaksi_ekonomi', $request->module);
         }
 
-        $commodities = $query->paginate(10)->withQueryString();
+        $commodities = $query->paginate(10)->appends(request()->query());
 
         return Inertia::render('MasterData/Commodities/Index', [
             'commodities' => $commodities,

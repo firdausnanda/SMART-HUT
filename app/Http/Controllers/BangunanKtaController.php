@@ -17,7 +17,7 @@ class BangunanKtaController extends Controller
       $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $bangunanKta = $query->paginate(10)->withQueryString();
+    $bangunanKta = $query->paginate(10)->appends(request()->query());
 
     return Inertia::render('MasterData/BangunanKta/Index', [
       'bangunanKta' => $bangunanKta,

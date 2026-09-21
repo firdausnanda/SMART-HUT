@@ -81,7 +81,7 @@ class RekapBulananController extends Controller
             });
         }
 
-        $pegawais = $query->paginate(10)->withQueryString();
+        $pegawais = $query->paginate(10)->appends(request()->query());
 
         $rekap = RekapStatistikBulanan::where('periode_tahun', $year)
             ->where('periode_bulan', $month)
@@ -276,7 +276,7 @@ class RekapBulananController extends Controller
         $success = $action->execute(
             model: $model,
             action: $workflowAction,
-            user: auth()->user(),
+            user: $this->user(),
             extraData: $extraData
         );
 
@@ -321,7 +321,7 @@ class RekapBulananController extends Controller
             model: $modelClass,
             action: $workflowAction,
             ids: $request->ids,
-            user: auth()->user(),
+            user: $this->user(),
             extraData: $extraData
         );
 

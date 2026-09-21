@@ -17,7 +17,7 @@ class BukanKayuController extends Controller
       $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $bukanKayu = $query->paginate(10)->withQueryString();
+    $bukanKayu = $query->paginate(10)->appends(request()->query());
 
     return Inertia::render('MasterData/BukanKayu/Index', [
       'bukanKayu' => $bukanKayu,

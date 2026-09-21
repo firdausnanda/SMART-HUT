@@ -34,7 +34,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($request->user()->roles->isEmpty()) {
+        if ($this->user()->roles->isEmpty()) {
             return redirect()->route('public.dashboard');
         }
 

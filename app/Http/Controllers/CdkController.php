@@ -12,7 +12,7 @@ class CdkController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            abort_if(!auth()->user()->isAdminProvinsi(), 403);
+            abort_if(!$this->user()->isAdminProvinsi(), 403);
             return $next($request);
         });
     }
@@ -30,7 +30,7 @@ class CdkController extends Controller
             });
         }
 
-        $cdks = $query->paginate(10)->withQueryString();
+        $cdks = $query->paginate(10)->appends(request()->query());
         $regencies = Regencies::where('province_id', '35')->orderBy('name', 'asc')->get(['id', 'name']);
 
         return Inertia::render('Cdk/Index', [

@@ -74,7 +74,7 @@ class SkpsController extends Controller
           ->orderBy('m_skema_perhutanan_sosial.name', $sortDirection);
       })
       ->when(!in_array($sortField, ['location', 'skema']), function ($q) use ($sortField, $sortDirection) {
-        $user = auth()->user();
+        $user = $this->user();
 
         if ($sortField === 'created_at' && $sortDirection === 'desc') {
           if ($user->hasRole('kacdk')) {
@@ -94,7 +94,7 @@ class SkpsController extends Controller
         };
       })
       ->paginate($request->integer('per_page', 10))
-      ->withQueryString();
+      ->appends(request()->query());
 
     // Stats with caching
     $stats = cache()->remember('skps-stats', 300, function () {
@@ -222,7 +222,7 @@ class SkpsController extends Controller
     $success = $action->execute(
       model: $skp,
       action: $workflowAction,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 
@@ -344,7 +344,7 @@ class SkpsController extends Controller
       model: Skps::class,
       action: $workflowAction,
       ids: $request->ids,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 

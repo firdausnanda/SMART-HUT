@@ -79,7 +79,7 @@ class KebakaranHutanController extends Controller
       })
 
       ->when(!in_array($sortField, ['location', 'pengelola']), function ($q) use ($sortField, $sortDirection) {
-        $user = auth()->user();
+        $user = $this->user();
 
         if ($sortField === 'created_at' && $sortDirection === 'desc') {
           if ($user->hasRole('kacdk')) {
@@ -100,7 +100,7 @@ class KebakaranHutanController extends Controller
       })
 
       ->paginate($request->integer('per_page', 10))
-      ->withQueryString();
+      ->appends(request()->query());
 
     $stats = cache()->remember(
       "karhutla-stats-{$selectedYear}",
@@ -237,7 +237,7 @@ class KebakaranHutanController extends Controller
     $success = $action->execute(
       model: $kebakaranHutan,
       action: $workflowAction,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 
@@ -366,7 +366,7 @@ class KebakaranHutanController extends Controller
       model: KebakaranHutan::class,
       action: $workflowAction,
       ids: $request->ids,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 

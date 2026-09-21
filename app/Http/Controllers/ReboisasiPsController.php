@@ -76,7 +76,7 @@ class ReboisasiPsController extends Controller
       })
 
       ->when($sortField !== 'location', function ($q) use ($sortField, $sortDirection) {
-        $user = auth()->user();
+        $user = $this->user();
 
         if ($sortField === 'created_at' && $sortDirection === 'desc') {
           if ($user->hasRole('kacdk')) {
@@ -97,7 +97,7 @@ class ReboisasiPsController extends Controller
       })
 
       ->paginate($request->integer('per_page', 10))
-      ->withQueryString();
+      ->appends(request()->query());
 
     $stats = cache()->remember(
       "reboisasi-ps-stats-{$selectedYear}",
@@ -249,7 +249,7 @@ class ReboisasiPsController extends Controller
     $success = $action->execute(
       model: $reboisasiPs,
       action: $workflowAction,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 
@@ -366,7 +366,7 @@ class ReboisasiPsController extends Controller
       model: ReboisasiPS::class,
       action: $workflowAction,
       ids: $request->ids,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 

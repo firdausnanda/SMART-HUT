@@ -17,7 +17,7 @@ class PengelolaPsController extends Controller
       $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $pengelolaPs = $query->paginate(10)->withQueryString();
+    $pengelolaPs = $query->paginate(10)->appends(request()->query());
 
     return Inertia::render('MasterData/PengelolaPs/Index', [
       'pengelolaPs' => $pengelolaPs,

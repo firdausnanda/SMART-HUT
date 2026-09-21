@@ -73,7 +73,7 @@ class RehabLahanController extends Controller
             })
 
             ->when($sortField !== 'location', function ($q) use ($sortField, $sortDirection) {
-                $user = auth()->user();
+                $user = $this->user();
 
                 if ($sortField === 'created_at' && $sortDirection === 'desc') {
                     if ($user->hasRole('kacdk')) {
@@ -94,7 +94,7 @@ class RehabLahanController extends Controller
             })
 
             ->paginate($request->integer('per_page', 10))
-            ->withQueryString();
+            ->appends(request()->query());
 
         $stats = cache()->remember(
             "rehab-lahan-stats-{$selectedYear}",
@@ -210,7 +210,7 @@ class RehabLahanController extends Controller
      */
     public function destroy(RehabLahan $rehabLahan)
     {
-        $user = auth()->user();
+        $user = $this->user();
 
         if ($user->hasAnyRole(['kasi', 'kacdk'])) {
             return redirect()->back()->with('error', 'Aksi tidak diijinkan. Role Anda tidak dapat menghapus data.');
@@ -255,7 +255,7 @@ class RehabLahanController extends Controller
         $success = $action->execute(
             model: $rehabLahan,
             action: $workflowAction,
-            user: auth()->user(),
+            user: $this->user(),
             extraData: $extraData
         );
 
@@ -387,7 +387,7 @@ class RehabLahanController extends Controller
             model: RehabLahan::class,
             action: $workflowAction,
             ids: $request->ids,
-            user: auth()->user(),
+            user: $this->user(),
             extraData: $extraData
         );
 

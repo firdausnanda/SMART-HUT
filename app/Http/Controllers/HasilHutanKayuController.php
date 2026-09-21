@@ -101,7 +101,7 @@ class HasilHutanKayuController extends Controller
       })
 
       ->when(!in_array($sortField, ['location', 'pengelola']), function ($q) use ($sortField, $sortDirection) {
-        $user = auth()->user();
+        $user = $this->user();
 
         if ($sortField === 'created_at' && $sortDirection === 'desc') {
           if ($user->hasRole('kacdk')) {
@@ -121,7 +121,7 @@ class HasilHutanKayuController extends Controller
       })
 
       ->paginate($request->integer('per_page', 10))
-      ->withQueryString();
+      ->appends(request()->query());
 
     // Calculate Stats with caching
     $cacheKey = "hhk-stats-{$forestType}-{$selectedYear}";
@@ -364,7 +364,7 @@ class HasilHutanKayuController extends Controller
     $success = $action->execute(
       model: $hasilHutanKayu,
       action: $workflowAction,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 
@@ -516,7 +516,7 @@ class HasilHutanKayuController extends Controller
       model: HasilHutanKayu::class,
       action: $workflowAction,
       ids: $request->ids,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 

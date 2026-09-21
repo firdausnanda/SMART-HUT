@@ -17,7 +17,7 @@ class ProvinceController extends Controller
       $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $provinces = $query->paginate(10)->withQueryString();
+    $provinces = $query->paginate(10)->appends(request()->query());
 
     return Inertia::render('MasterData/Provinces/Index', [
       'provinces' => $provinces,

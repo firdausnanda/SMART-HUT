@@ -76,7 +76,7 @@ class PerkembanganKthController extends Controller
       $q->leftJoin('m_districts', 'perkembangan_kth.district_id', '=', 'm_districts.id')
         ->orderBy('m_districts.name', $sortDirection);
     })->when(!in_array($sortField, ['location']), function ($q) use ($sortField, $sortDirection) {
-      $user = auth()->user();
+      $user = $this->user();
 
       if ($sortField === 'created_at' && $sortDirection === 'desc') {
         if ($user->hasRole('kacdk')) {
@@ -97,7 +97,7 @@ class PerkembanganKthController extends Controller
       };
     });
 
-    $datas = $query->paginate($request->integer('per_page', 10))->withQueryString();
+    $datas = $query->paginate($request->integer('per_page', 10))->appends(request()->query());
 
     // Stats Caching
     $stats = cache()->remember('perkembangan-kth-stats-all', 300, function () {
@@ -157,7 +157,7 @@ class PerkembanganKthController extends Controller
       model: PerkembanganKth::class,
       action: $workflowAction,
       ids: $request->ids,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 
@@ -284,7 +284,7 @@ class PerkembanganKthController extends Controller
     $success = $action->execute(
       model: $perkembanganKth,
       action: $workflowAction,
-      user: auth()->user(),
+      user: $this->user(),
       extraData: $extraData
     );
 
@@ -311,7 +311,7 @@ class PerkembanganKthController extends Controller
       'rejection_note' => 'required|string|max:255',
     ]);
 
-    $user = auth()->user();
+    $user = $this->user();
     $ids = $request->ids;
     $count = 0;
 
