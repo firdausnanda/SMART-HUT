@@ -23,6 +23,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 export default function PublicDashboard({ currentYear, availableYears, stats, selectedCdkId, cdks }) {
   const { auth } = usePage().props;
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [autoPlaying, setAutoPlaying] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memuat Data...');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -64,9 +65,10 @@ export default function PublicDashboard({ currentYear, availableYears, stats, se
 
   // Auto-slide effect
   useEffect(() => {
+    if (!autoPlaying) return;
     const interval = setInterval(nextSlide, 25000);
     return () => clearInterval(interval);
-  }, []);
+  }, [autoPlaying]);
 
   // Auto-reload data every 5 minutes
   useEffect(() => {
@@ -275,19 +277,19 @@ export default function PublicDashboard({ currentYear, availableYears, stats, se
 
           {/* Carousel Navigation & Header */}
           <div className="flex items-center justify-between mb-8">
-            <button onClick={prevSlide} className="p-2 rounded-full hover:bg-gray-200 transition-colors text-gray-400 hover:text-gray-900">
+            <button onClick={() => { setAutoPlaying(false); prevSlide(); }} className="p-2 rounded-full hover:bg-gray-200 transition-colors text-gray-400 hover:text-gray-900">
               <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             </button>
 
             <div className="text-center">
-              <h2 className={`text-4xl font-bold mb-2 transition-colors duration-500 ${modules[currentSlide]?.text}`}>
+              <h2 className={`text-2xl sm:text-4xl font-bold mb-2 transition-colors duration-500 ${modules[currentSlide]?.text}`}>
                 {modules[currentSlide]?.title}
               </h2>
               <div className="flex justify-center gap-2">
                 {modules.map((m, i) => (
                   <button
                     key={m.id}
-                    onClick={() => setCurrentSlide(i)}
+                    onClick={() => { setAutoPlaying(false); setCurrentSlide(i); }}
                     className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === i ? `w-8 ${m.color}` : 'w-2 bg-gray-300'}`}
                     aria-label={`Go to slide ${i + 1}`}
                   />
@@ -295,13 +297,20 @@ export default function PublicDashboard({ currentYear, availableYears, stats, se
               </div>
             </div>
 
-            <button onClick={nextSlide} className="p-2 rounded-full hover:bg-gray-200 transition-colors text-gray-400 hover:text-gray-900">
+            <button onClick={() => { setAutoPlaying(false); nextSlide(); }} className="p-2 rounded-full hover:bg-gray-200 transition-colors text-gray-400 hover:text-gray-900">
               <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
 
+          <div className="mb-4 flex justify-end">
+            <button type="button" onClick={() => setAutoPlaying(value => !value)} aria-pressed={autoPlaying}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-slate-400">
+              {autoPlaying ? 'Jeda pergantian otomatis' : 'Lanjutkan pergantian otomatis'}
+            </button>
+          </div>
+
           {/* Slides Content (Sliding Track) */}
-          <div className="relative overflow-hidden min-h-[550px]">
+          <div className="relative overflow-hidden min-h-[550px]" onPointerDownCapture={() => setAutoPlaying(false)} onFocusCapture={() => setAutoPlaying(false)}>
             <div
               className="flex transition-transform duration-700 ease-in-out will-change-transform"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}

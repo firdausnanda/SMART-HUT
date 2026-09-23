@@ -332,7 +332,7 @@ class DashboardController extends Controller
         $cdkId = $request->input('cdk_id');
 
         $cacheCdkId = $cdkId ?? 'all';
-        $cacheKey = 'public_yoy_dashboard_stats_' . $thisYear . '_' . $cacheCdkId;
+        $cacheKey = 'public_yoy_dashboard_stats_v2_' . $thisYear . '_' . $cacheCdkId;
 
         // Fetch all active CDKs for guest dropdown
         $cdks = \App\Models\Cdk::where('is_active', true)->get(['id', 'nama']);
@@ -589,10 +589,12 @@ class DashboardController extends Controller
     private function getBinaUsahaStats($currentYear, $cdkId = null)
     {
         $cacheCdkId = $cdkId ?? 'all';
-        return Cache::remember("bina_usaha_stats_{$currentYear}_{$cacheCdkId}", 300, function () use ($currentYear, $cdkId) {
+        return Cache::remember("bina_usaha_stats_v2_{$currentYear}_{$cacheCdkId}", 300, function () use ($currentYear, $cdkId) {
             // --- 3. Bina Usaha (Split into 5 categories) ---
             $forestTypes = ['Hutan Negara', 'Perhutanan Sosial', 'Hutan Rakyat'];
             $binaUsahaData = [];
+            $nonWoodByForest = app(\App\Services\NonWoodProductionStats::class)
+                ->forYear((int) $currentYear, $cdkId ? (int) $cdkId : null);
 
             // Optimization: Pre-fetch data for all types to minimize queries inside loop
             $kayuTotals = HasilHutanKayu::forCdk($cdkId)->where('year', $currentYear)
@@ -633,6 +635,9 @@ class DashboardController extends Controller
 
             foreach ($forestTypes as $type) {
                 $key = strtolower(str_replace(' ', '_', $type));
+                $binaUsahaData[$key] = $nonWoodByForest[$key] ?? [
+                    'bukan_kayu_by_unit' => [], 'bukan_kayu_unspecified' => [],
+                ];
 
                 // Kayu Realization (Sum from details)
                 $kayuRealization = HasilHutanKayu::forCdk($cdkId)->join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
@@ -670,6 +675,8 @@ class DashboardController extends Controller
                     ->limit(5)
                     ->pluck('total', 'commodity');
 
+                // Legacy fields retained for compatibility only. Public dashboards use
+                // bukan_kayu_by_unit, without name-based exclusions or ambiguous targets.
                 // Bukan Kayu Target (Excluding Bambu)
                 $bukanKayuTarget = HasilHutanBukanKayu::forCdk($cdkId)->where('year', $currentYear)
                     ->where('status', 'final')

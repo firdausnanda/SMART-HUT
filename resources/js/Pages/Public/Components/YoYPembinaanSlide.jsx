@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
-import YoYStatsCard from './YoYStatsCard';
+import YoYSummaryCard from './YoYSummaryCard';
 import { formatNumber } from './utils';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler } from 'chart.js';
 
@@ -70,7 +70,7 @@ const YoYPembinaanSlide = ({ label, secKey, years, stats, color, unit, commonOpt
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-1">
-            <YoYStatsCard
+            <YoYSummaryCard
               title={label}
               currentTotal={stats[years[0]].pembinaan[`${secKey}_total`] || 0}
               prevTotal={stats[years[1]].pembinaan[`${secKey}_total`] || 0}
@@ -81,7 +81,7 @@ const YoYPembinaanSlide = ({ label, secKey, years, stats, color, unit, commonOpt
             />
           </div>
 
-          <div className="md:col-span-3 space-y-6">
+          <div className="min-w-0 lg:col-span-3 space-y-6">
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Tren Realisasi {yearsCount} Tahun Terakhir</h4>

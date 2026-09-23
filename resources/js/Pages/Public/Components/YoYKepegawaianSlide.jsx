@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
-import YoYStatsCard from './YoYStatsCard';
+import YoYSummaryCard from './YoYSummaryCard';
 import { formatNumber } from './utils';
 
 const YoYKepegawaianSlide = ({ years, stats, commonOptions }) => {
@@ -111,7 +111,7 @@ const YoYKepegawaianSlide = ({ years, stats, commonOptions }) => {
           
           {/* Sidebar: Total Pegawai */}
           <div className="lg:col-span-1">
-            <YoYStatsCard
+            <YoYSummaryCard
               title="Total Pegawai"
               currentTotal={stats[currentYear]?.kepegawaian?.total_pegawai || 0}
               prevTotal={stats[prevYear]?.kepegawaian?.total_pegawai || 0}

@@ -108,7 +108,7 @@ const PembinaanSlide = ({ section, currentYear, commonOptions }) => {
           {/* Left: Professional Stats Card */}
           <div className="lg:col-span-1 flex flex-col gap-6">
             <StatsCard
-              title="Total Realisasi"
+              title={section.label}
               total={section.total}
               unit={section.unit}
               progress={percentage}
@@ -119,7 +119,7 @@ const PembinaanSlide = ({ section, currentYear, commonOptions }) => {
           </div>
 
           {/* Right: Charts Grid */}
-          <div className="md:col-span-3 space-y-6">
+          <div className="min-w-0 lg:col-span-3 space-y-6">
             {/* Combined Trend Chart: Realization vs Target */}
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">

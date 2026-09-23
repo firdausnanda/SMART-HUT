@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
-import YoYStatsCard from './YoYStatsCard';
+import YoYSummaryCard from './YoYSummaryCard';
 
 const YoYKebakaranSlide = ({ years, stats, commonOptions }) => {
   const chronologicalYears = useMemo(() => [...years].reverse(), [years]);
@@ -39,7 +39,7 @@ const YoYKebakaranSlide = ({ years, stats, commonOptions }) => {
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-1 space-y-6">
-            <YoYStatsCard
+            <YoYSummaryCard
               title="Kejadian Kebakaran"
               currentTotal={stats[years[0]]?.perlindungan?.kebakaran_kejadian || 0}
               prevTotal={stats[years[1]]?.perlindungan?.kebakaran_kejadian || 0}
@@ -48,7 +48,7 @@ const YoYKebakaranSlide = ({ years, stats, commonOptions }) => {
               currentYear={years[0]}
               prevYear={years[1]}
             />
-            <YoYStatsCard
+            <YoYSummaryCard
               title="Luas Area Terbakar"
               currentTotal={stats[years[0]]?.perlindungan?.kebakaran_area || 0}
               prevTotal={stats[years[1]]?.perlindungan?.kebakaran_area || 0}
@@ -59,7 +59,7 @@ const YoYKebakaranSlide = ({ years, stats, commonOptions }) => {
             />
           </div>
 
-          <div className="md:col-span-3 space-y-6">
+          <div className="min-w-0 lg:col-span-3 space-y-6">
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
               <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-6">Tren Karhutla {yearsCount} Tahun Terakhir</h4>
               <div className="flex-1 min-h-[400px]">

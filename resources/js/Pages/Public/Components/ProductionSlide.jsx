@@ -1,295 +1,62 @@
-import React, { useMemo } from 'react';
-import { Line, Bar } from 'react-chartjs-2';
+import React, { useState, useEffect } from 'react';
 import { formatNumber } from './utils';
+import { selectedUnit, topCommodities } from './nonWoodUtils';
+import { NonWoodUnitCards, NonWoodUnspecified } from './NonWoodDetails';
+import { ProductionPanel, ProductionMetric, ProductionTrend, CommodityRanking, ProductionEmpty, NON_WOOD_COLOR } from './ProductionUI';
+
+const months = Array.from({ length: 12 }, (_, i) => i + 1);
+const monthLabels = months.map(month => new Date(2024, month - 1, 1).toLocaleString('id-ID', { month: 'short' }));
 
 const ProductionSlide = ({ source, stats, currentYear, commonOptions }) => {
-  const woodTrendData = useMemo(() => {
-    const months = Array.from({ length: 12 }, (_, i) => i + 1);
-    const labels = months.map(m => {
-      const date = new Date();
-      date.setMonth(m - 1);
-      return date.toLocaleString('id-ID', { month: 'short' });
-    });
+  const production = stats?.bina_usaha?.[source.key] ?? {};
+  const groups = production.bukan_kayu_by_unit ?? [];
+  const [preferredUnit, setPreferredUnit] = useState('kg');
+  const group = selectedUnit(groups, preferredUnit);
+  useEffect(() => { setPreferredUnit(group?.unit ?? 'kg'); }, [group?.unit]);
+  const woodTotal = Number(production.kayu_total ?? 0);
+  const woodTarget = Number(production.kayu_target ?? 0);
+  const achievement = woodTarget > 0 ? woodTotal / woodTarget * 100 : null;
+  const woodCommodities = Object.entries(production.kayu_commodity ?? {}).map(([name, total]) => ({ name, total }));
 
-    return {
-      labels,
-      datasets: [
-        {
-          label: 'Realisasi Kayu (M³)',
-          data: months.map(m => stats?.bina_usaha[source.key]?.kayu_monthly?.[m] || 0),
-          borderColor: source.color,
-          backgroundColor: `${source.color}20`,
-          fill: true,
-          tension: 0.4,
-          order: 1
-        },
-        {
-          label: 'Target Kayu (M³)',
-          data: months.map(m => stats?.bina_usaha[source.key]?.kayu_target_monthly?.[m] || 0),
-          borderColor: '#9ca3af', // gray-400
-          backgroundColor: '#9ca3af20',
-          fill: true,
-          tension: 0.4,
-          borderDash: [5, 5],
-          order: 2
-        }
-      ]
-    };
-  }, [stats?.bina_usaha, source.key, source.color]);
-
-  const nonWoodTrendData = useMemo(() => {
-    const months = Array.from({ length: 12 }, (_, i) => i + 1);
-    const labels = months.map(m => {
-      const date = new Date();
-      date.setMonth(m - 1);
-      return date.toLocaleString('id-ID', { month: 'short' });
-    });
-
-    return {
-      labels,
-      datasets: [
-        {
-          label: 'Bukan Kayu (Kg)',
-          data: months.map(m => stats?.bina_usaha[source.key]?.bukan_kayu_monthly?.[m] || 0),
-          borderColor: '#f59e0b',
-          backgroundColor: '#f59e0b20',
-          fill: true,
-          tension: 0.4,
-          order: 1
-        },
-        {
-          label: 'Target Bukan Kayu (Kg)',
-          data: months.map(m => stats?.bina_usaha[source.key]?.bukan_kayu_target_monthly?.[m] || 0),
-          borderColor: '#9ca3af',
-          backgroundColor: '#9ca3af20',
-          fill: true,
-          tension: 0.4,
-          borderDash: [5, 5],
-          order: 2
-        }
-      ]
-    };
-  }, [stats?.bina_usaha, source.key]);
-
-  const topWoodData = useMemo(() => {
-    return {
-      labels: stats?.bina_usaha[source.key]?.kayu_commodity ? Object.keys(stats.bina_usaha[source.key].kayu_commodity) : [],
-      datasets: [{
-        label: 'Volume (M³)',
-        data: stats?.bina_usaha[source.key]?.kayu_commodity ? Object.values(stats.bina_usaha[source.key].kayu_commodity) : [],
-        backgroundColor: source.color,
-        borderRadius: 6
-      }]
-    };
-  }, [stats?.bina_usaha, source.key, source.color]);
-
-  const topNonWoodData = useMemo(() => {
-    return {
-      labels: stats?.bina_usaha[source.key]?.bukan_kayu_commodity ? Object.keys(stats.bina_usaha[source.key].bukan_kayu_commodity) : [],
-      datasets: [{
-        label: 'Produksi',
-        data: stats?.bina_usaha[source.key]?.bukan_kayu_commodity ? Object.values(stats.bina_usaha[source.key].bukan_kayu_commodity) : [],
-        backgroundColor: '#f59e0bCC',
-        borderRadius: 6
-      }]
-    };
-  }, [stats?.bina_usaha, source.key]);
-
-  const barOptions = useMemo(() => ({
-    ...commonOptions,
-    indexAxis: 'y',
-    maintainAspectRatio: false,
-    plugins: {
-      ...commonOptions.plugins,
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: (ctx) => {
-            const total = ctx.dataset.data.reduce((a, b) => Number(a) + Number(b), 0);
-            const percentage = total > 0 ? ((Number(ctx.raw) / total) * 100).toFixed(1) : 0;
-            const unit = ctx.dataset.label.includes('Volume') ? 'M³' : 'Kg';
-            return ` ${ctx.label}: ${formatNumber(ctx.raw)} ${unit} (${percentage}%)`;
-          }
-        }
-      }
-    },
-    scales: { y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }, x: { grid: { display: false } } }
-  }), [commonOptions]);
-
-  const lineOptions = useMemo(() => ({
-    ...commonOptions,
-    maintainAspectRatio: false
-  }), [commonOptions]);
-
-  const calculatePercentage = (realization, target) => {
-    if (realization > 0 && target <= 0) return 100;
-    return target > 0 ? (realization / target) * 100 : 0;
-  };
-
-  const kayuPercentage = calculatePercentage(
-    stats?.bina_usaha[source.key]?.kayu_total || 0,
-    stats?.bina_usaha[source.key]?.kayu_target || 0
-  );
-
-  const bukanKayuPercentage = calculatePercentage(
-    stats?.bina_usaha[source.key]?.bukan_kayu_total || 0,
-    stats?.bina_usaha[source.key]?.bukan_kayu_target || 0
-  );
-
-
-
-  const renderProgress = (label, percentage, target, color) => (
-    <div className="mb-4 last:mb-0">
-      <div className="flex justify-between items-end mb-1">
-        <div className="flex flex-col">
-          <span className="text-[9px] uppercase font-bold text-gray-400 tracking-widest">{label}</span>
-          <span className="text-lg font-black text-gray-900">{percentage.toFixed(1)}%</span>
-        </div>
-        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mb-1">Target: {formatNumber(target || 0)}</span>
-      </div>
-      <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner p-px">
-        <div
-          className="h-full rounded-full transition-all duration-1000 ease-out shadow-sm relative overflow-hidden"
-          style={{ width: `${Math.min(percentage, 100)}%`, backgroundColor: color }}
-        >
-          <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-[shimmer_2s_linear_infinite]"></div>
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="min-w-full px-4">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Left: Professional Stats Card */}
-          <div className="lg:col-span-1 flex flex-col gap-6">
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-b from-white to-gray-50 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-              <div className="relative bg-white p-8 rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col overflow-hidden">
-                {/* Decorative Circle */}
-                <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full opacity-[0.03] pointer-events-none" style={{ backgroundColor: source.color }}></div>
-
-                <div className="flex flex-col h-full relative z-10 gap-6">
-                  {/* Title Section */}
-                  <div className="text-center">
-                    <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gray-50 text-gray-500 border border-gray-100">
-                      Ringkasan Produksi
-                    </span>
-                  </div>
-
-                  {/* Wood Production Section */}
-                  <div className="flex-1 bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-100 flex flex-col items-center justify-center text-center group/card transition-all hover:shadow-md">
-                    <div className="mb-4 p-3 rounded-xl bg-white shadow-sm border border-gray-100 text-gray-700 group-hover/card:scale-110 transition-transform duration-300">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3c-4.418 0-8 2.686-8 6h3c0 1.657 2.239 3 5 3s5-1.343 5-3h3c0-3.314-3.582-6-8-6z m0 12c-1.105 0-2 .895-2 2v4h4v-4c0-1.105-.895-2-2-2z" />
-                      </svg>
-                    </div>
-                    <span className="text-[9px] uppercase font-bold text-gray-400 tracking-widest mb-1">Total Produksi Kayu</span>
-                    <h3 className="text-4xl font-black text-gray-900 leading-none mb-1 tabular-nums tracking-tight">
-                      {formatNumber(stats?.bina_usaha[source.key]?.kayu_total || 0)}
-                    </h3>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-md bg-opacity-10`} style={{ backgroundColor: source.color + '20', color: source.color }}>Meter Kubik (M³)</span>
-                  </div>
-
-                  {/* Non-Wood Production Section */}
-                  <div className="flex-1 bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-100 flex flex-col items-center justify-center text-center group/card transition-all hover:shadow-md">
-                    <div className="mb-4 p-3 rounded-xl bg-white shadow-sm border border-gray-100 text-amber-500 group-hover/card:scale-110 transition-transform duration-300">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                      </svg>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="text-[9px] uppercase font-bold text-gray-400 tracking-widest mb-1">Total Bukan Kayu</span>
-                      <h3 className="text-3xl font-black text-gray-900 leading-none mb-1 tabular-nums tracking-tight">
-                        {formatNumber(stats?.bina_usaha[source.key]?.bukan_kayu_total || 0)}
-                      </h3>
-                      <span className="text-xs font-bold text-amber-600 px-2 py-0.5 rounded-md bg-amber-50">Kg</span>
-                    </div>
-                  </div>
-
-
-
-                  <div className="w-full pt-4 border-t border-gray-50">
-                    {renderProgress('Kayu', kayuPercentage, stats?.bina_usaha[source.key]?.kayu_target, source.color)}
-                    {renderProgress('Bukan Kayu', bukanKayuPercentage, stats?.bina_usaha[source.key]?.bukan_kayu_target, '#f59e0b')}
-
-                  </div>
-
-                  <div className="text-center mt-2">
-                    <p className="text-[9px] text-gray-400 uppercase font-black tracking-[0.2em] opacity-60">Data Terupdate {currentYear}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: Charts Grid */}
-          <div className="md:col-span-3 space-y-6">
-            {/* Monthly Trends (Stacked) */}
-            <div className="grid grid-cols-1 gap-6">
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Tren Produksi Kayu Bulanan</h4>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-500">
-                      Realisasi: {kayuPercentage.toFixed(1)}%
-                    </span>
-                  </div>
-                </div>
-                <div className="h-[200px]">
-                  <Line
-                    data={woodTrendData}
-                    options={lineOptions}
-                  />
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">Tren Produksi Bukan Kayu Bulanan</h4>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-500">
-                      Realisasi: {bukanKayuPercentage.toFixed(1)}%
-                    </span>
-                  </div>
-                </div>
-                <div className="h-[200px]">
-                  <Line
-                    data={nonWoodTrendData}
-                    options={lineOptions}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Top Commodities (Side by Side) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">5 Komoditas Terbesar (Kayu)</h4>
-                <div className="h-[200px]">
-                  <Bar
-                    data={topWoodData}
-                    options={barOptions}
-                  />
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">5 Komoditas Terbesar (Bukan Kayu)</h4>
-                <div className="h-[200px]">
-                  <Bar
-                    data={topNonWoodData}
-                    options={barOptions}
-                  />
-                </div>
-              </div>
-            </div>
+  return <div className="w-full min-w-full shrink-0 px-1 sm:px-4">
+    <div className="mx-auto max-w-7xl space-y-5">
+      <ProductionPanel title="Hasil hutan kayu" code="HHK" subtitle={`Ringkasan produksi ${currentYear}`} color={source.color}>
+        <div className="grid grid-cols-2 gap-5 border-b border-slate-100 bg-slate-50/60 px-5 py-5 sm:grid-cols-3 sm:px-6">
+          <ProductionMetric label="Total realisasi" value={formatNumber(woodTotal)} unit="m³" color={source.color} />
+          <ProductionMetric label="Target produksi" value={formatNumber(woodTarget)} unit="m³" />
+          <div className="col-span-2 sm:col-span-1">
+            <ProductionMetric label="Capaian target" value={achievement == null ? '—' : `${formatNumber(Number(achievement.toFixed(1)))}%`} note={achievement == null ? 'Target belum tersedia.' : undefined} />
+            {achievement != null && <div className="mt-2 h-1.5 max-w-[180px] overflow-hidden rounded-full bg-slate-200" aria-hidden="true"><div className="h-full rounded-full" style={{ width: `${Math.min(Math.max(achievement, 0), 100)}%`, backgroundColor: source.color }} /></div>}
           </div>
         </div>
-      </div>
+        <div className="grid gap-6 px-5 py-5 sm:px-6 lg:grid-cols-3">
+          <div className="min-w-0 lg:col-span-2">
+            <ProductionTrend labels={monthLabels} values={months.map(m => production.kayu_monthly?.[m] ?? 0)} target={woodTarget > 0 ? months.map(m => production.kayu_target_monthly?.[m] ?? 0) : undefined} unit="m³" color={source.color} commonOptions={commonOptions} />
+          </div>
+          <div className="border-t border-slate-100 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+            <CommodityRanking items={woodCommodities} unit="m³" color={source.color} />
+          </div>
+        </div>
+      </ProductionPanel>
+
+      <ProductionPanel title="Hasil hutan bukan kayu" code="HHBK" subtitle="Pilih satuan untuk melihat tren dan komoditasnya" color={NON_WOOD_COLOR}>
+        {!!groups.length && <div className="border-b border-slate-100 bg-amber-50/30 px-5 py-4 sm:px-6">
+          <NonWoodUnitCards groups={groups} value={group?.unit} onChange={setPreferredUnit} />
+        </div>}
+        {group ? <div className="grid gap-6 px-5 py-5 sm:px-6 lg:grid-cols-3">
+          <div className="min-w-0 lg:col-span-2">
+            <ProductionTrend labels={monthLabels} values={months.map(m => group.monthly?.[m] ?? 0)} unit={group.unit} color={NON_WOOD_COLOR} commonOptions={commonOptions} />
+          </div>
+          <div className="border-t border-slate-100 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+            <CommodityRanking items={topCommodities(group)} unit={group.unit} color={NON_WOOD_COLOR} />
+          </div>
+        </div> : <ProductionEmpty>{production.bukan_kayu_unspecified?.length ? 'Belum ada produksi dengan satuan spesifik.' : undefined}</ProductionEmpty>}
+        {!!production.bukan_kayu_unspecified?.length && <footer className="border-t border-slate-100 px-5 py-3 sm:px-6">
+          <NonWoodUnspecified rows={production.bukan_kayu_unspecified} />
+        </footer>}
+      </ProductionPanel>
     </div>
-  );
+  </div>;
 };
 
 export default React.memo(ProductionSlide);
