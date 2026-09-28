@@ -23,10 +23,7 @@ class RekapKepegawaianService
             $activePegawaiIds = $pegawais->pluck('id')->toArray();
 
             // Hapus snapshot bulanan untuk pegawai yang sudah tidak aktif atau sudah dihapus di master data
-            RekapBulananPegawai::where('periode_tahun', $year)
-                ->where('periode_bulan', $month)
-                ->whereNotIn('pegawai_id', $activePegawaiIds)
-                ->delete();
+            $this->deleteSnapshotsForPeriod($year, $month, $activePegawaiIds);
 
             // 2. Simpan snapshot per pegawai
             foreach ($pegawais as $pegawai) {
@@ -88,7 +85,13 @@ class RekapKepegawaianService
     public function recalculateStatistik(int $year, int $month, string $sumber = 'manual'): void
     {
         $snapshots = RekapBulananPegawai::forPeriode($year, $month)->get();
-        if ($snapshots->isEmpty()) return;
+        if ($snapshots->isEmpty()) {
+            RekapStatistikBulanan::where('periode_tahun', $year)
+                ->where('periode_bulan', $month)
+                ->get()
+                ->each(fn (RekapStatistikBulanan $summary) => $summary->delete());
+            return;
+        }
 
         $stats = array_merge(
             $this->getSummaryStats($snapshots, $year, $month),
@@ -111,6 +114,27 @@ class RekapKepegawaianService
             $rekapStats->update($data);
         } else {
             RekapStatistikBulanan::create(array_merge($key, $data));
+        }
+    }
+
+    public function deleteSnapshotsForPeriod(int $year, int $month, ?array $retainedPegawaiIds = null): void
+    {
+        $query = RekapBulananPegawai::where('periode_tahun', $year)
+            ->where('periode_bulan', $month);
+        if ($retainedPegawaiIds !== null) {
+            $query->whereNotIn('pegawai_id', $retainedPegawaiIds);
+        }
+
+        $finalScopes = (clone $query)->where('status', 'final')
+            ->distinct()->get(['cdk_id', 'periode_tahun']);
+        $query->delete();
+
+        foreach ($finalScopes as $scope) {
+            app(PublicDashboardRealtime::class)->recordChange(
+                new RekapBulananPegawai,
+                ['status' => 'final', 'cdk_id' => $scope->cdk_id, 'periode_tahun' => $scope->periode_tahun],
+                null,
+            );
         }
     }
 

@@ -9,21 +9,36 @@ class NonWoodProductionStats
 {
     public function forYear(int $year, ?int $cdkId = null): array
     {
+        return $this->forYears([$year], $cdkId)[$year] ?? [];
+    }
+
+    public function forYears(array $years, ?int $cdkId = null): array
+    {
+        $years = array_values(array_unique(array_map('intval', $years)));
+        if ($years === []) {
+            return [];
+        }
+
         // Read raw units: enum casting would reject historical, unknown values.
         $rows = DB::table('hasil_hutan_bukan_kayu_details as d')
             ->join('hasil_hutan_bukan_kayu as h', 'd.hasil_hutan_bukan_kayu_id', '=', 'h.id')
             ->leftJoin('m_bukan_kayu as c', 'd.bukan_kayu_id', '=', 'c.id')
-            ->where('h.year', $year)
+            ->whereIn('h.year', $years)
             ->where('h.status', 'final')
             ->whereNull('h.deleted_at')
             ->when($cdkId !== null, fn ($q) => $q->where('h.cdk_id', $cdkId))
-            ->selectRaw('h.forest_type, h.month, d.unit, d.bukan_kayu_id as commodity_id, c.name as commodity_name, SUM(d.annual_volume_realization) as total')
-            ->groupBy('h.forest_type', 'h.month', 'd.unit', 'd.bukan_kayu_id', 'c.name')
+            ->selectRaw('h.year, h.forest_type, h.month, d.unit, d.bukan_kayu_id as commodity_id, c.name as commodity_name, SUM(d.annual_volume_realization) as total')
+            ->groupBy('h.year', 'h.forest_type', 'h.month', 'd.unit', 'd.bukan_kayu_id', 'c.name')
             // Preserve original unknown units even with a case-insensitive MySQL collation.
             ->groupByRaw('HEX(d.unit)')
             ->get();
 
-        return $this->aggregate($rows);
+        $result = [];
+        foreach ($rows->groupBy('year') as $year => $yearRows) {
+            $result[(int) $year] = $this->aggregate($yearRows);
+        }
+
+        return $result;
     }
 
     public function aggregate(iterable $rows): array

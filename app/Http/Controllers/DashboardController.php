@@ -297,10 +297,33 @@ class DashboardController extends Controller
         ]);
     }
 
+    private function resolvePublicCdkId($requestedCdkId): ?int
+    {
+        $user = auth()->user();
+        if ($user && !$user->isAdminProvinsi()) {
+            return $user->cdk_id === null ? null : (int) $user->cdk_id;
+        }
+
+        return $requestedCdkId ? (int) $requestedCdkId : null;
+    }
+
+    private function publicDashboardRealtimeConfig(): ?array
+    {
+        if (config('broadcasting.default') !== 'reverb') {
+            return null;
+        }
+
+        return [
+            'key' => config('broadcasting.connections.reverb.key'),
+            'host' => config('reverb.client.host'),
+            'port' => config('reverb.client.port'),
+        ];
+    }
+
     public function publicDashboard(Request $request)
     {
         $currentYear = $request->input('year', date('Y'));
-        $cdkId = $request->input('cdk_id');
+        $cdkId = $this->resolvePublicCdkId($request->input('cdk_id'));
 
         // Generate current year and 5 years back
         $thisYear = (int) date('Y');
@@ -314,6 +337,7 @@ class DashboardController extends Controller
             'availableYears' => $availableYears,
             'selectedCdkId' => $cdkId ? (int) $cdkId : null,
             'cdks' => $cdks,
+            'realtime' => $this->publicDashboardRealtimeConfig(),
             'stats' => [
                 'pembinaan' => $this->getPembinaanStats($currentYear, $cdkId),
                 'perlindungan' => $this->getPerlindunganStats($currentYear, $cdkId),
@@ -329,24 +353,27 @@ class DashboardController extends Controller
     {
         $thisYear = (int) date('Y');
         $years = range($thisYear, 2021);
-        $cdkId = $request->input('cdk_id');
+        $cdkId = $this->resolvePublicCdkId($request->input('cdk_id'));
 
         $cacheCdkId = $cdkId ?? 'all';
-        $cacheKey = 'public_yoy_dashboard_stats_v2_' . $thisYear . '_' . $cacheCdkId;
+        $cacheKey = 'public_yoy_dashboard_stats_v3_' . $thisYear . '_' . $cacheCdkId;
 
         // Fetch all active CDKs for guest dropdown
         $cdks = \App\Models\Cdk::where('is_active', true)->get(['id', 'nama']);
 
-        $stats = Cache::remember($cacheKey, 600, function () use ($years, $cdkId) {
+        $stats = Cache::remember($cacheKey, 300, function () use ($years, $cdkId) {
             // Ambil data kepegawaian YoY sekaligus (1 query)
             $kepegawaianYoY = $this->getKepegawaianYoYStats($years, $cdkId);
+            $missingBinaYears = array_values(array_filter($years, fn ($year) => !Cache::has($this->binaUsahaCacheKey($year, $cdkId))));
+            $nonWoodByYear = $missingBinaYears === [] ? [] : app(\App\Services\NonWoodProductionStats::class)
+                ->forYears($missingBinaYears, $cdkId ? (int) $cdkId : null);
 
             $result = [];
             foreach ($years as $year) {
                 $result[$year] = [
                     'pembinaan' => $this->getPembinaanStats($year, $cdkId),
                     'perlindungan' => $this->getPerlindunganStats($year, $cdkId),
-                    'bina_usaha' => $this->getBinaUsahaStats($year, $cdkId),
+                    'bina_usaha' => $this->getBinaUsahaStats($year, $cdkId, $nonWoodByYear[$year] ?? []),
                     'kelembagaan_ps' => $this->getKelembagaanPsStats($year, $cdkId),
                     'kelembagaan_hr' => $this->getKelembagaanHrStats($year, $cdkId),
                     'kepegawaian' => $kepegawaianYoY[$year] ?? [],
@@ -359,6 +386,7 @@ class DashboardController extends Controller
             'years' => $years,
             'selectedCdkId' => $cdkId ? (int) $cdkId : null,
             'cdks' => $cdks,
+            'realtime' => $this->publicDashboardRealtimeConfig(),
             'stats' => $stats
         ]);
     }
@@ -366,18 +394,18 @@ class DashboardController extends Controller
     private function getPembinaanStats($currentYear, $cdkId = null)
     {
         $cacheCdkId = $cdkId ?? 'all';
-        return Cache::remember("pembinaan_stats_{$currentYear}_{$cacheCdkId}", 300, function () use ($currentYear, $cdkId) {
+        return Cache::remember("pembinaan_stats_v2_{$currentYear}_{$cacheCdkId}", 300, function () use ($currentYear, $cdkId) {
             // Helper for standard rehab stats
             $getStats = function ($modelClass, $tableName) use ($currentYear, $cdkId) {
                 $baseQuery = $modelClass::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final');
+                $monthly = (clone $baseQuery)->selectRaw('month, sum(realization) as realization, sum(target_annual) as target')
+                    ->groupBy('month')->get()->keyBy('month');
 
                 return [
-                    'total' => (float) (clone $baseQuery)->sum('realization'),
-                    'target_total' => (float) (clone $baseQuery)->sum('target_annual'),
-                    'chart' => $this->fillMonths((clone $baseQuery)->selectRaw('month, sum(realization) as total')
-                        ->groupBy('month')->orderBy('month')->pluck('total', 'month')),
-                    'target_chart' => $this->fillMonths((clone $baseQuery)->selectRaw('month, sum(target_annual) as total')
-                        ->groupBy('month')->orderBy('month')->pluck('total', 'month')),
+                    'total' => (float) $monthly->sum('realization'),
+                    'target_total' => (float) $monthly->sum('target'),
+                    'chart' => $this->fillMonths($monthly->map(fn ($row) => $row->realization)),
+                    'target_chart' => $this->fillMonths($monthly->map(fn ($row) => $row->target)),
                     'fund' => SumberDana::leftJoin($tableName, function ($join) use ($tableName, $currentYear, $cdkId) {
                         $join->on('m_sumber_dana.name', '=', "$tableName.fund_source")
                             ->where("$tableName.year", '=', $currentYear)
@@ -421,26 +449,21 @@ class DashboardController extends Controller
             // 1.4 RHL Teknis (Optimized with SQL joins)
             $rhlBase = RhlTeknis::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final');
 
-            $rhlTeknisTotal = RhlTeknis::forCdk($cdkId)->join('rhl_teknis_details', 'rhl_teknis.id', '=', 'rhl_teknis_details.rhl_teknis_id')
-                ->where('rhl_teknis.year', $currentYear)
-                ->where('rhl_teknis.status', 'final')
-                ->sum('rhl_teknis_details.unit_amount');
-
-            $rhlTeknisTargetTotal = (clone $rhlBase)->sum('target_annual');
-
-            $rhlTeknisChart = $this->fillMonths(RhlTeknis::forCdk($cdkId)->join('rhl_teknis_details', 'rhl_teknis.id', '=', 'rhl_teknis_details.rhl_teknis_id')
+            $rhlRealizationMonthly = RhlTeknis::forCdk($cdkId)->join('rhl_teknis_details', 'rhl_teknis.id', '=', 'rhl_teknis_details.rhl_teknis_id')
                 ->where('rhl_teknis.year', $currentYear)
                 ->where('rhl_teknis.status', 'final')
                 ->selectRaw('month, sum(rhl_teknis_details.unit_amount) as total')
                 ->groupBy('month')
-                ->orderBy('month')
-                ->pluck('total', 'month'));
+                ->pluck('total', 'month');
 
-            $rhlTeknisTargetChart = $this->fillMonths((clone $rhlBase)
+            $rhlTargetMonthly = (clone $rhlBase)
                 ->selectRaw('month, sum(target_annual) as total')
                 ->groupBy('month')
-                ->orderBy('month')
-                ->pluck('total', 'month'));
+                ->pluck('total', 'month');
+            $rhlTeknisTotal = (float) $rhlRealizationMonthly->sum();
+            $rhlTeknisTargetTotal = (float) $rhlTargetMonthly->sum();
+            $rhlTeknisChart = $this->fillMonths($rhlRealizationMonthly);
+            $rhlTeknisTargetChart = $this->fillMonths($rhlTargetMonthly);
 
             $rhlTeknisFund = SumberDana::leftJoin('rhl_teknis', function ($join) use ($currentYear, $cdkId) {
                 $join->on('m_sumber_dana.name', '=', 'rhl_teknis.fund_source')
@@ -509,24 +532,19 @@ class DashboardController extends Controller
     private function getPerlindunganStats($currentYear, $cdkId = null)
     {
         $cacheCdkId = $cdkId ?? 'all';
-        return Cache::remember("perlindungan_stats_{$currentYear}_{$cacheCdkId}", 300, function () use ($currentYear, $cdkId) {
+        return Cache::remember("perlindungan_stats_v2_{$currentYear}_{$cacheCdkId}", 300, function () use ($currentYear, $cdkId) {
             // --- 2. Perlindungan Hutan ---
             // Kebakaran
-            $kebakaranStats = KebakaranHutan::forCdk($cdkId)->where('year', $currentYear)
-                ->where('status', 'final')
-                ->selectRaw('SUM(number_of_fires) as total_kejadian, SUM(fire_area) as total_area')
-                ->first();
-
             $kebakaranMonthlyRaw = KebakaranHutan::forCdk($cdkId)->where('year', $currentYear)
                 ->where('status', 'final')
                 ->selectRaw('month, sum(number_of_fires) as incidents, sum(fire_area) as area')
                 ->groupBy('month')
-                ->get();
+                ->get()->keyBy('month');
 
             $kebakaranChart = $this->fillMonths($kebakaranMonthlyRaw->pluck('incidents', 'month'));
             $kebakaranMonthlyData = [];
             for ($i = 1; $i <= 12; $i++) {
-                $item = $kebakaranMonthlyRaw->where('month', $i)->first();
+                $item = $kebakaranMonthlyRaw->get($i);
                 $kebakaranMonthlyData[$i] = [
                     'incidents' => (int) ($item->incidents ?? 0),
                     'area' => (float) ($item->area ?? 0),
@@ -543,20 +561,15 @@ class DashboardController extends Controller
                 ->keyBy('pengelola');
 
             // Wisata
-            $wisataStats = PengunjungWisata::forCdk($cdkId)->where('year', $currentYear)
-                ->where('status', 'final')
-                ->selectRaw('SUM(number_of_visitors) as total_visitors, SUM(gross_income) as total_income')
-                ->first();
-
             $wisataMonthlyRaw = PengunjungWisata::forCdk($cdkId)->where('year', $currentYear)
                 ->where('status', 'final')
                 ->selectRaw('month, sum(number_of_visitors) as visitors, sum(gross_income) as income')
                 ->groupBy('month')
-                ->get();
+                ->get()->keyBy('month');
 
             $wisataMonthlyStats = [];
             for ($i = 1; $i <= 12; $i++) {
-                $item = $wisataMonthlyRaw->where('month', $i)->first();
+                $item = $wisataMonthlyRaw->get($i);
                 $wisataMonthlyStats[$i] = [
                     'visitors' => (int) ($item->visitors ?? 0),
                     'income' => (float) ($item->income ?? 0),
@@ -573,46 +586,51 @@ class DashboardController extends Controller
                 ->keyBy('pengelola');
 
             return [
-                'kebakaran_kejadian' => (int) ($kebakaranStats->total_kejadian ?? 0),
-                'kebakaran_area' => (float) ($kebakaranStats->total_area ?? 0),
+                'kebakaran_kejadian' => (int) $kebakaranMonthlyRaw->sum('incidents'),
+                'kebakaran_area' => (float) $kebakaranMonthlyRaw->sum('area'),
                 'kebakaranChart' => $kebakaranChart,
                 'kebakaranMonthly' => $kebakaranMonthlyData,
                 'kebakaranByPengelola' => $kebakaranByPengelola,
-                'wisata_visitors' => (int) ($wisataStats->total_visitors ?? 0),
-                'wisata_income' => (float) ($wisataStats->total_income ?? 0),
+                'wisata_visitors' => (int) $wisataMonthlyRaw->sum('visitors'),
+                'wisata_income' => (float) $wisataMonthlyRaw->sum('income'),
                 'wisataMonthly' => $wisataMonthlyStats,
                 'wisataByPengelola' => $wisataByPengelola,
             ];
         });
     }
 
-    private function getBinaUsahaStats($currentYear, $cdkId = null)
+    private function binaUsahaCacheKey($year, $cdkId): string
     {
-        $cacheCdkId = $cdkId ?? 'all';
-        return Cache::remember("bina_usaha_stats_v2_{$currentYear}_{$cacheCdkId}", 300, function () use ($currentYear, $cdkId) {
+        return 'bina_usaha_stats_v3_' . $year . '_' . ($cdkId ?? 'all');
+    }
+
+    private function getBinaUsahaStats($currentYear, $cdkId = null, ?array $prefetchedNonWood = null)
+    {
+        return Cache::remember($this->binaUsahaCacheKey($currentYear, $cdkId), 300, function () use ($currentYear, $cdkId, $prefetchedNonWood) {
             // --- 3. Bina Usaha (Split into 5 categories) ---
             $forestTypes = ['Hutan Negara', 'Perhutanan Sosial', 'Hutan Rakyat'];
             $binaUsahaData = [];
-            $nonWoodByForest = app(\App\Services\NonWoodProductionStats::class)
+            $nonWoodByForest = $prefetchedNonWood ?? app(\App\Services\NonWoodProductionStats::class)
                 ->forYear((int) $currentYear, $cdkId ? (int) $cdkId : null);
 
-            // Optimization: Pre-fetch data for all types to minimize queries inside loop
-            $kayuTotals = HasilHutanKayu::forCdk($cdkId)->where('year', $currentYear)
-                ->where('status', 'final')
-                ->groupBy('forest_type')
-                ->pluck(DB::raw('sum(volume_target)'), 'forest_type');
-
+            // Read each wood series once for every forest type.
             $kayuMonthlyByForestType = HasilHutanKayu::forCdk($cdkId)->where('year', $currentYear)
                 ->where('status', 'final')
                 ->selectRaw('forest_type, month, sum(volume_target) as total')
                 ->groupBy('forest_type', 'month')
                 ->get()
                 ->groupBy('forest_type');
-
-            $bukanKayuTotals = HasilHutanBukanKayu::forCdk($cdkId)->where('year', $currentYear)
-                ->where('status', 'final')
-                ->groupBy('forest_type')
-                ->pluck(DB::raw('sum(volume_target)'), 'forest_type');
+            $kayuRealizationByForestType = HasilHutanKayu::forCdk($cdkId)
+                ->join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
+                ->where('hasil_hutan_kayu.year', $currentYear)->where('hasil_hutan_kayu.status', 'final')
+                ->selectRaw('hasil_hutan_kayu.forest_type, hasil_hutan_kayu.month, sum(hasil_hutan_kayu_details.volume_realization) as total')
+                ->groupBy('hasil_hutan_kayu.forest_type', 'hasil_hutan_kayu.month')->get()->groupBy('forest_type');
+            $kayuCommoditiesByForestType = HasilHutanKayu::forCdk($cdkId)
+                ->join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
+                ->join('m_kayu', 'hasil_hutan_kayu_details.kayu_id', '=', 'm_kayu.id')
+                ->where('hasil_hutan_kayu.year', $currentYear)->where('hasil_hutan_kayu.status', 'final')
+                ->selectRaw('hasil_hutan_kayu.forest_type, m_kayu.name as commodity, sum(hasil_hutan_kayu_details.volume_realization) as total')
+                ->groupBy('hasil_hutan_kayu.forest_type', 'm_kayu.name')->orderByDesc('total')->get()->groupBy('forest_type');
 
             // HHBK monthly realization (from details table)
             $bukanKayuMonthlyByForestType = HasilHutanBukanKayuDetail::join('hasil_hutan_bukan_kayu', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id', '=', 'hasil_hutan_bukan_kayu.id')
@@ -633,91 +651,53 @@ class DashboardController extends Controller
                 ->get()
                 ->groupBy('forest_type');
 
+            // Legacy HHBK fields retain their old meaning, but share grouped scans.
+            $nonBambooTargets = HasilHutanBukanKayu::forCdk($cdkId)->where('year', $currentYear)
+                ->where('status', 'final')
+                ->whereHas('details.bukanKayu', fn ($q) => $q->where('name', '!=', 'Bambu'))
+                ->selectRaw('forest_type, sum(volume_target) as total')->groupBy('forest_type')->pluck('total', 'forest_type');
+            $bambooTargets = HasilHutanBukanKayu::forCdk($cdkId)->where('year', $currentYear)
+                ->where('status', 'final')
+                ->whereHas('details.bukanKayu', fn ($q) => $q->where('name', 'Bambu'))
+                ->selectRaw('forest_type, sum(volume_target) as total')->groupBy('forest_type')->pluck('total', 'forest_type');
+            $legacyCommoditiesByForestType = HasilHutanBukanKayu::forCdk($cdkId)
+                ->join('hasil_hutan_bukan_kayu_details', 'hasil_hutan_bukan_kayu.id', '=', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id')
+                ->join('m_bukan_kayu', 'hasil_hutan_bukan_kayu_details.bukan_kayu_id', '=', 'm_bukan_kayu.id')
+                ->where('hasil_hutan_bukan_kayu.year', $currentYear)->where('hasil_hutan_bukan_kayu.status', 'final')
+                ->selectRaw('hasil_hutan_bukan_kayu.forest_type, m_bukan_kayu.name as commodity, sum(hasil_hutan_bukan_kayu_details.annual_volume_realization) as total')
+                ->groupBy('hasil_hutan_bukan_kayu.forest_type', 'm_bukan_kayu.name')
+                ->orderByDesc('total')->get()->groupBy('forest_type');
+            // These two legacy totals historically use the detail query without the parent model's auth scope.
+            $legacyRealizationTotals = HasilHutanBukanKayuDetail::join('hasil_hutan_bukan_kayu', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id', '=', 'hasil_hutan_bukan_kayu.id')
+                ->join('m_bukan_kayu', 'hasil_hutan_bukan_kayu_details.bukan_kayu_id', '=', 'm_bukan_kayu.id')
+                ->where('hasil_hutan_bukan_kayu.year', $currentYear)->where('hasil_hutan_bukan_kayu.status', 'final')
+                ->whereNull('hasil_hutan_bukan_kayu.deleted_at')
+                ->when($cdkId, fn ($q) => $q->where('hasil_hutan_bukan_kayu.cdk_id', $cdkId))
+                ->selectRaw("hasil_hutan_bukan_kayu.forest_type, sum(case when m_bukan_kayu.name != 'Bambu' then hasil_hutan_bukan_kayu_details.annual_volume_realization else 0 end) as non_bamboo_total, sum(case when m_bukan_kayu.name = 'Bambu' then hasil_hutan_bukan_kayu_details.annual_volume_realization else 0 end) as bamboo_total")
+                ->groupBy('hasil_hutan_bukan_kayu.forest_type')->get()->keyBy('forest_type');
+
             foreach ($forestTypes as $type) {
                 $key = strtolower(str_replace(' ', '_', $type));
                 $binaUsahaData[$key] = $nonWoodByForest[$key] ?? [
                     'bukan_kayu_by_unit' => [], 'bukan_kayu_unspecified' => [],
                 ];
 
-                // Kayu Realization (Sum from details)
-                $kayuRealization = HasilHutanKayu::forCdk($cdkId)->join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
-                    ->where('hasil_hutan_kayu.year', $currentYear)
-                    ->where('hasil_hutan_kayu.status', 'final')
-                    ->where('hasil_hutan_kayu.forest_type', $type)
-                    ->sum('hasil_hutan_kayu_details.volume_realization');
+                $woodMonthly = $kayuRealizationByForestType[$type] ?? collect();
+                $woodTargetMonthly = $kayuMonthlyByForestType[$type] ?? collect();
+                $binaUsahaData[$key]['kayu_total'] = (float) $woodMonthly->sum('total');
+                $binaUsahaData[$key]['kayu_target'] = (float) $woodTargetMonthly->sum('total');
+                $binaUsahaData[$key]['kayu_monthly'] = $this->fillMonths($woodMonthly->pluck('total', 'month'));
+                $binaUsahaData[$key]['kayu_target_monthly'] = $this->fillMonths($woodTargetMonthly->pluck('total', 'month'));
+                $binaUsahaData[$key]['kayu_commodity'] = ($kayuCommoditiesByForestType[$type] ?? collect())
+                    ->take(5)->pluck('total', 'commodity');
 
-                // Kayu Monthly Realization
-                $kayuMonthlyRealization = HasilHutanKayu::forCdk($cdkId)->join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
-                    ->where('hasil_hutan_kayu.year', $currentYear)
-                    ->where('hasil_hutan_kayu.status', 'final')
-                    ->where('hasil_hutan_kayu.forest_type', $type)
-                    ->selectRaw('month, sum(hasil_hutan_kayu_details.volume_realization) as total')
-                    ->groupBy('month')
-                    ->pluck('total', 'month');
-
-                $binaUsahaData[$key]['kayu_total'] = (float) $kayuRealization;
-                $binaUsahaData[$key]['kayu_target'] = (float) ($kayuTotals[$type] ?? 0);
-                $binaUsahaData[$key]['kayu_monthly'] = $this->fillMonths($kayuMonthlyRealization);
-                $binaUsahaData[$key]['kayu_target_monthly'] = $this->fillMonths(
-                    isset($kayuMonthlyByForestType[$type])
-                    ? $kayuMonthlyByForestType[$type]->pluck('total', 'month')
-                    : []
-                );
-
-                $binaUsahaData[$key]['kayu_commodity'] = HasilHutanKayu::forCdk($cdkId)->join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
-                    ->join('m_kayu', 'hasil_hutan_kayu_details.kayu_id', '=', 'm_kayu.id')
-                    ->where('hasil_hutan_kayu.year', $currentYear)
-                    ->where('hasil_hutan_kayu.status', 'final')
-                    ->where('hasil_hutan_kayu.forest_type', $type)
-                    ->selectRaw('m_kayu.name as commodity, sum(hasil_hutan_kayu_details.volume_realization) as total')
-                    ->groupBy('m_kayu.name')
-                    ->orderByDesc('total')
-                    ->limit(5)
-                    ->pluck('total', 'commodity');
-
-                // Legacy fields retained for compatibility only. Public dashboards use
-                // bukan_kayu_by_unit, without name-based exclusions or ambiguous targets.
-                // Bukan Kayu Target (Excluding Bambu)
-                $bukanKayuTarget = HasilHutanBukanKayu::forCdk($cdkId)->where('year', $currentYear)
-                    ->where('status', 'final')
-                    ->where('forest_type', $type)
-                    ->whereHas('details.bukanKayu', fn($q) => $q->where('name', '!=', 'Bambu'))
-                    ->sum('volume_target');
-
-                // Bukan Kayu Realization
-                $bukanKayuRealization = (float) HasilHutanBukanKayuDetail::join('hasil_hutan_bukan_kayu', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id', '=', 'hasil_hutan_bukan_kayu.id')
-                    ->join('m_bukan_kayu', 'hasil_hutan_bukan_kayu_details.bukan_kayu_id', '=', 'm_bukan_kayu.id')
-                    ->where('hasil_hutan_bukan_kayu.year', $currentYear)
-                    ->where('hasil_hutan_bukan_kayu.status', 'final')
-                    ->where('hasil_hutan_bukan_kayu.forest_type', $type)
-                    ->whereNull('hasil_hutan_bukan_kayu.deleted_at')
-                    ->where('m_bukan_kayu.name', '!=', 'Bambu')
-                    ->when($cdkId, fn($q) => $q->where('hasil_hutan_bukan_kayu.cdk_id', $cdkId))
-                    ->sum('hasil_hutan_bukan_kayu_details.annual_volume_realization');
-
-                $binaUsahaData[$key]['bukan_kayu_total'] = $bukanKayuRealization;
-                $binaUsahaData[$key]['bukan_kayu_target'] = (float) $bukanKayuTarget;
-
-                // Bambu Target
-                $bambuTarget = HasilHutanBukanKayu::forCdk($cdkId)->where('year', $currentYear)
-                    ->where('status', 'final')
-                    ->where('forest_type', $type)
-                    ->whereHas('details.bukanKayu', fn($q) => $q->where('name', 'Bambu'))
-                    ->sum('volume_target');
-
-                // Bambu Realization
-                $bambuRealization = (float) HasilHutanBukanKayuDetail::join('hasil_hutan_bukan_kayu', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id', '=', 'hasil_hutan_bukan_kayu.id')
-                    ->join('m_bukan_kayu', 'hasil_hutan_bukan_kayu_details.bukan_kayu_id', '=', 'm_bukan_kayu.id')
-                    ->where('hasil_hutan_bukan_kayu.year', $currentYear)
-                    ->where('hasil_hutan_bukan_kayu.status', 'final')
-                    ->where('hasil_hutan_bukan_kayu.forest_type', $type)
-                    ->whereNull('hasil_hutan_bukan_kayu.deleted_at')
-                    ->where('m_bukan_kayu.name', 'Bambu')
-                    ->when($cdkId, fn($q) => $q->where('hasil_hutan_bukan_kayu.cdk_id', $cdkId))
-                    ->sum('hasil_hutan_bukan_kayu_details.annual_volume_realization');
-
-                $binaUsahaData[$key]['bambu_total'] = $bambuRealization;
-                $binaUsahaData[$key]['bambu_target'] = (float) $bambuTarget;
+                // Compatibility fields retain their existing cross-unit meaning; public views use bukan_kayu_by_unit.
+                $legacyCommodities = $legacyCommoditiesByForestType[$type] ?? collect();
+                $legacyTotals = $legacyRealizationTotals->get($type);
+                $binaUsahaData[$key]['bukan_kayu_total'] = (float) ($legacyTotals->non_bamboo_total ?? 0);
+                $binaUsahaData[$key]['bukan_kayu_target'] = (float) ($nonBambooTargets[$type] ?? 0);
+                $binaUsahaData[$key]['bambu_total'] = (float) ($legacyTotals->bamboo_total ?? 0);
+                $binaUsahaData[$key]['bambu_target'] = (float) ($bambooTargets[$type] ?? 0);
 
                 $binaUsahaData[$key]['bukan_kayu_monthly'] = $this->fillMonths(
                     isset($bukanKayuMonthlyByForestType[$type])
@@ -731,20 +711,12 @@ class DashboardController extends Controller
                     : []
                 );
 
-                $binaUsahaData[$key]['bukan_kayu_commodity'] = HasilHutanBukanKayu::forCdk($cdkId)->join('hasil_hutan_bukan_kayu_details', 'hasil_hutan_bukan_kayu.id', '=', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id')
-                    ->join('m_bukan_kayu', 'hasil_hutan_bukan_kayu_details.bukan_kayu_id', '=', 'm_bukan_kayu.id')
-                    ->where('hasil_hutan_bukan_kayu.year', $currentYear)
-                    ->where('hasil_hutan_bukan_kayu.status', 'final')
-                    ->where('hasil_hutan_bukan_kayu.forest_type', $type)
-                    ->selectRaw('m_bukan_kayu.name as commodity, sum(hasil_hutan_bukan_kayu_details.annual_volume_realization) as total')
-                    ->groupBy('m_bukan_kayu.name')
-                    ->orderByDesc('total')
-                    ->limit(5)
-                    ->pluck('total', 'commodity');
+                $binaUsahaData[$key]['bukan_kayu_commodity'] = $legacyCommodities
+                    ->take(5)->pluck('total', 'commodity');
             }
 
-            // PBPHH
-            $pbphhStats = [
+            // PBPHH is independent of the selected year.
+            $pbphhStats = Cache::remember('pbphh_public_static_stats_v1_' . ($cdkId ?? 'all'), 300, fn () => [
                 'total_units' => Pbphh::forCdk($cdkId)->where('status', 'final')->count(),
                 'total_workers' => Pbphh::forCdk($cdkId)->where('status', 'final')->sum('number_of_workers'),
                 'total_investment' => Pbphh::forCdk($cdkId)->where('status', 'final')->sum('investment_value'),
@@ -768,30 +740,27 @@ class DashboardController extends Controller
                     ->orderByDesc('count')
                     ->get()
                     ->toArray()
-            ];
+            ]);
 
             // PNBP - Improved: Use DECIMAL for accurate summing of potential decimal values
             $pnbpRealizationSql = "CAST(pnbp_realization AS DECIMAL(15,2))";
+            $pnbpMonthlyRaw = RealisasiPnbp::forCdk($cdkId)->where('year', $currentYear)
+                ->where('status', 'final')
+                ->selectRaw("month, sum($pnbpRealizationSql) as realization, sum(pnbp_target) as target")
+                ->groupBy('month')->get()->keyBy('month');
+            $pnbpMonthly = [];
+            for ($i = 1; $i <= 12; $i++) {
+                $item = $pnbpMonthlyRaw->get($i);
+                $pnbpMonthly[$i] = [
+                    'realization' => (float) ($item->realization ?? 0),
+                    'target' => (float) ($item->target ?? 0),
+                ];
+            }
 
             $pnbpStats = [
-                'total_realization' => (float) RealisasiPnbp::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final')->sum(DB::raw($pnbpRealizationSql)),
-                'total_target' => (float) RealisasiPnbp::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final')->sum('pnbp_target'),
-                'monthly' => (function () use ($currentYear, $pnbpRealizationSql, $cdkId) {
-                    $raw = RealisasiPnbp::forCdk($cdkId)->where('year', $currentYear)
-                        ->where('status', 'final')
-                        ->selectRaw("month, sum($pnbpRealizationSql) as realization, sum(pnbp_target) as target")
-                        ->groupBy('month')
-                        ->get();
-                    $filled = [];
-                    for ($i = 1; $i <= 12; $i++) {
-                        $item = $raw->where('month', $i)->first();
-                        $filled[$i] = [
-                            'realization' => (float) ($item->realization ?? 0),
-                            'target' => (float) ($item->target ?? 0),
-                        ];
-                    }
-                    return $filled;
-                })(),
+                'total_realization' => (float) $pnbpMonthlyRaw->sum('realization'),
+                'total_target' => (float) $pnbpMonthlyRaw->sum('target'),
+                'monthly' => $pnbpMonthly,
                 'by_regency' => RealisasiPnbp::forCdk($cdkId)->join('m_regencies', 'realisasi_pnbp.regency_id', '=', 'm_regencies.id')
                     ->where('realisasi_pnbp.year', $currentYear)
                     ->where('realisasi_pnbp.status', 'final')
@@ -822,18 +791,11 @@ class DashboardController extends Controller
     {
         $cacheCdkId = $cdkId ?? 'all';
         // Cache static data (not dependent on year) for 10 minutes (600 seconds)
-        $staticStats = Cache::remember("kelembagaan_ps_static_stats_{$cacheCdkId}", 600, function () use ($cdkId) {
+        $staticStats = Cache::remember("kelembagaan_ps_static_stats_v2_{$cacheCdkId}", 600, function () use ($cdkId) {
             return [
                 'kelompok_count' => Skps::forCdk($cdkId)->where('status', 'final')->count(),
                 'area_total' => (float) Skps::forCdk($cdkId)->where('status', 'final')->sum('ps_area'),
                 'kk_total' => (int) Skps::forCdk($cdkId)->where('status', 'final')->sum('number_of_kk'),
-            ];
-        });
-
-        // Cache yearly data for 10 minutes (600 seconds)
-        $yearlyStats = Cache::remember("kelembagaan_ps_yearly_stats_{$currentYear}_{$cacheCdkId}", 600, function () use ($currentYear, $cdkId) {
-            return [
-                'nekon_total' => (float) NilaiEkonomi::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final')->sum('total_transaction_value'),
                 'scheme_distribution' => SkemaPerhutananSosial::leftJoin('skps', function ($join) use ($cdkId) {
                     $join->on('m_skema_perhutanan_sosial.id', '=', 'skps.id_skema_perhutanan_sosial')
                         ->where('skps.status', 'final')
@@ -843,6 +805,13 @@ class DashboardController extends Controller
                     ->groupBy('m_skema_perhutanan_sosial.id', 'm_skema_perhutanan_sosial.name')
                     ->orderByDesc('count')
                     ->get(),
+            ];
+        });
+
+        // Cache yearly data for 10 minutes (600 seconds)
+        $yearlyStats = Cache::remember("kelembagaan_ps_yearly_stats_v2_{$currentYear}_{$cacheCdkId}", 600, function () use ($currentYear, $cdkId) {
+            return [
+                'nekon_total' => (float) NilaiEkonomi::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final')->sum('total_transaction_value'),
                 'economic_by_regency' => NilaiEkonomi::forCdk($cdkId)->join('m_regencies', 'nilai_ekonomi.regency_id', '=', 'm_regencies.id')
                     ->where('nilai_ekonomi.year', $currentYear)
                     ->where('nilai_ekonomi.status', 'final')
@@ -1179,23 +1148,23 @@ class DashboardController extends Controller
     {
         $cacheCdkId = $cdkId ?? 'all';
         // Cache static data (not dependent on year) for 10 minutes (600 seconds)
-        $staticStats = Cache::remember("kelembagaan_hr_static_stats_{$cacheCdkId}", 600, function () use ($cdkId) {
+        $staticStats = Cache::remember("kelembagaan_hr_static_stats_v2_{$cacheCdkId}", 600, function () use ($cdkId) {
             return [
                 'kelompok_count' => PerkembanganKth::forCdk($cdkId)->where('status', 'final')->count(),
                 'area_total' => (float) PerkembanganKth::forCdk($cdkId)->where('status', 'final')->sum('luas_kelola'),
                 'anggota_total' => (int) PerkembanganKth::forCdk($cdkId)->where('status', 'final')->sum('jumlah_anggota'),
-            ];
-        });
-
-        // Cache yearly data for 10 minutes (600 seconds)
-        $yearlyStats = Cache::remember("kelembagaan_hr_yearly_stats_{$currentYear}_{$cacheCdkId}", 600, function () use ($currentYear, $cdkId) {
-            return [
-                'nte_total' => (float) NilaiTransaksiEkonomi::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final')->sum('total_nilai_transaksi'),
                 'class_distribution' => PerkembanganKth::forCdk($cdkId)->where('status', 'final')
                     ->selectRaw('kelas_kelembagaan as class_name, count(*) as count')
                     ->groupBy('kelas_kelembagaan')
                     ->orderByDesc('count')
                     ->get(),
+            ];
+        });
+
+        // Cache yearly data for 10 minutes (600 seconds)
+        $yearlyStats = Cache::remember("kelembagaan_hr_yearly_stats_v2_{$currentYear}_{$cacheCdkId}", 600, function () use ($currentYear, $cdkId) {
+            return [
+                'nte_total' => (float) NilaiTransaksiEkonomi::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final')->sum('total_nilai_transaksi'),
                 'economic_by_regency' => NilaiTransaksiEkonomi::forCdk($cdkId)->join('m_regencies', 'nilai_transaksi_ekonomi.regency_id', '=', 'm_regencies.id')
                     ->where('nilai_transaksi_ekonomi.year', $currentYear)
                     ->where('nilai_transaksi_ekonomi.status', 'final')

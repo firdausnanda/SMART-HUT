@@ -21,6 +21,11 @@ services:
       - RUN_MIGRATIONS=true          # Set to true to run migrations on startup
       - LOG_CHANNEL=${LOG_CHANNEL:-daily}  # Fallback to 'daily' if not set in .env
       - QUEUE_CONNECTION=database    # Ensure queue driver is database (not sync)
+      - CACHE_STORE=database
+      - BROADCAST_CONNECTION=reverb
+      - REVERB_HOST=reverb
+      - REVERB_PORT=8080
+      - REVERB_SCHEME=http
     env_file:
       - .env
     volumes:
@@ -56,11 +61,16 @@ services:
     container_name: kda-worker
     restart: unless-stopped
     # Override default entrypoint to run supervisor with the worker-only config
-    command: ["/usr/local/bin/entrypoint.sh", "supervisord", "-c", "/etc/supervisor/conf.d/worker.conf"]
+    command: ["supervisord", "-c", "/etc/supervisor/conf.d/worker.conf"]
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
       - QUEUE_CONNECTION=database    # Explicit override for worker container
+      - CACHE_STORE=database
+      - BROADCAST_CONNECTION=reverb
+      - REVERB_HOST=reverb
+      - REVERB_PORT=8080
+      - REVERB_SCHEME=http
     env_file:
       - .env
     volumes:
@@ -73,6 +83,30 @@ services:
       - laradock_net
     # Worker containers do not expose ports; no healthcheck needed via HTTP.
     # The supervisor process itself keeps workers alive (autorestart=true).
+
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kda-reverb
+    restart: unless-stopped
+    command: ["php", "/var/www/html/artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - RUN_MIGRATIONS=false
+      - CACHE_STORE=database
+      - QUEUE_CONNECTION=database
+      - BROADCAST_CONNECTION=reverb
+      - REVERB_HOST=reverb
+      - REVERB_PORT=8080
+      - REVERB_SCHEME=http
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - laradock_net
 
 volumes:
   kda-storage:

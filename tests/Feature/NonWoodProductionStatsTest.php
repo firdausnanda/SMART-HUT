@@ -116,4 +116,24 @@ class NonWoodProductionStatsTest extends TestCase
         $this->assertSame([], $service->forYear(2024));
         $this->assertSame([], $service->forYear(2026, 999));
     }
+
+    public function test_multiple_years_are_loaded_with_one_query_and_keep_years_separate(): void
+    {
+        $this->record('Hutan Negara', 'kg', 10);
+        $this->record('Hutan Negara', 'liter', 5, 2, ['year' => 2025]);
+        $this->record('Hutan Negara', 'kg', 20, 2, ['cdk_id' => 2]);
+        $this->record('Hutan Negara', 'kg', 30, 2, ['status' => 'draft']);
+        $this->record('Hutan Negara', 'kg', 40, 2, ['deleted_at' => '2026-01-01 00:00:00']);
+
+        $queries = 0;
+        DB::listen(function () use (&$queries) { $queries++; });
+        $result = app(NonWoodProductionStats::class)->forYears([2026, 2025, 2024], 1);
+
+        $this->assertSame(1, $queries);
+        $this->assertEquals(10, $result[2026]['hutan_negara']['bukan_kayu_by_unit'][0]['total']);
+        $this->assertSame('kg', $result[2026]['hutan_negara']['bukan_kayu_by_unit'][0]['unit']);
+        $this->assertEquals(5, $result[2025]['hutan_negara']['bukan_kayu_by_unit'][0]['total']);
+        $this->assertSame('liter', $result[2025]['hutan_negara']['bukan_kayu_by_unit'][0]['unit']);
+        $this->assertArrayNotHasKey(2024, $result);
+    }
 }

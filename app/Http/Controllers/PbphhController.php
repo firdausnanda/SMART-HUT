@@ -177,13 +177,15 @@ class PbphhController extends Controller
     ]);
 
     $data = collect($validated)->except('jenis_produksi')->toArray();
-    $pbphh->update($data);
+    DB::transaction(function () use ($pbphh, $data, $request) {
+      $pbphh->update($data);
 
-    $pivotData = [];
-    foreach ($request->jenis_produksi as $item) {
-      $pivotData[$item['jenis_produksi_id']] = ['kapasitas_ijin' => $item['kapasitas_ijin']];
-    }
-    $pbphh->jenis_produksi()->sync($pivotData);
+      $pivotData = [];
+      foreach ($request->jenis_produksi as $item) {
+        $pivotData[$item['jenis_produksi_id']] = ['kapasitas_ijin' => $item['kapasitas_ijin']];
+      }
+      $pbphh->jenis_produksi()->sync($pivotData);
+    });
 
     return redirect()->route('pbphh.index')
       ->with('success', 'Data berhasil diperbarui');

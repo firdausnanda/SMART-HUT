@@ -15,11 +15,13 @@ import YoYKepegawaianSlide from './Components/YoYKepegawaianSlide';
 
 // Utils
 import { truncateName } from './Components/utils';
+import useDashboardRealtime from './Components/useDashboardRealtime';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler);
 
-export default function PublicYoYDashboard({ years, stats, selectedCdkId, cdks }) {
+export default function PublicYoYDashboard({ years, stats, selectedCdkId, cdks, realtime }) {
   const { auth } = usePage().props;
+  useDashboardRealtime({ years, selectedCdkId, user: auth?.user, realtime });
   const [currentSlide, setCurrentSlide] = useState(0);
   const [autoPlaying, setAutoPlaying] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -82,21 +84,6 @@ export default function PublicYoYDashboard({ years, stats, selectedCdkId, cdks }
 
     return () => clearInterval(slideInterval);
   }, [modules.length, autoPlaying]);
-
-  // Data reload effect
-  useEffect(() => {
-    const reloadInterval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        router.reload({
-          only: ['stats'],
-          preserveScroll: true,
-          preserveState: true,
-        });
-      }
-    }, 5 * 60 * 1000); // 1 minute
-
-    return () => clearInterval(reloadInterval);
-  }, []);
 
   const commonOptions = useMemo(() => ({
     responsive: true,

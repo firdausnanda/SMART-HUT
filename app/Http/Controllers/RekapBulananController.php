@@ -14,6 +14,7 @@ use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class RekapBulananController extends Controller
 {
@@ -241,11 +242,10 @@ class RekapBulananController extends Controller
         $month = $rekap->periode_bulan;
 
         // Delete all related pegawais
-        RekapBulananPegawai::where('periode_tahun', $year)
-            ->where('periode_bulan', $month)
-            ->delete();
-
-        $rekap->delete();
+        DB::transaction(function () use ($year, $month, $rekap) {
+            $this->service->deleteSnapshotsForPeriod($year, $month);
+            $rekap->delete();
+        });
 
         return redirect()->route('rekap-bulanan.index')->with('success', "Rekap periode {$month}/{$year} berhasil dihapus.");
     }

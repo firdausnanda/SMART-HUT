@@ -17,11 +17,13 @@ import KepegawaianSlide from './Components/KepegawaianSlide';
 
 // Utils
 import { truncateName } from './Components/utils';
+import useDashboardRealtime from './Components/useDashboardRealtime';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement, Filler);
 
-export default function PublicDashboard({ currentYear, availableYears, stats, selectedCdkId, cdks }) {
+export default function PublicDashboard({ currentYear, availableYears, stats, selectedCdkId, cdks, realtime }) {
   const { auth } = usePage().props;
+  useDashboardRealtime({ years: [currentYear], selectedCdkId, user: auth?.user, realtime });
   const [currentSlide, setCurrentSlide] = useState(0);
   const [autoPlaying, setAutoPlaying] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,21 +71,6 @@ export default function PublicDashboard({ currentYear, availableYears, stats, se
     const interval = setInterval(nextSlide, 25000);
     return () => clearInterval(interval);
   }, [autoPlaying]);
-
-  // Auto-reload data every 5 minutes
-  useEffect(() => {
-    const reloadInterval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        router.reload({
-          only: ['stats'],
-          preserveScroll: true,
-          preserveState: true,
-        });
-      }
-    }, 5 * 60 * 1000); // 5 minutes
-
-    return () => clearInterval(reloadInterval);
-  }, []);
 
   const handleYearChange = (selectedOption) => {
     router.get(route('public.dashboard'), { year: selectedOption.value, cdk_id: selectedCdkId }, {

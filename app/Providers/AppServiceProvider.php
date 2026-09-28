@@ -21,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        foreach (\App\Services\PublicDashboardRealtime::observedModels() as $modelClass) {
+            $modelClass::observe(\App\Observers\PublicDashboardSourceObserver::class);
+        }
+
         if (config('app.env') === 'production') {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
