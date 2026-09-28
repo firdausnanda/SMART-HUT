@@ -28,6 +28,7 @@ class KupsProcessor extends BaseImportProcessor
         }
 
         return Kups::create([
+            'cdk_id' => $this->importCdkId,
             'regency_id' => $regency->id,
             'district_id' => $district->id,
             'nama_kups' => $row['nama_kups'],

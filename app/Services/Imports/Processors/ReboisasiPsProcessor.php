@@ -83,6 +83,7 @@ class ReboisasiPsProcessor extends BaseImportProcessor
         $sumberDana = !empty($row['sumber_dana']) ? strtolower(trim($row['sumber_dana'])) : 'other';
 
         $parent = ReboisasiPS::create([
+            'cdk_id'        => $this->importCdkId,
             'year'          => $row['tahun'],
             'month'         => $bulan,
             'province_id'   => 35,

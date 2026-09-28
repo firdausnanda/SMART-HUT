@@ -79,6 +79,7 @@ class KebakaranHutanProcessor extends BaseImportProcessor
         $luas = (float) str_replace(',', '.', (string) $luasStr);
 
         $parent = KebakaranHutan::create([
+            'cdk_id'              => $this->importCdkId,
             'year'                => $row['tahun'],
             'month'               => $bulan,
             'province_id'         => 35,

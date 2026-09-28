@@ -21,6 +21,7 @@ use App\Jobs\ProcessImportBatch;
 use App\Models\ImportBatch;
 use App\Imports\StagingImport;
 use App\Services\Imports\NilaiTransaksiEkonomiImportValidator;
+use App\Services\Imports\NilaiTransaksiEkonomiRepairService;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
 
@@ -387,6 +388,28 @@ class NilaiTransaksiEkonomiController extends Controller
   public function template()
   {
     return Excel::download(new NilaiTransaksiEkonomiTemplateExport, 'template_import_nilai_transaksi_ekonomi.xlsx');
+  }
+
+  public function previewImportedDataRepair(NilaiTransaksiEkonomiRepairService $repair)
+  {
+    return response()->json($repair->preview($this->repairScopeCdkId()));
+  }
+
+  public function repairImportedData(NilaiTransaksiEkonomiRepairService $repair)
+  {
+    return response()->json($repair->repair($this->repairScopeCdkId(), $this->user()->id));
+  }
+
+  private function repairScopeCdkId(): ?int
+  {
+    $user = $this->user();
+    if ($user->isAdminProvinsi()) {
+      return null;
+    }
+
+    abort_if($user->cdk_id === null, 403);
+
+    return (int) $user->cdk_id;
   }
 
   public function previewImport(Request $request)

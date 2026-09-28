@@ -38,6 +38,7 @@ class PenghijauanLingkunganProcessor extends BaseImportProcessor
         $realization = floatval(str_replace(',', '.', (string)($row['realisasi_ha'] ?? 0)));
 
         PenghijauanLingkungan::create([
+            'cdk_id' => $this->importCdkId,
             'year' => $row['tahun'],
             'month' => $row['bulan_angka'],
             'regency_id' => $regency?->id,

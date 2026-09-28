@@ -35,6 +35,7 @@ class PengunjungWisataProcessor extends BaseImportProcessor
         $grossIncome = floatval(str_replace(',', '.', (string)($row['pendapatan_bruto_rp'] ?? 0)));
 
         PengunjungWisata::create([
+            'cdk_id' => $this->importCdkId,
             'year' => $row['tahun'],
             'month' => $row['bulan_angka_1_12'],
             'id_pengelola_wisata' => $pengelolaWisataId,

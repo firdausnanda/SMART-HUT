@@ -7,11 +7,16 @@ use Illuminate\Support\Facades\DB;
 
 abstract class BaseImportProcessor
 {
+    protected ?int $importCdkId = null;
+
     /**
      * Process all valid staging rows from the batch and return count of imported records.
      */
     public function process(ImportBatch $batch): int
     {
+        $batch->loadMissing('user');
+        $this->importCdkId = $batch->user?->cdk_id;
+
         // Pre-load reference data ONCE for all rows (eliminates N+1 lookups)
         $this->bootReferenceCache();
 

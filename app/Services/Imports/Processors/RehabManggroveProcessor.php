@@ -64,6 +64,7 @@ class RehabManggroveProcessor extends BaseImportProcessor
         $bulan = $row['bulan_angka'] ?? $row['bulan_angka_1_12'] ?? null;
 
         $parent = RehabManggrove::create([
+            'cdk_id'      => $this->importCdkId,
             'year'        => $row['tahun'] ?? null,
             'month'       => $bulan,
             'province_id' => 35,

@@ -44,6 +44,7 @@ class PerkembanganKthProcessor extends BaseImportProcessor
         }
 
         PerkembanganKth::create([
+            'cdk_id' => $this->importCdkId,
             'year' => $row['tahun'],
             'month' => $bulanInfo,
             'nama_kth' => $row['nama_kth'],

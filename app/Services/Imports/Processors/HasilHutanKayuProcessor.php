@@ -91,6 +91,7 @@ class HasilHutanKayuProcessor extends BaseImportProcessor
         $volumeTarget = (float) str_replace(',', '.', (string) $volumeTargetStr);
 
         $parent = HasilHutanKayu::create([
+            'cdk_id'              => $this->importCdkId,
             'year'                => $row['tahun'],
             'month'               => $bulan,
             'province_id'         => 35,

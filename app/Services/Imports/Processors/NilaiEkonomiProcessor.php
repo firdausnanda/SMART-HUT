@@ -9,6 +9,7 @@ use App\Models\NilaiEkonomi;
 class NilaiEkonomiProcessor extends BaseImportProcessor
 {
     protected static $commodityCache = null;
+    private array $transactions = [];
 
     protected function bootReferenceCache(): void
     {
@@ -26,6 +27,7 @@ class NilaiEkonomiProcessor extends BaseImportProcessor
         self::$regencies = null;
         self::$districts = null;
         self::$commodityCache = null;
+        $this->transactions = [];
 
         return parent::process($batch);
     }
@@ -42,17 +44,31 @@ class NilaiEkonomiProcessor extends BaseImportProcessor
             return false;
         }
 
-        $transaction = NilaiEkonomi::create([
-            'year' => $row['tahun'],
-            'month' => $row['bulan_1_12'],
-            'nama_kelompok' => $row['nama_kelompok'],
-            'province_id' => 35,
-            'regency_id' => $regency->id,
-            'district_id' => $district->id,
-            'status' => 'draft',
-            'created_by' => $batch->user_id,
-            'total_transaction_value' => 0,
+        $namaKelompok = trim((string) $row['nama_kelompok']);
+        $groupKey = json_encode([
+            $this->importCdkId,
+            (int) $row['tahun'],
+            (int) $row['bulan_1_12'],
+            mb_strtolower(preg_replace('/\s+/u', ' ', $namaKelompok)),
+            $regency->id,
+            $district->id,
         ]);
+
+        if (!isset($this->transactions[$groupKey])) {
+            $this->transactions[$groupKey] = NilaiEkonomi::create([
+                'cdk_id' => $this->importCdkId,
+                'year' => $row['tahun'],
+                'month' => $row['bulan_1_12'],
+                'nama_kelompok' => $namaKelompok,
+                'province_id' => 35,
+                'regency_id' => $regency->id,
+                'district_id' => $district->id,
+                'status' => 'draft',
+                'created_by' => $batch->user_id,
+                'total_transaction_value' => 0,
+            ]);
+        }
+        $transaction = $this->transactions[$groupKey];
 
         $commodities = array_map('trim', explode(',', (string) ($row['komoditas'] ?? '')));
         $volumes = array_map('trim', explode(',', (string) ($row['volume_produksi'] ?? '')));

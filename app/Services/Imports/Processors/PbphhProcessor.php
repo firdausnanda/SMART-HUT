@@ -72,6 +72,7 @@ class PbphhProcessor extends BaseImportProcessor
 
         return DB::transaction(function () use ($row, $batch, $regency, $district, $pivotData, $presentCondition) {
             $pbphh = Pbphh::create([
+                'cdk_id' => $this->importCdkId,
                 'number' => $row['nomor_izin'] ?? '',
                 'name' => $row['nama_industri'] ?? '',
                 'province_id' => $regency->province_id ?? 35,

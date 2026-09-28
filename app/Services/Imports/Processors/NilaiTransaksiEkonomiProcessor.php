@@ -6,13 +6,14 @@ use App\Models\ImportBatch;
 use App\Models\NilaiTransaksiEkonomi;
 use App\Models\NilaiTransaksiEkonomiDetail;
 use App\Models\Commodity;
+use App\Services\Imports\NilaiTransaksiEkonomiGroupKey;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class NilaiTransaksiEkonomiProcessor extends BaseImportProcessor
 {
     protected static $villageCache = [];
     protected static $commodityCache = null;
+    private array $transactions = [];
 
     protected function bootReferenceCache(): void
     {
@@ -31,6 +32,7 @@ class NilaiTransaksiEkonomiProcessor extends BaseImportProcessor
         self::$districts = null;
         self::$villageCache = [];
         self::$commodityCache = null;
+        $this->transactions = [];
         
         return parent::process($batch);
     }
@@ -94,21 +96,34 @@ class NilaiTransaksiEkonomiProcessor extends BaseImportProcessor
         $village = $this->getVillage($district->id, $desaInfo);
         if (!$village) return false;
 
-        $transaction = NilaiTransaksiEkonomi::create([
-            'year'        => $row['tahun'],
-            'month'       => $bulanInfo,
-            'nama_kth'    => $row['nama_kth'],
-            'regency_id'  => $regency?->id,
-            'district_id' => $district?->id,
-            'village_id'  => $village?->id,
-            'province_id' => 35,
-            'status'      => 'draft',
-            'created_by'  => $batch->user_id,
-            'total_nilai_transaksi' => 0,
-        ]);
+        $namaKth = trim((string) $row['nama_kth']);
+        $groupKey = NilaiTransaksiEkonomiGroupKey::make(
+            $this->importCdkId,
+            (int) $row['tahun'],
+            (int) $bulanInfo,
+            $namaKth,
+            35,
+            (int) $regency->id,
+            (int) $district->id,
+            (int) $village->id,
+        );
 
-
-
+        if (!isset($this->transactions[$groupKey])) {
+            $this->transactions[$groupKey] = NilaiTransaksiEkonomi::create([
+                'cdk_id' => $this->importCdkId,
+                'year' => $row['tahun'],
+                'month' => $bulanInfo,
+                'nama_kth' => $namaKth,
+                'regency_id' => $regency->id,
+                'district_id' => $district->id,
+                'village_id' => $village->id,
+                'province_id' => 35,
+                'status' => 'draft',
+                'created_by' => $batch->user_id,
+                'total_nilai_transaksi' => 0,
+            ]);
+        }
+        $transaction = $this->transactions[$groupKey];
         $commodities = array_map('trim', explode(',', (string) ($row['komoditas'] ?? '')));
         $volumes     = array_map('trim', explode(',', (string) ($row['volume_produksi'] ?? '')));
         $satuans     = array_map('trim', explode(',', (string) ($row['satuan'] ?? '')));

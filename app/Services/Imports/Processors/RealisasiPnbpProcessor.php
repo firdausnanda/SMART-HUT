@@ -53,6 +53,7 @@ class RealisasiPnbpProcessor extends BaseImportProcessor
         $realisasi = (float) str_replace(',', '.', (string) $realisasiStr);
 
         $parent = RealisasiPnbp::create([
+            'cdk_id'                   => $this->importCdkId,
             'year'                     => $row['tahun'],
             'month'                    => $bulan,
             'province_id'              => $regency->province_id ?? 35,
