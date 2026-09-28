@@ -79,7 +79,7 @@ Route::controller(PerkembanganKthController::class)->prefix('perkembangan-kth')-
 Route::controller(NilaiTransaksiEkonomiController::class)->prefix('nilai-transaksi-ekonomi')->name('nilai-transaksi-ekonomi.')->group(function () {
     Route::middleware(['permission:nilai-transaksi-ekonomi.import', 'permission:nilai-transaksi-ekonomi.delete'])->group(function () {
         Route::get('repair-imported-data/preview', 'previewImportedDataRepair')->name('repair-preview');
-        Route::post('repair-imported-data', 'repairImportedData')->name('repair-imported-data');
+        Route::get('repair-imported-data', 'repairImportedData')->name('repair-imported-data');
     });
     Route::middleware('permission:nilai-transaksi-ekonomi.edit')->group(function () {
         Route::post('{nilai_transaksi_ekonomi}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
