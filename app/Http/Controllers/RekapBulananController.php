@@ -264,6 +264,12 @@ class RekapBulananController extends Controller
 
         $workflowAction = WorkflowAction::from($request->action);
 
+        match ($workflowAction) {
+            WorkflowAction::SUBMIT => $this->authorize('demografi-pegawai.edit'),
+            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('demografi-pegawai.approve'),
+            WorkflowAction::DELETE => $this->authorize('demografi-pegawai.delete'),
+        };
+
         if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
             return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');
         }
@@ -307,6 +313,12 @@ class RekapBulananController extends Controller
             : RekapBulananPegawai::class;
 
         $workflowAction = WorkflowAction::from($request->action);
+
+        match ($workflowAction) {
+            WorkflowAction::SUBMIT => $this->authorize('demografi-pegawai.edit'),
+            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('demografi-pegawai.approve'),
+            WorkflowAction::DELETE => $this->authorize('demografi-pegawai.delete'),
+        };
 
         if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
             return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');

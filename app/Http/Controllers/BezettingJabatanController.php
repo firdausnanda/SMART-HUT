@@ -14,7 +14,7 @@ class BezettingJabatanController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:kepegawaian.create')->only(['store']); // Bezetting uses store for creating from modal
+        $this->middleware('permission:bezetting-jabatan.create')->only(['store']); // Bezetting uses store for creating from modal
     }
     public function index(Request $request)
     {
@@ -96,9 +96,9 @@ class BezettingJabatanController extends Controller
         $workflowAction = WorkflowAction::from($request->action);
 
         match ($workflowAction) {
-            WorkflowAction::SUBMIT => $this->authorize('kepegawaian.edit'),
-            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kepegawaian.approve'),
-            WorkflowAction::DELETE => $this->authorize('kepegawaian.delete'),
+            WorkflowAction::SUBMIT => $this->authorize('bezetting-jabatan.edit'),
+            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('bezetting-jabatan.approve'),
+            WorkflowAction::DELETE => $this->authorize('bezetting-jabatan.delete'),
         };
 
         if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
@@ -143,9 +143,9 @@ class BezettingJabatanController extends Controller
         $workflowAction = WorkflowAction::from($request->action);
 
         match ($workflowAction) {
-            WorkflowAction::SUBMIT => $this->authorize('kepegawaian.edit'),
-            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('kepegawaian.approve'),
-            WorkflowAction::DELETE => $this->authorize('kepegawaian.delete'),
+            WorkflowAction::SUBMIT => $this->authorize('bezetting-jabatan.edit'),
+            WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('bezetting-jabatan.approve'),
+            WorkflowAction::DELETE => $this->authorize('bezetting-jabatan.delete'),
         };
 
         if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {

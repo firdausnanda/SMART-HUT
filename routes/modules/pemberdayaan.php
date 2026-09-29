@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 // === SKPS ===
 Route::controller(SkpsController::class)->prefix('skps')->name('skps.')->group(function () {
-    Route::middleware('permission:skps.edit')->group(function () {
+    Route::middleware('permission:skps.edit|skps.approve|skps.delete')->group(function () {
         Route::post('{skp}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });
@@ -29,7 +29,7 @@ Route::controller(SkpsController::class)->prefix('skps')->name('skps.')->group(f
 
 // === KUPS ===
 Route::controller(KupsController::class)->prefix('kups')->name('kups.')->group(function () {
-    Route::middleware('permission:kups.edit')->group(function () {
+    Route::middleware('permission:kups.edit|kups.approve|kups.delete')->group(function () {
         Route::post('{kup}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });
@@ -45,7 +45,7 @@ Route::controller(KupsController::class)->prefix('kups')->name('kups.')->group(f
 
 // === NILAI EKONOMI ===
 Route::controller(NilaiEkonomiController::class)->prefix('nilai-ekonomi')->name('nilai-ekonomi.')->group(function () {
-    Route::middleware('permission:nilai-ekonomi.edit')->group(function () {
+    Route::middleware('permission:nilai-ekonomi.edit|nilai-ekonomi.approve|nilai-ekonomi.delete')->group(function () {
         Route::post('{nilai_ekonomi}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });
@@ -61,7 +61,7 @@ Route::controller(NilaiEkonomiController::class)->prefix('nilai-ekonomi')->name(
 
 // === PERKEMBANGAN KTH ===
 Route::controller(PerkembanganKthController::class)->prefix('perkembangan-kth')->name('perkembangan-kth.')->group(function () {
-    Route::middleware('permission:perkembangan-kth.edit')->group(function () {
+    Route::middleware('permission:perkembangan-kth.edit|perkembangan-kth.approve|perkembangan-kth.delete')->group(function () {
         Route::post('{perkembangan_kth}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });
@@ -79,9 +79,9 @@ Route::controller(PerkembanganKthController::class)->prefix('perkembangan-kth')-
 Route::controller(NilaiTransaksiEkonomiController::class)->prefix('nilai-transaksi-ekonomi')->name('nilai-transaksi-ekonomi.')->group(function () {
     Route::middleware(['permission:nilai-transaksi-ekonomi.import', 'permission:nilai-transaksi-ekonomi.delete'])->group(function () {
         Route::get('repair-imported-data/preview', 'previewImportedDataRepair')->name('repair-preview');
-        Route::get('repair-imported-data', 'repairImportedData')->name('repair-imported-data');
+        Route::post('repair-imported-data', 'repairImportedData')->name('repair-imported-data');
     });
-    Route::middleware('permission:nilai-transaksi-ekonomi.edit')->group(function () {
+    Route::middleware('permission:nilai-transaksi-ekonomi.edit|nilai-transaksi-ekonomi.approve|nilai-transaksi-ekonomi.delete')->group(function () {
         Route::post('{nilai_transaksi_ekonomi}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });

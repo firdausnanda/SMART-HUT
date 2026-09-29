@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 // === REHAB LAHAN ===
 Route::controller(RehabLahanController::class)->prefix('rehab-lahan')->name('rehab-lahan.')->group(function () {
-    Route::middleware('permission:rehab-lahan.edit')->group(function () {
+    Route::middleware('permission:rehab-lahan.edit|rehab-lahan.approve|rehab-lahan.delete')->group(function () {
         Route::post('{rehab_lahan}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });
@@ -29,7 +29,7 @@ Route::controller(RehabLahanController::class)->prefix('rehab-lahan')->name('reh
 
 // === PENGHIJAUAN LINGKUNGAN ===
 Route::controller(PenghijauanLingkunganController::class)->prefix('penghijauan-lingkungan')->name('penghijauan-lingkungan.')->group(function () {
-    Route::middleware('permission:penghijauan-lingkungan.edit')->group(function () {
+    Route::middleware('permission:penghijauan-lingkungan.edit|penghijauan-lingkungan.approve|penghijauan-lingkungan.delete')->group(function () {
         Route::post('{penghijauan_lingkungan}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });
@@ -45,7 +45,7 @@ Route::controller(PenghijauanLingkunganController::class)->prefix('penghijauan-l
 
 // === REHAB MANGGROVE ===
 Route::controller(RehabManggroveController::class)->prefix('rehab-manggrove')->name('rehab-manggrove.')->group(function () {
-    Route::middleware('permission:rehab-manggrove.edit')->group(function () {
+    Route::middleware('permission:rehab-manggrove.edit|rehab-manggrove.approve|rehab-manggrove.delete')->group(function () {
         Route::post('{rehab_manggrove}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });
@@ -61,7 +61,7 @@ Route::controller(RehabManggroveController::class)->prefix('rehab-manggrove')->n
 
 // === RHL TEKNIS ===
 Route::controller(RhlTeknisController::class)->prefix('rhl-teknis')->name('rhl-teknis.')->group(function () {
-    Route::middleware('permission:rhl-teknis.edit')->group(function () {
+    Route::middleware('permission:rhl-teknis.edit|rhl-teknis.approve|rhl-teknis.delete')->group(function () {
         Route::post('{rhl_teknis}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });
@@ -77,7 +77,7 @@ Route::controller(RhlTeknisController::class)->prefix('rhl-teknis')->name('rhl-t
 
 // === REBOISASI PS ===
 Route::controller(ReboisasiPsController::class)->prefix('reboisasi-ps')->name('reboisasi-ps.')->group(function () {
-    Route::middleware('permission:reboisasi-ps.edit')->group(function () {
+    Route::middleware('permission:reboisasi-ps.edit|reboisasi-ps.approve|reboisasi-ps.delete')->group(function () {
         Route::post('{reboisasi_ps}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });

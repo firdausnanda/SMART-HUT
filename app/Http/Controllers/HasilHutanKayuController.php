@@ -495,13 +495,14 @@ class HasilHutanKayuController extends Controller
 
     $workflowAction = WorkflowAction::from($request->action);
 
-    $firstModel = \App\Models\HasilHutanKayu::find($request->ids[0]);
-
-    match ($workflowAction) {
-      WorkflowAction::SUBMIT => $this->authorizeForestType($firstModel->forest_type, 'edit'),
-      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorizeForestType($firstModel->forest_type, 'approve'),
-      WorkflowAction::DELETE => $this->authorizeForestType($firstModel->forest_type, 'delete'),
+    $permissionAction = match ($workflowAction) {
+      WorkflowAction::SUBMIT => 'edit',
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => 'approve',
+      WorkflowAction::DELETE => 'delete',
     };
+    foreach (HasilHutanKayu::whereIn('id', $request->ids)->distinct()->pluck('forest_type') as $forestType) {
+      $this->authorizeForestType($forestType, $permissionAction);
+    }
 
     if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
       return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');

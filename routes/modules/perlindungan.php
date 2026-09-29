@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 // === KEBAKARAN HUTAN ===
 Route::controller(KebakaranHutanController::class)->prefix('kebakaran-hutan')->name('kebakaran-hutan.')->group(function () {
-    Route::middleware('permission:kebakaran-hutan.edit')->group(function () {
+    Route::middleware('permission:kebakaran-hutan.edit|kebakaran-hutan.approve|kebakaran-hutan.delete')->group(function () {
         Route::post('{kebakaran_hutan}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });
@@ -26,7 +26,7 @@ Route::controller(KebakaranHutanController::class)->prefix('kebakaran-hutan')->n
 
 // === PENGUNJUNG WISATA ===
 Route::controller(PengunjungWisataController::class)->prefix('pengunjung-wisata')->name('pengunjung-wisata.')->group(function () {
-    Route::middleware('permission:pengunjung-wisata.edit')->group(function () {
+    Route::middleware('permission:pengunjung-wisata.edit|pengunjung-wisata.approve|pengunjung-wisata.delete')->group(function () {
         Route::post('{pengunjung_wisata}/single-workflow-action', 'singleWorkflowAction')->name('single-workflow-action');
         Route::post('bulk-workflow-action', 'bulkWorkflowAction')->name('bulk-workflow-action');
     });

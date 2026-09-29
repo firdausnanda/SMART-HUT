@@ -28,7 +28,7 @@ Route::put('demografi-pegawai/riwayat-kgb/{riwayat_kgb}', [DemografiPegawaiContr
 Route::delete('demografi-pegawai/riwayat-kgb/{riwayat_kgb}', [DemografiPegawaiController::class, 'destroyKgb'])->middleware('permission:demografi-pegawai.delete')->name('demografi-pegawai.kgb.destroy');
 
 // --- Bezetting Jabatan ---
-Route::middleware('permission:bezetting-jabatan.edit')->group(function () {
+Route::middleware('permission:bezetting-jabatan.edit|bezetting-jabatan.approve|bezetting-jabatan.delete')->group(function () {
     Route::post('bezetting-jabatan/{bezetting_jabatan}/single-workflow-action', [BezettingJabatanController::class, 'singleWorkflowAction'])->name('bezetting-jabatan.single-workflow-action');
     Route::post('bezetting-jabatan/bulk-workflow-action', [BezettingJabatanController::class, 'bulkWorkflowAction'])->name('bezetting-jabatan.bulk-workflow-action');
 });
@@ -44,15 +44,15 @@ Route::get('proyeksi-gaji', [ProyeksiGajiController::class, 'index'])->middlewar
 
 // --- Rekap Kepegawaian Bulanan ---
 Route::prefix('rekap-bulanan')->name('rekap-bulanan.')->group(function () {
-    Route::get('/', [RekapBulananController::class, 'index'])->middleware('permission:rekap-bulanan.view')->name('index');
-    Route::get('/{year}/{month}', [RekapBulananController::class, 'show'])->middleware('permission:rekap-bulanan.view')->name('show');
-    Route::get('/{year}/{month}/pegawai', [RekapBulananController::class, 'showPegawai'])->middleware('permission:rekap-bulanan.view')->name('show-pegawai');
-    Route::post('/generate', [RekapBulananController::class, 'generate'])->middleware('permission:rekap-bulanan.create')->name('generate');
-    Route::get('/export/{year}/{month}', [RekapBulananController::class, 'export'])->middleware('permission:rekap-bulanan.export')->name('export');
-    Route::get('/export-bezetting/{year}/{month}', [RekapBulananController::class, 'exportBezetting'])->middleware('permission:rekap-bulanan.export')->name('export-bezetting');
-    Route::middleware('permission:rekap-bulanan.edit')->group(function () {
+    Route::get('/', [RekapBulananController::class, 'index'])->middleware('permission:demografi-pegawai.view')->name('index');
+    Route::get('/{year}/{month}', [RekapBulananController::class, 'show'])->middleware('permission:demografi-pegawai.view')->name('show');
+    Route::get('/{year}/{month}/pegawai', [RekapBulananController::class, 'showPegawai'])->middleware('permission:demografi-pegawai.view')->name('show-pegawai');
+    Route::post('/generate', [RekapBulananController::class, 'generate'])->middleware('permission:demografi-pegawai.create')->name('generate');
+    Route::get('/export/{year}/{month}', [RekapBulananController::class, 'export'])->middleware('permission:demografi-pegawai.export')->name('export');
+    Route::get('/export-bezetting/{year}/{month}', [RekapBulananController::class, 'exportBezetting'])->middleware('permission:demografi-pegawai.export')->name('export-bezetting');
+    Route::middleware('permission:demografi-pegawai.edit|demografi-pegawai.approve|demografi-pegawai.delete')->group(function () {
         Route::post('/{id}/single-workflow-action', [RekapBulananController::class, 'singleWorkflowAction'])->name('single-workflow-action');
         Route::post('/bulk-workflow-action', [RekapBulananController::class, 'bulkWorkflowAction'])->name('bulk-workflow-action');
     });
-    Route::delete('/{id}', [RekapBulananController::class, 'destroy'])->middleware('permission:rekap-bulanan.delete')->name('destroy');
+    Route::delete('/{id}', [RekapBulananController::class, 'destroy'])->middleware('permission:demografi-pegawai.delete')->name('destroy');
 });

@@ -62,7 +62,8 @@ RUN apk add --no-cache --virtual .build-deps \
     freetype-dev \
     libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) pdo_mysql gd zip bcmath opcache \
+    && docker-php-ext-install -j$(nproc) pdo_mysql gd zip bcmath opcache pcntl \
+    && php -r 'foreach (["SIGINT", "SIGTERM", "SIGTSTP"] as $signal) { if (!defined($signal)) { fwrite(STDERR, "Missing signal constant: $signal\n"); exit(1); } }' \
     && apk del .build-deps
 
 # Configure PHP Opcache for production
