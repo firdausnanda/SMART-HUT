@@ -3,14 +3,14 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\Concerns\UsesIsolatedForestryDatabase;
 use Tests\TestCase;
 
 class UserDeletionTest extends TestCase
 {
-    use DatabaseTransactions;
+    use UsesIsolatedForestryDatabase;
 
-    public function test_admin_can_delete_another_admin()
+    public function test_admin_cannot_delete_another_admin_of_equal_rank()
     {
         // Create an admin user who is the deleter
         $deleter = User::factory()->create();
@@ -23,12 +23,9 @@ class UserDeletionTest extends TestCase
         // Execute delete request
         $response = $this->actingAs($deleter)->delete(route('users.destroy', $targetUser->id));
 
-        // Assert redirect and success message
-        $response->assertRedirect(route('users.index'));
-        $response->assertSessionHas('success', 'User deleted successfully.');
-
-        // Assert target user is deleted from database
-        $this->assertDatabaseMissing('users', ['id' => $targetUser->id]);
+        $response->assertRedirect();
+        $response->assertSessionHas('error', 'Anda tidak dapat menghapus user dengan role yang setara atau lebih tinggi.');
+        $this->assertDatabaseHas('users', ['id' => $targetUser->id]);
     }
 
     public function test_non_admin_cannot_delete_admin()
@@ -45,7 +42,7 @@ class UserDeletionTest extends TestCase
         $response = $this->actingAs($deleter)->delete(route('users.destroy', $targetUser->id));
 
         // Assert redirect back with error message
-        $response->assertSessionHas('error', 'User dengan role admin tidak dapat dihapus oleh role lain.');
+        $response->assertSessionHas('error', 'Anda tidak dapat menghapus user dengan role yang setara atau lebih tinggi.');
 
         // Assert target user still exists in database
         $this->assertDatabaseHas('users', ['id' => $targetUser->id]);

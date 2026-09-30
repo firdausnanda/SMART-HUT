@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\ImportBatch;
 use App\Models\User;
-use App\Services\Imports\Processors\NilaiTransaksiEkonomiProcessor;
-use App\Services\Imports\NilaiTransaksiEkonomiRepairService;
+use Modules\Pemberdayaan\App\Services\Imports\Processors\NilaiTransaksiEkonomiProcessor;
+use Modules\Pemberdayaan\App\Services\Imports\NilaiTransaksiEkonomiRepairService;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;

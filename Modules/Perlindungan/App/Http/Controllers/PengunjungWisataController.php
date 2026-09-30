@@ -1,0 +1,347 @@
+<?php
+
+namespace Modules\Perlindungan\App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+
+use App\Models\PengunjungWisata;
+use App\Models\PengelolaWisata;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use App\Actions\SingleWorkflowAction;
+use App\Actions\BulkWorkflowAction;
+use App\Enums\WorkflowAction;
+use Illuminate\Validation\Rule;
+use App\Models\ImportBatch;
+use Maatwebsite\Excel\Validators\ValidationException;
+use Modules\Perlindungan\App\Imports\PengunjungWisataImport;
+use App\Jobs\ProcessImportBatch;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StagingImport;
+use Modules\Perlindungan\App\Services\Imports\PengunjungWisataImportValidator;
+use Modules\Perlindungan\App\Exports\PengunjungWisataExport;
+use Modules\Perlindungan\App\Exports\PengunjungWisataTemplateExport;
+use Illuminate\Support\Facades\Auth;
+
+class PengunjungWisataController extends Controller
+{
+  use \App\Traits\HandlesImportFailures;
+
+  public function index(Request $request)
+  {
+    $defaultYear = PengunjungWisata::max('year') ?? now()->year;
+    $selectedYear = $request->integer('year', $defaultYear);
+
+    $sortField = $request->query('sort', 'created_at');
+    $sortDirection = $request->query('direction', 'desc');
+
+    $datas = PengunjungWisata::query()
+      ->select([
+        'pengunjung_wisata.id',
+        'pengunjung_wisata.year',
+        'pengunjung_wisata.month',
+        'pengunjung_wisata.id_pengelola_wisata',
+        'pengunjung_wisata.number_of_visitors',
+        'pengunjung_wisata.gross_income',
+        'pengunjung_wisata.status',
+        'pengunjung_wisata.created_at',
+        'pengunjung_wisata.created_by',
+      ])
+      ->with([
+        'pengelolaWisata:id,name',
+        'creator:id,name'
+      ])
+      ->where('year', $selectedYear)
+
+      ->when($request->search, function ($q, $search) {
+        $q->whereHas('pengelolaWisata', fn($qq) => $qq->where('name', 'like', "{$search}%"));
+      })
+
+      ->when($sortField === 'pengelola', function ($q) use ($sortDirection) {
+        $q->leftJoin('m_pengelola_wisata', 'pengunjung_wisata.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
+          ->orderBy('m_pengelola_wisata.name', $sortDirection);
+      })
+
+      ->when($sortField !== 'pengelola', function ($q) use ($sortField, $sortDirection) {
+        $user = $this->user();
+
+        if ($sortField === 'created_at' && $sortDirection === 'desc') {
+          if ($user->hasRole('kacdk')) {
+            $q->orderByRaw("CASE WHEN status = 'waiting_cdk' THEN 0 ELSE 1 END");
+          } elseif ($user->hasRole('kasi')) {
+            $q->orderByRaw("CASE WHEN status = 'waiting_kasi' THEN 0 ELSE 1 END");
+          }
+        }
+
+        match ($sortField) {
+          'month' => $q->orderBy('month', $sortDirection),
+          'visitors' => $q->orderBy('number_of_visitors', $sortDirection),
+          'income' => $q->orderBy('gross_income', $sortDirection),
+          'status' => $q->orderBy('status', $sortDirection),
+          default => $q->orderBy('created_at', 'desc'),
+        };
+      })
+
+      ->paginate($request->integer('per_page', 10))
+      ->appends(request()->query());
+
+    $stats = cache()->remember(
+      "wisata-stats-{$selectedYear}",
+      300,
+      fn() => [
+        'total_visitors' => PengunjungWisata::where('year', $selectedYear)->where('status', 'final')->sum('number_of_visitors'),
+        'total_income' => PengunjungWisata::where('year', $selectedYear)->where('status', 'final')->sum('gross_income'),
+        'total_count' => PengunjungWisata::where('year', $selectedYear)->where('status', 'final')->count(),
+      ]
+    );
+
+    $availableYears = cache()->remember('wisata-years', 3600, function () {
+      $dbYears = PengunjungWisata::distinct()->pluck('year')->toArray();
+      $fixedYears = range(2025, 2021);
+      $years = array_unique(array_merge($dbYears, $fixedYears));
+      rsort($years);
+      return $years;
+    });
+
+    return Inertia::render('PengunjungWisata/Index', [
+      'datas' => $datas,
+      'stats' => $stats,
+      'filters' => [
+        'year' => (int) $selectedYear,
+        'search' => $request->search,
+        'sort' => $sortField,
+        'direction' => $sortDirection,
+        'per_page' => (int) $request->query('per_page', 10),
+      ],
+      'availableYears' => $availableYears,
+    ]);
+  }
+
+  public function create()
+  {
+    return Inertia::render('PengunjungWisata/Create', [
+      'pengelolaWisata' => PengelolaWisata::all()
+    ]);
+  }
+
+  public function store(Request $request)
+  {
+    $validated = $request->validate([
+      'year' => 'required|integer',
+      'month' => 'required|integer|min:1|max:12',
+      'id_pengelola_wisata' => 'required|exists:m_pengelola_wisata,id',
+      'number_of_visitors' => 'required|numeric',
+      'gross_income' => 'required|numeric',
+    ]);
+
+    PengunjungWisata::create($validated);
+
+    return redirect()->route('pengunjung-wisata.index')->with('success', 'Data Created Successfully');
+  }
+
+  public function edit(PengunjungWisata $pengunjungWisata)
+  {
+    return Inertia::render('PengunjungWisata/Edit', [
+      'data' => $pengunjungWisata->load('pengelolaWisata'),
+      'pengelolaWisata' => PengelolaWisata::all()
+    ]);
+  }
+
+  public function update(Request $request, PengunjungWisata $pengunjungWisata)
+  {
+    $validated = $request->validate([
+      'year' => 'required|integer',
+      'month' => 'required|integer|min:1|max:12',
+      'id_pengelola_wisata' => 'required|exists:m_pengelola_wisata,id',
+      'number_of_visitors' => 'required|numeric',
+      'gross_income' => 'required|numeric',
+    ]);
+
+    $pengunjungWisata->update($validated);
+
+    return redirect()->route('pengunjung-wisata.index')->with('success', 'Data Updated Successfully');
+  }
+
+  public function destroy(PengunjungWisata $pengunjungWisata)
+  {
+    $pengunjungWisata->delete();
+
+    return redirect()->route('pengunjung-wisata.index')->with('success', 'Data Deleted Successfully');
+  }
+
+  /**
+   * Single workflow action.
+   */
+  public function singleWorkflowAction(Request $request, PengunjungWisata $pengunjungWisata, SingleWorkflowAction $action)
+  {
+    $request->validate([
+      'action' => ['required', Rule::enum(WorkflowAction::class)],
+      'rejection_note' => 'nullable|string|max:255',
+    ]);
+
+    $workflowAction = WorkflowAction::from($request->action);
+
+    match ($workflowAction) {
+      WorkflowAction::SUBMIT => $this->authorize('pengunjung-wisata.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('pengunjung-wisata.approve'),
+      WorkflowAction::DELETE => $this->authorize('pengunjung-wisata.delete'),
+    };
+
+    if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
+      return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');
+    }
+
+    $extraData = [];
+    if ($request->filled('rejection_note')) {
+      $extraData['rejection_note'] = $request->rejection_note;
+    }
+
+    $success = $action->execute(
+      model: $pengunjungWisata,
+      action: $workflowAction,
+      user: $this->user(),
+      extraData: $extraData
+    );
+
+    if ($success) {
+      $message = match ($workflowAction) {
+        WorkflowAction::DELETE => 'dihapus',
+        WorkflowAction::SUBMIT => 'diajukan untuk verifikasi',
+        WorkflowAction::APPROVE => 'disetujui',
+        WorkflowAction::REJECT => 'ditolak',
+      };
+      return redirect()->back()->with('success', "Laporan berhasil {$message}.");
+    }
+
+    return redirect()->back()->with('error', 'Gagal memproses laporan atau status tidak sesuai.');
+  }
+
+  /**
+   * Export data to Excel.
+   */
+  public function export(Request $request)
+  {
+    $year = $request->query('year');
+    return Excel::download(new PengunjungWisataExport($year), 'pengunjung-wisata-' . date('Y-m-d') . '.xlsx');
+  }
+
+  /**
+   * Download import template.
+   */
+  public function template()
+  {
+    return Excel::download(new PengunjungWisataTemplateExport, 'template_import_pengunjung_wisata.xlsx');
+  }
+
+  /**
+   * Import data from Excel.
+   */
+  public function previewImport(Request $request)
+  {
+      $request->validate(['file' => 'required|mimes:xlsx,csv,xls']);
+      
+      $batch = ImportBatch::create([
+          'user_id' => Auth::id(),
+          'module_name' => 'pengunjung-wisata',
+          'filename' => $request->file('file')->getClientOriginalName(),
+          'status' => 'pending',
+      ]);
+
+      Excel::import(
+          new StagingImport($batch->id, new PengunjungWisataImportValidator()), 
+          $request->file('file')
+      );
+
+      return redirect()->route('pengunjung-wisata.show-preview', $batch->id);
+  }
+
+  public function showPreview(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'pengunjung-wisata') abort(404);
+
+      $rows = $batch->stagingRows()->paginate(50);
+      
+      return Inertia::render('PengunjungWisata/ImportPreview', [
+          'batch' => $batch,
+          'rows' => $rows
+      ]);
+  }
+
+  public function commitImport(ImportBatch $batch)
+  {
+      if ($batch->module_name !== 'pengunjung-wisata' || $batch->status !== 'pending') abort(400);
+      
+      $batch->update(['status' => 'processing']);
+      
+      ProcessImportBatch::dispatch($batch->id);
+      
+      return back();
+  }
+
+  public function import(Request $request)
+  {
+    $request->validate([
+      'file' => 'required|mimes:xlsx,csv,xls',
+    ]);
+
+    $import = new PengunjungWisataImport();
+
+    try {
+      Excel::import($import, $request->file('file'));
+    } catch (ValidationException $e) {
+      return redirect()->back()->with('import_errors', $this->mapImportFailures($e->failures()));
+    }
+
+    if ($import->failures()->isNotEmpty()) {
+      return redirect()->back()->with('import_errors', $this->mapImportFailures($import->failures()));
+    }
+
+    return redirect()->back()->with('success', 'Data berhasil diimport.');
+  }
+
+  public function bulkWorkflowAction(Request $request, BulkWorkflowAction $action)
+  {
+    $request->validate([
+      'ids' => 'required|array',
+      'ids.*' => 'exists:pengunjung_wisata,id',
+      'action' => ['required', Rule::enum(WorkflowAction::class)],
+      'rejection_note' => 'nullable|string|max:255',
+    ]);
+
+    $workflowAction = WorkflowAction::from($request->action);
+
+    match ($workflowAction) {
+      WorkflowAction::SUBMIT => $this->authorize('pengunjung-wisata.edit'),
+      WorkflowAction::APPROVE, WorkflowAction::REJECT => $this->authorize('pengunjung-wisata.approve'),
+      WorkflowAction::DELETE => $this->authorize('pengunjung-wisata.delete'),
+    };
+
+    if ($workflowAction === WorkflowAction::REJECT && !$request->filled('rejection_note')) {
+      return redirect()->back()->with('error', 'Catatan penolakan wajib diisi.');
+    }
+
+    $extraData = [];
+    if ($request->filled('rejection_note')) {
+      $extraData['rejection_note'] = $request->rejection_note;
+    }
+
+    $count = $action->execute(
+      model: PengunjungWisata::class,
+      action: $workflowAction,
+      ids: $request->ids,
+      user: $this->user(),
+      extraData: $extraData
+    );
+
+    $message = match ($workflowAction) {
+      WorkflowAction::DELETE => 'dihapus',
+      WorkflowAction::SUBMIT => 'diajukan',
+      WorkflowAction::APPROVE => 'disetujui',
+      WorkflowAction::REJECT => 'ditolak',
+    };
+
+    return redirect()->back()->with('success', "{$count} data berhasil {$message}.");
+  }
+}
+
+

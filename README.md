@@ -113,6 +113,14 @@ Ikuti langkah-langkah berikut untuk menjalankan aplikasi di lingkungan lokal And
 8. **Akses Aplikasi**
    Buka browser dan kunjungi `http://localhost:8000`.
 
+## 🗂️ Skema Database
+
+ERD dan petunjuk pembaruannya tersedia di [docs/database](docs/database/README.md). File DBML dikelompokkan menurut domain aplikasi dan dapat dibuat ulang dari skema MySQL pengembangan.
+
+## 🧪 Pengujian
+
+Gunakan PHP 8.3 dengan ekstensi `pdo_sqlite` aktif, lalu jalankan `php vendor/phpunit/phpunit/phpunit`. Konfigurasi PHPUnit memakai SQLite dalam memori dan menolak cache konfigurasi aplikasi agar tes tidak mengakses database pada `.env`. Jika `bootstrap/cache/config.php` ada, jalankan `php artisan config:clear` sebelum tes.
+
 ## 📄 Lisensi
 
 Aplikasi ini adalah perangkat lunak propertari. Hak cipta dilindungi undang-undang.

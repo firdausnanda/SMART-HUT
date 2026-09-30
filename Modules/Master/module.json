@@ -1,0 +1,11 @@
+{
+    "name": "Master",
+    "alias": "master",
+    "description": "Data master wilayah dan referensi bersama",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Master\\App\\Providers\\MasterServiceProvider"
+    ],
+    "files": []
+}

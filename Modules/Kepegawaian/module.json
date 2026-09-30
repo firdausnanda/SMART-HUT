@@ -1,0 +1,11 @@
+{
+    "name": "Kepegawaian",
+    "alias": "kepegawaian",
+    "description": "Kepegawaian: demografi pegawai, bezetting jabatan, proyeksi gaji, dan rekap bulanan",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Kepegawaian\\App\\Providers\\KepegawaianServiceProvider"
+    ],
+    "files": []
+}

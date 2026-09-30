@@ -3,14 +3,14 @@
 namespace Tests\Feature;
 
 use App\Events\PublicDashboardChanged;
-use App\Http\Controllers\DashboardController;
+use Modules\Dashboard\App\Http\Controllers\DashboardController;
 use App\Models\RehabLahan;
 use App\Models\Pbphh;
 use App\Models\RekapBulananPegawai;
 use App\Models\RekapStatistikBulanan;
 use App\Models\User;
 use App\Services\PublicDashboardRealtime;
-use App\Services\RekapKepegawaianService;
+use Modules\Kepegawaian\App\Services\RekapKepegawaianService;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;

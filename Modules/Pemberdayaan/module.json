@@ -1,0 +1,11 @@
+{
+    "name": "Pemberdayaan",
+    "alias": "pemberdayaan",
+    "description": "Pemberdayaan Masyarakat: SKPS, KUPS, Nilai Ekonomi, Perkembangan KTH, dan Nilai Transaksi Ekonomi",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Pemberdayaan\\App\\Providers\\PemberdayaanServiceProvider"
+    ],
+    "files": []
+}

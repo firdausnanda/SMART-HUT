@@ -2,21 +2,12 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class PublicDashboardTest extends TestCase
 {
-  use DatabaseTransactions;
-
-  public function test_public_dashboard_is_accessible()
+  public function test_public_dashboard_requires_authentication()
   {
-    $response = $this->get(route('public.dashboard'));
-
-    $response->assertStatus(200);
-    $response->assertInertia(
-      fn($page) => $page
-        ->component('Public/PublicDashboard')
-    );
+    $this->get(route('public.dashboard'))->assertRedirect(route('login'));
   }
 }

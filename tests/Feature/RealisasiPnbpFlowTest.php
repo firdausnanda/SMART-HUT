@@ -4,17 +4,17 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\RealisasiPnbp;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\Concerns\UsesIsolatedForestryDatabase;
 use Tests\TestCase;
 
 class RealisasiPnbpFlowTest extends TestCase
 {
-  use DatabaseTransactions;
+  use UsesIsolatedForestryDatabase;
 
   public function test_can_view_index()
   {
     $user = User::factory()->create();
-    $user->givePermissionTo('bina-usaha.view');
+    $user->givePermissionTo('realisasi-pnbp.view');
 
     $response = $this->actingAs($user)->get(route('realisasi-pnbp.index'));
     $response->assertStatus(200);
@@ -23,7 +23,7 @@ class RealisasiPnbpFlowTest extends TestCase
   public function test_can_create_realisasi_pnbp()
   {
     $user = User::factory()->create();
-    $user->givePermissionTo('bina-usaha.create');
+    $user->givePermissionTo('realisasi-pnbp.create');
 
     $pengelola = \App\Models\PengelolaWisata::factory()->create(['name' => 'Perhutani']);
 
@@ -31,7 +31,7 @@ class RealisasiPnbpFlowTest extends TestCase
       'year' => 2026,
       'month' => 5,
       'province_id' => 35,
-      'regency_id' => 3501, // Pacitan, assuming exists or using factory valid ID if checking logic
+      'regency_id' => 3501,
       'id_pengelola_wisata' => $pengelola->id,
       'types_of_forest_products' => 'Kayu Jati',
       'pnbp_target' => '1000000',
@@ -48,7 +48,7 @@ class RealisasiPnbpFlowTest extends TestCase
   public function test_can_update_realisasi_pnbp()
   {
     $user = User::factory()->create();
-    $user->givePermissionTo('bina-usaha.edit');
+    $user->givePermissionTo('realisasi-pnbp.edit');
 
     $item = RealisasiPnbp::factory()->create();
     $pengelola = \App\Models\PengelolaWisata::factory()->create(['name' => 'Masyarakat']);

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Http\Controllers\DashboardController;
+use Modules\Dashboard\App\Http\Controllers\DashboardController;
 use App\Models\User;
 use App\Services\NonWoodProductionStats;
 use Illuminate\Database\Schema\Blueprint;

@@ -1,0 +1,11 @@
+{
+    "name": "Dashboard",
+    "alias": "dashboard",
+    "description": "Dashboard internal dan publik, statistik lintas domain, dan ekspor ringkasan",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Dashboard\\App\\Providers\\DashboardServiceProvider"
+    ],
+    "files": []
+}

@@ -3,15 +3,17 @@
 namespace Tests\Feature;
 
 use App\Models\RealisasiPnbp;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Models\User;
+use Tests\Concerns\UsesIsolatedForestryDatabase;
 use Tests\TestCase;
 
 class RealisasiPnbpTest extends TestCase
 {
-  use DatabaseTransactions;
+  use UsesIsolatedForestryDatabase;
 
   public function test_can_create_realisasi_pnbp_with_factory()
   {
+    User::factory()->create();
     $realisasi = RealisasiPnbp::factory()->create();
 
     $this->assertDatabaseHas('realisasi_pnbp', [

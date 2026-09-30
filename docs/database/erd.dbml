@@ -1,0 +1,1108 @@
+// Struktur fisik database SMART-HUT; dibuat dengan php scripts/export-dbml.php.
+// Relasi Ref berasal dari foreign key MySQL. Relasi Eloquent tanpa constraint tidak otomatis muncul.
+
+Project SMART_HUT {
+  database_type: 'MySQL'
+  Note: 'Skema aktual database; kelompok tabel menunjukkan domain pemilik.'
+}
+
+// Master
+Table m_provinces {
+  id char(2) [pk]
+  name varchar(255) [not null]
+}
+
+Table m_regencies {
+  id char(4) [pk]
+  province_id char(2) [not null]
+  name varchar(255) [not null]
+}
+
+Table m_districts {
+  id char(7) [pk]
+  regency_id char(4) [not null]
+  name varchar(255) [not null]
+}
+
+Table m_villages {
+  id char(10) [pk]
+  district_id char(7) [not null]
+  name varchar(255) [not null]
+}
+
+Table m_bangunan_kta {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  description varchar(255)
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table m_sumber_dana {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table m_commodities {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  is_nilai_transaksi_ekonomi tinyint(1) [not null, default: 0]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table m_bukan_kayu {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table m_kayu {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table m_jenis_produksi {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table m_pengelola_wisata {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table m_pengelola_hutan {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table m_pengelola_ps {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table m_skema_perhutanan_sosial {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// Rhl
+Table rehab_lahan {
+  id "bigint unsigned" [pk, increment]
+  year year [not null]
+  month tinyint [not null]
+  province_id "bigint unsigned"
+  regency_id char(4)
+  district_id char(7)
+  village_id char(10)
+  target_annual decimal(15,2) [not null, default: 0.00]
+  realization decimal(15,2) [not null, default: 0.00]
+  fund_source varchar(255) [not null]
+  coordinates varchar(255)
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table penghijauan_lingkungan {
+  id "bigint unsigned" [pk, increment]
+  year year [not null]
+  month tinyint [not null]
+  target_annual decimal(15,2) [not null, default: 0.00]
+  realization decimal(15,2) [not null, default: 0.00]
+  fund_source varchar(255) [not null]
+  province_id "bigint unsigned"
+  regency_id char(4)
+  district_id char(7)
+  village_id char(10)
+  coordinates varchar(255)
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table rehab_manggrove {
+  id "bigint unsigned" [pk, increment]
+  year year [not null]
+  month tinyint [not null]
+  target_annual decimal(15,2) [not null, default: 0.00]
+  realization decimal(15,2) [not null, default: 0.00]
+  fund_source varchar(255) [not null]
+  province_id "bigint unsigned"
+  regency_id char(4)
+  district_id char(7)
+  village_id char(10)
+  coordinates varchar(255)
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table rhl_teknis {
+  id "bigint unsigned" [pk, increment]
+  year year [not null]
+  month tinyint [not null]
+  province_id "bigint unsigned"
+  regency_id char(4)
+  district_id char(7)
+  village_id char(10)
+  target_annual decimal(15,2) [not null, default: 0.00]
+  fund_source varchar(255) [not null]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table rhl_teknis_details {
+  id "bigint unsigned" [pk, increment]
+  rhl_teknis_id "bigint unsigned" [not null]
+  bangunan_kta_id "bigint unsigned"
+  unit_amount int [not null, default: 0]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table reboisasi_ps {
+  id "bigint unsigned" [pk, increment]
+  year year [not null]
+  month tinyint [not null]
+  target_annual decimal(15,2) [not null, default: 0.00]
+  realization decimal(15,2) [not null, default: 0.00]
+  fund_source varchar(255) [not null]
+  province_id "bigint unsigned"
+  regency_id char(4)
+  district_id char(7)
+  village_id char(10)
+  pengelola_id "bigint unsigned"
+  coordinates varchar(255)
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+// Perlindungan
+Table kebakaran_hutan {
+  id "bigint unsigned" [pk, increment]
+  year year [not null]
+  month tinyint [not null]
+  province_id "bigint unsigned"
+  regency_id char(4)
+  district_id char(7)
+  village_id char(10)
+  coordinates varchar(255)
+  id_pengelola_wisata varchar(255) [not null]
+  area_function varchar(255) [not null]
+  number_of_fires int [not null]
+  fire_area varchar(255) [not null]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table pengunjung_wisata {
+  id "bigint unsigned" [pk, increment]
+  year year [not null]
+  month tinyint [not null]
+  id_pengelola_wisata varchar(255) [not null]
+  number_of_visitors varchar(255) [not null]
+  gross_income varchar(255) [not null]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+// BinaUsaha
+Table hasil_hutan_kayu {
+  id "bigint unsigned" [pk, increment]
+  year year [not null]
+  month tinyint [not null]
+  province_id "bigint unsigned" [not null]
+  regency_id "bigint unsigned" [not null]
+  district_id "bigint unsigned"
+  pengelola_hutan_id "bigint unsigned"
+  pengelola_wisata_id "bigint unsigned"
+  forest_type "enum('Hutan Negara','Hutan Rakyat','Perhutanan Sosial')" [not null]
+  volume_target decimal(15,2) [not null, default: 0.00]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table hasil_hutan_kayu_details {
+  id "bigint unsigned" [pk, increment]
+  hasil_hutan_kayu_id "bigint unsigned" [not null]
+  kayu_id "bigint unsigned" [not null]
+  volume_realization decimal(15,2) [not null, default: 0.00]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table hasil_hutan_bukan_kayu {
+  id "bigint unsigned" [pk, increment]
+  year year [not null]
+  month tinyint [not null]
+  province_id "bigint unsigned" [not null]
+  regency_id "bigint unsigned" [not null]
+  district_id "bigint unsigned"
+  pengelola_hutan_id "bigint unsigned"
+  pengelola_wisata_id "bigint unsigned"
+  volume_target decimal(15,2) [not null, default: 0.00]
+  forest_type "enum('Hutan Negara','Hutan Rakyat','Perhutanan Sosial')" [not null]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table hasil_hutan_bukan_kayu_details {
+  id "bigint unsigned" [pk, increment]
+  hasil_hutan_bukan_kayu_id "bigint unsigned" [not null]
+  bukan_kayu_id "bigint unsigned" [not null]
+  annual_volume_realization decimal(10,2) [not null, default: 0.00]
+  unit varchar(255) [not null, default: 'Kg']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table pbphh {
+  id "bigint unsigned" [pk, increment]
+  province_id "bigint unsigned" [not null]
+  regency_id "bigint unsigned" [not null]
+  district_id "bigint unsigned" [not null]
+  name varchar(255) [not null]
+  number varchar(255) [not null]
+  investment_value varchar(255) [not null]
+  number_of_workers int [not null]
+  present_condition tinyint(1) [not null]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table pbphh_jenis_produksi {
+  id "bigint unsigned" [pk, increment]
+  pbphh_id "bigint unsigned" [not null]
+  jenis_produksi_id "bigint unsigned" [not null]
+  kapasitas_ijin decimal(15,2)
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table realisasi_pnbp {
+  id "bigint unsigned" [pk, increment]
+  year year [not null]
+  month tinyint [not null]
+  province_id "bigint unsigned" [not null]
+  regency_id "bigint unsigned" [not null]
+  types_of_forest_products varchar(255) [not null]
+  id_pengelola_wisata varchar(255) [not null]
+  pnbp_target varchar(255) [not null]
+  pnbp_realization varchar(255) [not null]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+// Pemberdayaan
+Table skps {
+  id "bigint unsigned" [pk, increment]
+  province_id "bigint unsigned" [not null]
+  regency_id "bigint unsigned" [not null]
+  district_id "bigint unsigned" [not null]
+  id_skema_perhutanan_sosial varchar(255) [not null]
+  nama_kelompok varchar(255)
+  potential text [not null]
+  ps_area decimal(15,2) [default: 0.00]
+  number_of_kk int [default: 0]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table kups {
+  id "bigint unsigned" [pk, increment]
+  province_id "bigint unsigned" [not null]
+  regency_id "bigint unsigned" [not null]
+  district_id "bigint unsigned" [not null]
+  nama_kups varchar(255)
+  category varchar(255) [not null]
+  commodity varchar(255) [not null]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table perkembangan_kth {
+  id "bigint unsigned" [pk, increment]
+  year year [not null]
+  month tinyint [not null]
+  province_id "bigint unsigned"
+  regency_id "bigint unsigned"
+  district_id "bigint unsigned"
+  village_id "bigint unsigned"
+  nama_kth varchar(255) [not null]
+  nomor_register varchar(255)
+  kelas_kelembagaan "enum('pemula','madya','utama')" [not null]
+  jumlah_anggota int [not null, default: 0]
+  luas_kelola decimal(15,2) [not null, default: 0.00]
+  potensi_kawasan text
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table nilai_ekonomi {
+  id "bigint unsigned" [pk, increment]
+  nama_kelompok varchar(255) [not null]
+  total_transaction_value decimal(19,2) [not null, default: 0.00]
+  year int [not null]
+  month int [not null]
+  province_id "bigint unsigned" [not null]
+  regency_id "bigint unsigned" [not null]
+  district_id "bigint unsigned" [not null]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table nilai_ekonomi_details {
+  id "bigint unsigned" [pk, increment]
+  nilai_ekonomi_id "bigint unsigned" [not null]
+  commodity_id "bigint unsigned" [not null]
+  production_volume decimal(15,2) [not null]
+  satuan varchar(255) [not null, default: 'Kg']
+  transaction_value decimal(19,2) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table nilai_transaksi_ekonomi {
+  id "bigint unsigned" [pk, increment]
+  year int [not null]
+  month int [not null]
+  province_id "bigint unsigned"
+  regency_id "bigint unsigned"
+  district_id "bigint unsigned"
+  village_id "bigint unsigned"
+  nama_kth varchar(255) [not null]
+  total_nilai_transaksi decimal(20,2) [not null, default: 0.00]
+  status "enum('draft','waiting_kasi','waiting_cdk','final','rejected')" [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table nilai_transaksi_ekonomi_details {
+  id "bigint unsigned" [pk, increment]
+  nilai_transaksi_ekonomi_id "bigint unsigned" [not null]
+  commodity_id "bigint unsigned" [not null]
+  volume_produksi decimal(15,2) [not null, default: 0.00]
+  satuan varchar(255) [not null, default: 'Kg']
+  nilai_transaksi decimal(20,2) [not null, default: 0.00]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// Kepegawaian
+Table pegawais {
+  id "bigint unsigned" [pk, increment]
+  nip varchar(255) [not null, unique]
+  nama_lengkap varchar(255) [not null]
+  tempat_lahir varchar(255) [not null]
+  tanggal_lahir date [not null]
+  jenis_kelamin "enum('L','P')" [not null]
+  agama varchar(255) [not null]
+  pendidikan_terakhir varchar(255) [not null]
+  status_pegawai varchar(255) [not null]
+  bezetting_id "bigint unsigned"
+  pangkat_golongan varchar(255)
+  tmt_cpns date
+  bup int [not null]
+  status_kedudukan varchar(255) [not null, default: 'Aktif']
+  nik varchar(255) [unique]
+  status_pernikahan varchar(255)
+  alamat text
+  tmt_pns date
+  unit_kerja varchar(255)
+  skpd varchar(255)
+  status "enum('draft','waiting_kasi','waiting_cdk','final','rejected')" [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table bezettings {
+  id "bigint unsigned" [pk, increment]
+  nama_jabatan varchar(255) [not null]
+  kebutuhan int [not null]
+  status "enum('draft','waiting_kasi','waiting_cdk','final','rejected')" [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+}
+
+Table riwayat_kgbs {
+  id "bigint unsigned" [pk, increment]
+  pegawai_id "bigint unsigned" [not null]
+  no_sk varchar(255) [not null]
+  tanggal_sk date [not null]
+  tmt_kgb date [not null]
+  gaji_pokok_baru bigint [not null]
+  tmt_kgb_berikutnya date [not null]
+  status "enum('draft','waiting_kasi','waiting_cdk','final','rejected')" [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table rekap_bulanan_pegawai {
+  id "bigint unsigned" [pk, increment]
+  pegawai_id "bigint unsigned" [not null]
+  periode_tahun int [not null]
+  periode_bulan int [not null]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  nip varchar(255) [not null]
+  nama_lengkap varchar(255) [not null]
+  status_pegawai varchar(255) [not null]
+  jenis_kelamin "enum('L','P')" [not null]
+  pendidikan_terakhir varchar(255) [not null]
+  pangkat_golongan varchar(255)
+  bezetting_id "bigint unsigned"
+  nama_jabatan_snapshot varchar(255)
+  unit_kerja varchar(255)
+  skpd varchar(255)
+  status_kedudukan varchar(255)
+  status_pernikahan varchar(255)
+  generasi varchar(255)
+  tanggal_lahir date
+  usia_per_periode int
+  tmt_cpns date
+  tmt_pns date
+  masa_kerja_tahun int
+  bup int
+  proyeksi_pensiun date
+  bulan_pensiun_tersisa int
+  gaji_pokok_terakhir bigint
+  tmt_kgb_berikutnya date
+  sumber_data varchar(255) [not null, default: 'manual']
+  created_at timestamp
+  updated_at timestamp
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+
+  indexes {
+    (pegawai_id, periode_tahun, periode_bulan) [unique]
+  }
+}
+
+Table rekap_statistik_bulanan {
+  id "bigint unsigned" [pk, increment]
+  periode_tahun int [not null]
+  periode_bulan int [not null]
+  status varchar(255) [not null, default: 'draft']
+  approved_by_kasi_at timestamp
+  approved_by_cdk_at timestamp
+  rejection_note text
+  total_pegawai_aktif int [not null, default: 0]
+  total_pns int [not null, default: 0]
+  total_pppk int [not null, default: 0]
+  total_honorer int [not null, default: 0]
+  total_laki int [not null, default: 0]
+  total_perempuan int [not null, default: 0]
+  total_pensiun_tahun_ini int [not null, default: 0]
+  total_pensiun_bulan_ini int [not null, default: 0]
+  total_pensiun_6_bulan int [not null, default: 0]
+  statistik_status_pegawai json
+  statistik_pendidikan json
+  statistik_golongan json
+  statistik_generasi json
+  statistik_status_pernikahan json
+  statistik_bezetting json
+  statistik_unit_kerja json
+  statistik_masa_kerja json
+  statistik_usia json
+  kgb_jatuh_bulan_ini int [not null, default: 0]
+  kgb_jatuh_3_bulan int [not null, default: 0]
+  dihasilkan_dari varchar(255) [not null, default: 'manual']
+  dihasilkan_pada timestamp
+  created_at timestamp
+  updated_at timestamp
+  created_by "bigint unsigned"
+  updated_by "bigint unsigned"
+  deleted_by "bigint unsigned"
+  deleted_at timestamp
+  cdk_id "bigint unsigned"
+
+  indexes {
+    (periode_tahun, periode_bulan) [unique]
+  }
+}
+
+// AksesDanOrganisasi
+Table users {
+  id "bigint unsigned" [pk, increment]
+  cdk_id "bigint unsigned"
+  google_id varchar(255)
+  name varchar(255) [not null]
+  email varchar(255) [not null, unique]
+  avatar varchar(255)
+  username varchar(255) [not null, unique]
+  jabatan varchar(255)
+  email_verified_at timestamp
+  password varchar(255)
+  remember_token varchar(100)
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table password_reset_tokens {
+  email varchar(255) [pk]
+  token varchar(255) [not null]
+  created_at timestamp
+}
+
+Table sessions {
+  id varchar(255) [pk]
+  user_id "bigint unsigned"
+  ip_address varchar(45)
+  user_agent text
+  payload longtext [not null]
+  last_activity int [not null]
+}
+
+Table roles {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  description varchar(255)
+  guard_name varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    (name, guard_name) [unique]
+  }
+}
+
+Table permissions {
+  id "bigint unsigned" [pk, increment]
+  name varchar(255) [not null]
+  description varchar(255)
+  guard_name varchar(255) [not null]
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    (name, guard_name) [unique]
+  }
+}
+
+Table model_has_roles {
+  role_id "bigint unsigned" [not null]
+  model_type varchar(255) [not null]
+  model_id "bigint unsigned" [not null]
+
+  indexes {
+    (role_id, model_id, model_type) [pk]
+  }
+}
+
+Table model_has_permissions {
+  permission_id "bigint unsigned" [not null]
+  model_type varchar(255) [not null]
+  model_id "bigint unsigned" [not null]
+
+  indexes {
+    (permission_id, model_id, model_type) [pk]
+  }
+}
+
+Table role_has_permissions {
+  permission_id "bigint unsigned" [not null]
+  role_id "bigint unsigned" [not null]
+
+  indexes {
+    (permission_id, role_id) [pk]
+  }
+}
+
+Table personal_access_tokens {
+  id "bigint unsigned" [pk, increment]
+  tokenable_type varchar(255) [not null]
+  tokenable_id "bigint unsigned" [not null]
+  name varchar(255) [not null]
+  token varchar(64) [not null, unique]
+  abilities text
+  last_used_at timestamp
+  expires_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table activity_log {
+  id "bigint unsigned" [pk, increment]
+  log_name varchar(255)
+  description text [not null]
+  subject_type varchar(255)
+  event varchar(255)
+  subject_id "bigint unsigned"
+  causer_type varchar(255)
+  causer_id "bigint unsigned"
+  properties json
+  batch_uuid char(36)
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table cdks {
+  id "bigint unsigned" [pk, increment]
+  kode varchar(255) [not null, unique]
+  nama varchar(255) [not null]
+  kepala_nama varchar(255)
+  alamat text
+  is_active tinyint(1) [not null, default: 1]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table cdk_regency {
+  cdk_id "bigint unsigned" [not null]
+  regency_id varchar(255) [not null]
+
+  indexes {
+    (cdk_id, regency_id) [pk]
+  }
+}
+
+// ImporBersama
+Table import_batches {
+  id char(36) [pk]
+  user_id "bigint unsigned" [not null]
+  module_name varchar(255) [not null]
+  filename varchar(255) [not null]
+  status "enum('pending','processing','completed','failed')" [not null, default: 'pending']
+  imported_count "int unsigned" [not null, default: 0]
+  error_message text
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table import_staging_rows {
+  id "bigint unsigned" [pk, increment]
+  import_batch_id char(36) [not null]
+  row_number int [not null]
+  data_payload json [not null]
+  status "enum('valid','invalid')" [not null, default: 'valid']
+  validation_errors json
+  created_at timestamp
+  updated_at timestamp
+}
+
+// Infrastruktur
+Table migrations {
+  id "int unsigned" [pk, increment]
+  migration varchar(255) [not null]
+  batch int [not null]
+}
+
+Table cache {
+  key varchar(255) [pk]
+  value mediumtext [not null]
+  expiration int [not null]
+}
+
+Table cache_locks {
+  key varchar(255) [pk]
+  owner varchar(255) [not null]
+  expiration int [not null]
+}
+
+Table jobs {
+  id "bigint unsigned" [pk, increment]
+  queue varchar(255) [not null]
+  payload longtext [not null]
+  attempts "tinyint unsigned" [not null]
+  reserved_at "int unsigned"
+  available_at "int unsigned" [not null]
+  created_at "int unsigned" [not null]
+}
+
+Table job_batches {
+  id varchar(255) [pk]
+  name varchar(255) [not null]
+  total_jobs int [not null]
+  pending_jobs int [not null]
+  failed_jobs int [not null]
+  failed_job_ids longtext [not null]
+  options mediumtext
+  cancelled_at int
+  created_at int [not null]
+  finished_at int
+}
+
+Table failed_jobs {
+  id "bigint unsigned" [pk, increment]
+  uuid varchar(255) [not null, unique]
+  connection text [not null]
+  queue text [not null]
+  payload longtext [not null]
+  exception longtext [not null]
+  failed_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+}
+
+Table pulse_values {
+  id "bigint unsigned" [pk, increment]
+  timestamp "int unsigned" [not null]
+  type varchar(255) [not null]
+  key mediumtext [not null]
+  key_hash binary(16)
+  value mediumtext [not null]
+
+  indexes {
+    (type, key_hash) [unique]
+  }
+}
+
+Table pulse_entries {
+  id "bigint unsigned" [pk, increment]
+  timestamp "int unsigned" [not null]
+  type varchar(255) [not null]
+  key mediumtext [not null]
+  key_hash binary(16)
+  value bigint
+}
+
+Table pulse_aggregates {
+  id "bigint unsigned" [pk, increment]
+  bucket "int unsigned" [not null]
+  period "mediumint unsigned" [not null]
+  type varchar(255) [not null]
+  key mediumtext [not null]
+  key_hash binary(16)
+  aggregate varchar(255) [not null]
+  value decimal(20,2) [not null]
+  count "int unsigned"
+
+  indexes {
+    (bucket, period, type, aggregate, key_hash) [unique]
+  }
+}
+
+// Kelompok domain; satu tabel hanya mempunyai satu pemilik dalam diagram ini.
+TableGroup Master {
+  m_provinces
+  m_regencies
+  m_districts
+  m_villages
+  m_bangunan_kta
+  m_sumber_dana
+  m_commodities
+  m_bukan_kayu
+  m_kayu
+  m_jenis_produksi
+  m_pengelola_wisata
+  m_pengelola_hutan
+  m_pengelola_ps
+  m_skema_perhutanan_sosial
+}
+
+TableGroup Rhl {
+  rehab_lahan
+  penghijauan_lingkungan
+  rehab_manggrove
+  rhl_teknis
+  rhl_teknis_details
+  reboisasi_ps
+}
+
+TableGroup Perlindungan {
+  kebakaran_hutan
+  pengunjung_wisata
+}
+
+TableGroup BinaUsaha {
+  hasil_hutan_kayu
+  hasil_hutan_kayu_details
+  hasil_hutan_bukan_kayu
+  hasil_hutan_bukan_kayu_details
+  pbphh
+  pbphh_jenis_produksi
+  realisasi_pnbp
+}
+
+TableGroup Pemberdayaan {
+  skps
+  kups
+  perkembangan_kth
+  nilai_ekonomi
+  nilai_ekonomi_details
+  nilai_transaksi_ekonomi
+  nilai_transaksi_ekonomi_details
+}
+
+TableGroup Kepegawaian {
+  pegawais
+  bezettings
+  riwayat_kgbs
+  rekap_bulanan_pegawai
+  rekap_statistik_bulanan
+}
+
+TableGroup AksesDanOrganisasi {
+  users
+  password_reset_tokens
+  sessions
+  roles
+  permissions
+  model_has_roles
+  model_has_permissions
+  role_has_permissions
+  personal_access_tokens
+  activity_log
+  cdks
+  cdk_regency
+}
+
+TableGroup ImporBersama {
+  import_batches
+  import_staging_rows
+}
+
+TableGroup Infrastruktur {
+  migrations
+  cache
+  cache_locks
+  jobs
+  job_batches
+  failed_jobs
+  pulse_values
+  pulse_entries
+  pulse_aggregates
+}
+
+// Foreign key yang benar-benar terdaftar di MySQL.
+Ref: bezettings.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: cdk_regency.cdk_id > cdks.id [delete: cascade, update: no action]
+Ref: hasil_hutan_bukan_kayu.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: hasil_hutan_bukan_kayu.pengelola_hutan_id > m_pengelola_hutan.id [delete: cascade, update: no action]
+Ref: hasil_hutan_bukan_kayu.pengelola_wisata_id > m_pengelola_wisata.id [delete: set null, update: no action]
+Ref: hasil_hutan_bukan_kayu_details.bukan_kayu_id > m_bukan_kayu.id [delete: cascade, update: no action]
+Ref: hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id > hasil_hutan_bukan_kayu.id [delete: cascade, update: no action]
+Ref: hasil_hutan_kayu.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: hasil_hutan_kayu.pengelola_wisata_id > m_pengelola_wisata.id [delete: set null, update: no action]
+Ref: hasil_hutan_kayu_details.hasil_hutan_kayu_id > hasil_hutan_kayu.id [delete: cascade, update: no action]
+Ref: hasil_hutan_kayu_details.kayu_id > m_kayu.id [delete: cascade, update: no action]
+Ref: import_batches.user_id > users.id [delete: cascade, update: no action]
+Ref: import_staging_rows.import_batch_id > import_batches.id [delete: cascade, update: no action]
+Ref: kebakaran_hutan.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: kups.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: m_districts.regency_id > m_regencies.id [delete: no action, update: no action]
+Ref: m_regencies.province_id > m_provinces.id [delete: no action, update: no action]
+Ref: m_villages.district_id > m_districts.id [delete: no action, update: no action]
+Ref: model_has_permissions.permission_id > permissions.id [delete: cascade, update: no action]
+Ref: model_has_roles.role_id > roles.id [delete: cascade, update: no action]
+Ref: nilai_ekonomi.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: nilai_ekonomi_details.commodity_id > m_commodities.id [delete: no action, update: no action]
+Ref: nilai_ekonomi_details.nilai_ekonomi_id > nilai_ekonomi.id [delete: cascade, update: no action]
+Ref: nilai_transaksi_ekonomi.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: nilai_transaksi_ekonomi_details.commodity_id > m_commodities.id [delete: no action, update: no action]
+Ref: nilai_transaksi_ekonomi_details.nilai_transaksi_ekonomi_id > nilai_transaksi_ekonomi.id [delete: cascade, update: no action]
+Ref: pbphh.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: pbphh_jenis_produksi.jenis_produksi_id > m_jenis_produksi.id [delete: cascade, update: no action]
+Ref: pbphh_jenis_produksi.pbphh_id > pbphh.id [delete: cascade, update: no action]
+Ref: pegawais.bezetting_id > bezettings.id [delete: set null, update: no action]
+Ref: pegawais.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: penghijauan_lingkungan.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: pengunjung_wisata.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: perkembangan_kth.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: realisasi_pnbp.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: reboisasi_ps.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: reboisasi_ps.pengelola_id > m_pengelola_ps.id [delete: set null, update: no action]
+Ref: rehab_lahan.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: rehab_manggrove.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: rekap_bulanan_pegawai.bezetting_id > bezettings.id [delete: set null, update: no action]
+Ref: rekap_bulanan_pegawai.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: rekap_bulanan_pegawai.created_by > users.id [delete: set null, update: no action]
+Ref: rekap_bulanan_pegawai.deleted_by > users.id [delete: set null, update: no action]
+Ref: rekap_bulanan_pegawai.pegawai_id > pegawais.id [delete: cascade, update: no action]
+Ref: rekap_bulanan_pegawai.updated_by > users.id [delete: set null, update: no action]
+Ref: rekap_statistik_bulanan.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: rekap_statistik_bulanan.created_by > users.id [delete: set null, update: no action]
+Ref: rekap_statistik_bulanan.deleted_by > users.id [delete: set null, update: no action]
+Ref: rekap_statistik_bulanan.updated_by > users.id [delete: set null, update: no action]
+Ref: rhl_teknis.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: rhl_teknis_details.bangunan_kta_id > m_bangunan_kta.id [delete: set null, update: no action]
+Ref: rhl_teknis_details.rhl_teknis_id > rhl_teknis.id [delete: cascade, update: no action]
+Ref: riwayat_kgbs.pegawai_id > pegawais.id [delete: cascade, update: no action]
+Ref: role_has_permissions.permission_id > permissions.id [delete: cascade, update: no action]
+Ref: role_has_permissions.role_id > roles.id [delete: cascade, update: no action]
+Ref: skps.cdk_id > cdks.id [delete: set null, update: no action]
+Ref: users.cdk_id > cdks.id [delete: set null, update: no action]

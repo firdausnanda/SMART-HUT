@@ -1,0 +1,11 @@
+{
+    "name": "Perlindungan",
+    "alias": "perlindungan",
+    "description": "Fitur perlindungan hutan: Kebakaran Hutan dan Pengunjung Wisata",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Perlindungan\\App\\Providers\\PerlindunganServiceProvider"
+    ],
+    "files": []
+}

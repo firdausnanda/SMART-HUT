@@ -1,0 +1,11 @@
+{
+    "name": "BinaUsaha",
+    "alias": "binausaha",
+    "description": "Bina Usaha Kehutanan: hasil hutan kayu, hasil hutan bukan kayu, PBPHH, dan realisasi PNBP",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\BinaUsaha\\App\\Providers\\BinaUsahaServiceProvider"
+    ],
+    "files": []
+}

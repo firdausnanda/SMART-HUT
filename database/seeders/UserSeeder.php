@@ -40,11 +40,17 @@ class UserSeeder extends Seeder
                 'password' => bcrypt($row[1]),
             ]);
 
+            if ($row[2] == 'peh' || $row[2] == 'pk') {
+                $user->assignRole('pelaksana');
+            } else {
+
+                $user->assignRole($row[2]);
+            }
+
+
             // Hanya assign role — permission dikelola via UI atau RoleSeeder
-            $user->assignRole($row[2]);
         }
 
         fclose($file);
     }
 }
-

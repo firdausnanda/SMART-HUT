@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\ImportBatch;
-use App\Services\Imports\Processors\KupsProcessor;
-use App\Services\Imports\Processors\NilaiEkonomiProcessor;
-use App\Services\Imports\Processors\SkpsProcessor;
+use Modules\Pemberdayaan\App\Services\Imports\Processors\KupsProcessor;
+use Modules\Pemberdayaan\App\Services\Imports\Processors\NilaiEkonomiProcessor;
+use Modules\Pemberdayaan\App\Services\Imports\Processors\SkpsProcessor;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;

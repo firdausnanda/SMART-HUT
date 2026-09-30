@@ -1,0 +1,11 @@
+{
+    "name": "Rhl",
+    "alias": "rhl",
+    "description": "Rehabilitasi hutan dan lahan: lima alur RHL",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Rhl\\App\\Providers\\RhlServiceProvider"
+    ],
+    "files": []
+}

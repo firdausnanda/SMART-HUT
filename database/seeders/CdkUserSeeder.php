@@ -79,7 +79,7 @@ class CdkUserSeeder extends Seeder
                 'password' => bcrypt('password123'),
                 'cdk_id' => $cdk->id,
             ]);
-            $pkUser->assignRole('pk');
+            $pkUser->assignRole('pelaksana');
             $pkUser->syncPermissions($operatorPermissions);
 
             // C. PEH (Pengendali Ekosistem Hutan)
@@ -91,7 +91,7 @@ class CdkUserSeeder extends Seeder
                 'password' => bcrypt('password123'),
                 'cdk_id' => $cdk->id,
             ]);
-            $pehUser->assignRole('peh');
+            $pehUser->assignRole('pelaksana');
             $pehUser->syncPermissions($operatorPermissions);
         }
     }
