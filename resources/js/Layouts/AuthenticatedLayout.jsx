@@ -1256,7 +1256,7 @@ export default function Authenticated({ user, header, children }) {
                                         <button className="flex items-center gap-3 px-3 py-2 rounded-xl border border-transparent hover:border-gray-100 hover:bg-gray-50/50 transition-all duration-300 group">
                                             <div className="hidden sm:flex flex-col text-right">
                                                 <span className="text-sm font-bold text-gray-800 group-hover:text-primary-700 transition-colors tracking-tight leading-none">{user.name}</span>
-                                                <span className="text-[10px] font-semibold text-gray-400 mt-1 uppercase tracking-wider uppercase">{user.roles_description || 'User'}</span>
+                                                <span className="text-[10px] font-semibold text-gray-400 mt-1 uppercase tracking-wider">{user.roles_description || 'User'}</span>
                                             </div>
                                             <div className="relative">
                                                 <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-primary-700 to-primary-500 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white group-hover:ring-primary-100 transition-all transform group-hover:scale-105 duration-300">

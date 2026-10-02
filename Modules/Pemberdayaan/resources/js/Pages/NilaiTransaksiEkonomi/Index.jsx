@@ -14,6 +14,7 @@ import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import LoadingOverlay from '@/Components/LoadingOverlay';
 import BulkActionToolbar from '@/Components/BulkActionToolbar';
+import ExportFilterModal from '@/Components/ExportFilterModal';
 
 const MySwal = withReactContent(Swal);
 
@@ -45,6 +46,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, com
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memproses...');
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [importFile, setImportFile] = useState(null);
 
   const formatLabel = (name) => {
@@ -518,7 +520,7 @@ export default function Index({ auth, datas, stats, filters, availableYears, com
               <div className="flex gap-2">
                 {canExport && (
                   <button
-                    onClick={() => window.location.href = route('nilai-transaksi-ekonomi.export', { year: params.year })}
+                    onClick={() => setShowExportModal(true)}
                     className="flex items-center gap-2 px-4 py-3 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -952,6 +954,15 @@ export default function Index({ auth, datas, stats, filters, availableYears, com
         isAdmin={isAdmin}
       />
 
+      <ExportFilterModal
+        show={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={(exportFilters) => { window.location.href = route('nilai-transaksi-ekonomi.export', exportFilters); }}
+        year={params.year}
+        years={availableYears}
+        defaultStatus="final"
+        commodities={commodities}
+      />
       <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
         <form onSubmit={handleImportSubmit} className="p-0 overflow-hidden">
           <div className="p-6 bg-slate-50 border-b border-gray-100 flex items-center justify-between">

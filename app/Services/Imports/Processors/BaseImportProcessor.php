@@ -84,14 +84,10 @@ abstract class BaseImportProcessor
     {
         $nameLower = strtolower(trim($name));
         foreach (static::$districts as $district) {
-            if ($regencyId && $district->regency_id !== $regencyId) continue;
+            if ($regencyId !== null && (int) $district->regency_id !== $regencyId) continue;
             if (str_contains(strtolower($district->name), $nameLower)) {
                 return $district;
             }
-        }
-        // Fallback: search without regency constraint
-        if ($regencyId) {
-            return $this->findDistrict($name, null);
         }
         return null;
     }

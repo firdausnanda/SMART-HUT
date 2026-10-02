@@ -12,10 +12,12 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class NilaiTransaksiEkonomiExport implements FromCollection, WithHeadings, WithMapping, WithStyles
 {
   protected $year;
+  protected array $filters;
 
-  public function __construct($year = null)
+  public function __construct($year = null, array $filters = [])
   {
     $this->year = $year;
+    $this->filters = $filters;
   }
 
   public function collection()
@@ -29,12 +31,19 @@ class NilaiTransaksiEkonomiExport implements FromCollection, WithHeadings, WithM
         'details.commodity' => fn($q) => $q->withoutGlobalScope('not_nilai_transaksi_ekonomi')
       ])
       ->when($this->year, fn($q) => $q->where('year', $this->year))
-      ->where('status', 'final')
+      ->when(($this->filters['status'] ?? 'final') !== 'all', fn($q) => $q->where('status', $this->filters['status'] ?? 'final'))
+      ->when($this->filters['month'] ?? null, fn($q, $month) => $q->where('month', $month))
+      ->when($this->filters['regency_id'] ?? null, fn($q, $id) => $q->where('regency_id', $id))
+      ->when($this->filters['district_id'] ?? null, fn($q, $id) => $q->where('district_id', $id))
+      ->when($this->filters['commodity_id'] ?? null, fn($q, $id) => $q->whereHas('details', fn($details) => $details->where('commodity_id', $id)))
       ->get();
 
     $rows = collect();
     foreach ($records as $record) {
       foreach ($record->details as $detail) {
+        if (($this->filters['commodity_id'] ?? null) && $detail->commodity_id != $this->filters['commodity_id']) {
+          continue;
+        }
         // Attach the parent record info to each detail for mapping
         $detail->parent = $record;
         $rows->push($detail);

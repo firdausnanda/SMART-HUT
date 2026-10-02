@@ -390,8 +390,14 @@ class HasilHutanKayuController extends Controller
     $forestType = $request->query('forest_type', 'Hutan Negara');
     $this->authorizeForestType($forestType, 'export');
     $this->authorizeForestType($forestType, 'view');
-    $year = $request->query('year');
-    return Excel::download(new HasilHutanKayuExport($forestType, $year), 'hasil-hutan-kayu-' . date('Y-m-d') . '.xlsx');
+    $filters = $request->validate([
+      'year' => 'nullable|integer|between:2000,2100',
+      'month' => 'nullable|integer|between:1,12',
+      'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+      'regency_id' => 'nullable|integer|min:1',
+      'district_id' => 'nullable|integer|min:1',
+    ]);
+    return Excel::download(new HasilHutanKayuExport($forestType, $filters['year'] ?? null, $filters), 'hasil-hutan-kayu-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template(Request $request)

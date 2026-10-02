@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import LoadingOverlay from '@/Components/LoadingOverlay';
 import BulkActionToolbar from '@/Components/BulkActionToolbar';
+import ExportFilterModal from '@/Components/ExportFilterModal';
 
 const MySwal = withReactContent(Swal);
 
@@ -21,6 +22,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memproses...');
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [importFile, setImportFile] = useState(null);
   const formatNumber = (num) => new Intl.NumberFormat('id-ID').format(num);
 
@@ -432,7 +434,7 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
   };
 
   const handleExport = () => {
-    window.location.href = route('hasil-hutan-kayu.export', { forest_type, year });
+    setShowExportModal(true);
   };
 
   const handleImportSubmit = (e) => {
@@ -898,6 +900,13 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
         isAdmin={isAdmin}
       />
 
+      <ExportFilterModal
+        show={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={(exportFilters) => { window.location.href = route('hasil-hutan-kayu.export', { forest_type, ...exportFilters }); }}
+        year={year}
+        years={yearOptions}
+      />
       <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
         <form onSubmit={handleImportSubmit} className="p-0 overflow-hidden">
           <div className="p-6 bg-slate-50 border-b border-gray-100 flex items-center justify-between">

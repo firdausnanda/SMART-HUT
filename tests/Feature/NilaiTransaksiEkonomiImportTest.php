@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\ImportBatch;
 use App\Models\User;
+use Modules\Pemberdayaan\App\Exports\NilaiTransaksiEkonomiExport;
 use Modules\Pemberdayaan\App\Services\Imports\Processors\NilaiTransaksiEkonomiProcessor;
 use Modules\Pemberdayaan\App\Services\Imports\NilaiTransaksiEkonomiRepairService;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,6 +14,45 @@ use Tests\TestCase;
 
 class NilaiTransaksiEkonomiImportTest extends TestCase
 {
+    public function test_transaction_export_filters_status_period_location_and_commodity(): void
+    {
+        $matchingId = null;
+        foreach ([
+            [2025, 4, 1, 2, 3, 'final', 1],
+            [2025, 4, 1, 2, 3, 'draft', 1],
+            [2025, 5, 1, 2, 3, 'draft', 1],
+            [2025, 4, 9, 2, 3, 'draft', 1],
+            [2025, 4, 1, 2, 3, 'draft', 2],
+            [2024, 4, 1, 2, 3, 'draft', 1],
+        ] as [$year, $month, $regency, $district, $village, $status, $commodity]) {
+            $id = DB::table('nilai_transaksi_ekonomi')->insertGetId([
+                'year' => $year, 'month' => $month, 'province_id' => 35,
+                'regency_id' => $regency, 'district_id' => $district, 'village_id' => $village,
+                'nama_kth' => 'Uji', 'status' => $status,
+            ]);
+            DB::table('nilai_transaksi_ekonomi_details')->insert([
+                'nilai_transaksi_ekonomi_id' => $id, 'commodity_id' => $commodity,
+                'volume_produksi' => 1, 'satuan' => 'kg', 'nilai_transaksi' => 100,
+            ]);
+            if ($year === 2025 && $month === 4 && $regency === 1 && $status === 'draft' && $commodity === 1) {
+                $matchingId = $id;
+            }
+        }
+        DB::table('nilai_transaksi_ekonomi_details')->insert([
+            'nilai_transaksi_ekonomi_id' => $matchingId, 'commodity_id' => 2,
+            'volume_produksi' => 1, 'satuan' => 'kg', 'nilai_transaksi' => 100,
+        ]);
+
+        $filtered = (new NilaiTransaksiEkonomiExport(2025, [
+            'month' => 4, 'status' => 'draft', 'regency_id' => 1,
+            'district_id' => 2, 'commodity_id' => 1,
+        ]))->collection();
+        $this->assertCount(1, $filtered);
+        $this->assertSame('draft', $filtered->first()->parent->status);
+        $this->assertSame(1, $filtered->first()->commodity_id);
+        $this->assertCount(1, (new NilaiTransaksiEkonomiExport(2025))->collection());
+    }
+
     protected function setUp(): void
     {
         parent::setUp();

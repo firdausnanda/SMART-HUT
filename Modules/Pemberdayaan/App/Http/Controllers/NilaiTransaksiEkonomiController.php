@@ -383,8 +383,15 @@ class NilaiTransaksiEkonomiController extends Controller
 
   public function export(Request $request)
   {
-    $year = $request->query('year');
-    return Excel::download(new NilaiTransaksiEkonomiExport($year), 'nilai-transaksi-ekonomi-' . date('Y-m-d') . '.xlsx');
+    $filters = $request->validate([
+      'year' => 'nullable|integer|between:2000,2100',
+      'month' => 'nullable|integer|between:1,12',
+      'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+      'regency_id' => 'nullable|integer|min:1',
+      'district_id' => 'nullable|integer|min:1',
+      'commodity_id' => 'nullable|integer|min:1',
+    ]);
+    return Excel::download(new NilaiTransaksiEkonomiExport($filters['year'] ?? null, $filters), 'nilai-transaksi-ekonomi-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()

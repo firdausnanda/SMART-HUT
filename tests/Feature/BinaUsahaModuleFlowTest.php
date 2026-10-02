@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Jobs\ProcessImportBatch;
 use App\Models\ImportBatch;
 use App\Models\User;
+use Modules\BinaUsaha\App\Exports\HasilHutanKayuExport;
+use Modules\BinaUsaha\App\Exports\HasilHutanBukanKayuExport;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -100,6 +102,31 @@ class BinaUsahaModuleFlowTest extends TestCase
         $user->givePermissionTo($permissions);
 
         return $user;
+    }
+
+    public function test_forest_exports_filter_period_status_and_location(): void
+    {
+        foreach (['hasil_hutan_kayu' => HasilHutanKayuExport::class, 'hasil_hutan_bukan_kayu' => HasilHutanBukanKayuExport::class] as $table => $exportClass) {
+            foreach ([
+                [2025, 4, 3501, 350101, 'final'],
+                [2025, 5, 3501, 350101, 'final'],
+                [2025, 4, 3501, 350101, 'draft'],
+                [2025, 4, 3502, 350201, 'final'],
+                [2024, 4, 3501, 350101, 'final'],
+            ] as [$year, $month, $regency, $district, $status]) {
+                DB::table($table)->insert([
+                    'year' => $year, 'month' => $month, 'province_id' => 35,
+                    'regency_id' => $regency, 'district_id' => $district,
+                    'forest_type' => 'Hutan Negara', 'volume_target' => 1,
+                    'status' => $status,
+                ]);
+            }
+
+            $export = new $exportClass('Hutan Negara', 2025, [
+                'month' => 4, 'status' => 'final', 'regency_id' => 3501, 'district_id' => 350101,
+            ]);
+            $this->assertSame(1, $export->query()->count());
+        }
     }
 
     public function test_forest_type_permission_is_enforced_inside_the_module_controller(): void

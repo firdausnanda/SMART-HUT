@@ -12,11 +12,13 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
 {
   protected $forestType;
   protected $year;
+  protected array $filters;
 
-  public function __construct($forestType, $year = null)
+  public function __construct($forestType, $year = null, array $filters = [])
   {
     $this->forestType = $forestType;
     $this->year = $year;
+    $this->filters = $filters;
   }
 
   public function query()
@@ -26,7 +28,11 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
       ->where('forest_type', $this->forestType)
       ->when($this->year, function ($q) {
         return $q->where('year', $this->year);
-      });
+      })
+      ->when($this->filters['month'] ?? null, fn($q, $month) => $q->where('month', $month))
+      ->when(($this->filters['status'] ?? 'all') !== 'all', fn($q) => $q->where('status', $this->filters['status']))
+      ->when($this->filters['regency_id'] ?? null, fn($q, $id) => $q->where('regency_id', $id))
+      ->when($this->filters['district_id'] ?? null, fn($q, $id) => $q->where('district_id', $id));
   }
 
   public function headings(): array
