@@ -6,7 +6,7 @@ Modul `Dashboard` memiliki empat route dan `DashboardController` untuk dashboard
 
 - URL, nama route, method, dan middleware `web`/`auth` tetap sama. Dashboard internal juga tetap memakai `verified` dan `CheckDashboardAccess`.
 - Agregasi membaca model di `App\Models` dari berbagai domain. Ekspor rehabilitasi lahan memakai `Modules\Rhl\App\Exports\RehabLahanExport`. Perubahan namespace controller tidak mengubah cache key, bentuk respons, atau channel realtime.
-- Halaman React tetap di `resources/js/Pages` dan nama halaman Inertia tidak berubah. Model, migrasi, event, broadcaster, dan data tidak dipindahkan pada langkah ini.
+- Halaman React `Dashboard.jsx` dan seluruh `Public`, termasuk helper khusus dashboard, berada di `Modules/Dashboard/resources/js/Pages`. Nama halaman Inertia tetap sama dan dimuat oleh resolver React pusat. Model, migrasi, event, broadcaster, dan data tetap di lokasi asal.
 - Route Profile dan endpoint dropdown lokasi berada langsung di `routes/web.php`, dengan controller tetap di `App\Http\Controllers`. Keduanya dipakai lintas domain dan tidak dimiliki modul Dashboard.
 - Modul harus aktif agar empat route Dashboard tersedia. Tidak ada perubahan skema database atau migrasi ulang data.
 

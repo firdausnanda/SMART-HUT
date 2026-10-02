@@ -6,7 +6,7 @@ Modul `Kepegawaian` memiliki alur Demografi Pegawai, Bezetting Jabatan, Proyeksi
 
 - URL, nama route, middleware autentikasi dan permission, serta parameter route tetap sama. Route Rekap Bulanan tetap memakai permission `demografi-pegawai.*`.
 - Impor Pegawai berjalan langsung melalui `PegawaiImport`; domain ini tidak memakai `ImportBatch` atau pemroses queue `ProcessImportBatch`.
-- Model `App\Models`, migrasi, factory, seeder, enum, serta halaman React di `resources/js/Pages/Kepegawaian` tetap di lokasi asal. Resolver Inertia dan penyimpanan data tidak berubah.
+- Model `App\Models`, migrasi, factory, seeder, dan enum tetap di lokasi asal. Halaman React berada di `Modules/Kepegawaian/resources/js/Pages/Kepegawaian`; nama halaman Inertia tetap sama dan dimuat oleh resolver React pusat.
 - `App\Actions` tetap menyediakan workflow bersama. Perintah `rekap:kepegawaian` di `App\Console\Commands\GenerateRekapKepegawaian` dan dashboard publik menggunakan `Modules\Kepegawaian\App\Services\RekapKepegawaianService`.
 - Modul harus aktif agar route tersedia. Kelas layanan tetap dimuat Composer untuk perintah dan dashboard.
 

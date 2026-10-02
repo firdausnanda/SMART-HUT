@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { availableUnits, selectedUnit, compareProduction, topCommodities, totalForUnit } from '../../resources/js/Pages/Public/Components/nonWoodUtils.js';
+import { availableUnits, selectedUnit, compareProduction, topCommodities, totalForUnit } from '../../Modules/Dashboard/resources/js/Pages/Public/Components/nonWoodUtils.js';
 
 test('unit selection uses all years, defaults to kg and survives refreshes', () => {
   const groups = availableUnits([{ unit: 'batang' }, { unit: 'kg' }, { unit: 'liter' }, { unit: 'kg' }]);

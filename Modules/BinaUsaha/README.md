@@ -6,7 +6,7 @@ Modul `BinaUsaha` memiliki alur Hasil Hutan Kayu, Hasil Hutan Bukan Kayu, PBPHH,
 
 - URL, nama route, middleware permission, dan parameter route tetap sama. Hasil Hutan Kayu dan Bukan Kayu tetap memakai tiga kelompok permission: `produksi-hutan-negara`, `produksi-perhutanan-sosial`, dan `produksi-hutan-rakyat`. Controller masih memeriksa permission untuk `forest_type` yang dipilih.
 - Nilai `ImportBatch.module_name` tetap `hasil-hutan-kayu|<forest_type>` untuk kayu, `hhbk|<forest_type>` untuk bukan kayu, `pbphh`, dan `realisasi-pnbp`. Suffix menyimpan jenis hutan batch lama dan tetap dibaca pemroses.
-- Model `App\Models`, migrasi, factory, seeder, serta halaman React di `resources/js/Pages` tetap di lokasi asal. Resolver Inertia dan penyimpanan data tidak berubah.
+- Model `App\Models`, migrasi, factory, dan seeder tetap di lokasi asal. Halaman React keempat fitur berada di `Modules/BinaUsaha/resources/js/Pages`; nama halaman Inertia tetap sama dan dimuat oleh resolver React pusat.
 - Workflow (`App\Actions`), staging (`App\Imports\StagingImport`), job `App\Jobs\ProcessImportBatch`, `BaseImportProcessor`, model lokasi, dan master data adalah layanan bersama. Job memetakan empat prefix batch lama ke pemroses modul ini.
 - Modul harus aktif agar route tersedia. Status modul bukan sakelar untuk menghentikan queue karena kelas pemroses masih dapat dimuat Composer.
 

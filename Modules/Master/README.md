@@ -5,7 +5,7 @@ Modul `Master` memiliki route dan controller untuk 13 data referensi: provinsi, 
 ## Batas dan dependensi
 
 - URL, nama route, method, middleware `web`/`auth`/permission, dan parameter tetap sama. Parameter seperti `{bangunan_ktum}`, `{pengelola_wisatum}`, dan `{pengelola_p}` berasal dari penamaan resource Laravel yang sudah dipakai aplikasi.
-- Model, relasi, migrasi, seeder, dan factory tetap di `App` karena data referensi ini dipakai modul lain. Halaman React tetap di `resources/js/Pages/MasterData`; nama halaman Inertia tidak berubah.
+- Model, relasi, migrasi, seeder, dan factory tetap di `App` karena data referensi ini dipakai modul lain. Halaman React berada di `Modules/Master/resources/js/Pages/MasterData`; nama halaman Inertia tetap sama dan dimuat oleh resolver React pusat.
 - Route CDK dan manajemen pengguna tetap di area Admin. Dashboard serta impor domain lain tetap menjadi konsumen model Master, tanpa dipindahkan ke modul ini.
 - Modul harus aktif agar route Master tersedia. Modul ini tidak memiliki alur impor queue atau ekspor sendiri, dan tidak mengubah skema database.
 

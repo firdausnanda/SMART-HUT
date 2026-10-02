@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { affectsDashboard } from '../../resources/js/Pages/Public/Components/dashboardRealtime.js';
+import { affectsDashboard } from '../../Modules/Dashboard/resources/js/Pages/Public/Components/dashboardRealtime.js';
 
 test('a yearly change refreshes only a matching year and CDK', () => {
   assert.equal(affectsDashboard({ year: 2026, cdkId: 2 }, [2026], 2), true);

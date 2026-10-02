@@ -6,7 +6,7 @@ Modul `Pemberdayaan` memiliki alur SKPS, KUPS, Nilai Ekonomi, Perkembangan KTH, 
 
 - URL, nama route, middleware autentikasi dan permission, serta parameter route tetap sama. Route perbaikan data Nilai Transaksi Ekonomi tetap mewajibkan permission `nilai-transaksi-ekonomi.import` dan `nilai-transaksi-ekonomi.delete` secara bersamaan.
 - Nilai `ImportBatch.module_name` tetap `skps`, `kups`, `nilai-ekonomi`, `perkembangan-kth`, dan `nilai-transaksi-ekonomi`. Job `App\Jobs\ProcessImportBatch` memetakan batch lama ke pemroses modul.
-- Model `App\Models`, migrasi, factory, seeder, serta halaman React di `resources/js/Pages` tetap di lokasi asal. Resolver Inertia dan penyimpanan data tidak berubah.
+- Model `App\Models`, migrasi, factory, dan seeder tetap di lokasi asal. Halaman React kelima fitur berada di `Modules/Pemberdayaan/resources/js/Pages`; nama halaman Inertia tetap sama dan dimuat oleh resolver React pusat.
 - Workflow (`App\Actions`), staging (`App\Imports\StagingImport`), `BaseImportProcessor`, model lokasi dan master data adalah layanan bersama. Dashboard, halaman publik, dan activity log tetap memakai model yang sama.
 - Modul harus aktif agar route tersedia. Status modul bukan sakelar untuk menghentikan queue karena kelas pemroses masih dapat dimuat Composer.
 

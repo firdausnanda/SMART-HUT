@@ -5,9 +5,9 @@ Modul `Rhl` memiliki alur Rehab Lahan, Penghijauan Lingkungan, Rehab Mangrove, R
 ## Batas dan dependensi
 
 - URL, nama route, middleware permission, parameter route, dan nilai `ImportBatch.module_name` tetap sama: `rehab-lahan`, `penghijauan-lingkungan`, `rehab-manggrove`, `rhl-teknis`, dan `reboisasi-ps`.
-- Model `App\Models` beserta migrasi, factory, seeder, dan halaman React `resources/js/Pages` tetap di lokasi asal. Resolver Inertia dan penyimpanan data tidak berubah.
+- Model `App\Models` beserta migrasi, factory, dan seeder tetap di lokasi asal. Halaman React kelima fitur berada di `Modules/Rhl/resources/js/Pages`; nama halaman Inertia tetap sama dan dimuat oleh resolver React pusat.
 - Workflow (`App\Actions`), staging (`App\Imports\StagingImport`), job `App\Jobs\ProcessImportBatch`, `BaseImportProcessor`, serta model lokasi dan referensi lain adalah layanan bersama. Job memetakan kelima nilai `module_name` lama ke pemroses modul ini.
-- Dashboard tetap di aplikasi utama dan menggunakan `Modules\Rhl\App\Exports\RehabLahanExport` untuk unduhan Rehab Lahan.
+- Modul Dashboard menggunakan `Modules\Rhl\App\Exports\RehabLahanExport` untuk unduhan Rehab Lahan.
 - Modul harus aktif agar route tersedia. Status modul bukan sakelar untuk menghentikan queue karena kelas pemroses masih dapat dimuat Composer.
 
 ## Verifikasi dan rilis lokal
