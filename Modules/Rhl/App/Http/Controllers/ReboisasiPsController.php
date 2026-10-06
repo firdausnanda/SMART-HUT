@@ -9,6 +9,7 @@ use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
 use Illuminate\Validation\Rule;
 use App\Models\ReboisasiPS;
+use App\Models\Cdk;
 use App\Models\PengelolaPS;
 use App\Models\SumberDana;
 use Illuminate\Http\Request;
@@ -132,6 +133,11 @@ class ReboisasiPsController extends Controller
         'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
+      'cdks' => $this->user()->isAdminProvinsi() ? Cdk::orderBy('nama')->get(['id', 'nama']) : [],
+      'exportFundSources' => ReboisasiPS::distinct()->orderBy('fund_source')->pluck('fund_source')->filter()->values(),
+      'exportManagers' => PengelolaPS::orderBy('name')->get(['id', 'name']),
+      'exportColumns' => collect(ReboisasiPsExport::COLUMN_HEADINGS)
+        ->map(fn($label, $key) => ['key' => $key, 'label' => $label])->values(),
       'sumberDana' => $sumberDana
     ]);
   }
@@ -270,8 +276,20 @@ class ReboisasiPsController extends Controller
 
   public function export(Request $request)
   {
-    $year = $request->query('year');
-    return Excel::download(new ReboisasiPsExport($year), 'reboisasi-ps-' . date('Y-m-d') . '.xlsx');
+    $filters = $request->validate([
+      'year' => 'nullable|integer|between:2000,2100',
+      'month' => 'nullable|integer|between:1,12',
+      'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+      'cdk_id' => 'nullable|integer|exists:cdks,id',
+      'regency_id' => 'nullable|integer|min:1',
+      'district_id' => 'nullable|integer|min:1',
+      'fund_source' => 'nullable|string|max:100',
+      'pengelola_id' => 'nullable|integer|exists:m_pengelola_ps,id',
+      'columns' => ['sometimes', 'array', 'min:1', 'max:' . count(ReboisasiPsExport::COLUMN_HEADINGS)],
+      'columns.*' => ['string', 'distinct', Rule::in(array_keys(ReboisasiPsExport::COLUMN_HEADINGS))],
+    ]);
+
+    return Excel::download(new ReboisasiPsExport($filters['year'] ?? null, $filters), 'reboisasi-ps-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()

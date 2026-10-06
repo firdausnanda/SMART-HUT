@@ -12,10 +12,11 @@ import LoadingOverlay from '@/Components/LoadingOverlay';
 import BulkActionToolbar from '@/Components/BulkActionToolbar';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
+import ExportFilterModal from '@/Components/ExportFilterModal';
 
 const MySwal = withReactContent(Swal);
 
-export default function Index({ auth, data, filters, stats, availableYears }) {
+export default function Index({ auth, data, filters, stats, availableYears, cdks, exportColumns, exportCommodities }) {
   const { flash } = usePage().props;
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
   const [isSearching, setIsSearching] = useState(false);
@@ -24,6 +25,7 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
   const [selectedIds, setSelectedIds] = useState([]);
   const [params, setParams] = useState({ ...filters, per_page: filters.per_page || 10 });
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [importFile, setImportFile] = useState(null);
 
   const SortIcon = ({ field }) => {
@@ -371,7 +373,7 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
             <div className="flex gap-2">
               {canExport && (
                 <button
-                  onClick={() => window.location.href = route('nilai-ekonomi.export', { year: params.year })}
+                  onClick={() => setShowExportModal(true)}
                   className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -714,6 +716,18 @@ export default function Index({ auth, data, filters, stats, availableYears }) {
         canApprove={canApprove}
         canDelete={canDelete}
         isAdmin={isAdmin}
+      />
+
+      <ExportFilterModal
+        show={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={(exportFilters) => { window.location.href = route('nilai-ekonomi.export', exportFilters); }}
+        year={params.year}
+        years={availableYears}
+        defaultStatus="final"
+        cdks={cdks}
+        commodities={exportCommodities}
+        exportColumns={exportColumns}
       />
 
       <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>

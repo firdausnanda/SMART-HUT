@@ -5,6 +5,7 @@ namespace Modules\BinaUsaha\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 
 use App\Models\Pbphh;
+use App\Models\Cdk;
 use App\Models\JenisProduksi;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -104,6 +105,9 @@ class PbphhController extends Controller
     return Inertia::render('Pbphh/Index', [
       'datas' => $datas,
       'stats' => $stats,
+      'cdks' => $this->user()->isAdminProvinsi() ? Cdk::orderBy('nama')->get(['id', 'nama']) : [],
+      'exportColumns' => collect(PbphhExport::COLUMN_HEADINGS)
+        ->map(fn($label, $key) => ['key' => $key, 'label' => $label])->values(),
       'filters' => [
         'search' => $request->search,
         'sort' => $sortField,
@@ -252,7 +256,16 @@ class PbphhController extends Controller
 
   public function export(Request $request)
   {
-    return Excel::download(new PbphhExport(), 'pbphh-' . date('Y-m-d') . '.xlsx');
+    $filters = $request->validate([
+      'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+      'cdk_id' => 'nullable|integer|exists:cdks,id',
+      'regency_id' => 'nullable|integer|min:1',
+      'district_id' => 'nullable|integer|min:1',
+      'columns' => ['sometimes', 'array', 'min:1', 'max:' . count(PbphhExport::COLUMN_HEADINGS)],
+      'columns.*' => ['string', 'distinct', Rule::in(array_keys(PbphhExport::COLUMN_HEADINGS))],
+    ]);
+
+    return Excel::download(new PbphhExport($filters), 'pbphh-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()

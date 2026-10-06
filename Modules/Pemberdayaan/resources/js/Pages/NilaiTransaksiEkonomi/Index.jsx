@@ -18,7 +18,7 @@ import ExportFilterModal from '@/Components/ExportFilterModal';
 
 const MySwal = withReactContent(Swal);
 
-export default function Index({ auth, datas, stats, filters, availableYears, commodities }) {
+export default function Index({ auth, datas, stats, filters, availableYears, commodities, cdks, exportColumns }) {
   const { flash } = usePage().props;
   const [selectedIds, setSelectedIds] = useState([]);
   const [params, setParams] = useState({
@@ -962,6 +962,8 @@ export default function Index({ auth, datas, stats, filters, availableYears, com
         years={availableYears}
         defaultStatus="final"
         commodities={commodities}
+        cdks={cdks}
+        exportColumns={exportColumns}
       />
       <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
         <form onSubmit={handleImportSubmit} className="p-0 overflow-hidden">

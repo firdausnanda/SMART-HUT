@@ -14,14 +14,16 @@ import TextInput from '@/Components/TextInput';
 import Pagination from '@/Components/Pagination';
 import LoadingOverlay from '@/Components/LoadingOverlay';
 import BulkActionToolbar from '@/Components/BulkActionToolbar';
+import ExportFilterModal from '@/Components/ExportFilterModal';
 
 const MySwal = withReactContent(Swal);
 
-export default function Index({ auth, datas, stats, filters, availableYears }) {
+export default function Index({ auth, datas, stats, filters, availableYears, cdks, exportColumns }) {
   const { flash } = usePage().props;
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memproses...');
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [importFile, setImportFile] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [params, setParams] = useState({
@@ -378,7 +380,7 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
               <div className="flex gap-2">
                 {canExport && (
                   <button
-                    onClick={() => window.location.href = route('perkembangan-kth.export')}
+                    onClick={() => setShowExportModal(true)}
                     className="flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-primary-100 rounded-xl font-bold text-sm shadow-sm hover:bg-primary-800 transition-colors border border-primary-600/50"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -767,6 +769,17 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
         />
 
       </AuthenticatedLayout>
+      <ExportFilterModal
+        show={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={(exportFilters) => { window.location.href = route('perkembangan-kth.export', exportFilters); }}
+        year=""
+        years={availableYears}
+        defaultStatus="final"
+        cdks={cdks}
+        exportColumns={exportColumns}
+      />
+
       <Modal show={showImportModal} onClose={() => setShowImportModal(false)}>
         <form onSubmit={(e) => { 
           e.preventDefault(); 

@@ -13,6 +13,7 @@ import Pagination from '@/Components/Pagination';
 import StatusBadge from '@/Components/StatusBadge';
 import LoadingOverlay from '@/Components/LoadingOverlay';
 import BulkActionToolbar from '@/Components/BulkActionToolbar';
+import ExportFilterModal from '@/Components/ExportFilterModal';
 import TextInput from '@/Components/TextInput';
 
 const SortIcon = ({ field }) => {
@@ -26,7 +27,7 @@ const SortIcon = ({ field }) => {
   );
 };
 
-export default function Index({ auth, datas, stats, filters = {} }) {
+export default function Index({ auth, datas, stats, filters = {}, cdks, exportColumns }) {
   // Use filters prop safely with default empty object
   const currentFilters = filters || {};
   const { flash, errors } = usePage().props;
@@ -40,6 +41,7 @@ export default function Index({ auth, datas, stats, filters = {} }) {
   const canEdit = userPermissions.includes('pbphh.edit') || isAdmin;
   const canDelete = userPermissions.includes('pbphh.delete') || isAdmin;
   const canApprove = userPermissions.includes('pbphh.approve') || isAdmin;
+  const canExport = userPermissions.includes('pbphh.export') || isAdmin;
 
   useEffect(() => {
     if (flash?.import_errors) {
@@ -84,6 +86,7 @@ export default function Index({ auth, datas, stats, filters = {} }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [importFile, setImportFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memproses...');
@@ -475,15 +478,15 @@ export default function Index({ auth, datas, stats, filters = {} }) {
                 </p>
               </div>
               <div className="flex gap-2">
-                <button
-                  onClick={() => window.location.href = route('pbphh.export')}
+                {canExport && <button
+                  onClick={() => setShowExportModal(true)}
                   className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
                   Export
-                </button>
+                </button>}
                 <button
                   onClick={() => setShowImportModal(true)}
                   className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 text-emerald-100 rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-800 transition-colors border border-emerald-600/50"
@@ -842,6 +845,17 @@ export default function Index({ auth, datas, stats, filters = {} }) {
         canApprove={canApprove}
         canDelete={canDelete}
         isAdmin={isAdmin}
+      />
+
+      <ExportFilterModal
+        show={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={(exportFilters) => { window.location.href = route('pbphh.export', exportFilters); }}
+        defaultStatus="final"
+        cdks={cdks}
+        exportColumns={exportColumns}
+        showYear={false}
+        showMonth={false}
       />
 
       {/* Import Modal */}

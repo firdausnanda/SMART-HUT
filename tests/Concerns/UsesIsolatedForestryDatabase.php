@@ -16,6 +16,9 @@ trait UsesIsolatedForestryDatabase
     {
         $this->setUpUserDatabase();
 
+        Schema::create('cdks', function (Blueprint $table) {
+            $table->id(); $table->string('nama');
+        });
         Schema::create('m_provinces', function (Blueprint $table) {
             $table->id(); $table->string('name');
         });

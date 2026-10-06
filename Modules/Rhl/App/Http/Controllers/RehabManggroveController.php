@@ -5,6 +5,7 @@ namespace Modules\Rhl\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 
 use App\Models\RehabManggrove;
+use App\Models\Cdk;
 use App\Actions\SingleWorkflowAction;
 use App\Actions\BulkWorkflowAction;
 use App\Enums\WorkflowAction;
@@ -130,6 +131,10 @@ class RehabManggroveController extends Controller
         'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
+      'cdks' => $this->user()->isAdminProvinsi() ? Cdk::orderBy('nama')->get(['id', 'nama']) : [],
+      'exportFundSources' => RehabManggrove::distinct()->orderBy('fund_source')->pluck('fund_source')->filter()->values(),
+      'exportColumns' => collect(RehabManggroveExport::COLUMN_HEADINGS)
+        ->map(fn($label, $key) => ['key' => $key, 'label' => $label])->values(),
       'sumberDana' => $sumberDana
     ]);
   }
@@ -260,8 +265,19 @@ class RehabManggroveController extends Controller
 
   public function export(Request $request)
   {
-    $year = $request->query('year');
-    return Excel::download(new RehabManggroveExport($year), 'rehab-manggrove-' . date('Y-m-d') . '.xlsx');
+    $filters = $request->validate([
+      'year' => 'nullable|integer|between:2000,2100',
+      'month' => 'nullable|integer|between:1,12',
+      'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+      'cdk_id' => 'nullable|integer|exists:cdks,id',
+      'regency_id' => 'nullable|integer|min:1',
+      'district_id' => 'nullable|integer|min:1',
+      'fund_source' => 'nullable|string|max:100',
+      'columns' => ['sometimes', 'array', 'min:1', 'max:' . count(RehabManggroveExport::COLUMN_HEADINGS)],
+      'columns.*' => ['string', 'distinct', Rule::in(array_keys(RehabManggroveExport::COLUMN_HEADINGS))],
+    ]);
+
+    return Excel::download(new RehabManggroveExport($filters['year'] ?? null, $filters), 'rehab-manggrove-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()

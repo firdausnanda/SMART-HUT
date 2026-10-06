@@ -14,6 +14,71 @@ use Tests\TestCase;
 
 class NilaiTransaksiEkonomiImportTest extends TestCase
 {
+    public function test_transaction_export_can_include_input_oleh(): void
+    {
+        DB::table('users')->where('id', 7)->update(['name' => 'Operator CDK']);
+        $recordId = DB::table('nilai_transaksi_ekonomi')->insertGetId([
+            'cdk_id' => 42, 'year' => 2025, 'month' => 4, 'province_id' => 35,
+            'regency_id' => 1, 'district_id' => 2, 'village_id' => 3,
+            'nama_kth' => 'KTH Pilihan', 'status' => 'final', 'created_by' => 7,
+        ]);
+        DB::table('nilai_transaksi_ekonomi_details')->insert([
+            'nilai_transaksi_ekonomi_id' => $recordId, 'commodity_id' => 10,
+            'volume_produksi' => 1, 'satuan' => 'kg', 'nilai_transaksi' => 100,
+        ]);
+
+        $export = new NilaiTransaksiEkonomiExport(2025, ['columns' => ['creator']]);
+
+        $this->assertSame(['Input Oleh'], $export->headings());
+        $this->assertSame(['Operator CDK'], $export->map($export->collection()->first()));
+    }
+
+    public function test_transaction_export_includes_only_selected_columns_in_selected_order(): void
+    {
+        $recordId = DB::table('nilai_transaksi_ekonomi')->insertGetId([
+            'cdk_id' => 42, 'year' => 2025, 'month' => 4, 'province_id' => 35,
+            'regency_id' => 1, 'district_id' => 2, 'village_id' => 3,
+            'nama_kth' => 'KTH Pilihan', 'status' => 'final',
+        ]);
+        DB::table('nilai_transaksi_ekonomi_details')->insert([
+            'nilai_transaksi_ekonomi_id' => $recordId, 'commodity_id' => 10,
+            'volume_produksi' => 1, 'satuan' => 'kg', 'nilai_transaksi' => 100,
+        ]);
+
+        $export = new NilaiTransaksiEkonomiExport(2025, [
+            'columns' => ['nama_kth', 'month', 'year'],
+        ]);
+
+        $this->assertSame(['Nama KTH', 'Bulan', 'Tahun'], $export->headings());
+        $this->assertSame(['KTH Pilihan', 'April', 2025], $export->map($export->collection()->first()));
+    }
+
+    public function test_transaction_export_can_select_one_cdk(): void
+    {
+        $cdk42 = DB::table('nilai_transaksi_ekonomi')->insertGetId([
+            'cdk_id' => 42, 'year' => 2025, 'month' => 4, 'province_id' => 35,
+            'regency_id' => 1, 'district_id' => 2, 'village_id' => 3,
+            'nama_kth' => 'KTH CDK 42', 'status' => 'final',
+        ]);
+        $cdk43 = DB::table('nilai_transaksi_ekonomi')->insertGetId([
+            'cdk_id' => 43, 'year' => 2025, 'month' => 4, 'province_id' => 35,
+            'regency_id' => 1, 'district_id' => 2, 'village_id' => 3,
+            'nama_kth' => 'KTH CDK 43', 'status' => 'final',
+        ]);
+
+        foreach ([$cdk42, $cdk43] as $id) {
+            DB::table('nilai_transaksi_ekonomi_details')->insert([
+                'nilai_transaksi_ekonomi_id' => $id, 'commodity_id' => 10,
+                'volume_produksi' => 1, 'satuan' => 'kg', 'nilai_transaksi' => 100,
+            ]);
+        }
+
+        $rows = (new NilaiTransaksiEkonomiExport(2025, ['cdk_id' => 42]))->collection();
+
+        $this->assertCount(1, $rows);
+        $this->assertSame($cdk42, $rows->first()->parent->id);
+    }
+
     public function test_transaction_export_filters_status_period_location_and_commodity(): void
     {
         $matchingId = null;
@@ -64,6 +129,7 @@ class NilaiTransaksiEkonomiImportTest extends TestCase
 
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable();
             $table->unsignedBigInteger('cdk_id')->nullable();
         });
         Schema::create('import_batches', function (Blueprint $table) {

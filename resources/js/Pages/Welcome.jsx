@@ -1,22 +1,11 @@
-import { Head, Link } from '@inertiajs/react';
-import { useRef, useState } from 'react';
-import { eastJavaDistrictPaths, eastJavaPath, eastJavaProjection } from './jawaTimurGeometry';
-import './welcome.css';
+import { Link, Head } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 const pageTitle = 'SMART-HUT | Sistem Monitoring Data Kehutanan Jawa Timur';
-const pageDescription = 'SMART-HUT adalah platform Dinas Kehutanan Provinsi Jawa Timur untuk monitoring dan analisis data kehutanan.';
+const pageDescription = 'SMART-HUT adalah platform Dinas Kehutanan Provinsi Jawa Timur untuk monitoring, pengelolaan, dan pelaporan data kehutanan.';
 
-const initialView = { zoom: 1, x: 0, y: 0 };
-
-function constrain(view) {
-    if (view.zoom === 1) return initialView;
-    const limit = 8;
-    return {
-        ...view,
-        x: Math.max(100 - view.zoom * 100 - limit, Math.min(limit, view.x)),
-        y: Math.max(100 - view.zoom * 100 - limit, Math.min(limit, view.y)),
-    };
-}
+const CountUp = ({ end, duration }) => {
+    const [count, setCount] = useState(0);
 
 function ArrowIcon() {
     return <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>;
@@ -58,25 +47,65 @@ function EastJavaMap() {
         setDragging(false);
     };
 
+export default function Welcome({ auth, laravelVersion, phpVersion, totalData = 0, seo }) {
+    const homeUrl = seo.homeUrl;
+    const imageUrl = `${homeUrl}img/hutan_indonesia.jpeg`;
+    const organization = {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Dinas Kehutanan Provinsi Jawa Timur',
+        url: homeUrl,
+        logo: `${homeUrl}img/logo.webp`,
+    };
+
     return (
-        <div className="welcome-visual">
-            <div className="welcome-visual-header">
-                <span className="welcome-visual-index">JAWA TIMUR</span>
-            </div>
-            <figure className="welcome-map-figure">
-                <div className="welcome-map-viewport" data-dragging={dragging} data-zoomed={view.zoom > 1}
-                    onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={stopDrag} onPointerCancel={stopDrag}
-                    aria-label="Peta interaktif Jawa Timur">
-                    <div className="welcome-map-art" style={{ transform: `translate(${view.x}%, ${view.y}%) scale(${view.zoom})` }}>
-                        <svg viewBox={`0 0 ${eastJavaProjection.width} ${eastJavaProjection.height}`} role="img" aria-label="Peta Jawa Timur dengan batas kabupaten dan kota" preserveAspectRatio="xMidYMid meet">
-                            <defs><clipPath id="welcome-east-java-clip"><path d={eastJavaPath} /></clipPath></defs>
-                            <path className="welcome-map-depth" d={eastJavaPath} transform="translate(0 11)" />
-                            <path className="welcome-map-land" d={eastJavaPath} />
-                            <g clipPath="url(#welcome-east-java-clip)">
-                                {eastJavaDistrictPaths.map((district, index) => <path key={district.name} className="welcome-map-district" d={district.path} pathLength="1" style={{ '--district-order': index }} />)}
-                            </g>
-                            <path className="welcome-map-coast" d={eastJavaPath} pathLength="1" />
-                        </svg>
+        <>
+            <Head title="Sistem Monitoring Data Kehutanan Jawa Timur">
+                <meta head-key="description" name="description" content={pageDescription} />
+                <link head-key="canonical" rel="canonical" href={homeUrl} />
+                <meta head-key="og-type" property="og:type" content="website" />
+                <meta head-key="og-locale" property="og:locale" content="id_ID" />
+                <meta head-key="og-title" property="og:title" content={pageTitle} />
+                <meta head-key="og-description" property="og:description" content={pageDescription} />
+                <meta head-key="og-url" property="og:url" content={homeUrl} />
+                <meta head-key="og-image" property="og:image" content={imageUrl} />
+                <meta head-key="twitter-card" name="twitter:card" content="summary_large_image" />
+                <meta head-key="twitter-title" name="twitter:title" content={pageTitle} />
+                <meta head-key="twitter-description" name="twitter:description" content={pageDescription} />
+                <meta head-key="twitter-image" name="twitter:image" content={imageUrl} />
+                <script head-key="organization" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }} />
+            </Head>
+            <div className="min-h-screen bg-white text-gray-800 font-sans selection:bg-primary-500 selection:text-white overflow-hidden">
+                {/* Navbar */}
+                <nav className="absolute top-0 w-full z-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex justify-between items-center h-20">
+                            <div className="flex-shrink-0 flex items-center gap-4">
+
+                                {/* Logo Mark - Enhanced */}
+                                <div className="group cursor-pointer flex-shrink-0">
+                                    <div className="w-12 h-12 flex items-center justify-center p-0.5">
+                                        <img src="/img/logo.webp" alt="Logo CDK" className="w-full h-full object-contain" />
+                                    </div>
+                                </div>
+
+                                <div className="hidden sm:flex flex-col">
+                                    <span className="font-display font-bold text-lg text-gray-900 tracking-tight leading-tight">
+                                        Dinas Kehutanan
+                                    </span>
+                                    <span className="text-[10px] uppercase tracking-wider text-primary-700/80 font-bold">
+                                        Provinsi Jawa Timur
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Logo Mark - Gerbang Nusantara (Right Side) */}
+                            <div className="group cursor-pointer flex-shrink-0">
+                                <div className="w-32 h-12 flex items-center justify-center p-0.5">
+                                    <img src="/img/logo_gerbang_nusantara.png" alt="Logo Gerbang Nusantara" className="w-full h-full object-contain" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <span className="welcome-map-north" aria-hidden="true"><span>↑</span><small>U</small></span>
                     <div className="welcome-map-controls" role="group" aria-label="Kontrol peta">

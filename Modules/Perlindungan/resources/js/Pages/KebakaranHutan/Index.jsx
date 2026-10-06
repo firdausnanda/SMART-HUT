@@ -13,10 +13,11 @@ import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import LoadingOverlay from '@/Components/LoadingOverlay';
 import BulkActionToolbar from '@/Components/BulkActionToolbar';
+import ExportFilterModal from '@/Components/ExportFilterModal';
 
 const MySwal = withReactContent(Swal);
 
-export default function Index({ auth, datas, stats, filters, availableYears }) {
+export default function Index({ auth, datas, stats, filters, availableYears, cdks, exportManagers, exportColumns }) {
   const { flash, errors } = usePage().props;
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memproses...');
@@ -31,10 +32,12 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
   const canEdit = userPermissions.includes('kebakaran-hutan.edit') || isAdmin;
   const canDelete = userPermissions.includes('kebakaran-hutan.delete') || isAdmin;
   const canApprove = userPermissions.includes('kebakaran-hutan.approve') || isAdmin;
+  const canExport = userPermissions.includes('kebakaran-hutan.export') || isAdmin;
 
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
   const [isSearching, setIsSearching] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [importFile, setImportFile] = useState(null);
 
   /* Selection State */
@@ -429,15 +432,15 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
                 </p>
               </div>
               <div className="flex gap-2">
-                <button
-                  onClick={() => window.location.href = route('kebakaran-hutan.export', { year: filters.year })}
+                {canExport && <button
+                  onClick={() => setShowExportModal(true)}
                   className="flex items-center gap-2 px-4 py-2.5 bg-red-700 text-red-100 rounded-xl font-bold text-sm shadow-sm hover:bg-red-800 transition-colors border border-red-600/50"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
                   Export
-                </button>
+                </button>}
                 <button
                   onClick={() => setShowImportModal(true)}
                   className="flex items-center gap-2 px-4 py-2.5 bg-red-700 text-red-100 rounded-xl font-bold text-sm shadow-sm hover:bg-red-800 transition-colors border border-red-600/50"
@@ -816,6 +819,18 @@ export default function Index({ auth, datas, stats, filters, availableYears }) {
         canApprove={canApprove}
         canDelete={canDelete}
         isAdmin={isAdmin}
+      />
+
+      <ExportFilterModal
+        show={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={(exportFilters) => { window.location.href = route('kebakaran-hutan.export', exportFilters); }}
+        year=""
+        years={availableYears}
+        defaultStatus="final"
+        cdks={cdks}
+        managers={exportManagers}
+        exportColumns={exportColumns}
       />
 
       {/* Import Modal */}
