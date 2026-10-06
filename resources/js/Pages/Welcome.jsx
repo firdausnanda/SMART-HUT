@@ -1,216 +1,155 @@
-import { Link, Head } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { Head, Link } from '@inertiajs/react';
+import { useRef, useState } from 'react';
+import { eastJavaDistrictPaths, eastJavaPath, eastJavaProjection } from './jawaTimurGeometry';
+import './welcome.css';
 
-const CountUp = ({ end, duration }) => {
-    const [count, setCount] = useState(0);
+const initialView = { zoom: 1, x: 0, y: 0 };
 
-    useEffect(() => {
-        let startTime = null;
-        const step = (timestamp) => {
-            if (!startTime) startTime = timestamp;
-            const progress = Math.min((timestamp - startTime) / duration, 1);
-            setCount(Math.floor(progress * end));
-            if (progress < 1) {
-                window.requestAnimationFrame(step);
-            }
-        };
-        window.requestAnimationFrame(step);
-    }, [end, duration]);
+function constrain(view) {
+    if (view.zoom === 1) return initialView;
+    const limit = 8;
+    return {
+        ...view,
+        x: Math.max(100 - view.zoom * 100 - limit, Math.min(limit, view.x)),
+        y: Math.max(100 - view.zoom * 100 - limit, Math.min(limit, view.y)),
+    };
+}
 
-    return <span className="text-2xl font-black text-gray-800">{count.toLocaleString('id-ID')}</span>;
-};
+function ArrowIcon() {
+    return <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+}
 
-export default function Welcome({ auth, laravelVersion, phpVersion, totalData = 0 }) {
+function EastJavaMap() {
+    const [view, setView] = useState(initialView);
+    const [dragging, setDragging] = useState(false);
+    const dragStart = useRef(null);
+
+    const reset = () => setView(initialView);
+
+    const changeZoom = (difference) => {
+        setView((current) => {
+            const zoom = Math.max(1, Math.min(2.5, current.zoom + difference));
+            const centerX = (50 - current.x) / current.zoom;
+            const centerY = (50 - current.y) / current.zoom;
+            return constrain({ zoom, x: 50 - centerX * zoom, y: 50 - centerY * zoom });
+        });
+    };
+
+    const startDrag = (event) => {
+        if (view.zoom <= 1 || event.pointerType !== 'mouse' || event.button !== 0 || event.target.closest('button')) return;
+        event.currentTarget.setPointerCapture(event.pointerId);
+        dragStart.current = { x: event.clientX, y: event.clientY, view };
+        setDragging(true);
+    };
+
+    const moveDrag = (event) => {
+        if (!dragStart.current) return;
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const x = dragStart.current.view.x + ((event.clientX - dragStart.current.x) / bounds.width) * 100;
+        const y = dragStart.current.view.y + ((event.clientY - dragStart.current.y) / bounds.height) * 100;
+        setView(constrain({ ...dragStart.current.view, x, y }));
+    };
+
+    const stopDrag = () => {
+        dragStart.current = null;
+        setDragging(false);
+    };
+
     return (
-        <>
-            <Head title="Sistem Monitoring Analisis Real Time Data Kehutanan" />
-            <div className="min-h-screen bg-white text-gray-800 font-sans selection:bg-primary-500 selection:text-white overflow-hidden">
-                {/* Navbar */}
-                <nav className="absolute top-0 w-full z-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex justify-between items-center h-20">
-                            <div className="flex-shrink-0 flex items-center gap-4">
-
-                                {/* Logo Mark - Enhanced */}
-                                <div className="group cursor-pointer flex-shrink-0">
-                                    <div className="w-12 h-12 flex items-center justify-center p-0.5">
-                                        <img src="/img/logo.webp" alt="Logo CDK" className="w-full h-full object-contain" />
-                                    </div>
-                                </div>
-
-                                <div className="hidden sm:flex flex-col">
-                                    <span className="font-display font-bold text-lg text-gray-900 tracking-tight leading-tight">
-                                        Dinas Kehutanan
-                                    </span>
-                                    <span className="text-[10px] uppercase tracking-wider text-primary-700/80 font-bold">
-                                        Provinsi Jawa Timur
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Logo Mark - Gerbang Nusantara (Right Side) */}
-                            <div className="group cursor-pointer flex-shrink-0">
-                                <div className="w-32 h-12 flex items-center justify-center p-0.5">
-                                    <img src="/img/logo_gerbang_nusantara.png" alt="Logo Gerbang Nusantara" className="w-full h-full object-contain" />
-                                </div>
-                            </div>
-                        </div>
+        <div className="welcome-visual">
+            <div className="welcome-visual-header">
+                <span className="welcome-visual-index">JAWA TIMUR</span>
+            </div>
+            <figure className="welcome-map-figure">
+                <div className="welcome-map-viewport" data-dragging={dragging} data-zoomed={view.zoom > 1}
+                    onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={stopDrag} onPointerCancel={stopDrag}
+                    aria-label="Peta interaktif Jawa Timur">
+                    <div className="welcome-map-art" style={{ transform: `translate(${view.x}%, ${view.y}%) scale(${view.zoom})` }}>
+                        <svg viewBox={`0 0 ${eastJavaProjection.width} ${eastJavaProjection.height}`} role="img" aria-label="Peta Jawa Timur dengan batas kabupaten dan kota" preserveAspectRatio="xMidYMid meet">
+                            <defs><clipPath id="welcome-east-java-clip"><path d={eastJavaPath} /></clipPath></defs>
+                            <path className="welcome-map-depth" d={eastJavaPath} transform="translate(0 11)" />
+                            <path className="welcome-map-land" d={eastJavaPath} />
+                            <g clipPath="url(#welcome-east-java-clip)">
+                                {eastJavaDistrictPaths.map((district, index) => <path key={district.name} className="welcome-map-district" d={district.path} pathLength="1" style={{ '--district-order': index }} />)}
+                            </g>
+                            <path className="welcome-map-coast" d={eastJavaPath} pathLength="1" />
+                        </svg>
                     </div>
-                </nav>
-
-                {/* Hero Section */}
-                <div className="relative min-h-screen flex items-center">
-                    {/* Background Subtle Wash */}
-                    <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary-50/50 to-white/80"></div>
-
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 pt-16">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-
-                            {/* Left Column: Content */}
-                            <div className="text-left space-y-6">
-                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs font-bold tracking-wide shadow-sm mb-2">
-                                    <span className="relative flex h-2 w-2">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                    </span>
-                                    Official Platform Dinas Kehutanan Jawa Timur
-                                </div>
-
-                                <div className="mb-10 relative">
-                                    <div className="absolute -left-10 -top-10 w-40 h-40 bg-emerald-100/50 rounded-full blur-3xl -z-10"></div>
-
-                                    <h1 className="text-5xl font-display font-black sm:text-7xl lg:text-8xl leading-none tracking-tighter mb-6">
-                                        <span className="text-yellow-500 drop-shadow-sm font-semibold">
-                                            SMART
-                                        </span>
-                                        <span className='text-primary-900 drop-shadow-sm font-bold mx-1'>-</span>
-                                        <span className="text-primary-900 drop-shadow-sm font-medium">
-                                            HUT
-                                        </span>
-                                    </h1>
-
-                                    <div className="relative pl-6 border-l-4 border-emerald-500/30 py-1">
-                                        <h2 className="font-sans font-bold text-xl sm:text-2xl text-gray-700 leading-snug tracking-tight">
-                                            Sistem Monitoring <span className="text-emerald-700">Analisis Real Time</span> <br />
-                                            Data Kehutanan
-                                        </h2>
-                                    </div>
-                                </div>
-
-                                <p className="font-sans text-base sm:text-lg text-gray-500 leading-relaxed max-w-md">
-                                    Platform terintegrasi untuk monitoring, pengelolaan, dan pelaporan data statistik kehutanan secara akurat dan realtime.
-                                </p>
-
-                                <div className="flex flex-col sm:flex-row flex-wrap gap-4 pt-2">
-                                    <Link
-                                        href={auth.user ? route('dashboard') : route('login')}
-                                        className="px-6 py-3 rounded-full bg-primary-700 text-white font-semibold text-sm hover:bg-primary-800 shadow-lg shadow-primary-700/20 transition-all duration-300 transform hover:-translate-y-0.5 text-center"
-                                    >
-                                        {auth.user ? 'Masuk Admin Panel' : 'Masuk sekarang'}
-                                    </Link>
-                                    <Link
-                                        href={route('public.dashboard')}
-                                        className="px-6 py-3 rounded-full bg-white text-primary-700 border border-primary-200 font-semibold text-sm hover:bg-primary-50 transition-all duration-300 transform hover:-translate-y-0.5 text-center"
-                                    >
-                                        Dashboard Infografis Tahun Berjalan
-                                    </Link>
-                                    <Link
-                                        href={route('public.dashboard-yoy')}
-                                        className="px-6 py-3 rounded-full bg-yellow-400 text-yellow-900 font-semibold text-sm hover:bg-yellow-500 shadow-lg shadow-yellow-400/20 transition-all duration-300 transform hover:-translate-y-0.5 text-center"
-                                    >
-                                        Dashboard Infografis Year-on-Year
-                                    </Link>
-                                </div>
-
-                                <div className="pt-6 flex items-center gap-6 text-gray-400 text-sm font-medium">
-                                    <div className="flex items-center gap-1.5">
-                                        <svg className="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        Realtime
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <svg className="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        Terintegrasi
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <svg className="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        Akurat
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right Column: Visual Composition */}
-                            <div className="relative hidden lg:block h-full">
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] -z-10">
-                                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full text-emerald-50/60 fill-current opacity-70 animate-[pulse_4s_ease-in-out_infinite]">
-                                        <path transform="translate(100 100)" d="M42.7,-72.8C54.6,-67.2,63.1,-54.6,70.9,-42.2C78.7,-29.8,85.8,-17.6,83.9,-6.3C82,5,71.1,15.4,61.8,24.8C52.5,34.2,44.9,42.5,36,50.4C27.1,58.3,16.9,65.8,5.1,68.8C-6.7,71.8,-20.1,70.3,-32.1,64.3C-44.1,58.3,-54.7,47.8,-62.8,35.6C-70.9,23.4,-76.5,9.5,-75.4,-3.9C-74.3,-17.3,-66.5,-30.2,-56.3,-40.4C-46.1,-50.6,-33.5,-58.1,-20.7,-62.9C-7.9,-67.7,6.3,-69.8,20.4,-71.8C34.5,-73.8,48.6,-75.7,42.7,-72.8Z" />
-                                    </svg>
-                                </div>
-
-                                <div className="relative w-full max-w-md mx-auto aspect-[4/5] mt-8">
-                                    {/* Decorative Pattern Grid */}
-                                    <div className="absolute -top-8 -right-8 w-32 h-32 opacity-20">
-                                        <svg className="w-full h-full text-emerald-800" fill="currentColor" viewBox="0 0 100 100">
-                                            <pattern id="grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                                                <circle cx="2" cy="2" r="2" />
-                                            </pattern>
-                                            <rect width="100" height="100" fill="url(#grid)" />
-                                        </svg>
-                                    </div>
-
-                                    {/* Main Image */}
-                                    <div className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl shadow-emerald-900/10 z-10 group">
-                                        <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/80 via-transparent to-transparent z-10 opacity-90 transition-opacity duration-300 group-hover:opacity-100"></div>
-                                        <img
-                                            src="/img/hutan_indonesia.jpeg"
-                                            alt="Hutan Indonesia"
-                                            className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
-                                        />
-
-                                        {/* Bottom Caption on Image */}
-                                        <div className="absolute bottom-8 left-8 right-8 z-20 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <div className="w-8 h-1 bg-yellow-500 rounded-full"></div>
-                                                <span className="text-emerald-100 text-xs font-bold tracking-widest uppercase">Wilayah Kerja</span>
-                                            </div>
-                                            <h3 className="text-white font-display font-bold text-2xl leading-tight">
-                                                Dinas Kehutanan <br /> Provinsi Jawa Timur
-                                            </h3>
-                                        </div>
-                                    </div>
-
-                                    {/* Stats Glass Card */}
-                                    <div className="absolute top-12 -left-6 z-30 perspective-1000 hover:z-40 animate-float">
-                                        <div className="flex items-center gap-4 bg-white/90 backdrop-blur-xl p-4 pr-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 transform transition-all duration-300 hover:scale-105 hover:shadow-emerald-900/20 group">
-                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 group-hover:rotate-12 transition-transform duration-300">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Total Data Terinput</p>
-                                                <div className="flex items-center gap-2">
-                                                    <CountUp end={totalData} duration={2000} />
-                                                    <span className="flex h-2 w-2 relative">
-                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
+                    <span className="welcome-map-north" aria-hidden="true"><span>↑</span><small>U</small></span>
+                    <div className="welcome-map-controls" role="group" aria-label="Kontrol peta">
+                        <button type="button" onClick={() => changeZoom(0.5)} disabled={view.zoom >= 2.5} aria-label="Perbesar peta">+</button>
+                        <span aria-live="polite">{Math.round(view.zoom * 100)}%</span>
+                        <button type="button" onClick={() => changeZoom(-0.5)} disabled={view.zoom <= 1} aria-label="Perkecil peta">−</button>
+                        <button type="button" className="welcome-map-reset" onClick={reset} disabled={view.zoom === 1}>Reset</button>
                     </div>
                 </div>
+                <figcaption className="welcome-map-caption">
+                    <span><i className="welcome-map-key-land" /> Batas provinsi</span>
+                    <span><i className="welcome-map-key-district" /> Batas kabupaten/kota</span>
+                </figcaption>
+            </figure>
+            <div className="welcome-visual-footer" id="welcome-map-detail">
+                <p aria-live="polite">{view.zoom > 1
+                    ? 'Peta Jawa Timur diperbesar. Geser dengan mouse, atau kembalikan tampilan utuh.'
+                    : 'Perbesar peta untuk melihat batas kabupaten dan kota lebih jelas.'}</p>
+                <button type="button" onClick={view.zoom > 1 ? reset : () => changeZoom(0.5)}>
+                    {view.zoom > 1 ? 'Lihat peta utuh' : 'Perbesar peta'} <ArrowIcon />
+                </button>
             </div>
+        </div>
+    );
+}
+
+export default function Welcome({ auth, totalData = 0 }) {
+    const rawCount = Number(totalData);
+    const count = Number.isFinite(rawCount) && rawCount > 0 ? rawCount : 0;
+
+    return (
+        <>
+            <Head title="Data Kehutanan Jawa Timur">
+                <meta name="description" content="SMART-HUT, sistem data kehutanan Dinas Kehutanan Provinsi Jawa Timur." />
+            </Head>
+            <main className="welcome-page">
+                <section className="welcome-hero" aria-labelledby="welcome-title">
+                    <header className="welcome-header">
+                        <div className="welcome-agency">
+                            <img src="/img/logo.webp" alt="Lambang Provinsi Jawa Timur" width="36" height="48" />
+                            <span><strong>Dinas Kehutanan</strong><small>Provinsi Jawa Timur</small></span>
+                        </div>
+                        {auth?.user && <nav className="welcome-nav" aria-label="Navigasi utama">
+                            <Link href={route('public.dashboard')}>Infografis</Link>
+                            <Link href={route('public.dashboard-yoy')}>Perbandingan tahun</Link>
+                        </nav>}
+                        <img className="welcome-gerbang-logo" src="/img/logo_gerbang_nusantara.png" alt="Jawa Timur Gerbang Baru Nusantara" width="155" height="44" />
+                    </header>
+                    <div className="welcome-hero-content">
+                        <div className={`welcome-copy${!auth?.user ? ' welcome-copy--guest' : ''}`}>
+                            <div className="welcome-copy-intro">
+                                <p className="welcome-overline">Dinas Kehutanan Provinsi Jawa Timur</p>
+                                <h1 id="welcome-title"><span className="welcome-title-accent">SMART</span>-HUT</h1>
+                                <p className="welcome-subtitle">Sistem Monitoring Analisis Real Time Data Kehutanan</p>
+                            </div>
+                            <div className="welcome-copy-main">
+                                <p className="welcome-description">SMART-HUT menyatukan data kehutanan dalam satu sistem untuk mendukung monitoring dan analisis pengelolaan hutan di Jawa Timur.</p>
+                                <div className="welcome-actions">
+                                    {!auth?.user && <Link className="welcome-login-action" href={route('login')}>Masuk Sekarang <ArrowIcon /></Link>}
+                                    <Link className="welcome-primary-action" href={route('public.dashboard')}>Infografis Tahun Berjalan <ArrowIcon /></Link>
+                                    <Link className="welcome-comparison-action" href={route('public.dashboard-yoy')}>Infografis Year on Year <ArrowIcon /></Link>
+                                </div>
+                            </div>
+                            <div className="welcome-data">
+                                <span className="welcome-data-rule" />
+                                <div><strong>{count.toLocaleString('id-ID')}</strong><p><b>Total data terinput</b><br />{count > 0 ? 'Catatan dalam sistem SMART-HUT' : 'Belum ada data terinput'}</p></div>
+                            </div>
+                        </div>
+                        <EastJavaMap />
+                    </div>
+                    <footer className="welcome-footer">
+                        <span>© 2026 Dinas Kehutanan Provinsi Jawa Timur</span>
+                        <p>Peta disederhanakan untuk orientasi. <span className='text-black text-opacity-25'>Developed by FNC</span></p>
+                    </footer>
+                </section>
+            </main>
         </>
     );
 }

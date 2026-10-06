@@ -35,7 +35,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         if ($this->user()->roles->isEmpty()) {
-            return redirect()->route('public.dashboard');
+            return redirect()->intended(route('public.dashboard'));
         }
 
         return redirect()->intended(RouteServiceProvider::HOME);

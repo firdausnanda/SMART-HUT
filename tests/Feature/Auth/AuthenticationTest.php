@@ -30,6 +30,20 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('public.dashboard'));
     }
 
+    public function test_login_returns_to_the_selected_year_on_year_dashboard(): void
+    {
+        $user = User::factory()->create();
+
+        $this->get(route('public.dashboard-yoy'))->assertRedirect(route('login'));
+
+        $response = $this->post('/login', [
+            'username' => $user->username,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('public.dashboard-yoy'));
+    }
+
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
         $user = User::factory()->create();
