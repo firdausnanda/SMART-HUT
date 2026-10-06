@@ -3,6 +3,9 @@ import { useRef, useState } from 'react';
 import { eastJavaDistrictPaths, eastJavaPath, eastJavaProjection } from './jawaTimurGeometry';
 import './welcome.css';
 
+const pageTitle = 'SMART-HUT | Sistem Monitoring Data Kehutanan Jawa Timur';
+const pageDescription = 'SMART-HUT adalah platform Dinas Kehutanan Provinsi Jawa Timur untuk monitoring dan analisis data kehutanan.';
+
 const initialView = { zoom: 1, x: 0, y: 0 };
 
 function constrain(view) {
@@ -100,14 +103,36 @@ function EastJavaMap() {
     );
 }
 
-export default function Welcome({ auth, totalData = 0 }) {
+export default function Welcome({ auth, totalData = 0, seo }) {
     const rawCount = Number(totalData);
     const count = Number.isFinite(rawCount) && rawCount > 0 ? rawCount : 0;
+    const homeUrl = seo.homeUrl;
+    const imageUrl = `${homeUrl}img/hutan_indonesia.jpeg`;
+    const organization = {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Dinas Kehutanan Provinsi Jawa Timur',
+        url: homeUrl,
+        logo: `${homeUrl}img/logo.webp`,
+    };
 
     return (
         <>
-            <Head title="Data Kehutanan Jawa Timur">
-                <meta name="description" content="SMART-HUT, sistem data kehutanan Dinas Kehutanan Provinsi Jawa Timur." />
+            <Head title="Sistem Monitoring Data Kehutanan Jawa Timur">
+                <meta head-key="description" name="description" content={pageDescription} />
+                <meta head-key="author" name="author" content="Firdaus Nanda Christian" />
+                <link head-key="canonical" rel="canonical" href={homeUrl} />
+                <meta head-key="og-type" property="og:type" content="website" />
+                <meta head-key="og-locale" property="og:locale" content="id_ID" />
+                <meta head-key="og-title" property="og:title" content={pageTitle} />
+                <meta head-key="og-description" property="og:description" content={pageDescription} />
+                <meta head-key="og-url" property="og:url" content={homeUrl} />
+                <meta head-key="og-image" property="og:image" content={imageUrl} />
+                <meta head-key="twitter-card" name="twitter:card" content="summary_large_image" />
+                <meta head-key="twitter-title" name="twitter:title" content={pageTitle} />
+                <meta head-key="twitter-description" name="twitter:description" content={pageDescription} />
+                <meta head-key="twitter-image" name="twitter:image" content={imageUrl} />
+                <script head-key="organization" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }} />
             </Head>
             <main className="welcome-page">
                 <section className="welcome-hero" aria-labelledby="welcome-title">
@@ -116,10 +141,6 @@ export default function Welcome({ auth, totalData = 0 }) {
                             <img src="/img/logo.webp" alt="Lambang Provinsi Jawa Timur" width="36" height="48" />
                             <span><strong>Dinas Kehutanan</strong><small>Provinsi Jawa Timur</small></span>
                         </div>
-                        {auth?.user && <nav className="welcome-nav" aria-label="Navigasi utama">
-                            <Link href={route('public.dashboard')}>Infografis</Link>
-                            <Link href={route('public.dashboard-yoy')}>Perbandingan tahun</Link>
-                        </nav>}
                         <img className="welcome-gerbang-logo" src="/img/logo_gerbang_nusantara.png" alt="Jawa Timur Gerbang Baru Nusantara" width="155" height="44" />
                     </header>
                     <div className="welcome-hero-content">
@@ -127,14 +148,16 @@ export default function Welcome({ auth, totalData = 0 }) {
                             <div className="welcome-copy-intro">
                                 <p className="welcome-overline">Dinas Kehutanan Provinsi Jawa Timur</p>
                                 <h1 id="welcome-title"><span className="welcome-title-accent">SMART</span>-HUT</h1>
-                                <p className="welcome-subtitle">Sistem Monitoring Analisis Real Time Data Kehutanan</p>
+                                <p className="welcome-subtitle">Sistem Monitoring Analisis <em className="italic">Real Time</em> Data Kehutanan</p>
                             </div>
                             <div className="welcome-copy-main">
                                 <p className="welcome-description">SMART-HUT menyatukan data kehutanan dalam satu sistem untuk mendukung monitoring dan analisis pengelolaan hutan di Jawa Timur.</p>
                                 <div className="welcome-actions">
-                                    {!auth?.user && <Link className="welcome-login-action" href={route('login')}>Masuk Sekarang <ArrowIcon /></Link>}
+                                    {auth?.user
+                                        ? <Link className="welcome-login-action" href={route('dashboard')}>Masuk Dashboard <ArrowIcon /></Link>
+                                        : <Link className="welcome-login-action" href={route('login')}>Masuk Sekarang <ArrowIcon /></Link>}
                                     <Link className="welcome-primary-action" href={route('public.dashboard')}>Infografis Tahun Berjalan <ArrowIcon /></Link>
-                                    <Link className="welcome-comparison-action" href={route('public.dashboard-yoy')}>Infografis Year on Year <ArrowIcon /></Link>
+                                    <Link className="welcome-comparison-action" href={route('public.dashboard-yoy')}><span>Infografis <em className="italic">Year on Year</em></span><ArrowIcon /></Link>
                                 </div>
                             </div>
                             <div className="welcome-data">
@@ -146,7 +169,7 @@ export default function Welcome({ auth, totalData = 0 }) {
                     </div>
                     <footer className="welcome-footer">
                         <span>© 2026 Dinas Kehutanan Provinsi Jawa Timur</span>
-                        <p>Peta disederhanakan untuk orientasi. <span className='text-black text-opacity-25'>Developed by FNC</span></p>
+                        <p>Peta disederhanakan untuk orientasi.</p>
                     </footer>
                 </section>
             </main>
