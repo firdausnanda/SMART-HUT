@@ -5,6 +5,7 @@ namespace Modules\Pemberdayaan\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 
 use App\Models\NilaiEkonomi;
+use App\Models\Cdk;
 use App\Models\Commodity;
 use App\Models\Provinces;
 use App\Models\Regencies;
@@ -132,6 +133,10 @@ class NilaiEkonomiController extends Controller
             ],
             'stats' => $stats,
             'availableYears' => $availableYears,
+            'cdks' => $this->user()->isAdminProvinsi() ? Cdk::orderBy('nama')->get(['id', 'nama']) : [],
+            'exportColumns' => collect(NilaiEkonomiExport::COLUMN_HEADINGS)
+                ->map(fn($label, $key) => ['key' => $key, 'label' => $label])->values(),
+            'exportCommodities' => Commodity::orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -383,8 +388,19 @@ class NilaiEkonomiController extends Controller
 
     public function export(Request $request)
     {
-        $year = $request->query('year');
-        return Excel::download(new NilaiEkonomiExport($year), 'nilai-ekonomi-' . date('Y-m-d') . '.xlsx');
+        $filters = $request->validate([
+            'year' => 'nullable|integer|between:2000,2100',
+            'month' => 'nullable|integer|between:1,12',
+            'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+            'cdk_id' => 'nullable|integer|exists:cdks,id',
+            'regency_id' => 'nullable|integer|min:1',
+            'district_id' => 'nullable|integer|min:1',
+            'commodity_id' => 'nullable|integer|min:1',
+            'columns' => ['sometimes', 'array', 'min:1', 'max:' . count(NilaiEkonomiExport::COLUMN_HEADINGS)],
+            'columns.*' => ['string', 'distinct', Rule::in(array_keys(NilaiEkonomiExport::COLUMN_HEADINGS))],
+        ]);
+
+        return Excel::download(new NilaiEkonomiExport($filters['year'] ?? null, $filters), 'nilai-ekonomi-' . date('Y-m-d') . '.xlsx');
     }
 
     public function template()

@@ -17,7 +17,7 @@ import ExportFilterModal from '@/Components/ExportFilterModal';
 
 const MySwal = withReactContent(Swal);
 
-export default function Index({ auth, datas, forest_type, filters, stats, available_years }) {
+export default function Index({ auth, datas, forest_type, filters, stats, available_years, cdks, exportColumns }) {
   const { flash, errors } = usePage().props;
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Memproses...');
@@ -982,6 +982,8 @@ export default function Index({ auth, datas, forest_type, filters, stats, availa
         onExport={(exportFilters) => { window.location.href = route('hasil-hutan-bukan-kayu.export', { forest_type, ...exportFilters }); }}
         year={year}
         years={yearOptions}
+        cdks={cdks}
+        exportColumns={exportColumns}
       />
       <Modal show={showImportModal} onClose={() => setShowImportModal(false)
       }>

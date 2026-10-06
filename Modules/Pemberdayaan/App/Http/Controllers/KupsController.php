@@ -5,6 +5,7 @@ namespace Modules\Pemberdayaan\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 
 use App\Models\Kups;
+use App\Models\Cdk;
 use App\Models\Provinces;
 use App\Models\Regencies;
 use App\Models\Districts;
@@ -97,6 +98,9 @@ class KupsController extends Controller
         'direction' => $sortDirection,
         'per_page' => (int) $request->query('per_page', 10),
       ],
+      'cdks' => $this->user()->isAdminProvinsi() ? Cdk::orderBy('nama')->get(['id', 'nama']) : [],
+      'exportColumns' => collect(KupsExport::COLUMN_HEADINGS)
+        ->map(fn($label, $key) => ['key' => $key, 'label' => $label])->values(),
     ]);
   }
 
@@ -209,9 +213,18 @@ class KupsController extends Controller
     return redirect()->back()->with('error', 'Gagal memproses laporan atau status tidak sesuai.');
   }
 
-  public function export()
+  public function export(Request $request)
   {
-    return Excel::download(new KupsExport, 'perkembangan-kups-' . date('Y-m-d') . '.xlsx');
+    $filters = $request->validate([
+      'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+      'cdk_id' => 'nullable|integer|exists:cdks,id',
+      'regency_id' => 'nullable|integer|min:1',
+      'district_id' => 'nullable|integer|min:1',
+      'columns' => ['sometimes', 'array', 'min:1', 'max:' . count(KupsExport::COLUMN_HEADINGS)],
+      'columns.*' => ['string', 'distinct', Rule::in(array_keys(KupsExport::COLUMN_HEADINGS))],
+    ]);
+
+    return Excel::download(new KupsExport($filters), 'perkembangan-kups-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()

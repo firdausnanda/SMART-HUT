@@ -5,6 +5,7 @@ namespace Modules\Pemberdayaan\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 
 use App\Models\NilaiTransaksiEkonomi;
+use App\Models\Cdk;
 use App\Models\Commodity;
 use App\Models\NilaiTransaksiEkonomiDetail;
 use App\Actions\BulkWorkflowAction;
@@ -161,6 +162,12 @@ class NilaiTransaksiEkonomiController extends Controller
       'datas' => $datas,
       'stats' => $stats,
       'commodities' => $commodities,
+      'cdks' => $this->user()->isAdminProvinsi()
+        ? Cdk::orderBy('nama')->get(['id', 'nama'])
+        : [],
+      'exportColumns' => collect(NilaiTransaksiEkonomiExport::COLUMN_HEADINGS)
+        ->map(fn($label, $key) => ['key' => $key, 'label' => $label])
+        ->values(),
       'filters' => [
         'year' => (int) $selectedYear,
         'search' => $request->search,
@@ -390,6 +397,9 @@ class NilaiTransaksiEkonomiController extends Controller
       'regency_id' => 'nullable|integer|min:1',
       'district_id' => 'nullable|integer|min:1',
       'commodity_id' => 'nullable|integer|min:1',
+      'cdk_id' => 'nullable|integer|exists:cdks,id',
+      'columns' => ['sometimes', 'array', 'min:1', 'max:' . count(NilaiTransaksiEkonomiExport::COLUMN_HEADINGS)],
+      'columns.*' => ['string', 'distinct', Rule::in(array_keys(NilaiTransaksiEkonomiExport::COLUMN_HEADINGS))],
     ]);
     return Excel::download(new NilaiTransaksiEkonomiExport($filters['year'] ?? null, $filters), 'nilai-transaksi-ekonomi-' . date('Y-m-d') . '.xlsx');
   }

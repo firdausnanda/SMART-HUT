@@ -11,44 +11,48 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class RealisasiPnbpExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithTitle
 {
-  protected $year;
+  public const COLUMN_HEADINGS = [
+    'no' => 'No', 'year' => 'Tahun', 'month' => 'Bulan',
+    'regency' => 'Kabupaten/Kota', 'pengelola_wisata' => 'Pengelola Wisata',
+    'types_of_forest_products' => 'Jenis Hasil Hutan', 'pnbp_target' => 'Target PNBP',
+    'pnbp_realization' => 'Realisasi PNBP', 'status' => 'Status',
+    'creator' => 'Diinput Oleh', 'created_at' => 'Tanggal Input',
+  ];
 
-  public function __construct($year = null)
+  private $year;
+  private array $filters;
+  private array $columns;
+  private int $rowNumber = 0;
+
+  public function __construct($year = null, array $filters = [])
   {
     $this->year = $year;
+    $this->filters = $filters;
+    $this->columns = $filters['columns'] ?? array_keys(self::COLUMN_HEADINGS);
   }
 
   public function query()
   {
     return RealisasiPnbp::query()
-      ->with(['creator', 'regency', 'pengelola_wisata'])
-      ->where('status', 'final')
+      ->with(['creator:id,name', 'regency', 'pengelola_wisata'])
+      ->when(($this->filters['status'] ?? 'final') !== 'all', fn($q) => $q->where('status', $this->filters['status'] ?? 'final'))
       ->when($this->year, fn($q) => $q->where('year', $this->year))
+      ->when($this->filters['month'] ?? null, fn($q, $value) => $q->where('month', $value))
+      ->when($this->filters['cdk_id'] ?? null, fn($q, $value) => $q->where('cdk_id', $value))
+      ->when($this->filters['regency_id'] ?? null, fn($q, $value) => $q->where('regency_id', $value))
+      ->when($this->filters['pengelola_wisata_id'] ?? null, fn($q, $value) => $q->where('id_pengelola_wisata', $value))
       ->orderBy('year', 'desc')
       ->orderBy('month', 'asc');
   }
 
   public function headings(): array
   {
-    return [
-      'No',
-      'Tahun',
-      'Bulan',
-      'Kabupaten/Kota',
-      'Pengelola Wisata',
-      'Jenis Hasil Hutan',
-      'Target PNBP',
-      'Realisasi PNBP',
-      'Status',
-      'Diinput Oleh',
-      'Tanggal Input'
-    ];
+    return array_map(fn($column) => self::COLUMN_HEADINGS[$column], $this->columns);
   }
 
   public function map($row): array
   {
-    static $no = 0;
-    $no++;
+    $this->rowNumber++;
     $monthNames = [
       1 => 'Januari',
       2 => 'Februari',
@@ -64,19 +68,21 @@ class RealisasiPnbpExport implements FromQuery, WithHeadings, WithMapping, Shoul
       12 => 'Desember'
     ];
 
-    return [
-      $no,
-      $row->year,
-      $monthNames[$row->month] ?? $row->month,
-      $row->regency->name ?? '-',
-      $row->pengelola_wisata->name ?? '-',
-      $row->types_of_forest_products,
-      $row->pnbp_target,
-      $row->pnbp_realization,
-      ucfirst($row->status),
-      $row->creator->name ?? 'Unknown',
-      $row->created_at->format('d-m-Y H:i'),
+    $values = [
+      'no' => $this->rowNumber,
+      'year' => $row->year,
+      'month' => $monthNames[$row->month] ?? $row->month,
+      'regency' => $row->regency?->name ?? '-',
+      'pengelola_wisata' => $row->pengelola_wisata?->name ?? '-',
+      'types_of_forest_products' => $row->types_of_forest_products,
+      'pnbp_target' => $row->pnbp_target,
+      'pnbp_realization' => $row->pnbp_realization,
+      'status' => ucfirst($row->status),
+      'creator' => $row->creator?->name ?? 'Unknown',
+      'created_at' => $row->created_at?->format('d-m-Y H:i') ?? '-',
     ];
+
+    return array_map(fn($column) => $values[$column], $this->columns);
   }
 
   public function title(): string

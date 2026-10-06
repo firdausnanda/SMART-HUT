@@ -5,6 +5,7 @@ namespace Modules\Perlindungan\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 
 use App\Models\PengunjungWisata;
+use App\Models\Cdk;
 use App\Models\PengelolaWisata;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -114,6 +115,10 @@ class PengunjungWisataController extends Controller
         'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
+      'cdks' => $this->user()->isAdminProvinsi() ? Cdk::orderBy('nama')->get(['id', 'nama']) : [],
+      'exportManagers' => PengelolaWisata::orderBy('name')->get(['id', 'name']),
+      'exportColumns' => collect(PengunjungWisataExport::COLUMN_HEADINGS)
+        ->map(fn($label, $key) => ['key' => $key, 'label' => $label])->values(),
     ]);
   }
 
@@ -221,8 +226,17 @@ class PengunjungWisataController extends Controller
    */
   public function export(Request $request)
   {
-    $year = $request->query('year');
-    return Excel::download(new PengunjungWisataExport($year), 'pengunjung-wisata-' . date('Y-m-d') . '.xlsx');
+    $filters = $request->validate([
+      'year' => 'nullable|integer|between:2000,2100',
+      'month' => 'nullable|integer|between:1,12',
+      'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+      'cdk_id' => 'nullable|integer|exists:cdks,id',
+      'pengelola_wisata_id' => 'nullable|integer|exists:m_pengelola_wisata,id',
+      'columns' => ['sometimes', 'array', 'min:1', 'max:' . count(PengunjungWisataExport::COLUMN_HEADINGS)],
+      'columns.*' => ['string', 'distinct', Rule::in(array_keys(PengunjungWisataExport::COLUMN_HEADINGS))],
+    ]);
+
+    return Excel::download(new PengunjungWisataExport($filters['year'] ?? null, $filters), 'pengunjung-wisata-' . date('Y-m-d') . '.xlsx');
   }
 
   /**

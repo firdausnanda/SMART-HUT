@@ -4,6 +4,7 @@ namespace Modules\Perlindungan\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\KebakaranHutan;
+use App\Models\Cdk;
 use App\Models\PengelolaWisata;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -135,6 +136,10 @@ class KebakaranHutanController extends Controller
         'per_page' => (int) $request->query('per_page', 10),
       ],
       'availableYears' => $availableYears,
+      'cdks' => $this->user()->isAdminProvinsi() ? Cdk::orderBy('nama')->get(['id', 'nama']) : [],
+      'exportManagers' => PengelolaWisata::orderBy('name')->get(['id', 'name']),
+      'exportColumns' => collect(KebakaranHutanExport::COLUMN_HEADINGS)
+        ->map(fn($label, $key) => ['key' => $key, 'label' => $label])->values(),
     ]);
   }
 
@@ -260,8 +265,19 @@ class KebakaranHutanController extends Controller
    */
   public function export(Request $request)
   {
-    $year = $request->query('year');
-    return Excel::download(new KebakaranHutanExport($year), 'kebakaran-hutan-' . date('Y-m-d') . '.xlsx');
+    $filters = $request->validate([
+      'year' => 'nullable|integer|between:2000,2100',
+      'month' => 'nullable|integer|between:1,12',
+      'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+      'cdk_id' => 'nullable|integer|exists:cdks,id',
+      'regency_id' => 'nullable|integer|min:1',
+      'district_id' => 'nullable|integer|min:1',
+      'pengelola_wisata_id' => 'nullable|integer|exists:m_pengelola_wisata,id',
+      'columns' => ['sometimes', 'array', 'min:1', 'max:' . count(KebakaranHutanExport::COLUMN_HEADINGS)],
+      'columns.*' => ['string', 'distinct', Rule::in(array_keys(KebakaranHutanExport::COLUMN_HEADINGS))],
+    ]);
+
+    return Excel::download(new KebakaranHutanExport($filters['year'] ?? null, $filters), 'kebakaran-hutan-' . date('Y-m-d') . '.xlsx');
   }
 
   /**

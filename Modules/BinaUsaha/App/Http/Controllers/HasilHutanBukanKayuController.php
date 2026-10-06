@@ -5,6 +5,7 @@ namespace Modules\BinaUsaha\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 
 use App\Models\HasilHutanBukanKayu;
+use App\Models\Cdk;
 use App\Models\HasilHutanBukanKayuDetail;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -174,6 +175,9 @@ class HasilHutanBukanKayuController extends Controller
       'forest_type' => $forestType,
       'stats' => $stats,
       'available_years' => $availableYears,
+      'cdks' => $this->user()->isAdminProvinsi() ? Cdk::orderBy('nama')->get(['id', 'nama']) : [],
+      'exportColumns' => collect(HasilHutanBukanKayuExport::COLUMN_HEADINGS)
+        ->map(fn($label, $key) => ['key' => $key, 'label' => $label])->values(),
       'filters' => [
         'year' => (int) $selectedYear,
         'search' => $request->search,
@@ -405,8 +409,11 @@ class HasilHutanBukanKayuController extends Controller
       'year' => 'nullable|integer|between:2000,2100',
       'month' => 'nullable|integer|between:1,12',
       'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+      'cdk_id' => 'nullable|integer|exists:cdks,id',
       'regency_id' => 'nullable|integer|min:1',
       'district_id' => 'nullable|integer|min:1',
+      'columns' => ['sometimes', 'array', 'min:1', 'max:' . count(HasilHutanBukanKayuExport::COLUMN_HEADINGS)],
+      'columns.*' => ['string', 'distinct', Rule::in(array_keys(HasilHutanBukanKayuExport::COLUMN_HEADINGS))],
     ]);
     return Excel::download(new HasilHutanBukanKayuExport($forestType, $filters['year'] ?? null, $filters), 'hasil-hutan-bukan-kayu-' . date('Y-m-d') . '.xlsx');
   }

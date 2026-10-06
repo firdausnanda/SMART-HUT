@@ -5,6 +5,7 @@ namespace Modules\Pemberdayaan\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 
 use App\Models\Skps;
+use App\Models\Cdk;
 use App\Models\SkemaPerhutananSosial;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -118,6 +119,9 @@ class SkpsController extends Controller
         'direction' => $sortDirection,
         'per_page' => (int) $request->query('per_page', 10),
       ],
+      'cdks' => $this->user()->isAdminProvinsi() ? Cdk::orderBy('nama')->get(['id', 'nama']) : [],
+      'exportColumns' => collect(SkpsExport::COLUMN_HEADINGS)
+        ->map(fn($label, $key) => ['key' => $key, 'label' => $label])->values(),
     ]);
   }
 
@@ -243,9 +247,18 @@ class SkpsController extends Controller
     return redirect()->back()->with('error', 'Gagal memproses laporan atau status tidak sesuai.');
   }
 
-  public function export()
+  public function export(Request $request)
   {
-    return Excel::download(new SkpsExport, 'perkembangan-skps-' . date('Y-m-d') . '.xlsx');
+    $filters = $request->validate([
+      'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+      'cdk_id' => 'nullable|integer|exists:cdks,id',
+      'regency_id' => 'nullable|integer|min:1',
+      'district_id' => 'nullable|integer|min:1',
+      'columns' => ['sometimes', 'array', 'min:1', 'max:' . count(SkpsExport::COLUMN_HEADINGS)],
+      'columns.*' => ['string', 'distinct', Rule::in(array_keys(SkpsExport::COLUMN_HEADINGS))],
+    ]);
+
+    return Excel::download(new SkpsExport($filters), 'perkembangan-skps-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()

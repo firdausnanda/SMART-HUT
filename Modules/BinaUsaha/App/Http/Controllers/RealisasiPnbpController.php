@@ -5,6 +5,7 @@ namespace Modules\BinaUsaha\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 
 use App\Models\RealisasiPnbp;
+use App\Models\Cdk;
 use App\Models\PengelolaWisata;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -122,6 +123,10 @@ class RealisasiPnbpController extends Controller
       'datas' => $datas,
       'stats' => $stats,
       'available_years' => $availableYears,
+      'cdks' => $this->user()->isAdminProvinsi() ? Cdk::orderBy('nama')->get(['id', 'nama']) : [],
+      'exportManagers' => PengelolaWisata::orderBy('name')->get(['id', 'name']),
+      'exportColumns' => collect(RealisasiPnbpExport::COLUMN_HEADINGS)
+        ->map(fn($label, $key) => ['key' => $key, 'label' => $label])->values(),
       'filters' => [
         'year' => (int) $selectedYear,
         'search' => $request->search,
@@ -245,8 +250,18 @@ class RealisasiPnbpController extends Controller
 
   public function export(Request $request)
   {
-    $year = $request->query('year');
-    return Excel::download(new RealisasiPnbpExport($year), 'realisasi-pnbp-' . date('Y-m-d') . '.xlsx');
+    $filters = $request->validate([
+      'year' => 'nullable|integer|between:2000,2100',
+      'month' => 'nullable|integer|between:1,12',
+      'status' => 'nullable|in:all,draft,waiting_kasi,waiting_cdk,final,rejected',
+      'cdk_id' => 'nullable|integer|exists:cdks,id',
+      'regency_id' => 'nullable|integer|min:1',
+      'pengelola_wisata_id' => 'nullable|integer|exists:m_pengelola_wisata,id',
+      'columns' => ['sometimes', 'array', 'min:1', 'max:' . count(RealisasiPnbpExport::COLUMN_HEADINGS)],
+      'columns.*' => ['string', 'distinct', Rule::in(array_keys(RealisasiPnbpExport::COLUMN_HEADINGS))],
+    ]);
+
+    return Excel::download(new RealisasiPnbpExport($filters['year'] ?? null, $filters), 'realisasi-pnbp-' . date('Y-m-d') . '.xlsx');
   }
 
   public function template()

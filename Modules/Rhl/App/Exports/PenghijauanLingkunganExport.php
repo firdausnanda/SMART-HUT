@@ -11,48 +11,51 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class PenghijauanLingkunganExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithTitle
 {
-  protected $year;
+  public const COLUMN_HEADINGS = [
+    'no' => 'No', 'year' => 'Tahun', 'month' => 'Bulan', 'province' => 'Provinsi',
+    'regency' => 'Kabupaten/Kota', 'district' => 'Kecamatan', 'village' => 'Desa/Kelurahan',
+    'target_annual' => 'Target Tahunan (Ha)', 'realization' => 'Realisasi (Ha)',
+    'fund_source' => 'Sumber Dana', 'status' => 'Status', 'creator' => 'Diinput Oleh',
+    'created_at' => 'Tanggal Input',
+  ];
 
-  public function __construct($year = null)
+  private $year;
+  private array $filters;
+  private array $columns;
+  private int $rowNumber = 0;
+
+  public function __construct($year = null, array $filters = [])
   {
     $this->year = $year;
+    $this->filters = $filters;
+    $this->columns = $filters['columns'] ?? array_keys(self::COLUMN_HEADINGS);
   }
 
   public function query()
   {
     return PenghijauanLingkungan::query()
-      ->with(['province_rel', 'regency_rel', 'district_rel', 'village_rel', 'creator'])
-      ->where('status', 'final')
+      ->with(['province_rel', 'regency_rel', 'district_rel', 'village_rel', 'creator:id,name'])
+      ->when(($this->filters['status'] ?? 'final') !== 'all', fn($q) => $q->where('status', $this->filters['status'] ?? 'final'))
       ->when($this->year, function ($q) {
         return $q->where('year', $this->year);
       })
+      ->when($this->filters['month'] ?? null, fn($q, $value) => $q->where('month', $value))
+      ->when($this->filters['cdk_id'] ?? null, fn($q, $value) => $q->where('cdk_id', $value))
+      ->when($this->filters['regency_id'] ?? null, fn($q, $value) => $q->where('regency_id', $value))
+      ->when($this->filters['district_id'] ?? null, fn($q, $value) => $q->where('district_id', $value))
+      ->when($this->filters['fund_source'] ?? null, fn($q, $value) => $q->where('fund_source', $value))
       ->orderBy('year', 'desc')
       ->orderBy('month', 'asc');
   }
 
   public function headings(): array
   {
-    return [
-      'No',
-      'Tahun',
-      'Bulan',
-      'Provinsi',
-      'Kabupaten/Kota',
-      'Kecamatan',
-      'Desa/Kelurahan',
-      'Target Tahunan (Ha)',
-      'Realisasi (Ha)',
-      'Sumber Dana',
-      'Status',
-      'Diinput Oleh',
-      'Tanggal Input',
-    ];
+    return array_map(fn($column) => self::COLUMN_HEADINGS[$column], $this->columns);
   }
 
   public function map($row): array
   {
-    static $no = 0;
-    $no++;
+    $this->rowNumber++;
 
     $monthNames = [
       1 => 'Januari',
@@ -77,21 +80,23 @@ class PenghijauanLingkunganExport implements FromQuery, WithHeadings, WithMappin
       'other' => 'Lainnya',
     ];
 
-    return [
-      $no,
-      $row->year,
-      $monthNames[$row->month] ?? $row->month,
-      $row->province_rel->name ?? 'JAWA TIMUR',
-      $row->regency_rel->name ?? '-',
-      $row->district_rel->name ?? '-',
-      $row->village_rel->name ?? '-',
-      number_format($row->target_annual, 2, ',', '.'),
-      number_format($row->realization, 2, ',', '.'),
-      $fundSourceLabels[$row->fund_source] ?? $row->fund_source,
-      ucfirst($row->status),
-      $row->creator->name ?? 'Unknown',
-      $row->created_at->format('d-m-Y H:i'),
+    $values = [
+      'no' => $this->rowNumber,
+      'year' => $row->year,
+      'month' => $monthNames[$row->month] ?? $row->month,
+      'province' => $row->province_rel?->name ?? 'JAWA TIMUR',
+      'regency' => $row->regency_rel?->name ?? '-',
+      'district' => $row->district_rel?->name ?? '-',
+      'village' => $row->village_rel?->name ?? '-',
+      'target_annual' => number_format($row->target_annual, 2, ',', '.'),
+      'realization' => number_format($row->realization, 2, ',', '.'),
+      'fund_source' => $fundSourceLabels[$row->fund_source] ?? $row->fund_source,
+      'status' => ucfirst($row->status),
+      'creator' => $row->creator?->name ?? 'Unknown',
+      'created_at' => $row->created_at?->format('d-m-Y H:i') ?? '-',
     ];
+
+    return array_map(fn($column) => $values[$column], $this->columns);
   }
 
   public function title(): string
