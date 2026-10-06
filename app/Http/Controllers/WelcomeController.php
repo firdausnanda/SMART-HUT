@@ -53,6 +53,9 @@ class WelcomeController extends Controller
       'laravelVersion' => Application::VERSION,
       'phpVersion' => PHP_VERSION,
       'totalData' => $totalData,
+      'seo' => [
+        'homeUrl' => rtrim(config('app.url'), '/') . '/',
+      ],
     ]);
   }
 }

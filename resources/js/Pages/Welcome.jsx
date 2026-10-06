@@ -1,6 +1,9 @@
 import { Link, Head } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
+const pageTitle = 'SMART-HUT | Sistem Monitoring Data Kehutanan Jawa Timur';
+const pageDescription = 'SMART-HUT adalah platform Dinas Kehutanan Provinsi Jawa Timur untuk monitoring, pengelolaan, dan pelaporan data kehutanan.';
+
 const CountUp = ({ end, duration }) => {
     const [count, setCount] = useState(0);
 
@@ -20,10 +23,34 @@ const CountUp = ({ end, duration }) => {
     return <span className="text-2xl font-black text-gray-800">{count.toLocaleString('id-ID')}</span>;
 };
 
-export default function Welcome({ auth, laravelVersion, phpVersion, totalData = 0 }) {
+export default function Welcome({ auth, laravelVersion, phpVersion, totalData = 0, seo }) {
+    const homeUrl = seo.homeUrl;
+    const imageUrl = `${homeUrl}img/hutan_indonesia.jpeg`;
+    const organization = {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Dinas Kehutanan Provinsi Jawa Timur',
+        url: homeUrl,
+        logo: `${homeUrl}img/logo.webp`,
+    };
+
     return (
         <>
-            <Head title="Sistem Monitoring Analisis Real Time Data Kehutanan" />
+            <Head title="Sistem Monitoring Data Kehutanan Jawa Timur">
+                <meta head-key="description" name="description" content={pageDescription} />
+                <link head-key="canonical" rel="canonical" href={homeUrl} />
+                <meta head-key="og-type" property="og:type" content="website" />
+                <meta head-key="og-locale" property="og:locale" content="id_ID" />
+                <meta head-key="og-title" property="og:title" content={pageTitle} />
+                <meta head-key="og-description" property="og:description" content={pageDescription} />
+                <meta head-key="og-url" property="og:url" content={homeUrl} />
+                <meta head-key="og-image" property="og:image" content={imageUrl} />
+                <meta head-key="twitter-card" name="twitter:card" content="summary_large_image" />
+                <meta head-key="twitter-title" name="twitter:title" content={pageTitle} />
+                <meta head-key="twitter-description" name="twitter:description" content={pageDescription} />
+                <meta head-key="twitter-image" name="twitter:image" content={imageUrl} />
+                <script head-key="organization" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }} />
+            </Head>
             <div className="min-h-screen bg-white text-gray-800 font-sans selection:bg-primary-500 selection:text-white overflow-hidden">
                 {/* Navbar */}
                 <nav className="absolute top-0 w-full z-50">
