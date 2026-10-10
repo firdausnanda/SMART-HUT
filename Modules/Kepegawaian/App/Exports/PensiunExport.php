@@ -7,10 +7,15 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PensiunExport implements FromCollection, WithHeadings, WithTitle, WithStyles, ShouldAutoSize
+class PensiunExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithTitle, WithStyles, ShouldAutoSize, WithColumnFormatting, WithCustomValueBinder
 {
+    use BindsIdentifierColumnsAsText;
+
     protected $data;
 
     public function __construct($data)

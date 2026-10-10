@@ -7,12 +7,22 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PegawaiTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle, WithStyles, WithEvents
+class PegawaiTemplateExport extends DefaultValueBinder implements WithHeadings, ShouldAutoSize, WithTitle, WithStyles, WithEvents, WithCustomValueBinder
 {
+    use BindsIdentifierColumnsAsText;
+
+    protected function identifierColumns(): array
+    {
+        return ['A', 'C'];
+    }
+
     public function title(): string
     {
         return 'Template Import Pegawai';
@@ -83,6 +93,9 @@ class PegawaiTemplateExport implements WithHeadings, ShouldAutoSize, WithTitle, 
                         'Aktif',
                     ]
                 ], null, 'A2');
+
+                $sheet->getStyle('A2:A1000')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
+                $sheet->getStyle('C2:C1000')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
 
                 // Style example row
                 $sheet->getStyle('A2:S2')->applyFromArray([

@@ -2,11 +2,22 @@
 
 namespace Tests\Feature;
 
+use App\Models\Pegawai;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Maatwebsite\Excel\Facades\Excel;
+use Modules\Kepegawaian\App\Exports\KgbExport;
+use Modules\Kepegawaian\App\Exports\PegawaiExport;
+use Modules\Kepegawaian\App\Exports\PegawaiTemplateExport;
+use Modules\Kepegawaian\App\Exports\PensiunExport;
+use Modules\Kepegawaian\App\Exports\RekapBulananExport;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Spatie\Permission\Models\Permission;
 use Tests\Concerns\UsesIsolatedUserDatabase;
 use Tests\TestCase;
@@ -68,6 +79,8 @@ class KepegawaianModuleFlowTest extends TestCase
             $table->unsignedBigInteger('cdk_id')->nullable();
             $table->integer('periode_tahun');
             $table->integer('periode_bulan');
+            $table->string('nip')->nullable();
+            $table->string('nama_lengkap')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -110,6 +123,97 @@ class KepegawaianModuleFlowTest extends TestCase
             $response->assertOk();
             $this->assertStringContainsString($filename, $response->headers->get('content-disposition'));
         }
+    }
+
+    public function test_nik_and_nip_are_exported_as_exact_text(): void
+    {
+        $this->actingAs(User::factory()->create(['cdk_id' => 42]));
+
+        $nip = '199001012015011001';
+        $nik = '3578123456789001';
+        Pegawai::create([
+            'cdk_id' => 42,
+            'nip' => $nip,
+            'nik' => $nik,
+            'nama_lengkap' => 'Pegawai Uji',
+            'jenis_kelamin' => 'L',
+            'status' => 'final',
+            'status_kedudukan' => 'Aktif',
+        ]);
+        Pegawai::create([
+            'cdk_id' => 42,
+            'nip' => '012345678901234567',
+            'nik' => '0012345678901234',
+            'nama_lengkap' => 'Pegawai Uji 2',
+            'jenis_kelamin' => 'L',
+            'status' => 'final',
+            'status_kedudukan' => 'Aktif',
+        ]);
+
+        $pegawaiSheet = $this->readExport(new PegawaiExport)->getActiveSheet();
+        $this->assertSame(DataType::TYPE_NUMERIC, $pegawaiSheet->getCell('A2')->getDataType());
+        $this->assertIdentifierCell($pegawaiSheet->getCell('B2'), $nip);
+        $this->assertIdentifierCell($pegawaiSheet->getCell('D2'), $nik);
+        $this->assertIdentifierCell($pegawaiSheet->getCell('B3'), '012345678901234567');
+        $this->assertIdentifierCell($pegawaiSheet->getCell('D3'), '0012345678901234');
+
+        DB::table('rekap_bulanan_pegawai')->insert([
+            'cdk_id' => 42,
+            'periode_tahun' => 2026,
+            'periode_bulan' => 9,
+            'nip' => $nip,
+            'nama_lengkap' => 'Pegawai Uji',
+        ]);
+        $rekapSheet = $this->readExport(new RekapBulananExport(2026, 9))->getSheetByName('Detail Snapshot Pegawai');
+        $this->assertIdentifierCell($rekapSheet->getCell('B2'), $nip);
+
+        $kgbSheet = $this->readExport(new KgbExport([[
+            'nip' => $nip,
+            'nama' => 'Pegawai Uji',
+            'pangkat_golongan' => 'III/a',
+            'unit_kerja' => 'CDK Uji',
+            'tmt_kgb_berikutnya' => '2026-09-01',
+            'status' => 'Akan Datang',
+        ]]))->getActiveSheet();
+        $this->assertIdentifierCell($kgbSheet->getCell('B2'), $nip);
+
+        $pensiunSheet = $this->readExport(new PensiunExport([[
+            'nip' => $nip,
+            'nama' => 'Pegawai Uji',
+            'pangkat_golongan' => 'III/a',
+            'unit_kerja' => 'CDK Uji',
+            'tanggal_lahir' => '1968-09-01',
+            'bup' => 58,
+            'tmt_pensiun' => '2026-09-01',
+            'status' => 'Akan Datang',
+        ]]))->getActiveSheet();
+        $this->assertIdentifierCell($pensiunSheet->getCell('B2'), $nip);
+
+        $templateSheet = $this->readExport(new PegawaiTemplateExport)->getActiveSheet();
+        $this->assertIdentifierCell($templateSheet->getCell('A2'), '199001012015011001');
+        $this->assertIdentifierCell($templateSheet->getCell('C2'), '3578123456789001');
+        $this->assertSame(NumberFormat::FORMAT_TEXT, $templateSheet->getStyle('A3')->getNumberFormat()->getFormatCode());
+        $this->assertSame(NumberFormat::FORMAT_TEXT, $templateSheet->getStyle('C3')->getNumberFormat()->getFormatCode());
+    }
+
+    private function readExport(object $export): Spreadsheet
+    {
+        $path = tempnam(sys_get_temp_dir(), 'pegawai-export-');
+
+        try {
+            file_put_contents($path, Excel::raw($export, \Maatwebsite\Excel\Excel::XLSX));
+
+            return IOFactory::load($path);
+        } finally {
+            unlink($path);
+        }
+    }
+
+    private function assertIdentifierCell(\PhpOffice\PhpSpreadsheet\Cell\Cell $cell, string $expected): void
+    {
+        $this->assertSame($expected, $cell->getValue());
+        $this->assertSame(DataType::TYPE_STRING, $cell->getDataType());
+        $this->assertSame(NumberFormat::FORMAT_TEXT, $cell->getStyle()->getNumberFormat()->getFormatCode());
     }
 
     public function test_employee_csv_import_uses_the_module_importer(): void

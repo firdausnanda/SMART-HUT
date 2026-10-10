@@ -9,10 +9,20 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PegawaiExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles, WithTitle
+class PegawaiExport extends DefaultValueBinder implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles, WithTitle, WithColumnFormatting, WithCustomValueBinder
 {
+    use BindsIdentifierColumnsAsText;
+
+    protected function identifierColumns(): array
+    {
+        return ['B', 'D'];
+    }
+
     public function query()
     {
         return Pegawai::with('bezetting', 'creator')->orderBy('nama_lengkap');

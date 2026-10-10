@@ -11,6 +11,9 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class RekapBulananExport implements WithMultipleSheets
@@ -88,8 +91,10 @@ class RekapStatistikSheet implements FromCollection, WithTitle, WithHeadings, Sh
     }
 }
 
-class RekapDetailPegawaiSheet implements FromCollection, WithTitle, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
+class RekapDetailPegawaiSheet extends DefaultValueBinder implements FromCollection, WithTitle, WithHeadings, WithMapping, ShouldAutoSize, WithStyles, WithColumnFormatting, WithCustomValueBinder
 {
+    use BindsIdentifierColumnsAsText;
+
     protected $year;
     protected $month;
     protected $rowNumber = 0;
@@ -122,7 +127,7 @@ class RekapDetailPegawaiSheet implements FromCollection, WithTitle, WithHeadings
         $this->rowNumber++;
         return [
             $this->rowNumber,
-            $row->nip . ' ', // force string
+            $row->nip,
             $row->nama_lengkap,
             $row->status_pegawai,
             $row->pangkat_golongan,
