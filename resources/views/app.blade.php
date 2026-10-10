@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="app-name" content="{{ config('app.name', 'SMART-HUT') }}">
+    <meta name="description" content="{{ config('app.name', 'SMART-HUT') }} merupakan sistem informasi manajemen terpadu untuk kemudahan pemantauan, pengelolaan data, dan efisiensi operasional.">
+    <meta name="keywords" content="smart-hut, kda, sistem informasi, manajemen data, pemantauan, aplikasi web, terintegrasi">
+    <meta name="author" content="Firdaus Nanda Christian">
 
     <title inertia>{{ config('app.name', 'SMART-HUT') }}</title>
 
