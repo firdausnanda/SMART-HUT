@@ -4,8 +4,6 @@ import { useState } from 'react';
 
 export default function Index({ auth, backups }) {
   const [isCreating, setIsCreating] = useState(false);
-  const [deletingFile, setDeletingFile] = useState(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { flash } = usePage().props;
 
   const handleCreateBackup = () => {
@@ -13,22 +11,6 @@ export default function Index({ auth, backups }) {
     router.post(route('backups.create'), {}, {
       onFinish: () => setIsCreating(false),
     });
-  };
-
-  const confirmDelete = (filename) => {
-    setDeletingFile(filename);
-    setShowDeleteConfirm(true);
-  };
-
-  const handleDelete = () => {
-    if (deletingFile) {
-      router.delete(route('backups.destroy', deletingFile), {
-        onFinish: () => {
-          setShowDeleteConfirm(false);
-          setDeletingFile(null);
-        },
-      });
-    }
   };
 
   return (
@@ -195,15 +177,6 @@ export default function Index({ auth, backups }) {
                           </svg>
                           Unduh
                         </a>
-                        <button
-                          onClick={() => confirmDelete(backup.name)}
-                          className="inline-flex items-center px-3 py-1.5 text-xs font-bold text-red-700 bg-red-50 rounded-lg hover:bg-red-100 transition-colors border border-red-100"
-                        >
-                          <svg className="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                          Hapus
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -231,46 +204,6 @@ export default function Index({ auth, backups }) {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 z-[100] overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
-            <div className="fixed inset-0 bg-gray-500/75 transition-opacity" onClick={() => setShowDeleteConfirm(false)}></div>
-            <div className="relative bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
-              <div className="bg-white px-6 pt-6 pb-4">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900">Hapus Backup</h3>
-                    <p className="mt-2 text-sm text-gray-500">
-                      Apakah Anda yakin ingin menghapus file backup <span className="font-semibold text-gray-700">{deletingFile}</span>?
-                      Tindakan ini tidak dapat dibatalkan.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-                >
-                  Batal
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="px-4 py-2 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors"
-                >
-                  Ya, Hapus
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </AuthenticatedLayout>
   );
 }
