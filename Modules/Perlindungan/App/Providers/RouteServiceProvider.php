@@ -28,6 +28,7 @@ class RouteServiceProvider extends ServiceProvider
     public function map(): void
     {
         $this->mapWebRoutes();
+        $this->mapApiRoutes();
     }
 
     /**
@@ -42,4 +43,14 @@ class RouteServiceProvider extends ServiceProvider
             ->group(module_path('Perlindungan', '/routes/web.php'));
     }
 
+    /**
+     * Endpoint data Perlindungan untuk klien integrasi (/api/v1/perlindungan/...).
+     */
+    protected function mapApiRoutes(): void
+    {
+        Route::prefix('api/v1')
+            ->name('api.v1.')
+            ->middleware(['api', 'integrasi'])
+            ->group(module_path('Perlindungan', '/routes/api.php'));
+    }
 }

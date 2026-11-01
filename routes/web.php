@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\ApiDocumentationController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\CdkController;
+use App\Http\Controllers\IntegrasiKlienController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -15,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index']);
+
+// Dokumentasi API integrasi data (publik; akses data tetap memakai token)
+Route::get('/docs/api', [ApiDocumentationController::class, 'show'])->name('docs.api');
 
 Route::middleware('auth')->group(function () {
     // User management
@@ -32,6 +37,13 @@ Route::middleware('auth')->group(function () {
     Route::resource('cdks', CdkController::class)->only(['store'])->middleware('permission:cdks.create');
     Route::resource('cdks', CdkController::class)->only(['update'])->middleware('permission:cdks.edit');
     Route::resource('cdks', CdkController::class)->only(['destroy'])->middleware('permission:cdks.delete');
+
+    // Klien API integrasi data (SIPETAK, CDK Trenggalek, dll.)
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('integrasi-klien', IntegrasiKlienController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::post('integrasi-klien/{integrasi_klien}/tokens', [IntegrasiKlienController::class, 'storeToken'])->name('integrasi-klien.tokens.store');
+        Route::delete('integrasi-klien/{integrasi_klien}/tokens/{token}', [IntegrasiKlienController::class, 'destroyToken'])->whereNumber('token')->name('integrasi-klien.tokens.destroy');
+    });
 
     Route::resource('activity-log', ActivityLogController::class)->only(['index'])->middleware('permission:activity-log.view');
 

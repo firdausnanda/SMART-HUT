@@ -117,6 +117,10 @@ Ikuti langkah-langkah berikut untuk menjalankan aplikasi di lingkungan lokal And
 
 ERD dan petunjuk pembaruannya tersedia di [docs/database](docs/database/README.md). File DBML dikelompokkan menurut domain aplikasi dan dapat dibuat ulang dari skema MySQL pengembangan.
 
+## 🔌 API Integrasi Data
+
+Sistem lain (saat ini SIPETAK dan CDK Trenggalek) membaca data final SMART-HUT melalui `/api/v1` memakai token Sanctum. Panduan integrator dan admin ada di [docs/integrasi-data](docs/integrasi-data/README.md), rencana tahapannya di [rencana.md](docs/integrasi-data/rencana.md).
+
 ## 🧪 Pengujian
 
 Gunakan PHP 8.3 dengan ekstensi `pdo_sqlite` aktif, lalu jalankan `php vendor/phpunit/phpunit/phpunit`. Konfigurasi PHPUnit memakai SQLite dalam memori dan menolak cache konfigurasi aplikasi agar tes tidak mengakses database pada `.env`. Jika `bootstrap/cache/config.php` ada, jalankan `php artisan config:clear` sebelum tes.

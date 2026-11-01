@@ -1390,6 +1390,40 @@ export default function Authenticated({ user, header, children }) {
                                         </span>
                                     )}
                                 </Link>
+
+                                <Link
+                                    href={route("integrasi-klien.index")}
+                                    className={`group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${
+                                        isSidebarCollapsed
+                                            ? "justify-center px-0"
+                                            : "px-4"
+                                    } ${
+                                        route().current("integrasi-klien.*")
+                                            ? "bg-white/10 border-white/20 text-white shadow-lg"
+                                            : "border-transparent text-primary-100 hover:bg-white/5 hover:border-white/10 hover:text-white"
+                                    }`}
+                                    title={isSidebarCollapsed ? "Klien Integrasi" : ""}
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className={`flex-shrink-0 h-5 w-5 transition-colors ${isSidebarCollapsed ? "mx-auto" : "mr-3"} ${route().current("integrasi-klien.*") ? "text-white" : "text-primary-300 group-hover:text-white"}`}
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                                        />
+                                    </svg>
+                                    {!isSidebarCollapsed && (
+                                        <span className="text-sm font-semibold">
+                                            Klien Integrasi
+                                        </span>
+                                    )}
+                                </Link>
                             </>
                         )}
                     </>

@@ -44,6 +44,11 @@ class RhlTeknis extends Model implements Workflowable
     return $this->belongsTo(User::class, 'created_by');
   }
 
+  public function province_rel()
+  {
+    return $this->belongsTo(Provinces::class, 'province_id');
+  }
+
   public function regency()
   {
     return $this->belongsTo(Regencies::class, 'regency_id');
