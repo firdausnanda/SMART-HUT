@@ -55,7 +55,7 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
   {
     $detailsString = $row->details->map(function ($d) {
       $real = $d->annual_volume_realization ?? 0;
-      return ($d->bukanKayu->name ?? '?') . ': ' . $real . ' ' . $d->unit;
+      return ($d->bukanKayu->name ?? '?') . ': ' . $real . ' ' . ($d->unit?->value ?? '');
     })->join(",\n");
 
     $totalVolume = $row->volume_target;
