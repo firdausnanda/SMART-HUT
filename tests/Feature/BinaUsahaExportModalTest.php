@@ -97,8 +97,33 @@ class BinaUsahaExportModalTest extends TestCase
                 'columns' => ['year', 'creator']]);
             $this->assertSame([1], $export->query()->pluck('id')->all(), $table);
             $this->assertSame(['Tahun', 'Diinput Oleh'], $export->headings(), $table);
-            $this->assertSame([2025, 'Operator CDK'], $export->map($export->query()->first()), $table);
+            // HHBK memetakan satu laporan menjadi satu baris per komoditas.
+            $expected = $class === HasilHutanBukanKayuExport::class ? [[2025, 'Operator CDK']] : [2025, 'Operator CDK'];
+            $this->assertSame($expected, $export->map($export->query()->first()), $table);
         }
+    }
+
+    public function test_hhbk_export_splits_commodities_into_separate_rows(): void
+    {
+        DB::table('hasil_hutan_bukan_kayu')->insert(['id' => 1, 'cdk_id' => 42, 'year' => 2025,
+            'month' => 4, 'forest_type' => 'Hutan Negara', 'regency_id' => 1, 'district_id' => 10,
+            'pengelola_hutan_id' => 5, 'volume_target' => 10, 'status' => 'final', 'created_by' => 7,
+            'created_at' => '2025-04-01', 'updated_at' => '2025-04-01']);
+        DB::table('m_bukan_kayu')->insert([['id' => 1, 'name' => 'Madu'], ['id' => 2, 'name' => 'Bambu']]);
+        DB::table('hasil_hutan_bukan_kayu_details')->insert([
+            ['hasil_hutan_bukan_kayu_id' => 1, 'bukan_kayu_id' => 1, 'annual_volume_realization' => 12.5, 'unit' => 'kg'],
+            ['hasil_hutan_bukan_kayu_id' => 1, 'bukan_kayu_id' => 2, 'annual_volume_realization' => 30, 'unit' => 'batang'],
+        ]);
+
+        $export = new HasilHutanBukanKayuExport('Hutan Negara', 2025, [
+            'columns' => ['id', 'commodity', 'realization', 'unit', 'volume_target']]);
+        $rows = $export->map($export->query()->first());
+
+        $this->assertSame(['ID', 'Komoditas', 'Realisasi', 'Satuan', 'Total Target'], $export->headings());
+        $this->assertCount(2, $rows);
+        $this->assertSame([1, 'Madu', 12.5, 'kg'], array_slice($rows[0], 0, 4));
+        $this->assertEquals(10, $rows[0][4]);
+        $this->assertSame([1, 'Bambu', 30.0, 'batang', null], $rows[1]);
     }
 
     public function test_pbphh_export_applies_cdk_status_location_and_columns(): void

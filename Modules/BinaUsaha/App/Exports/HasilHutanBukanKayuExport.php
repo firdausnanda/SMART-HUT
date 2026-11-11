@@ -13,8 +13,8 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
   public const COLUMN_HEADINGS = [
     'id' => 'ID', 'year' => 'Tahun', 'month' => 'Bulan', 'province' => 'Provinsi',
     'regency' => 'Kabupaten/Kota', 'location' => 'Kecamatan / Pengelola',
-    'details' => 'Komoditas (Realisasi)', 'volume_target' => 'Total Target',
-    'volume_realization' => 'Total Realisasi', 'status' => 'Status',
+    'commodity' => 'Komoditas', 'realization' => 'Realisasi', 'unit' => 'Satuan',
+    'volume_target' => 'Total Target', 'status' => 'Status',
     'creator' => 'Diinput Oleh', 'created_at' => 'Tanggal Input',
   ];
 
@@ -51,17 +51,30 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
     return array_map(fn($column) => self::COLUMN_HEADINGS[$column], $this->columns);
   }
 
+  /**
+   * Satu baris per komoditas. Data tanpa komoditas tetap menghasilkan satu baris.
+   * Total Target adalah nilai per laporan, jadi hanya diisi di baris pertama
+   * supaya penjumlahan kolom di Excel tidak terhitung ganda.
+   */
   public function map($row): array
   {
-    $detailsString = $row->details->map(function ($d) {
-      $real = $d->annual_volume_realization ?? 0;
-      return ($d->bukanKayu->name ?? '?') . ': ' . $real . ' ' . ($d->unit?->value ?? '');
-    })->join(",\n");
+    $details = $row->details->isEmpty() ? collect([null]) : $row->details->values();
 
-    $totalVolume = $row->volume_target;
-    $totalRealization = $row->details->sum('annual_volume_realization');
+    return $details->map(function ($detail, $index) use ($row) {
+      $values = $this->baseValues($row) + [
+        'commodity' => $detail ? ($detail->bukanKayu->name ?? '?') : '-',
+        'realization' => $detail ? (float) ($detail->annual_volume_realization ?? 0) : null,
+        'unit' => $detail?->unit?->value ?? ($detail ? '' : '-'),
+        'volume_target' => $index === 0 ? $row->volume_target : null,
+      ];
 
-    $values = [
+      return array_map(fn($column) => $values[$column], $this->columns);
+    })->all();
+  }
+
+  private function baseValues($row): array
+  {
+    return [
       'id' => $row->id,
       'year' => $row->year,
       'month' => date('F', mktime(0, 0, 0, $row->month, 10)),
@@ -72,14 +85,9 @@ class HasilHutanBukanKayuExport implements FromQuery, WithHeadings, WithMapping,
       : ($row->forest_type === 'Hutan Negara'
         ? ($row->pengelolaHutan->name ?? '-')
         : ($row->district->name ?? '-')),
-      'details' => $detailsString ?: '-',
-      'volume_target' => $totalVolume,
-      'volume_realization' => $totalRealization,
       'status' => $row->status,
       'creator' => $row->creator?->name ?? 'Unknown',
       'created_at' => $row->created_at?->format('d-m-Y H:i') ?? '-',
     ];
-
-    return array_map(fn($column) => $values[$column], $this->columns);
   }
 }
