@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\BinaUsaha\App\Http\Controllers\Api\V1\BinaUsahaDataController;
+use Modules\BinaUsaha\App\Http\Controllers\Api\V1\BinaUsahaRekapController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,8 @@ Route::prefix('bina-usaha')
     ->middleware('ability:bina-usaha.read')
     ->controller(BinaUsahaDataController::class)
     ->group(function () {
+        Route::get('rekap', [BinaUsahaRekapController::class, 'show'])->name('rekap');
+
         foreach (['hasil-hutan-kayu', 'hasil-hutan-bukan-kayu', 'pbphh', 'realisasi-pnbp'] as $dataset) {
             Route::get($dataset, 'index')->defaults('dataset', $dataset)->name("$dataset.index");
             Route::get("$dataset/deleted", 'deleted')->defaults('dataset', $dataset)->name("$dataset.deleted");

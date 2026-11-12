@@ -237,4 +237,52 @@ class IntegrasiPerlindunganApiTest extends TestCase
             $this->getAs(null, "/api/v1/perlindungan/$dataset/deleted?since=2026-01-01", ['rhl.read'])->assertStatus(403);
         }
     }
+
+    public function test_rekap_sums_text_columns_and_lists_reporting_pengelola(): void
+    {
+        $this->fire(['month' => 6]);
+        $this->fire(['month' => 9, 'regency_id' => '3504', 'number_of_fires' => 1, 'fire_area' => '22.6', 'updated_at' => '2026-10-01 00:00:00']);
+        $this->fire(['fire_area' => 'tidak diketahui', 'number_of_fires' => 3]);
+        $this->fire(['year' => 2025]);
+        $this->fire(['status' => 'waiting_cdk']);
+        $this->fire(['cdk_id' => $this->malang]);
+
+        $this->visit();
+        $this->visit(['month' => 8, 'number_of_visitors' => '2.120', 'gross_income' => 'Rp 21.200.000']);
+        $this->visit(['month' => 3, 'id_pengelola_wisata' => '2', 'number_of_visitors' => '10', 'gross_income' => '100000']);
+        $this->visit(['year' => 2025, 'number_of_visitors' => '999']);
+        $this->visit(['cdk_id' => $this->malang]);
+
+        $data = $this->getAs($this->trenggalek, '/api/v1/perlindungan/rekap')->assertOk()->json('data');
+
+        $this->assertSame(2026, $data['tahun']);
+        $this->assertSame([2025, 2026], $data['tahun_tersedia']);
+        $this->assertEquals([
+            'jumlah_kejadian' => 6,
+            'luas_terbakar_ha' => 24.1,
+            'periode' => ['bulan_awal' => 6, 'bulan_akhir' => 9],
+            'per_kabupaten' => [
+                ['kabupaten' => ['id' => '3503', 'nama' => 'KABUPATEN TRENGGALEK'], 'jumlah_kejadian' => 5, 'luas_terbakar_ha' => 1.5],
+                ['kabupaten' => ['id' => '3504', 'nama' => 'KABUPATEN TULUNGAGUNG'], 'jumlah_kejadian' => 1, 'luas_terbakar_ha' => 22.6],
+            ],
+        ], $data['kebakaran_hutan']);
+        $this->assertEquals([
+            'jumlah_pengunjung' => 3568,
+            'pendapatan_bruto_rp' => 35680000,
+            'periode' => ['bulan_awal' => 1, 'bulan_akhir' => 8],
+            'per_pengelola' => [
+                ['pengelola' => ['id' => 11, 'nama' => 'Tani Sentosa (Trenggalek)'], 'jumlah_pengunjung' => 3558, 'pendapatan_bruto_rp' => 35580000, 'periode' => ['bulan_awal' => 1, 'bulan_akhir' => 8]],
+                ['pengelola' => ['id' => 2, 'nama' => 'KPH Kediri'], 'jumlah_pengunjung' => 10, 'pendapatan_bruto_rp' => 100000, 'periode' => ['bulan_awal' => 3, 'bulan_akhir' => 3]],
+            ],
+        ], $data['pengunjung_wisata']);
+        $this->assertSame('2026-10-01T00:00:00+00:00', $data['diperbarui_pada']);
+
+        // Pengunjung wisata tidak punya lokasi: null bila difilter per kabupaten.
+        $filtered = $this->getAs($this->trenggalek, '/api/v1/perlindungan/rekap?tahun=2026&kabupaten_id=3504')->assertOk()->json('data');
+        $this->assertSame(1, $filtered['kebakaran_hutan']['jumlah_kejadian']);
+        $this->assertNull($filtered['pengunjung_wisata']);
+
+        $this->assertSame(999, $this->getAs($this->trenggalek, '/api/v1/perlindungan/rekap?tahun=2025')->json('data.pengunjung_wisata.jumlah_pengunjung'));
+        $this->getAs(null, '/api/v1/perlindungan/rekap', ['rhl.read'])->assertStatus(403);
+    }
 }

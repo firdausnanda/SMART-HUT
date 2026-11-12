@@ -284,4 +284,95 @@ class IntegrasiBinaUsahaApiTest extends TestCase
             $this->getAs(null, "/api/v1/bina-usaha/$dataset/deleted?since=2026-01-01", ['rhl.read'])->assertStatus(403);
         }
     }
+
+    public function test_rekap_sums_production_pnbp_and_pbphh(): void
+    {
+        $kayu = fn (array $a, array $volumes = []) => tap(DB::table('hasil_hutan_kayu')->insertGetId($this->workflow(array_merge([
+            'year' => 2026, 'month' => 1, 'province_id' => 35, 'regency_id' => 3503, 'forest_type' => 'Hutan Rakyat',
+        ], $a))), fn (int $id) => DB::table('hasil_hutan_kayu_details')->insert(array_map(
+            fn ($volume) => ['hasil_hutan_kayu_id' => $id, 'kayu_id' => 1, 'volume_realization' => $volume], $volumes
+        )));
+        $kayu(['volume_target' => 100], [60.5, 20]);
+        $kayu(['month' => 9, 'regency_id' => 3506, 'volume_target' => 50, 'updated_at' => '2026-10-02 00:00:00'], [10]);
+        $kayu(['year' => 2025, 'volume_target' => 999], [999]);
+        $kayu(['status' => 'draft', 'volume_target' => 999], [999]);
+        $kayu(['cdk_id' => $this->malang, 'volume_target' => 999], [999]);
+
+        $hhbk = DB::table('hasil_hutan_bukan_kayu')->insertGetId($this->workflow([
+            'year' => 2026, 'month' => 3, 'province_id' => 35, 'regency_id' => 3503, 'forest_type' => 'Hutan Rakyat',
+        ]));
+        DB::table('hasil_hutan_bukan_kayu_details')->insert([
+            ['hasil_hutan_bukan_kayu_id' => $hhbk, 'bukan_kayu_id' => 27, 'annual_volume_realization' => 284, 'unit' => 'batang'],
+            ['hasil_hutan_bukan_kayu_id' => $hhbk, 'bukan_kayu_id' => 4, 'annual_volume_realization' => 500, 'unit' => 'Kg'],
+            ['hasil_hutan_bukan_kayu_id' => $hhbk, 'bukan_kayu_id' => 4, 'annual_volume_realization' => 23.5, 'unit' => 'kg'],
+            ['hasil_hutan_bukan_kayu_id' => $hhbk, 'bukan_kayu_id' => 4, 'annual_volume_realization' => 2, 'unit' => 'ton'],
+        ]);
+
+        $pnbp = fn (array $a) => DB::table('realisasi_pnbp')->insert($this->workflow(array_merge([
+            'year' => 2026, 'month' => 6, 'province_id' => 35, 'regency_id' => 3506,
+            'types_of_forest_products' => 'Kayu', 'id_pengelola_wisata' => '4', 'pnbp_target' => '0', 'pnbp_realization' => '0',
+        ], $a)));
+        $pnbp(['pnbp_target' => '10.000.000', 'pnbp_realization' => 'Rp 2.040.000']);
+        $pnbp(['month' => 7, 'pnbp_target' => '0', 'pnbp_realization' => '460000']);
+
+        $pbphh = fn (array $a) => DB::table('pbphh')->insert($this->workflow(array_merge([
+            'province_id' => 35, 'regency_id' => 3503, 'district_id' => 3503130, 'name' => 'UD', 'number' => '1',
+            'investment_value' => '0', 'number_of_workers' => 0, 'present_condition' => 1,
+        ], $a)));
+        $pbphh(['investment_value' => '550.000.000', 'number_of_workers' => 6]);
+        $pbphh(['investment_value' => 'Rp 50.000.000', 'number_of_workers' => 4, 'present_condition' => 0]);
+
+        $data = $this->getAs($this->trenggalek, '/api/v1/bina-usaha/rekap')->assertOk()->json('data');
+
+        $this->assertSame(2026, $data['tahun']);
+        $this->assertSame([2025, 2026], $data['tahun_tersedia']);
+        $this->assertEquals([
+            'jumlah_catatan' => 2,
+            'target_volume_m3' => 150,
+            'realisasi_volume_m3' => 90.5,
+            'persentase_realisasi' => 60.3,
+            'periode' => ['bulan_awal' => 1, 'bulan_akhir' => 9],
+            'per_kabupaten' => [
+                ['kabupaten' => ['id' => '3503', 'nama' => 'KABUPATEN TRENGGALEK'], 'jumlah_catatan' => 1, 'target_volume_m3' => 100, 'realisasi_volume_m3' => 80.5, 'persentase_realisasi' => 80.5],
+                ['kabupaten' => ['id' => '3506', 'nama' => 'KABUPATEN KEDIRI'], 'jumlah_catatan' => 1, 'target_volume_m3' => 50, 'realisasi_volume_m3' => 10, 'persentase_realisasi' => 20],
+            ],
+        ], $data['hasil_hutan_kayu']);
+        // Satuan tidak digabung; beda huruf besar/kecil dianggap satuan yang sama.
+        $this->assertEquals([
+            'jumlah_catatan' => 1,
+            'periode' => ['bulan_awal' => 3, 'bulan_akhir' => 3],
+            'per_komoditas' => [
+                ['komoditas' => ['id' => 27, 'nama' => 'Bambu'], 'satuan' => 'batang', 'realisasi_volume' => 284],
+                ['komoditas' => ['id' => 4, 'nama' => 'Empon - Empon'], 'satuan' => 'kg', 'realisasi_volume' => 523.5],
+                ['komoditas' => ['id' => 4, 'nama' => 'Empon - Empon'], 'satuan' => 'ton', 'realisasi_volume' => 2],
+            ],
+        ], $data['hasil_hutan_bukan_kayu']);
+        $this->assertEquals([
+            'target_pnbp_rp' => 10000000,
+            'realisasi_pnbp_rp' => 2500000,
+            'persentase_realisasi' => 25,
+            'periode' => ['bulan_awal' => 6, 'bulan_akhir' => 7],
+            'per_kabupaten' => [
+                ['kabupaten' => ['id' => '3506', 'nama' => 'KABUPATEN KEDIRI'], 'target_pnbp_rp' => 10000000, 'realisasi_pnbp_rp' => 2500000, 'persentase_realisasi' => 25],
+            ],
+        ], $data['realisasi_pnbp']);
+        $this->assertEquals([
+            'jumlah_izin' => 2,
+            'jumlah_beroperasi' => 1,
+            'jumlah_tenaga_kerja' => 10,
+            'nilai_investasi_rp' => 600000000,
+            'per_kabupaten' => [
+                ['kabupaten' => ['id' => '3503', 'nama' => 'KABUPATEN TRENGGALEK'], 'jumlah_izin' => 2, 'jumlah_beroperasi' => 1, 'jumlah_tenaga_kerja' => 10, 'nilai_investasi_rp' => 600000000],
+            ],
+        ], $data['pbphh']);
+        $this->assertSame('2026-10-02T00:00:00+00:00', $data['diperbarui_pada']);
+
+        $filtered = $this->getAs($this->trenggalek, '/api/v1/bina-usaha/rekap?tahun=2025&kabupaten_id=3506')->assertOk()->json('data');
+        $this->assertSame(0, $filtered['hasil_hutan_kayu']['jumlah_catatan']);
+        $this->assertNull($filtered['hasil_hutan_kayu']['persentase_realisasi']);
+        $this->assertSame(0, $filtered['pbphh']['jumlah_izin']);
+
+        $this->assertEquals(999, $this->getAs($this->trenggalek, '/api/v1/bina-usaha/rekap?tahun=2025')->json('data.hasil_hutan_kayu.realisasi_volume_m3'));
+        $this->getAs(null, '/api/v1/bina-usaha/rekap', ['rhl.read'])->assertStatus(403);
+    }
 }

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Rhl\App\Http\Controllers\Api\V1\RhlDataController;
+use Modules\Rhl\App\Http\Controllers\Api\V1\RhlRekapController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,8 @@ Route::prefix('rhl')
     ->middleware('ability:rhl.read')
     ->controller(RhlDataController::class)
     ->group(function () {
+        Route::get('rekap', [RhlRekapController::class, 'show'])->name('rekap');
+
         foreach (['rehab-lahan', 'penghijauan-lingkungan', 'rehab-mangrove', 'reboisasi-ps', 'rhl-teknis'] as $dataset) {
             Route::get($dataset, 'index')->defaults('dataset', $dataset)->name("$dataset.index");
             Route::get("$dataset/deleted", 'deleted')->defaults('dataset', $dataset)->name("$dataset.deleted");

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Perlindungan\App\Http\Controllers\Api\V1\PerlindunganDataController;
+use Modules\Perlindungan\App\Http\Controllers\Api\V1\PerlindunganRekapController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,8 @@ Route::prefix('perlindungan')
     ->middleware('ability:perlindungan.read')
     ->controller(PerlindunganDataController::class)
     ->group(function () {
+        Route::get('rekap', [PerlindunganRekapController::class, 'show'])->name('rekap');
+
         foreach (['kebakaran-hutan', 'pengunjung-wisata'] as $dataset) {
             Route::get($dataset, 'index')->defaults('dataset', $dataset)->name("$dataset.index");
             Route::get("$dataset/deleted", 'deleted')->defaults('dataset', $dataset)->name("$dataset.deleted");

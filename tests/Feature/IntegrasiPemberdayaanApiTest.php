@@ -278,4 +278,97 @@ class IntegrasiPemberdayaanApiTest extends TestCase
             $this->getAs(null, "/api/v1/pemberdayaan/$dataset/deleted?since=2026-01-01", ['rhl.read'])->assertStatus(403);
         }
     }
+
+    public function test_rekap_counts_each_kth_once_and_sums_per_kabupaten(): void
+    {
+        DB::table('m_regencies')->insert(['id' => '3503', 'province_id' => '35', 'name' => 'KABUPATEN TRENGGALEK']);
+        $kth = fn (array $a) => DB::table('perkembangan_kth')->insert($this->workflow(array_merge([
+            'year' => 2015, 'month' => 1, 'nama_kth' => 'KTH', 'kelas_kelembagaan' => 'pemula', 'regency_id' => 3503,
+        ], $a)));
+        // Satu KTH, tiga catatan: yang dipakai catatan terbaru (2023, 30 anggota).
+        $kth(['nomor_register' => '35/03/KTH.013/2016', 'year' => 2016, 'jumlah_anggota' => 74, 'luas_kelola' => 1]);
+        $kth(['nomor_register' => '35/03/KTH.013/2016', 'year' => 2023, 'jumlah_anggota' => 30, 'luas_kelola' => 10.5]);
+        $kth(['nomor_register' => ' 35/03/kth.013/2016 ', 'year' => 2016, 'month' => 2, 'jumlah_anggota' => 30]);
+        $kth(['nomor_register' => '35/04/KTH.159/2003', 'regency_id' => 3504, 'jumlah_anggota' => 26]);
+        // Tanpa nomor register: masing-masing dihitung sendiri.
+        $kth(['nomor_register' => null, 'regency_id' => 3504, 'jumlah_anggota' => 5]);
+        $kth(['nomor_register' => '', 'regency_id' => 3504, 'jumlah_anggota' => 7]);
+        // Tidak ikut: belum final, CDK lain, dan sudah dihapus.
+        $kth(['nomor_register' => 'DRAFT', 'status' => 'waiting_cdk', 'jumlah_anggota' => 99]);
+        $kth(['nomor_register' => 'MALANG', 'cdk_id' => $this->malang, 'jumlah_anggota' => 99]);
+        $kth(['nomor_register' => 'HAPUS', 'deleted_at' => '2026-02-01 00:00:00', 'jumlah_anggota' => 99]);
+
+        $skps = fn (array $a) => DB::table('skps')->insert($this->workflow(array_merge(['id_skema_perhutanan_sosial' => '2', 'potential' => '-'], $a)));
+        $skps(['regency_id' => 3503, 'ps_area' => 100.5, 'number_of_kk' => 200]);
+        $skps(['regency_id' => 3504, 'ps_area' => 50, 'number_of_kk' => 101]);
+        foreach (['Blue', 'Gold', 'Blue'] as $kelas) {
+            DB::table('kups')->insert($this->workflow(['category' => $kelas, 'commodity' => 'Pisang']));
+        }
+
+        $transaksi = fn (array $a) => DB::table('nilai_transaksi_ekonomi')->insert($this->workflow(array_merge(['nama_kth' => 'KTH', 'regency_id' => 3503], $a)));
+        $transaksi(['year' => 2025, 'month' => 12, 'total_nilai_transaksi' => 900]);
+        $transaksi(['year' => 2026, 'month' => 1, 'total_nilai_transaksi' => 1000.5]);
+        $transaksi(['year' => 2026, 'month' => 1, 'total_nilai_transaksi' => 500, 'regency_id' => 3504]);
+        $transaksi(['year' => 2026, 'month' => 9, 'total_nilai_transaksi' => 250, 'updated_at' => '2026-10-23 03:00:00']);
+        $transaksi(['year' => 2026, 'month' => 10, 'total_nilai_transaksi' => 7777, 'status' => 'draft']);
+        DB::table('nilai_ekonomi')->insert($this->workflow(['year' => 2026, 'month' => 3, 'nama_kelompok' => 'Gapoktan', 'total_transaction_value' => 3700]));
+
+        $data = $this->getAs($this->trenggalek, '/api/v1/pemberdayaan/rekap')->assertOk()->assertJsonStructure(['data', 'waktu_server'])->json('data');
+
+        // Tahun bawaan = tahun terakhir yang punya data final.
+        $this->assertSame(2026, $data['tahun']);
+        $this->assertSame([2025, 2026], $data['tahun_tersedia']);
+        $this->assertEquals(['jumlah' => 4, 'jumlah_anggota' => 68, 'luas_kelola_ha' => 10.5, 'jumlah_catatan' => 6], $data['kth']);
+        $this->assertEquals(['jumlah_kelompok' => 2, 'jumlah_kk' => 301, 'luas_ps_ha' => 150.5], $data['perhutanan_sosial']);
+        $this->assertEquals(['jumlah' => 3, 'per_kelas' => [['kelas' => 'Blue', 'jumlah' => 2], ['kelas' => 'Gold', 'jumlah' => 1]]], $data['kups']);
+        $this->assertEquals([
+            'total_rp' => 1750.5,
+            'jumlah_catatan' => 3,
+            'periode' => ['bulan_awal' => 1, 'bulan_akhir' => 9],
+            'per_bulan' => [
+                ['bulan' => 1, 'jumlah_catatan' => 2, 'total_rp' => 1500.5],
+                ['bulan' => 9, 'jumlah_catatan' => 1, 'total_rp' => 250],
+            ],
+        ], $data['nilai_transaksi_ekonomi']);
+        $this->assertEquals(3700, $data['nilai_ekonomi']['total_rp']);
+        $this->assertEquals([
+            [
+                'kabupaten' => ['id' => '3503', 'nama' => 'KABUPATEN TRENGGALEK'],
+                'kth' => ['jumlah' => 1, 'jumlah_anggota' => 30, 'luas_kelola_ha' => 10.5],
+                'perhutanan_sosial' => ['jumlah_kelompok' => 1, 'jumlah_kk' => 200, 'luas_ps_ha' => 100.5],
+                'nilai_transaksi_ekonomi_rp' => 1250.5,
+            ],
+            [
+                'kabupaten' => ['id' => '3504', 'nama' => 'KABUPATEN TULUNGAGUNG'],
+                'kth' => ['jumlah' => 3, 'jumlah_anggota' => 38, 'luas_kelola_ha' => 0],
+                'perhutanan_sosial' => ['jumlah_kelompok' => 1, 'jumlah_kk' => 101, 'luas_ps_ha' => 50],
+                'nilai_transaksi_ekonomi_rp' => 500,
+            ],
+        ], $data['per_kabupaten']);
+        $this->assertSame('2026-10-23T03:00:00+00:00', $data['diperbarui_pada']);
+
+        $filtered = $this->getAs($this->trenggalek, '/api/v1/pemberdayaan/rekap?tahun=2025&kabupaten_id=3503')->assertOk()->json('data');
+        $this->assertSame(2025, $filtered['tahun']);
+        $this->assertEquals(900, $filtered['nilai_transaksi_ekonomi']['total_rp']);
+        $this->assertEquals(['jumlah' => 1, 'jumlah_anggota' => 30, 'luas_kelola_ha' => 10.5, 'jumlah_catatan' => 3], $filtered['kth']);
+        $this->assertCount(1, $filtered['per_kabupaten']);
+
+        // Klien provinsi ikut melihat CDK lain.
+        $this->assertSame(5, $this->getAs(null, '/api/v1/pemberdayaan/rekap')->json('data.kth.jumlah'));
+    }
+
+    public function test_rekap_without_data_and_validation(): void
+    {
+        $data = $this->getAs(null, '/api/v1/pemberdayaan/rekap')->assertOk()->json('data');
+
+        $this->assertNull($data['tahun']);
+        $this->assertSame([], $data['tahun_tersedia']);
+        $this->assertSame(0, $data['kth']['jumlah']);
+        $this->assertNull($data['nilai_transaksi_ekonomi']['periode']);
+        $this->assertSame([], $data['per_kabupaten']);
+        $this->assertNull($data['diperbarui_pada']);
+
+        $this->getAs(null, '/api/v1/pemberdayaan/rekap?tahun=abc')->assertStatus(422)->assertJsonValidationErrors('tahun');
+        $this->getAs(null, '/api/v1/pemberdayaan/rekap', ['rhl.read'])->assertStatus(403);
+    }
 }

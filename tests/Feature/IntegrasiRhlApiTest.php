@@ -288,4 +288,42 @@ class IntegrasiRhlApiTest extends TestCase
         ], $response->json('data'));
         Carbon::setTestNow();
     }
+
+    public function test_rekap_sums_target_and_realization_per_dataset(): void
+    {
+        $this->row('rehab_lahan', ['month' => 2, 'target_annual' => 5, 'realization' => 5]);
+        $this->row('rehab_lahan', ['month' => 2, 'target_annual' => 5, 'realization' => 5]);
+        $this->row('rehab_lahan', ['month' => 11, 'regency_id' => '3507', 'target_annual' => 39, 'realization' => 0, 'updated_at' => '2026-11-05 00:00:00']);
+        $this->row('rehab_lahan', ['year' => 2025, 'target_annual' => 100, 'realization' => 100]);
+        $this->row('rehab_lahan', ['status' => 'draft', 'target_annual' => 100]);
+        $this->row('rehab_lahan', ['cdk_id' => $this->malang, 'target_annual' => 100]);
+        // Target belum diisi: persentase null.
+        $this->row('penghijauan_lingkungan', ['target_annual' => 0, 'realization' => 35]);
+
+        $data = $this->getAs($this->token($this->trenggalek), '/api/v1/rhl/rekap')->assertOk()->json('data');
+
+        $this->assertSame(2026, $data['tahun']);
+        $this->assertSame([2025, 2026], $data['tahun_tersedia']);
+        $this->assertEquals([
+            'jumlah_lokasi' => 3,
+            'target_tahunan_ha' => 49,
+            'realisasi_ha' => 10,
+            'persentase_realisasi' => 20.4,
+            'periode' => ['bulan_awal' => 2, 'bulan_akhir' => 11],
+            'per_kabupaten' => [
+                ['kabupaten' => ['id' => '3503', 'nama' => 'KABUPATEN TRENGGALEK'], 'jumlah_lokasi' => 2, 'target_tahunan_ha' => 10, 'realisasi_ha' => 10, 'persentase_realisasi' => 100],
+                ['kabupaten' => ['id' => '3507', 'nama' => 'KABUPATEN MALANG'], 'jumlah_lokasi' => 1, 'target_tahunan_ha' => 39, 'realisasi_ha' => 0, 'persentase_realisasi' => 0],
+            ],
+        ], $data['rehab_lahan']);
+        $this->assertEquals(35, $data['penghijauan_lingkungan']['realisasi_ha']);
+        $this->assertNull($data['penghijauan_lingkungan']['persentase_realisasi']);
+        $this->assertSame(0, $data['rehab_mangrove']['jumlah_lokasi']);
+        $this->assertNull($data['reboisasi_ps']['periode']);
+        $this->assertSame('2026-11-05T00:00:00+00:00', $data['diperbarui_pada']);
+
+        $filtered = $this->getAs($this->token($this->trenggalek), '/api/v1/rhl/rekap?tahun=2025&kabupaten_id=3503')->assertOk()->json('data');
+        $this->assertEquals(100, $filtered['rehab_lahan']['realisasi_ha']);
+
+        $this->getAs($this->token(null, ['perlindungan.read']), '/api/v1/rhl/rekap')->assertStatus(403);
+    }
 }
