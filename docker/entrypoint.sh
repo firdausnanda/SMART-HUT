@@ -17,6 +17,19 @@ if ! php -m | grep -q "^zip$"; then
 fi
 
 # ---------------------------------------------------------------------------
+# Make the log directory writable by PHP-FPM (www-data)
+# ---------------------------------------------------------------------------
+# storage/logs is bind-mounted from the host, so it keeps the host's ownership
+# (often a deploy user + gid 33), which www-data (uid/gid 82 on Alpine) cannot
+# write to. A logger that cannot open its file turns every logged event into a
+# 500. Only the group is changed, so the host owner keeps access; setgid makes
+# new files inherit the group, including those created by the root-run workers.
+echo "Fixing log directory permissions..."
+chgrp -R www-data storage/logs 2>/dev/null || echo "[WARNING] Could not change group of storage/logs."
+chmod -R g+rwX storage/logs 2>/dev/null || echo "[WARNING] Could not chmod storage/logs."
+chmod g+s storage/logs 2>/dev/null || true
+
+# ---------------------------------------------------------------------------
 # Clear any pre-existing cached configuration files to prevent boot crashes
 # ---------------------------------------------------------------------------
 echo "Clearing pre-existing cached files..."

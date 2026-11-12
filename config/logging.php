@@ -62,6 +62,7 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
+            'permission' => 0664,
             'replace_placeholders' => true,
         ],
 
@@ -70,6 +71,9 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => env('LOG_DAILY_DAYS', 14),
+            // Berkas log ditulis bersama oleh php-fpm (www-data) dan worker (root):
+            // harus bisa ditulis grup agar yang membuat berkas lebih dulu tidak mengunci yang lain.
+            'permission' => 0664,
             'replace_placeholders' => true,
         ],
 

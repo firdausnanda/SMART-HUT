@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\IntegrationClient;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -36,8 +37,12 @@ class ActivityLogController extends Controller
       $query->where(function ($q) use ($request) {
         $q->where('description', 'like', '%' . $request->search . '%')
           ->orWhere('subject_type', 'like', '%' . $request->search . '%')
-          ->orWhereHas('causer', function ($qCAuser) use ($request) {
-            $qCAuser->where('name', 'like', '%' . $request->search . '%');
+          // Pelaku bisa User (kolom name) atau klien integrasi (kolom nama).
+          ->orWhereHasMorph('causer', [User::class], function ($qCauser) use ($request) {
+            $qCauser->where('name', 'like', '%' . $request->search . '%');
+          })
+          ->orWhereHasMorph('causer', [IntegrationClient::class], function ($qCauser) use ($request) {
+            $qCauser->where('nama', 'like', '%' . $request->search . '%');
           });
       });
     }

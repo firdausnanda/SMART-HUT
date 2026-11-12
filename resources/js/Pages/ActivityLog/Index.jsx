@@ -380,8 +380,9 @@ export default function Index({ auth, activities, filters, options }) {
                     <td className="px-6 py-4">
                       {activity.causer ? (
                         <div className="flex flex-col">
-                          <span className="font-bold text-gray-900 text-sm">{activity.causer.name}</span>
-                          <span className="text-xs text-gray-500">{activity.causer.email}</span>
+                          {/* Klien integrasi memakai kolom nama/kode, bukan name/email. */}
+                          <span className="font-bold text-gray-900 text-sm">{activity.causer.name ?? activity.causer.nama}</span>
+                          <span className="text-xs text-gray-500">{activity.causer.email ?? (activity.causer.kode ? `Klien integrasi: ${activity.causer.kode}` : '')}</span>
                         </div>
                       ) : (
                         <span className="text-gray-400 italic">System</span>

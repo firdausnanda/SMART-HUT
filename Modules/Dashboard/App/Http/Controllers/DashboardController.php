@@ -234,9 +234,15 @@ class DashboardController extends Controller
 
         // --- Recent Activity ---
         // Do not cache activities to keep them real-time
+        // Pelaku aktivitas bisa User atau klien integrasi (IntegrationClient), dan
+        // hanya User yang punya roles. Permintaan API klien dicatat per request,
+        // jadi tidak ditampilkan di sini supaya tidak menenggelamkan aktivitas pengguna.
         $activitiesQuery = Activity::latest()
             ->take(5)
-            ->with(['causer', 'causer.roles']);
+            ->where(fn ($q) => $q->whereNull('event')->orWhere('event', '!=', 'api_request'))
+            ->with(['causer' => fn (\Illuminate\Database\Eloquent\Relations\MorphTo $morphTo) => $morphTo->morphWith([
+                \App\Models\User::class => ['roles'],
+            ])]);
 
         if ($selectedCdkId) {
             $activitiesQuery->whereHas('causer', function ($q) use ($selectedCdkId) {
@@ -269,10 +275,10 @@ class DashboardController extends Controller
                 return [
                     'id' => $activity->id,
                     'description' => $description,
-                    'causer' => $activity->causer ? $activity->causer->name : 'System',
-                    'role' => $activity->causer && $activity->causer->roles->isNotEmpty()
+                    'causer' => $activity->causer ? ($activity->causer->name ?? $activity->causer->nama ?? '-') : 'System',
+                    'role' => $activity->causer instanceof \App\Models\User && $activity->causer->roles->isNotEmpty()
                         ? $activity->causer->roles->first()->description
-                        : '-',
+                        : ($activity->causer instanceof \App\Models\IntegrationClient ? 'Klien Integrasi' : '-'),
                     'created_at' => $activity->created_at->diffForHumans(),
                     'subject_type' => class_basename($activity->subject_type),
                     'event' => $activity->event,
