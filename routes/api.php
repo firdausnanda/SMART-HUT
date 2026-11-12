@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\IntegrationClientController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware(['auth:sanctum', 'throttle:api'])->get('/user', function (Request $request) {
     return $request->user();
 });
+
+/*
+|--------------------------------------------------------------------------
+| API Integrasi Data v1
+|--------------------------------------------------------------------------
+|
+| Endpoint baca-saja untuk klien integrasi (SIPETAK, CDK Trenggalek, dll.).
+| Dokumentasi: docs/integrasi-data/README.md
+|
+*/
+
+Route::prefix('v1')
+    ->name('api.v1.')
+    ->middleware('integrasi')
+    ->group(function () {
+        Route::get('klien', [IntegrationClientController::class, 'show'])->name('klien');
+    });

@@ -42,8 +42,17 @@ class Kernel extends HttpKernel
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
+            \App\Http\Middleware\ForceJsonResponse::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+
+        // Stack untuk semua endpoint /api/v1 klien integrasi (dipakai bersama
+        // routes/api.php dan routes/api.php milik modul).
+        'integrasi' => [
+            'auth:sanctum',
+            'integrasi.client',
+            'throttle:integrasi',
+            'integrasi.log',
         ],
     ];
 
@@ -66,5 +75,9 @@ class Kernel extends HttpKernel
         'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+        'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+        'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+        'integrasi.client' => \App\Http\Middleware\EnsureIntegrationClient::class,
+        'integrasi.log' => \App\Http\Middleware\LogIntegrationRequest::class,
     ];
 }
