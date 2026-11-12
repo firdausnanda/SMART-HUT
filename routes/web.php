@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index']);
 
+// Health check used by the Docker healthcheck (docker-compose.yml)
+Route::get('/up', fn () => response('OK'))->name('health');
+
 Route::middleware('auth')->group(function () {
     // User management
     Route::get('users/export', [UserController::class, 'export'])->middleware('permission:users.export')->name('users.export');
