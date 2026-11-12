@@ -20,6 +20,8 @@ Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index']);
 
 // Dokumentasi API integrasi data (publik; akses data tetap memakai token)
 Route::get('/docs/api', [ApiDocumentationController::class, 'show'])->name('docs.api');
+// Health check used by the Docker healthcheck (docker-compose.yml)
+Route::get('/up', fn () => response('OK'))->name('health');
 
 Route::middleware('auth')->group(function () {
     // User management
