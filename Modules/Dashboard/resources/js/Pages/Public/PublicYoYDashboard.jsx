@@ -21,7 +21,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 
 export default function PublicYoYDashboard({ years, stats, selectedCdkId, cdks, realtime }) {
   const { auth } = usePage().props;
-  useDashboardRealtime({ years, selectedCdkId, user: auth?.user, realtime });
+  useDashboardRealtime({ years, selectedCdkId, realtime });
   const [currentSlide, setCurrentSlide] = useState(0);
   const [autoPlaying, setAutoPlaying] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);

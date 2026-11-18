@@ -46,6 +46,12 @@ trait BelongsToCdk
         return $query->where($this->getTable() . '.cdk_id', $cdkId ?? $user->cdk_id);
     }
 
+    public function scopeForPublicDashboardCdk($query, ?int $cdkId = null)
+    {
+        return $query->withoutGlobalScope('cdk_scope')
+            ->when($cdkId !== null, fn ($query) => $query->where($this->qualifyColumn('cdk_id'), $cdkId));
+    }
+
     /**
      * Get Cdk relation.
      */

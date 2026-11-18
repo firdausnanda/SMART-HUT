@@ -4,9 +4,9 @@ import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import { affectsDashboard } from './dashboardRealtime';
 
-export default function useDashboardRealtime({ years, selectedCdkId, user, realtime }) {
+export default function useDashboardRealtime({ years, selectedCdkId, realtime }) {
   const yearKey = years.join(',');
-  const effectiveCdkId = selectedCdkId ?? user?.cdk_id ?? null;
+  const { key, host, port: configuredPort, channel } = realtime ?? {};
 
   useEffect(() => {
     let echo;
@@ -50,25 +50,22 @@ export default function useDashboardRealtime({ years, selectedCdkId, user, realt
     }, 5 * 60 * 1000);
     document.addEventListener('visibilitychange', onVisibilityChange);
 
-    if (realtime?.key && user) {
+    if (key && channel) {
       const secure = window.location.protocol === 'https:';
-      const port = realtime.port || Number(window.location.port) || (secure ? 443 : 80);
-      const channel = user.cdk_id == null
-        ? 'dashboard.province'
-        : `dashboard.cdk.${user.cdk_id}`;
+      const port = configuredPort || Number(window.location.port) || (secure ? 443 : 80);
       echo = new Echo({
         broadcaster: 'reverb',
-        key: realtime.key,
+        key,
         Pusher,
         cluster: 'mt1',
-        wsHost: realtime.host || window.location.hostname,
+        wsHost: host || window.location.hostname,
         wsPort: port,
         wssPort: port,
         forceTLS: secure,
         enabledTransports: secure ? ['wss'] : ['ws'],
       });
       echo.private(channel).listen('.dashboard.changed', (change) => {
-        if (affectsDashboard(change, visibleYears, effectiveCdkId)) scheduleRefresh();
+        if (affectsDashboard(change, visibleYears, selectedCdkId)) scheduleRefresh();
       });
       const client = echo.connector.pusher;
       client.connection.bind('connected', () => {
@@ -84,5 +81,5 @@ export default function useDashboardRealtime({ years, selectedCdkId, user, realt
       document.removeEventListener('visibilitychange', onVisibilityChange);
       echo?.disconnect();
     };
-  }, [yearKey, effectiveCdkId, user?.id, user?.cdk_id, realtime?.key, realtime?.host, realtime?.port]);
+  }, [yearKey, selectedCdkId, key, host, configuredPort, channel]);
 }

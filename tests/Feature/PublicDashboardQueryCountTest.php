@@ -2,10 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Models\RehabLahan;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class PublicDashboardQueryCountTest extends TestCase
@@ -52,6 +58,7 @@ class PublicDashboardQueryCountTest extends TestCase
                 'statistik_status_pegawai', 'statistik_generasi', 'statistik_pendidikan', 'statistik_golongan',
                 'statistik_status_pernikahan', 'statistik_bezetting', 'statistik_masa_kerja',
             ],
+            'rekap_bulanan_pegawai' => ['periode_tahun', 'periode_bulan', 'cdk_id', 'status'],
         ];
         foreach ($tables as $name => $columns) {
             Schema::create($name, function (Blueprint $table) use ($columns) {
@@ -100,5 +107,60 @@ class PublicDashboardQueryCountTest extends TestCase
         $yoy->assertOk();
         $this->assertLessThanOrEqual(20 + 45 * count(range($year, 2021)), $queries);
         $this->assertEquals(4, $yoy->json("props.stats.$year.bina_usaha.hutan_negara.bukan_kayu_by_unit.0.total"));
+    }
+
+    #[DataProvider('publicDashboardAccounts')]
+    public function test_authenticated_accounts_can_filter_both_infographics(?string $roleName, ?int $homeCdkId): void
+    {
+        config(['broadcasting.default' => 'reverb']);
+        $year = (int) date('Y');
+        DB::table('cdks')->insert(['id' => 2, 'nama' => 'CDK B', 'is_active' => 1]);
+        DB::table('rehab_lahan')->insert([
+            ['year' => $year, 'month' => 1, 'cdk_id' => 1, 'status' => 'final', 'realization' => 10],
+            ['year' => $year, 'month' => 1, 'cdk_id' => 2, 'status' => 'final', 'realization' => 25],
+            ['year' => $year, 'month' => 1, 'cdk_id' => 2, 'status' => 'draft', 'realization' => 100],
+        ]);
+
+        $roles = new Collection;
+        if ($roleName !== null) {
+            $role = new Role(['name' => $roleName, 'guard_name' => 'web']);
+            $role->setRelation('permissions', new Collection);
+            $roles->push($role);
+        }
+        $user = new User(['cdk_id' => $homeCdkId]);
+        $user->id = 7;
+        $user->setRelation('roles', $roles);
+        $user->setRelation('permissions', new Collection);
+        $this->actingAs($user);
+
+        $version = (new \App\Http\Middleware\HandleInertiaRequests)->version(Request::create('/public/dashboard'));
+        $this->withHeaders(['X-Inertia' => 'true', 'X-Inertia-Version' => $version]);
+
+        foreach ([
+            'public.dashboard' => 'props.stats.pembinaan.rehab_total',
+            'public.dashboard-yoy' => "props.stats.$year.pembinaan.rehab_total",
+        ] as $route => $totalPath) {
+            $this->get(route($route))->assertOk()
+                ->assertJsonPath('props.selectedCdkId', $homeCdkId)
+                ->assertJsonPath($totalPath, $homeCdkId === null ? 35 : 10);
+            $this->get(route($route, ['cdk_id' => 2]))->assertOk()
+                ->assertJsonPath('props.selectedCdkId', 2)
+                ->assertJsonPath('props.realtime.channel', 'dashboard.province')
+                ->assertJsonPath($totalPath, 25);
+            $this->get(route($route, ['cdk_id' => '']))->assertOk()
+                ->assertJsonPath('props.selectedCdkId', null)
+                ->assertJsonPath($totalPath, 35);
+        }
+
+        $this->assertEquals($homeCdkId === null ? 0 : 10, RehabLahan::query()->sum('realization'));
+    }
+
+    public static function publicDashboardAccounts(): array
+    {
+        return [
+            'CDK operator' => ['pelaksana', 1],
+            'CDK head' => ['kacdk', 1],
+            'account without an assigned role or CDK' => [null, null],
+        ];
     }
 }

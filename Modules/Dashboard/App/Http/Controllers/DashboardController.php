@@ -305,14 +305,18 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function resolvePublicCdkId($requestedCdkId): ?int
+    private function resolvePublicCdkId(Request $request): ?int
     {
-        $user = auth()->user();
-        if ($user && !$user->isAdminProvinsi()) {
-            return $user->cdk_id === null ? null : (int) $user->cdk_id;
+        if (!$request->query->has('cdk_id')) {
+            $defaultCdkId = $request->user()?->cdk_id;
+            return $defaultCdkId === null ? null : (int) $defaultCdkId;
         }
 
-        return $requestedCdkId ? (int) $requestedCdkId : null;
+        return filter_var(
+            $request->query('cdk_id'),
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        ) ?: null;
     }
 
     private function publicDashboardRealtimeConfig(): ?array
@@ -325,19 +329,20 @@ class DashboardController extends Controller
             'key' => config('broadcasting.connections.reverb.key'),
             'host' => config('reverb.client.host'),
             'port' => config('reverb.client.port'),
+            'channel' => 'dashboard.province',
         ];
     }
 
     public function publicDashboard(Request $request)
     {
         $currentYear = $request->input('year', date('Y'));
-        $cdkId = $this->resolvePublicCdkId($request->input('cdk_id'));
+        $cdkId = $this->resolvePublicCdkId($request);
 
         // Generate current year and 5 years back
         $thisYear = (int) date('Y');
         $availableYears = range($thisYear, $thisYear - 5);
 
-        // Fetch all active CDKs for guest dropdown
+        // Fetch all active CDKs for the public filter.
         $cdks = \App\Models\Cdk::where('is_active', true)->get(['id', 'nama']);
 
         return Inertia::render('Public/PublicDashboard', [
@@ -361,12 +366,12 @@ class DashboardController extends Controller
     {
         $thisYear = (int) date('Y');
         $years = range($thisYear, 2021);
-        $cdkId = $this->resolvePublicCdkId($request->input('cdk_id'));
+        $cdkId = $this->resolvePublicCdkId($request);
 
         $cacheCdkId = $cdkId ?? 'all';
         $cacheKey = 'public_yoy_dashboard_stats_v3_' . $thisYear . '_' . $cacheCdkId;
 
-        // Fetch all active CDKs for guest dropdown
+        // Fetch all active CDKs for the public filter.
         $cdks = \App\Models\Cdk::where('is_active', true)->get(['id', 'nama']);
 
         $stats = Cache::remember($cacheKey, 300, function () use ($years, $cdkId) {
@@ -405,7 +410,7 @@ class DashboardController extends Controller
         return Cache::remember("pembinaan_stats_v2_{$currentYear}_{$cacheCdkId}", 300, function () use ($currentYear, $cdkId) {
             // Helper for standard rehab stats
             $getStats = function ($modelClass, $tableName) use ($currentYear, $cdkId) {
-                $baseQuery = $modelClass::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final');
+                $baseQuery = $modelClass::forPublicDashboardCdk($cdkId)->where('year', $currentYear)->where('status', 'final');
                 $monthly = (clone $baseQuery)->selectRaw('month, sum(realization) as realization, sum(target_annual) as target')
                     ->groupBy('month')->get()->keyBy('month');
 
@@ -446,7 +451,7 @@ class DashboardController extends Controller
             $reboisasiStats = $getStats(ReboisasiPS::class, 'reboisasi_ps');
 
             // Add Pengelola Stats for Reboisasi PS
-            $reboisasiStats['pengelola'] = ReboisasiPS::forCdk($cdkId)->join('m_pengelola_ps', 'reboisasi_ps.pengelola_id', '=', 'm_pengelola_ps.id')
+            $reboisasiStats['pengelola'] = ReboisasiPS::forPublicDashboardCdk($cdkId)->join('m_pengelola_ps', 'reboisasi_ps.pengelola_id', '=', 'm_pengelola_ps.id')
                 ->where('reboisasi_ps.year', $currentYear)
                 ->where('reboisasi_ps.status', 'final')
                 ->selectRaw('m_pengelola_ps.name as pengelola, count(reboisasi_ps.id) as total')
@@ -455,9 +460,9 @@ class DashboardController extends Controller
                 ->pluck('total', 'pengelola');
 
             // 1.4 RHL Teknis (Optimized with SQL joins)
-            $rhlBase = RhlTeknis::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final');
+            $rhlBase = RhlTeknis::forPublicDashboardCdk($cdkId)->where('year', $currentYear)->where('status', 'final');
 
-            $rhlRealizationMonthly = RhlTeknis::forCdk($cdkId)->join('rhl_teknis_details', 'rhl_teknis.id', '=', 'rhl_teknis_details.rhl_teknis_id')
+            $rhlRealizationMonthly = RhlTeknis::forPublicDashboardCdk($cdkId)->join('rhl_teknis_details', 'rhl_teknis.id', '=', 'rhl_teknis_details.rhl_teknis_id')
                 ->where('rhl_teknis.year', $currentYear)
                 ->where('rhl_teknis.status', 'final')
                 ->selectRaw('month, sum(rhl_teknis_details.unit_amount) as total')
@@ -543,7 +548,7 @@ class DashboardController extends Controller
         return Cache::remember("perlindungan_stats_v2_{$currentYear}_{$cacheCdkId}", 300, function () use ($currentYear, $cdkId) {
             // --- 2. Perlindungan Hutan ---
             // Kebakaran
-            $kebakaranMonthlyRaw = KebakaranHutan::forCdk($cdkId)->where('year', $currentYear)
+            $kebakaranMonthlyRaw = KebakaranHutan::forPublicDashboardCdk($cdkId)->where('year', $currentYear)
                 ->where('status', 'final')
                 ->selectRaw('month, sum(number_of_fires) as incidents, sum(fire_area) as area')
                 ->groupBy('month')
@@ -559,7 +564,7 @@ class DashboardController extends Controller
                 ];
             }
 
-            $kebakaranByPengelola = KebakaranHutan::forCdk($cdkId)->where('kebakaran_hutan.year', $currentYear)
+            $kebakaranByPengelola = KebakaranHutan::forPublicDashboardCdk($cdkId)->where('kebakaran_hutan.year', $currentYear)
                 ->where('kebakaran_hutan.status', 'final')
                 ->join('m_pengelola_wisata', 'kebakaran_hutan.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
                 ->selectRaw('m_pengelola_wisata.name as pengelola, sum(number_of_fires) as incidents, sum(fire_area) as area')
@@ -569,7 +574,7 @@ class DashboardController extends Controller
                 ->keyBy('pengelola');
 
             // Wisata
-            $wisataMonthlyRaw = PengunjungWisata::forCdk($cdkId)->where('year', $currentYear)
+            $wisataMonthlyRaw = PengunjungWisata::forPublicDashboardCdk($cdkId)->where('year', $currentYear)
                 ->where('status', 'final')
                 ->selectRaw('month, sum(number_of_visitors) as visitors, sum(gross_income) as income')
                 ->groupBy('month')
@@ -584,7 +589,7 @@ class DashboardController extends Controller
                 ];
             }
 
-            $wisataByPengelola = PengunjungWisata::forCdk($cdkId)->where('pengunjung_wisata.year', $currentYear)
+            $wisataByPengelola = PengunjungWisata::forPublicDashboardCdk($cdkId)->where('pengunjung_wisata.year', $currentYear)
                 ->where('pengunjung_wisata.status', 'final')
                 ->join('m_pengelola_wisata', 'pengunjung_wisata.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
                 ->selectRaw('m_pengelola_wisata.name as pengelola, sum(number_of_visitors) as visitors, sum(gross_income) as income')
@@ -622,18 +627,18 @@ class DashboardController extends Controller
                 ->forYear((int) $currentYear, $cdkId ? (int) $cdkId : null);
 
             // Read each wood series once for every forest type.
-            $kayuMonthlyByForestType = HasilHutanKayu::forCdk($cdkId)->where('year', $currentYear)
+            $kayuMonthlyByForestType = HasilHutanKayu::forPublicDashboardCdk($cdkId)->where('year', $currentYear)
                 ->where('status', 'final')
                 ->selectRaw('forest_type, month, sum(volume_target) as total')
                 ->groupBy('forest_type', 'month')
                 ->get()
                 ->groupBy('forest_type');
-            $kayuRealizationByForestType = HasilHutanKayu::forCdk($cdkId)
+            $kayuRealizationByForestType = HasilHutanKayu::forPublicDashboardCdk($cdkId)
                 ->join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
                 ->where('hasil_hutan_kayu.year', $currentYear)->where('hasil_hutan_kayu.status', 'final')
                 ->selectRaw('hasil_hutan_kayu.forest_type, hasil_hutan_kayu.month, sum(hasil_hutan_kayu_details.volume_realization) as total')
                 ->groupBy('hasil_hutan_kayu.forest_type', 'hasil_hutan_kayu.month')->get()->groupBy('forest_type');
-            $kayuCommoditiesByForestType = HasilHutanKayu::forCdk($cdkId)
+            $kayuCommoditiesByForestType = HasilHutanKayu::forPublicDashboardCdk($cdkId)
                 ->join('hasil_hutan_kayu_details', 'hasil_hutan_kayu.id', '=', 'hasil_hutan_kayu_details.hasil_hutan_kayu_id')
                 ->join('m_kayu', 'hasil_hutan_kayu_details.kayu_id', '=', 'm_kayu.id')
                 ->where('hasil_hutan_kayu.year', $currentYear)->where('hasil_hutan_kayu.status', 'final')
@@ -652,7 +657,7 @@ class DashboardController extends Controller
                 ->groupBy('forest_type');
 
             // HHBK monthly target (from parent table)
-            $bukanKayuTargetMonthlyByForestType = HasilHutanBukanKayu::forCdk($cdkId)->where('year', $currentYear)
+            $bukanKayuTargetMonthlyByForestType = HasilHutanBukanKayu::forPublicDashboardCdk($cdkId)->where('year', $currentYear)
                 ->where('status', 'final')
                 ->selectRaw('forest_type, month, sum(volume_target) as total')
                 ->groupBy('forest_type', 'month')
@@ -660,15 +665,15 @@ class DashboardController extends Controller
                 ->groupBy('forest_type');
 
             // Legacy HHBK fields retain their old meaning, but share grouped scans.
-            $nonBambooTargets = HasilHutanBukanKayu::forCdk($cdkId)->where('year', $currentYear)
+            $nonBambooTargets = HasilHutanBukanKayu::forPublicDashboardCdk($cdkId)->where('year', $currentYear)
                 ->where('status', 'final')
                 ->whereHas('details.bukanKayu', fn ($q) => $q->where('name', '!=', 'Bambu'))
                 ->selectRaw('forest_type, sum(volume_target) as total')->groupBy('forest_type')->pluck('total', 'forest_type');
-            $bambooTargets = HasilHutanBukanKayu::forCdk($cdkId)->where('year', $currentYear)
+            $bambooTargets = HasilHutanBukanKayu::forPublicDashboardCdk($cdkId)->where('year', $currentYear)
                 ->where('status', 'final')
                 ->whereHas('details.bukanKayu', fn ($q) => $q->where('name', 'Bambu'))
                 ->selectRaw('forest_type, sum(volume_target) as total')->groupBy('forest_type')->pluck('total', 'forest_type');
-            $legacyCommoditiesByForestType = HasilHutanBukanKayu::forCdk($cdkId)
+            $legacyCommoditiesByForestType = HasilHutanBukanKayu::forPublicDashboardCdk($cdkId)
                 ->join('hasil_hutan_bukan_kayu_details', 'hasil_hutan_bukan_kayu.id', '=', 'hasil_hutan_bukan_kayu_details.hasil_hutan_bukan_kayu_id')
                 ->join('m_bukan_kayu', 'hasil_hutan_bukan_kayu_details.bukan_kayu_id', '=', 'm_bukan_kayu.id')
                 ->where('hasil_hutan_bukan_kayu.year', $currentYear)->where('hasil_hutan_bukan_kayu.status', 'final')
@@ -725,16 +730,16 @@ class DashboardController extends Controller
 
             // PBPHH is independent of the selected year.
             $pbphhStats = Cache::remember('pbphh_public_static_stats_v1_' . ($cdkId ?? 'all'), 300, fn () => [
-                'total_units' => Pbphh::forCdk($cdkId)->where('status', 'final')->count(),
-                'total_workers' => Pbphh::forCdk($cdkId)->where('status', 'final')->sum('number_of_workers'),
-                'total_investment' => Pbphh::forCdk($cdkId)->where('status', 'final')->sum('investment_value'),
-                'by_regency' => Pbphh::forCdk($cdkId)->join('m_regencies', 'pbphh.regency_id', '=', 'm_regencies.id')
+                'total_units' => Pbphh::forPublicDashboardCdk($cdkId)->where('status', 'final')->count(),
+                'total_workers' => Pbphh::forPublicDashboardCdk($cdkId)->where('status', 'final')->sum('number_of_workers'),
+                'total_investment' => Pbphh::forPublicDashboardCdk($cdkId)->where('status', 'final')->sum('investment_value'),
+                'by_regency' => Pbphh::forPublicDashboardCdk($cdkId)->join('m_regencies', 'pbphh.regency_id', '=', 'm_regencies.id')
                     ->where('pbphh.status', 'final')
                     ->selectRaw('m_regencies.name as regency, count(*) as count')
                     ->groupBy('m_regencies.name')
                     ->orderByDesc('count')
                     ->pluck('count', 'regency'),
-                'by_production_type' => Pbphh::forCdk($cdkId)->join('pbphh_jenis_produksi', 'pbphh.id', '=', 'pbphh_jenis_produksi.pbphh_id')
+                'by_production_type' => Pbphh::forPublicDashboardCdk($cdkId)->join('pbphh_jenis_produksi', 'pbphh.id', '=', 'pbphh_jenis_produksi.pbphh_id')
                     ->join('m_jenis_produksi', 'pbphh_jenis_produksi.jenis_produksi_id', '=', 'm_jenis_produksi.id')
                     ->where('pbphh.status', 'final')
                     ->selectRaw('m_jenis_produksi.name as type, count(distinct pbphh.id) as count')
@@ -742,7 +747,7 @@ class DashboardController extends Controller
                     ->orderByDesc('count')
                     ->get()
                     ->toArray(),
-                'by_condition' => Pbphh::forCdk($cdkId)->where('status', 'final')
+                'by_condition' => Pbphh::forPublicDashboardCdk($cdkId)->where('status', 'final')
                     ->selectRaw('present_condition as condition_name, count(*) as count')
                     ->groupBy('present_condition')
                     ->orderByDesc('count')
@@ -752,7 +757,7 @@ class DashboardController extends Controller
 
             // PNBP - Improved: Use DECIMAL for accurate summing of potential decimal values
             $pnbpRealizationSql = "CAST(pnbp_realization AS DECIMAL(15,2))";
-            $pnbpMonthlyRaw = RealisasiPnbp::forCdk($cdkId)->where('year', $currentYear)
+            $pnbpMonthlyRaw = RealisasiPnbp::forPublicDashboardCdk($cdkId)->where('year', $currentYear)
                 ->where('status', 'final')
                 ->selectRaw("month, sum($pnbpRealizationSql) as realization, sum(pnbp_target) as target")
                 ->groupBy('month')->get()->keyBy('month');
@@ -769,14 +774,14 @@ class DashboardController extends Controller
                 'total_realization' => (float) $pnbpMonthlyRaw->sum('realization'),
                 'total_target' => (float) $pnbpMonthlyRaw->sum('target'),
                 'monthly' => $pnbpMonthly,
-                'by_regency' => RealisasiPnbp::forCdk($cdkId)->join('m_regencies', 'realisasi_pnbp.regency_id', '=', 'm_regencies.id')
+                'by_regency' => RealisasiPnbp::forPublicDashboardCdk($cdkId)->join('m_regencies', 'realisasi_pnbp.regency_id', '=', 'm_regencies.id')
                     ->where('realisasi_pnbp.year', $currentYear)
                     ->where('realisasi_pnbp.status', 'final')
                     ->selectRaw("m_regencies.name as regency, sum($pnbpRealizationSql) as total")
                     ->groupBy('m_regencies.name')
                     ->orderByDesc('total')
                     ->pluck('total', 'regency'),
-                'by_pengelola' => RealisasiPnbp::forCdk($cdkId)->join('m_pengelola_wisata', 'realisasi_pnbp.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
+                'by_pengelola' => RealisasiPnbp::forPublicDashboardCdk($cdkId)->join('m_pengelola_wisata', 'realisasi_pnbp.id_pengelola_wisata', '=', 'm_pengelola_wisata.id')
                     ->where('realisasi_pnbp.year', $currentYear)
                     ->where('realisasi_pnbp.status', 'final')
                     ->selectRaw("m_pengelola_wisata.name as pengelola, SUM($pnbpRealizationSql) as total")
@@ -801,9 +806,9 @@ class DashboardController extends Controller
         // Cache static data (not dependent on year) for 10 minutes (600 seconds)
         $staticStats = Cache::remember("kelembagaan_ps_static_stats_v2_{$cacheCdkId}", 600, function () use ($cdkId) {
             return [
-                'kelompok_count' => Skps::forCdk($cdkId)->where('status', 'final')->count(),
-                'area_total' => (float) Skps::forCdk($cdkId)->where('status', 'final')->sum('ps_area'),
-                'kk_total' => (int) Skps::forCdk($cdkId)->where('status', 'final')->sum('number_of_kk'),
+                'kelompok_count' => Skps::forPublicDashboardCdk($cdkId)->where('status', 'final')->count(),
+                'area_total' => (float) Skps::forPublicDashboardCdk($cdkId)->where('status', 'final')->sum('ps_area'),
+                'kk_total' => (int) Skps::forPublicDashboardCdk($cdkId)->where('status', 'final')->sum('number_of_kk'),
                 'scheme_distribution' => SkemaPerhutananSosial::leftJoin('skps', function ($join) use ($cdkId) {
                     $join->on('m_skema_perhutanan_sosial.id', '=', 'skps.id_skema_perhutanan_sosial')
                         ->where('skps.status', 'final')
@@ -819,15 +824,15 @@ class DashboardController extends Controller
         // Cache yearly data for 10 minutes (600 seconds)
         $yearlyStats = Cache::remember("kelembagaan_ps_yearly_stats_v2_{$currentYear}_{$cacheCdkId}", 600, function () use ($currentYear, $cdkId) {
             return [
-                'nekon_total' => (float) NilaiEkonomi::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final')->sum('total_transaction_value'),
-                'economic_by_regency' => NilaiEkonomi::forCdk($cdkId)->join('m_regencies', 'nilai_ekonomi.regency_id', '=', 'm_regencies.id')
+                'nekon_total' => (float) NilaiEkonomi::forPublicDashboardCdk($cdkId)->where('year', $currentYear)->where('status', 'final')->sum('total_transaction_value'),
+                'economic_by_regency' => NilaiEkonomi::forPublicDashboardCdk($cdkId)->join('m_regencies', 'nilai_ekonomi.regency_id', '=', 'm_regencies.id')
                     ->where('nilai_ekonomi.year', $currentYear)
                     ->where('nilai_ekonomi.status', 'final')
                     ->selectRaw('m_regencies.name as regency, sum(total_transaction_value) as total')
                     ->groupBy('m_regencies.name')
                     ->orderByDesc('total')
                     ->pluck('total', 'regency'),
-                'top_groups' => NilaiEkonomi::forCdk($cdkId)->where('year', $currentYear)
+                'top_groups' => NilaiEkonomi::forPublicDashboardCdk($cdkId)->where('year', $currentYear)
                     ->where('status', 'final')
                     ->selectRaw('nama_kelompok as group_name, sum(total_transaction_value) as total')
                     ->groupBy('nama_kelompok')
@@ -846,7 +851,7 @@ class DashboardController extends Controller
         return Cache::remember("kepegawaian_stats_{$currentYear}_{$cacheCdkId}", 300, function () use ($currentYear, $cdkId) {
             // 1. Coba ambil dari tabel rekap_statistik_bulanan (Data Snapshot Bulanan)
             // Ambil data terbaru untuk tahun yang dipilih berdasarkan bulan terakhir yang berstatus FINAL
-            $rekap = RekapStatistikBulanan::forCdk($cdkId)->where('periode_tahun', $currentYear)
+            $rekap = RekapStatistikBulanan::forPublicDashboardCdk($cdkId)->where('periode_tahun', $currentYear)
                 ->where('status', 'final')
                 ->orderByDesc('periode_bulan')
                 ->first();
@@ -898,7 +903,7 @@ class DashboardController extends Controller
                 }
 
                 // Data Tren untuk chart tren12Bulan
-                $trenBulanan = RekapStatistikBulanan::forCdk($cdkId)->where('status', 'final')
+                $trenBulanan = RekapStatistikBulanan::forPublicDashboardCdk($cdkId)->where('status', 'final')
                     ->orderBy('periode_tahun')
                     ->orderBy('periode_bulan')
                     ->limit(12)
@@ -967,7 +972,7 @@ class DashboardController extends Controller
         return Cache::remember('kepegawaian_yoy_stats_' . implode('_', $years) . '_' . $cacheCdkId, 300, function () use ($years, $cdkId) {
             // 1. Ambil semua rekap dari RekapStatistikBulanan untuk semua tahun sekaligus
             //    Ambil record terbaru (bulan terbesar) per tahun yang berstatus 'final'
-            $rekaps = RekapStatistikBulanan::forCdk($cdkId)->whereIn('periode_tahun', $years)
+            $rekaps = RekapStatistikBulanan::forPublicDashboardCdk($cdkId)->whereIn('periode_tahun', $years)
                 ->where('status', 'final')
                 ->orderByDesc('periode_bulan')
                 ->get()
@@ -1036,7 +1041,7 @@ class DashboardController extends Controller
     private function getKepegawaianFallbackForYear(int $year, $cdkId = null): array
     {
         // Fallback: Ambil dari RekapBulananPegawai (Snapshot per Row) jika statistik bulanan belum di-generate
-        $latestBulan = RekapBulananPegawai::forCdk($cdkId)->where('periode_tahun', $year)
+        $latestBulan = RekapBulananPegawai::forPublicDashboardCdk($cdkId)->where('periode_tahun', $year)
             ->where('status', 'final')
             ->orderByDesc('periode_bulan')
             ->value('periode_bulan');
@@ -1062,7 +1067,7 @@ class DashboardController extends Controller
             ];
         }
 
-        $base = RekapBulananPegawai::forCdk($cdkId)->where('periode_tahun', $year)
+        $base = RekapBulananPegawai::forPublicDashboardCdk($cdkId)->where('periode_tahun', $year)
             ->where('periode_bulan', $latestBulan)
             ->where('status', 'final')
             ->where('status_kedudukan', 'Aktif');
@@ -1106,7 +1111,8 @@ class DashboardController extends Controller
         ];
 
         // 6. Masa Kerja — ambil dari RekapStatistikBulanan (terbaru) jika ada
-        $rekapForMasaKerja = RekapStatistikBulanan::forCdk($cdkId)->where('periode_tahun', $year)
+        $rekapForMasaKerja = RekapStatistikBulanan::forPublicDashboardCdk($cdkId)->where('periode_tahun', $year)
+            ->where('status', 'final')
             ->orderByDesc('periode_bulan')
             ->value('statistik_masa_kerja');
         $workingYearsStats = !empty($rekapForMasaKerja) ? [
@@ -1158,10 +1164,10 @@ class DashboardController extends Controller
         // Cache static data (not dependent on year) for 10 minutes (600 seconds)
         $staticStats = Cache::remember("kelembagaan_hr_static_stats_v2_{$cacheCdkId}", 600, function () use ($cdkId) {
             return [
-                'kelompok_count' => PerkembanganKth::forCdk($cdkId)->where('status', 'final')->count(),
-                'area_total' => (float) PerkembanganKth::forCdk($cdkId)->where('status', 'final')->sum('luas_kelola'),
-                'anggota_total' => (int) PerkembanganKth::forCdk($cdkId)->where('status', 'final')->sum('jumlah_anggota'),
-                'class_distribution' => PerkembanganKth::forCdk($cdkId)->where('status', 'final')
+                'kelompok_count' => PerkembanganKth::forPublicDashboardCdk($cdkId)->where('status', 'final')->count(),
+                'area_total' => (float) PerkembanganKth::forPublicDashboardCdk($cdkId)->where('status', 'final')->sum('luas_kelola'),
+                'anggota_total' => (int) PerkembanganKth::forPublicDashboardCdk($cdkId)->where('status', 'final')->sum('jumlah_anggota'),
+                'class_distribution' => PerkembanganKth::forPublicDashboardCdk($cdkId)->where('status', 'final')
                     ->selectRaw('kelas_kelembagaan as class_name, count(*) as count')
                     ->groupBy('kelas_kelembagaan')
                     ->orderByDesc('count')
@@ -1172,8 +1178,8 @@ class DashboardController extends Controller
         // Cache yearly data for 10 minutes (600 seconds)
         $yearlyStats = Cache::remember("kelembagaan_hr_yearly_stats_v2_{$currentYear}_{$cacheCdkId}", 600, function () use ($currentYear, $cdkId) {
             return [
-                'nte_total' => (float) NilaiTransaksiEkonomi::forCdk($cdkId)->where('year', $currentYear)->where('status', 'final')->sum('total_nilai_transaksi'),
-                'economic_by_regency' => NilaiTransaksiEkonomi::forCdk($cdkId)->join('m_regencies', 'nilai_transaksi_ekonomi.regency_id', '=', 'm_regencies.id')
+                'nte_total' => (float) NilaiTransaksiEkonomi::forPublicDashboardCdk($cdkId)->where('year', $currentYear)->where('status', 'final')->sum('total_nilai_transaksi'),
+                'economic_by_regency' => NilaiTransaksiEkonomi::forPublicDashboardCdk($cdkId)->join('m_regencies', 'nilai_transaksi_ekonomi.regency_id', '=', 'm_regencies.id')
                     ->where('nilai_transaksi_ekonomi.year', $currentYear)
                     ->where('nilai_transaksi_ekonomi.status', 'final')
                     ->selectRaw('m_regencies.name as regency, sum(total_nilai_transaksi) as total')
@@ -1190,7 +1196,7 @@ class DashboardController extends Controller
                     ->orderByDesc('total')
                     ->limit(5)
                     ->pluck('total', 'commodity'),
-                'top_groups' => NilaiTransaksiEkonomi::forCdk($cdkId)->where('year', $currentYear)
+                'top_groups' => NilaiTransaksiEkonomi::forPublicDashboardCdk($cdkId)->where('year', $currentYear)
                     ->where('status', 'final')
                     ->selectRaw('nama_kth as group_name, sum(total_nilai_transaksi) as total')
                     ->groupBy('nama_kth')

@@ -23,7 +23,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 
 export default function PublicDashboard({ currentYear, availableYears, stats, selectedCdkId, cdks, realtime }) {
   const { auth } = usePage().props;
-  useDashboardRealtime({ years: [currentYear], selectedCdkId, user: auth?.user, realtime });
+  useDashboardRealtime({ years: [currentYear], selectedCdkId, realtime });
   const [currentSlide, setCurrentSlide] = useState(0);
   const [autoPlaying, setAutoPlaying] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -73,7 +73,7 @@ export default function PublicDashboard({ currentYear, availableYears, stats, se
   }, [autoPlaying]);
 
   const handleYearChange = (selectedOption) => {
-    router.get(route('public.dashboard'), { year: selectedOption.value, cdk_id: selectedCdkId }, {
+    router.get(route('public.dashboard'), { year: selectedOption.value, cdk_id: selectedCdkId ?? '' }, {
       preserveScroll: true,
       onStart: () => {
         setLoadingText('Mengambil Data Tahun ' + selectedOption.value + '...');

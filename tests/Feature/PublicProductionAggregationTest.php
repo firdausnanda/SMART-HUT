@@ -178,7 +178,7 @@ class PublicProductionAggregationTest extends TestCase
         $this->assertEquals(6, $previous['hutan_negara']['bukan_kayu_by_unit'][0]['total']);
     }
 
-    public function test_legacy_hhbk_totals_keep_their_original_scope_for_authenticated_cdk_users(): void
+    public function test_all_cdk_hhbk_totals_include_every_cdk_for_authenticated_cdk_users(): void
     {
         $this->nonWood(1, 'kg', 10, 5, 1);
         $this->nonWood(2, 'kg', 20, 7, 1);
@@ -189,8 +189,9 @@ class PublicProductionAggregationTest extends TestCase
 
         $this->assertEquals(12, $forest['bukan_kayu_total']);
         $this->assertEquals(3, $forest['bambu_total']);
-        $this->assertEquals(10, $forest['bukan_kayu_target']);
-        $this->assertEquals(5, $forest['bukan_kayu_commodity']['Madu']);
+        $this->assertEquals(30, $forest['bukan_kayu_target']);
+        $this->assertEquals(30, $forest['bambu_target']);
+        $this->assertEquals(12, $forest['bukan_kayu_commodity']['Madu']);
         $this->assertEquals(12, $forest['bukan_kayu_by_unit'][0]['total']);
     }
 }

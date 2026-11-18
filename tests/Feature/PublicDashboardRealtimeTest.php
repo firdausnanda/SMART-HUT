@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Events\PublicDashboardChanged;
-use Modules\Dashboard\App\Http\Controllers\DashboardController;
 use App\Models\RehabLahan;
 use App\Models\Pbphh;
 use App\Models\RekapBulananPegawai;
@@ -11,6 +10,7 @@ use App\Models\RekapStatistikBulanan;
 use App\Models\User;
 use App\Services\PublicDashboardRealtime;
 use Modules\Kepegawaian\App\Services\RekapKepegawaianService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -257,11 +257,12 @@ class PublicDashboardRealtimeTest extends TestCase
         $this->assertFalse(Cache::has('kepegawaian_stats_2026_1'));
     }
 
-    public function test_cdk_user_cannot_subscribe_to_another_cdk_or_province_channel(): void
+    public function test_cdk_user_can_subscribe_to_public_dashboard_province_channel(): void
     {
         $this->withoutMiddleware(\App\Http\Middleware\HandleInertiaRequests::class);
         $user = new User(['cdk_id' => 1]);
         $user->id = 7;
+        $user->setRelation('roles', new Collection);
         $this->actingAs($user);
         $this->post('/broadcasting/auth', [
             'channel_name' => 'private-dashboard.cdk.1', 'socket_id' => '123.456',
@@ -271,17 +272,15 @@ class PublicDashboardRealtimeTest extends TestCase
         ])->assertForbidden();
         $this->post('/broadcasting/auth', [
             'channel_name' => 'private-dashboard.province', 'socket_id' => '123.456',
-        ])->assertForbidden();
+        ])->assertOk();
     }
 
-    public function test_public_dashboard_scope_uses_authenticated_users_cdk(): void
+    public function test_guest_cannot_subscribe_to_public_dashboard_province_channel(): void
     {
-        $user = new User(['cdk_id' => 1]);
-        $user->id = 7;
-        $this->actingAs($user);
+        $this->withoutMiddleware(\App\Http\Middleware\HandleInertiaRequests::class);
 
-        $resolve = new \ReflectionMethod(DashboardController::class, 'resolvePublicCdkId');
-        $this->assertSame(1, $resolve->invoke(new DashboardController, 2));
-        $this->assertSame(1, $resolve->invoke(new DashboardController, null));
+        $this->post('/broadcasting/auth', [
+            'channel_name' => 'private-dashboard.province', 'socket_id' => '123.456',
+        ])->assertRedirect(route('login'));
     }
 }
