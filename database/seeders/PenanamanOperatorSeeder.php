@@ -35,7 +35,7 @@ class PenanamanOperatorSeeder extends Seeder
                 }
 
                 $username = 'operator_' . Str::slug($region->name, '_');
-                $email = $username . '@smarthut.jatim.prov';
+                $email = $username . '@smarthut.jatimprov';
                 if (User::where('username', $username)->orWhere('email', $email)->exists()) {
                     throw new RuntimeException("Username atau email cadangan untuk wilayah {$region->id} sudah dipakai akun lain.");
                 }
