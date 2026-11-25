@@ -1,0 +1,11 @@
+{
+    "name": "Penanaman",
+    "alias": "penanaman",
+    "description": "Data penanaman kabupaten/kota Jawa Timur",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Penanaman\\App\\Providers\\PenanamanServiceProvider"
+    ],
+    "files": []
+}

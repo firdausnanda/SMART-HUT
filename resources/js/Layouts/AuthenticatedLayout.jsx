@@ -155,7 +155,7 @@ export default function Authenticated({ user, header, children }) {
             >
                 {/* Dashboard */}
                 <Link
-                    href={route("dashboard")}
+                    href={user?.roles?.includes("operator_kabupaten") ? route("penanaman.index") : route("dashboard")}
                     className={`group relative flex items-center py-3 rounded-xl transition-all duration-200 border ${
                         isSidebarCollapsed ? "justify-center px-0" : "px-4"
                     } ${
@@ -314,6 +314,25 @@ export default function Authenticated({ user, header, children }) {
                             </div>
                         )}
                     </div>
+                )}
+
+                {hasPermission("penanaman.view") && (
+                    <Link
+                        href={route("penanaman.index")}
+                        title={isSidebarCollapsed ? "Data Penanaman" : ""}
+                        className={`group relative flex items-center rounded-xl border py-3 transition-colors ${
+                            isSidebarCollapsed ? "justify-center px-0" : "px-4"
+                        } ${
+                            route().current("penanaman.*")
+                                ? "border-white/20 bg-white/10 font-semibold text-white"
+                                : "border-transparent text-primary-100 hover:border-white/10 hover:bg-white/5 hover:text-white"
+                        }`}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 flex-shrink-0 ${isSidebarCollapsed ? "" : "mr-3"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8m0 0c-3 0-5-2-5-5V4c3 0 5 2 5 5m0 4c3 0 5-2 5-5V4c-3 0-5 2-5 5M5 21h14" />
+                        </svg>
+                        {!isSidebarCollapsed && <span className="text-sm font-semibold">Data Penanaman</span>}
+                    </Link>
                 )}
 
                 {/* Perlindungan dan Jasa Lingkungan */}

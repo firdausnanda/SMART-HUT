@@ -83,6 +83,7 @@ class ProcessImportBatch implements ShouldQueue
             'nilai-ekonomi'             => \Modules\Pemberdayaan\App\Services\Imports\Processors\NilaiEkonomiProcessor::class,
             'nilai-transaksi-ekonomi'   => \Modules\Pemberdayaan\App\Services\Imports\Processors\NilaiTransaksiEkonomiProcessor::class,
             'penghijauan-lingkungan'    => \Modules\Rhl\App\Services\Imports\Processors\PenghijauanLingkunganProcessor::class,
+            'penanaman'                 => \Modules\Penanaman\App\Services\Imports\Processors\PenanamanProcessor::class,
             'pengunjung-wisata'         => \Modules\Perlindungan\App\Services\Imports\Processors\PengunjungWisataProcessor::class,
             'perkembangan-kth'          => \Modules\Pemberdayaan\App\Services\Imports\Processors\PerkembanganKthProcessor::class,
             'realisasi-pnbp'            => \Modules\BinaUsaha\App\Services\Imports\Processors\RealisasiPnbpProcessor::class,

@@ -8,6 +8,7 @@ import LoadingOverlay from "@/Components/LoadingOverlay";
 export default function StagingImportPreview({
     batch,
     rows,
+    validCount = null,
     columns,
     commitUrl,
     cancelUrl,
@@ -96,7 +97,14 @@ export default function StagingImportPreview({
                             setIsLoading(false);
                         }
                     },
-                    onError: () => setIsLoading(false),
+                    onError: (errors) => {
+                        setIsLoading(false);
+                        Swal.fire({
+                            title: 'Import belum diproses',
+                            text: errors.import || 'Periksa kembali data pada pratinjau.',
+                            icon: 'error',
+                        });
+                    },
                     onFinish: () => {
                         if (!statusUrl) setIsLoading(false);
                     },
@@ -121,7 +129,7 @@ export default function StagingImportPreview({
         });
     };
 
-    const totalValid = rows.total || 0;
+    const totalValid = validCount ?? rows.total ?? 0;
     const progressPct = totalValid > 0 ? Math.round((importedCount / totalValid) * 100) : 0;
 
     return (
@@ -182,7 +190,7 @@ export default function StagingImportPreview({
                     <button onClick={handleCancel} className="w-full sm:w-auto px-5 py-2.5 flex items-center justify-center gap-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-300 font-bold text-sm transition-all shadow-sm">
                         <ArrowLeft size={18} /> Batal
                     </button>
-                    <button onClick={handleCommit} disabled={isLoading || isPolling} className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 font-bold text-sm transition-all shadow-[0_4px_12px_rgba(16,185,129,0.3)] hover:shadow-[0_6px_16px_rgba(16,185,129,0.4)] hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none">
+                    <button onClick={handleCommit} disabled={isLoading || isPolling || validCount === 0} className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 font-bold text-sm transition-all shadow-[0_4px_12px_rgba(16,185,129,0.3)] hover:shadow-[0_6px_16px_rgba(16,185,129,0.4)] hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none">
                         <Save size={18} /> Proses Data Valid
                     </button>
                 </div>

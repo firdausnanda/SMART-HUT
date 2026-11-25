@@ -38,13 +38,18 @@ class RoleSeeder extends Seeder
                 'name' => 'admin_provinsi',
                 'description' => 'Admin Provinsi',
             ],
+            [
+                'name' => 'operator_kabupaten',
+                'description' => 'Operator Kabupaten/Kota',
+            ],
         ];
 
         $allPermissions = \Spatie\Permission\Models\Permission::all();
 
         // Permission view + approve untuk semua modul (dipakai oleh kacdk di level role)
         $viewApprovePermissions = $allPermissions->filter(
-            fn($p) => str_ends_with($p->name, '.view') || str_ends_with($p->name, '.approve')
+            fn($p) => !str_starts_with($p->name, 'penanaman.') &&
+                (str_ends_with($p->name, '.view') || str_ends_with($p->name, '.approve'))
         );
 
         foreach ($roles as $role) {
@@ -55,9 +60,17 @@ class RoleSeeder extends Seeder
                 'description' => $role['description'],
             ]);
 
-            if (in_array($createdRole->name, ['admin', 'admin_provinsi', 'admin_cdk'])) {
+            if (in_array($createdRole->name, ['admin', 'admin_provinsi'])) {
                 // Super-admin roles: semua permission di level role
                 $createdRole->syncPermissions($allPermissions);
+            } elseif ($createdRole->name === 'admin_cdk') {
+                $createdRole->syncPermissions($allPermissions->reject(fn ($p) => str_starts_with($p->name, 'penanaman.')));
+            } elseif ($createdRole->name === 'operator_kabupaten') {
+                $createdRole->syncPermissions($allPermissions->whereIn('name', [
+                    'penanaman.view', 'penanaman.create', 'penanaman.edit', 'penanaman.delete',
+                      'penanaman.submit', 'penanaman.target',
+                      'penanaman.export', 'penanaman.import',
+                ]));
             } elseif ($createdRole->name === 'kacdk') {
                 // Kepala CDK: hanya view + approve di level role
                 // Permission granular lain dikelola via direct permission per user

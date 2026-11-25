@@ -21,6 +21,7 @@ class PermissionSeeder extends Seeder
             // Grub Pembinaan Hutan
             'rehab-lahan' => 'Rehabilitasi Lahan',
             'penghijauan-lingkungan' => 'Penghijauan Lingkungan',
+            'penanaman' => 'Data Penanaman',
             'rehab-manggrove' => 'Rehabilitasi Mangrove',
             'rhl-teknis' => 'Bangunan Konservasi Tanah dan Air',
             'reboisasi-ps' => 'Reboisasi Area Perhutanan Sosial',
@@ -63,6 +64,7 @@ class PermissionSeeder extends Seeder
         ];
 
         foreach ($modules as $moduleKey => $moduleName) {
+            if ($moduleKey === 'penanaman') continue;
             foreach ($actions as $actionKey => $actionName) {
                 Permission::updateOrCreate([
                     'name' => "{$moduleKey}.{$actionKey}",
@@ -71,6 +73,15 @@ class PermissionSeeder extends Seeder
                     'description' => "{$actionName} {$moduleName}",
                 ]);
             }
+        }
+
+        foreach (['view' => 'Melihat', 'create' => 'Menambah', 'edit' => 'Mengubah', 'delete' => 'Menghapus',
+            'submit' => 'Mengajukan', 'return' => 'Mengembalikan', 'target' => 'Mengelola Target',
+            'export' => 'Export', 'import' => 'Import'] as $action => $label) {
+            Permission::updateOrCreate(
+                ['name' => "penanaman.$action", 'guard_name' => 'web'],
+                ['description' => "$label Data Penanaman"]
+            );
         }
     }
 }

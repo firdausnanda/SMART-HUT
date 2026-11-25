@@ -21,7 +21,7 @@ class UserController extends Controller
       $allPermissions = \Spatie\Permission\Models\Permission::all();
       
       $map = [
-          'Pembinaan Hutan' => ['rehab-lahan', 'penghijauan-lingkungan', 'rehab-manggrove', 'rhl-teknis', 'reboisasi-ps'],
+          'Pembinaan Hutan' => ['rehab-lahan', 'penghijauan-lingkungan', 'penanaman', 'rehab-manggrove', 'rhl-teknis', 'reboisasi-ps'],
           'Perlindungan & Jasa Lingkungan' => ['kebakaran-hutan', 'pengunjung-wisata'],
           'Bina Usaha' => ['produksi-hutan-negara', 'produksi-perhutanan-sosial', 'produksi-hutan-rakyat', 'pbphh', 'realisasi-pnbp'],
           'Pemberdayaan Masyarakat' => ['skps', 'kups', 'nilai-ekonomi', 'perkembangan-kth', 'nilai-transaksi-ekonomi'],
@@ -47,6 +47,7 @@ class UserController extends Controller
    */
   public function index(Request $request)
   {
+    abort_if(!$this->user()->isAdminProvinsi() && !$this->user()->cdk_id, 403);
     $roleFilter = $request->input('role_filter', 'with_role');
     $query = User::with(['roles', 'cdk']);
 
@@ -160,6 +161,7 @@ class UserController extends Controller
    */
   public function edit(User $user)
   {
+    abort_if($user->hasRole('operator_kabupaten') && !$this->user()->isAdminProvinsi(), 403);
     if (!$this->user()->isAdminProvinsi() && $user->cdk_id !== $this->user()->cdk_id) {
       abort(403, 'Unauthorized action.');
     }
@@ -168,7 +170,7 @@ class UserController extends Controller
         abort(403, 'Anda tidak dapat mengedit user dengan role yang setara atau lebih tinggi.');
     }
 
-    $roles = $this->getAllowedRoles();
+    $roles = $this->getAllowedRoles($this->user()->isAdminProvinsi());
     $permissions = $this->getGroupedPermissions();
 
     $cdks = $this->user()->isAdminProvinsi() ? \App\Models\Cdk::where('is_active', true)->get(['id', 'nama']) : [];
@@ -190,6 +192,7 @@ class UserController extends Controller
    */
   public function update(Request $request, User $user)
   {
+    abort_if($user->hasRole('operator_kabupaten') && !$this->user()->isAdminProvinsi(), 403);
     if (!$this->user()->isAdminProvinsi() && $user->cdk_id !== $this->user()->cdk_id) {
       abort(403, 'Unauthorized action.');
     }
@@ -224,7 +227,7 @@ class UserController extends Controller
     $validated = $request->validate($rules);
 
     if ($user->id !== auth()->id()) {
-        $allowedRoles = $this->getAllowedRoles()->pluck('name')->toArray();
+        $allowedRoles = $this->getAllowedRoles($this->user()->isAdminProvinsi())->pluck('name')->toArray();
         if (!in_array($request->role, $allowedRoles)) {
             return back()->withErrors(['role' => 'Role tidak valid untuk tingkat akses Anda.']);
         }
@@ -232,6 +235,10 @@ class UserController extends Controller
         if ($request->role !== $user->roles->first()?->name) {
             return back()->withErrors(['role' => 'Anda tidak dapat mengubah role Anda sendiri.']);
         }
+    }
+
+    if ($request->role === 'operator_kabupaten' && !$user->regency_id) {
+      return back()->withErrors(['role' => 'Buat akun operator kabupaten/kota melalui halaman Akun Wilayah pada modul Penanaman.']);
     }
 
     $userData = \Illuminate\Support\Arr::except($validated, ['role', 'permissions', 'password', 'cdk_id']);
@@ -251,7 +258,9 @@ class UserController extends Controller
     $user->syncRoles([$request->role]);
 
     // Sync direct permissions
-    if ($request->has('permissions')) {
+    if ($request->role === 'operator_kabupaten') {
+      $user->syncPermissions([]);
+    } elseif ($request->has('permissions')) {
       $user->syncPermissions($request->permissions);
     }
 
@@ -263,6 +272,7 @@ class UserController extends Controller
    */
   public function destroy(User $user)
   {
+    abort_if($user->hasRole('operator_kabupaten') && !$this->user()->isAdminProvinsi(), 403);
     if (!$this->user()->isAdminProvinsi() && $user->cdk_id !== $this->user()->cdk_id) {
       abort(403, 'Unauthorized action.');
     }
@@ -314,11 +324,12 @@ class UserController extends Controller
     }
   }
 
-  private function getAllowedRoles()
+  private function getAllowedRoles(bool $includeOperator = false)
   {
     $currentUserLevel = $this->user()->getRoleLevel();
     
-    return Role::all()->filter(function ($role) use ($currentUserLevel) {
+    return Role::all()->filter(function ($role) use ($currentUserLevel, $includeOperator) {
+      if ($role->name === 'operator_kabupaten' && !$includeOperator) return false;
       $roleLevel = match ($role->name) {
         'admin' => 6,
         'admin_provinsi' => 5,

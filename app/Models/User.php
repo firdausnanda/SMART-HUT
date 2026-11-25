@@ -37,6 +37,7 @@ class User extends Authenticatable
         'google_id',
         'avatar',
         'cdk_id',
+        'regency_id',
     ];
 
     /**
@@ -75,6 +76,11 @@ class User extends Authenticatable
     public function cdk()
     {
         return $this->belongsTo(Cdk::class);
+    }
+
+    public function regency()
+    {
+        return $this->belongsTo(Regencies::class, 'regency_id');
     }
 
     public function isAdminProvinsi(): bool

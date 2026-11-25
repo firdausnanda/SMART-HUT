@@ -38,6 +38,10 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('public.dashboard'));
         }
 
+        if ($this->user()->hasRole('operator_kabupaten')) {
+            return redirect()->intended(route('penanaman.index'));
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

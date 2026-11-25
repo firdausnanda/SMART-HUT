@@ -15,7 +15,7 @@ const emptyLocation = { regency_id: '', district_id: '' };
 const emptyExportColumns = [];
 const fundSourceLabels = { apbn: 'APBN', apbd: 'APBD', swasta: 'Swasta', swadaya: 'Swadaya Masyarakat', other: 'Lainnya' };
 
-export default function ExportFilterModal({ show, onClose, onExport, year, years = [], defaultStatus = 'all', commodities = [], managers = [], fundSources = [], psManagers = [], buildingTypes = [], cdks = [], exportColumns = emptyExportColumns, showYear = true, showMonth = true, showLocation = true, showDistrict = true }) {
+export default function ExportFilterModal({ show, onClose, onExport, year, years = [], defaultStatus = 'all', statusChoices = statusOptions, statusLabel = 'Status Verifikasi', commodities = [], managers = [], fundSources = [], psManagers = [], buildingTypes = [], cdks = [], exportColumns = emptyExportColumns, showYear = true, showMonth = true, showLocation = true, showDistrict = true }) {
   const [filters, setFilters] = useState({ year: year ?? '', month: '', status: defaultStatus, ...emptyLocation, commodity_id: '', pengelola_wisata_id: '', fund_source: '', pengelola_id: '', bangunan_kta_id: '', cdk_id: '' });
   const [selectedColumns, setSelectedColumns] = useState(() => exportColumns.map(column => column.key));
   const [regencies, setRegencies] = useState([]);
@@ -110,9 +110,9 @@ export default function ExportFilterModal({ show, onClose, onExport, year, years
             </select>
           </div>}
           <div>
-            <label htmlFor="export-status" className={labelClass}>Status Verifikasi</label>
+            <label htmlFor="export-status" className={labelClass}>{statusLabel}</label>
             <select id="export-status" className={selectClass} value={filters.status} onChange={(e) => update('status', e.target.value)}>
-              {statusOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              {statusChoices.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
           </div>
           {showLocation && <div>

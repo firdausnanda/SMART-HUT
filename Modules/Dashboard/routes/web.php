@@ -11,5 +11,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/public/dashboard', [DashboardController::class, 'publicDashboard'])->name('public.dashboard');
     Route::get('/public/dashboard-yoy', [DashboardController::class, 'publicYoYDashboard'])->name('public.dashboard-yoy');
-    Route::get('/dashboard/export-rehab-lahan', [DashboardController::class, 'exportRehabLahan'])->name('dashboard.export-rehab-lahan');
+    Route::get('/dashboard/export-rehab-lahan', [DashboardController::class, 'exportRehabLahan'])
+        ->middleware(CheckDashboardAccess::class)->name('dashboard.export-rehab-lahan');
 });

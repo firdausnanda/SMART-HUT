@@ -9,6 +9,7 @@ const centralPages = path.join(projectRoot, 'resources/js/Pages');
 const ownership = {
     Perlindungan: ['KebakaranHutan', 'PengunjungWisata'],
     Rhl: ['RhlTeknis', 'RehabLahan', 'RehabManggrove', 'ReboisasiPs', 'PenghijauanLingkungan'],
+    Penanaman: ['Penanaman'],
     BinaUsaha: ['HasilHutanKayu', 'HasilHutanBukanKayu', 'Pbphh', 'RealisasiPnbp'],
     Pemberdayaan: ['Kups', 'Skps', 'PerkembanganKth', 'NilaiEkonomi', 'NilaiTransaksiEkonomi'],
     Kepegawaian: ['Kepegawaian'],

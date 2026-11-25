@@ -22,6 +22,10 @@ class CheckDashboardAccess
       return redirect()->route('public.dashboard');
     }
 
+    if ($user && $user->hasRole('operator_kabupaten')) {
+      return redirect()->route('penanaman.index');
+    }
+
     return $next($request);
   }
 }

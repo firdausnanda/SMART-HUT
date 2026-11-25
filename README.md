@@ -20,6 +20,7 @@ Sistem ini memiliki berbagai modul pengelolaan data, antara lain:
 ### 1. Rehabilitasi & Lingkungan
 - **Rehabilitasi Lahan (RHL):** Monitoring kegiatan rehabilitasi lahan kritis.
 - **Penghijauan Lingkungan:** Data kegiatan penghijauan di lingkungan masyarakat.
+- **Data Penanaman (modul mandiri):** Laporan per kabupaten/kota dengan target tahunan, rincian jenis tanaman, dan alur draft ke final.
 - **Rehabilitasi Mangrove:** Program pemulihan ekosistem mangrove.
 - **RHL Teknis & Reboisasi PS:** Pengelolaan teknis dan reboisasi di area Perhutanan Sosial.
 
